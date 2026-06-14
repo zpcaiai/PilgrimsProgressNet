@@ -1,0 +1,112 @@
+{
+  "id": "evangelist_first_call",
+  "nodes": {
+    "start": {
+      "speaker": "Evangelist",
+      "text": "You stand in the road with a book in your hand, tears on your face, and a weight bending your back. Tell me plainly: what has truth uncovered in you?",
+      "choices": [
+        {
+          "id": "burden",
+          "text": "I read that I am condemned, and the guilt will not leave me alone.",
+          "effects": { "humility": 6, "despair": -4 },
+          "flags": { "told_evangelist_burden": true },
+          "next": "name_it"
+        },
+        {
+          "id": "afraid",
+          "text": "I am afraid of judgment, of leaving, of being deceived by my own heart. All of it at once.",
+          "effects": { "fear": 4, "humility": 4 },
+          "next": "name_it"
+        },
+        {
+          "id": "deny",
+          "text": "Perhaps I have made too much of it. Perhaps the city will stand after all.",
+          "effects": { "deception": 5 },
+          "next": "press"
+        }
+      ]
+    },
+    "press": {
+      "speaker": "Evangelist",
+      "text": "Do you truly believe that, or is it only easier to say? A man may call smoke a morning mist, but the fire is not persuaded.",
+      "choices": [
+        {
+          "id": "admit",
+          "text": "No. I feel the burden every hour. I cannot keep pretending.",
+          "effects": { "humility": 8, "deception": -8, "despair": -3 },
+          "next": "name_it"
+        }
+      ]
+    },
+    "name_it": {
+      "speaker": "Evangelist",
+      "text": "Then you have taken the first true step: you have stopped lying to yourself. The burden is real, but it was never meant to be your master.",
+      "choices": [
+        {
+          "id": "where",
+          "text": "Where can I be rid of it? Tell me the way, and I will go.",
+          "effects": { "hope": 6 },
+          "next": "point_light"
+        },
+        {
+          "id": "unworthy",
+          "text": "But you do not know what I have done. Surely this road is for cleaner people.",
+          "effects": { "shame": 4, "humility": 4 },
+          "next": "even_you"
+        }
+      ]
+    },
+    "even_you": {
+      "speaker": "Evangelist",
+      "text": "I have never met a true pilgrim who first came worthy. The gate was not built for the clean to admire; it was built for the burdened to enter. Especially you.",
+      "choices": [
+        {
+          "id": "ok",
+          "text": "Especially me?",
+          "effects": { "shame": -8, "hope": 8, "faith": 4 },
+          "next": "point_light"
+        }
+      ]
+    },
+    "point_light": {
+      "speaker": "Evangelist",
+      "text": "Look there, beyond the eastern gate. Do you see the small light? Fix your eyes on it. Walk to the Wicket Gate. Knock, and do not argue with mercy before it opens.",
+      "choices": [
+        {
+          "id": "family",
+          "text": "And what of those I love, who beg me to stay?",
+          "effects": { "humility": 3 },
+          "next": "family_answer"
+        },
+        {
+          "id": "i_go",
+          "text": "Then I will go now, before fear teaches me another excuse.",
+          "effects": { "faith": 10, "perseverance": 6 },
+          "flags": { "talked_to_evangelist": true },
+          "next": "blessing"
+        }
+      ]
+    },
+    "family_answer": {
+      "speaker": "Evangelist",
+      "text": "Love them truly, but do not let their fear chain your feet in a city already falling. Go first; pray they follow. You cannot save them by perishing beside them.",
+      "choices": [
+        {
+          "id": "understand",
+          "text": "I understand. I will go.",
+          "effects": { "faith": 8, "perseverance": 5 },
+          "flags": { "talked_to_evangelist": true },
+          "next": "blessing"
+        }
+      ]
+    },
+    "blessing": {
+      "speaker": "Evangelist",
+      "text": "Then go, and do not turn back. The road will uncover more than you expect, but grace will meet you before every necessary step. Keep the light before your eyes.",
+      "choices": [
+        { "id": "amen", "text": "I will keep it before me.", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

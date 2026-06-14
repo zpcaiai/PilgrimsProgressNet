@@ -1,0 +1,43 @@
+{
+  "id": "doubting_castle",
+  "title": "Doubting Castle",
+  "subtitle": "When forgotten promises become the way out",
+  "intro": [
+    "You wake on cold stone with iron before you and Giant Despair pacing like a verdict overhead.",
+    "In this place, memory turns against you. The locked door looks final, and every promise feels like something you once imagined.",
+    "Search again. The key called Promise was never outside mercy's reach; it has been near your heart all along."
+  ],
+  "order": 12,
+  "scene_path": "res://scenes/chapters/doubting_castle/DoubtingCastle.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "delectable_mountains",
+  "previous_chapter_id": "vanity_fair",
+  "spiritual_theme": "Remembering grace when despair edits the truth",
+  "core_mechanic": "Endure Giant Despair's pressure, search the cell or your own breast pocket for Promise, and unlock the door before hopelessness becomes home.",
+  "required_flags": [
+    "left_vanity"
+  ],
+  "entry_effects": {
+    "despair": 20,
+    "hope": -10
+  },
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "escaped_castle",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "hope": 20,
+    "faith": 10,
+    "despair": -25
+  },
+  "quests": [
+    "escape_doubting_castle"
+  ],
+  "music": "res://assets/audio/music/doubting_castle.ogg",
+  "ambient": "res://assets/audio/ambient/doubting_castle.ogg"
+}

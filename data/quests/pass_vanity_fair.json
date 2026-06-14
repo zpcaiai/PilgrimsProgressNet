@@ -1,0 +1,10 @@
+{
+  "id": "pass_vanity_fair",
+  "title": "Pass Through Vanity Fair",
+  "description": "The fair sells a shinier self. Refuse its bargains, bear witness, and find Hopeful.",
+  "steps": [
+    { "id": "meet_hopeful", "description": "Meet the companion whose hope rises in the crowd.", "required_flag": "hopeful_joined" },
+    { "id": "leave", "description": "Leave by the far gate without selling peace for applause.", "required_flag": "left_vanity" }
+  ],
+  "rewards": { "discernment": 6 }
+}

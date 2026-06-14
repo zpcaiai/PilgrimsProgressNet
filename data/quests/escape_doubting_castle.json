@@ -1,0 +1,10 @@
+{
+  "id": "escape_doubting_castle",
+  "title": "Escape Doubting Castle",
+  "description": "Despair edits memory. Search again for the key called Promise, and unlock what fear called final.",
+  "steps": [
+    { "id": "get_key", "description": "Find Promise in the cell or in your own breast pocket.", "required_flag": "found_promise_key" },
+    { "id": "escape", "description": "Unlock the door before hopelessness feels like home.", "required_flag": "escaped_castle" }
+  ],
+  "rewards": { "hope": 10, "faith": 5 }
+}

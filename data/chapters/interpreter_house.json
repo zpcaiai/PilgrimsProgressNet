@@ -1,0 +1,41 @@
+{
+  "id": "interpreter_house",
+  "title": "The Interpreter's House",
+  "subtitle": "Rooms that teach the heart how to see",
+  "intro": [
+    "After the Cross, you are not sent out empty. A quiet house opens, lit by patient lamps.",
+    "Every room is a parable with a question hidden inside it: what do you love, what do you trust, what do you excuse?",
+    "Do not hurry past instruction. The road ahead will test what the soul refused to learn in safety."
+  ],
+  "order": 6,
+  "scene_path": "res://scenes/chapters/interpreter_house/InterpreterHouse.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "hill_difficulty",
+  "previous_chapter_id": "cross_and_tomb",
+  "spiritual_theme": "Discipleship, discernment, and teachable repentance",
+  "core_mechanic": "Speak with the Interpreter, consider symbolic rooms, and let each lesson sharpen faith, humility, and watchfulness before the climb.",
+  "required_flags": [
+    "burden_fallen"
+  ],
+  "entry_effects": {
+    "hope": 5
+  },
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "left_interpreter",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "discernment": 10,
+    "watchfulness": 8
+  },
+  "quests": [
+    "visit_interpreter"
+  ],
+  "music": "res://assets/audio/music/interpreter_house.ogg",
+  "ambient": "res://assets/audio/ambient/interpreter_house.ogg"
+}

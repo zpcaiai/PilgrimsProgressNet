@@ -1,0 +1,16 @@
+{
+  "id": "apollyon",
+  "display_name": "Apollyon",
+  "enemy_type": "boss",
+  "influence": 300,
+  "move_speed": 2.4,
+  "attack_range": 3.5,
+  "attack_cooldown": 2.0,
+  "color": [0.5, 0.12, 0.12],
+  "phases": [
+    { "phase": 1, "name": "Intimidation", "threshold": 220, "attack_effects": { "fear": 10, "faith": -3 } },
+    { "phase": 2, "name": "Accusation", "threshold": 120, "attack_effects": { "shame": 15, "hope": -5 } },
+    { "phase": 3, "name": "Desperate Assault", "threshold": 0, "attack_effects": { "fear": 8, "shame": 8, "despair": 8 } }
+  ],
+  "victory_effects": { "faith": 15, "perseverance": 15, "hope": 10, "fear": -30, "shame": -30 }
+}

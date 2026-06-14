@@ -1,0 +1,42 @@
+{
+  "id": "river_of_death",
+  "title": "The River of Death",
+  "subtitle": "The last surrender before welcome",
+  "intro": [
+    "At last the road reaches a wide river. No skill, record, companion, or courage can build a bridge over it.",
+    "The water rises with fear and falls beneath faith, but even faith here is a receiving, not a conquest.",
+    "Hopeful takes your hand and speaks what your heart cannot yet feel: the bottom is good. Step in."
+  ],
+  "order": 15,
+  "scene_path": "res://scenes/chapters/river_of_death/RiverOfDeath.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "celestial_city",
+  "previous_chapter_id": "enchanted_ground",
+  "spiritual_theme": "Death, dependence, and faith receiving the final mercy",
+  "core_mechanic": "Cross without a bridge; fear slows and deepens the water, while faith and Hopeful's voice steady your footing until the far bank holds.",
+  "required_flags": [
+    "crossed_enchanted"
+  ],
+  "entry_effects": {
+    "fear": 15
+  },
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "crossed_river",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "faith": 15,
+    "fear": -30,
+    "hope": 15
+  },
+  "quests": [
+    "cross_river"
+  ],
+  "music": "res://assets/audio/music/river_of_death.ogg",
+  "ambient": "res://assets/audio/ambient/river_of_death.ogg"
+}

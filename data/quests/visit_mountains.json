@@ -1,0 +1,10 @@
+{
+  "id": "visit_mountains",
+  "title": "Receive Counsel on the Mountains",
+  "description": "Let the Shepherds restore perspective: warnings are mercy, and the City is real.",
+  "steps": [
+    { "id": "see_city", "description": "Look through the glass toward the Celestial City.", "required_flag": "saw_celestial_city" },
+    { "id": "leave", "description": "Carry the Shepherds' warnings into the next ground.", "required_flag": "left_mountains" }
+  ],
+  "rewards": { "watchfulness": 6 }
+}

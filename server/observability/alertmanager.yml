@@ -1,0 +1,37 @@
+# Alertmanager routing. The default receiver is a generic webhook (swap for
+# Slack / email / PagerDuty in production — examples below).
+route:
+  receiver: default-webhook
+  group_by: ["alertname"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 3h
+  routes:
+    - matchers: ['severity="critical"']
+      receiver: default-webhook
+      repeat_interval: 1h
+
+receivers:
+  - name: default-webhook
+    webhook_configs:
+      # Forwards to the Feishu/DingTalk bridge (alert-bridge service).
+      # Set FEISHU_WEBHOOK / DINGTALK_WEBHOOK env on that service to enable.
+      - url: http://alert-bridge:8080/
+        send_resolved: true
+
+    # --- Slack example (uncomment + set api_url) ---
+    # slack_configs:
+    #   - api_url: https://hooks.slack.com/services/XXX/YYY/ZZZ
+    #     channel: "#alerts"
+    #     send_resolved: true
+
+    # --- Email example (configure global smtp_* first) ---
+    # email_configs:
+    #   - to: oncall@pilgrim.example.com
+    #     send_resolved: true
+
+# global:
+#   smtp_smarthost: "smtp.example.com:587"
+#   smtp_from: "alerts@pilgrim.example.com"
+#   smtp_auth_username: "alerts@pilgrim.example.com"
+#   smtp_auth_password: "..."

@@ -1,0 +1,45 @@
+{
+  "id": "hopeful_joins",
+  "nodes": {
+    "start": {
+      "speaker": "Hopeful",
+      "text": "I watched you refuse what this fair sells, not because it was ugly, but because peace was worth more. Something in me woke when I saw it. Let me walk the rest of the road with you.",
+      "choices": [
+        {
+          "id": "welcome",
+          "text": "Gladly. The road has taught me I was not made to walk alone.",
+          "effects": { "hope": 10, "perseverance": 5 },
+          "flags": { "hopeful_joined": true },
+          "next": "set_out"
+        },
+        {
+          "id": "warn",
+          "text": "The way ahead is darker than the fair admits. Are you sure?",
+          "effects": { "humility": 4 },
+          "next": "sure"
+        }
+      ]
+    },
+    "sure": {
+      "speaker": "Hopeful",
+      "text": "Dark and hard is where hope must become more than a word. I am sure.",
+      "choices": [
+        {
+          "id": "then_come",
+          "text": "Then come, Hopeful. We will keep each other awake.",
+          "effects": { "hope": 10, "perseverance": 5 },
+          "flags": { "hopeful_joined": true },
+          "next": "set_out"
+        }
+      ]
+    },
+    "set_out": {
+      "speaker": "Hopeful",
+      "text": "Lead on. When your courage runs low, I will remember aloud what we have already seen.",
+      "choices": [
+        { "id": "ok", "text": "Together, then.", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

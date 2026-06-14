@@ -1,0 +1,43 @@
+{
+  "id": "delectable_mountains",
+  "title": "The Delectable Mountains",
+  "subtitle": "Clear air, wise counsel, and a distant home",
+  "intro": [
+    "The prison air breaks behind you, and the mountains rise green and clean beneath shepherds who know the road.",
+    "They do not flatter pilgrims with easy promises. They give warnings, wounds named honestly, and a glass turned toward home.",
+    "Look long at the City. Hope is not fantasy here; it is a sight given before the last heaviness comes."
+  ],
+  "order": 13,
+  "scene_path": "res://scenes/chapters/delectable_mountains/DelectableMountains.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "enchanted_ground",
+  "previous_chapter_id": "doubting_castle",
+  "spiritual_theme": "Pastoral counsel, restored hope, and sight fixed on the promised end",
+  "core_mechanic": "Rest on the mountains, hear the Shepherds' warnings, look through the glass toward the City, and carry that sight into the last trials.",
+  "required_flags": [
+    "escaped_castle"
+  ],
+  "entry_effects": {
+    "hope": 10,
+    "weariness": -10
+  },
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "left_mountains",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "discernment": 8,
+    "watchfulness": 8,
+    "hope": 5
+  },
+  "quests": [
+    "visit_mountains"
+  ],
+  "music": "res://assets/audio/music/delectable_mountains.ogg",
+  "ambient": "res://assets/audio/ambient/delectable_mountains.ogg"
+}

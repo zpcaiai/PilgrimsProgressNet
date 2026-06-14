@@ -1,0 +1,41 @@
+{
+  "id": "enchanted_ground",
+  "title": "The Enchanted Ground",
+  "subtitle": "The danger that feels like relief",
+  "intro": [
+    "The air grows warm and kind after so much fear, and your eyelids call it mercy.",
+    "Nothing here snarls, accuses, or sells itself loudly. It only asks you to stop caring for a little while.",
+    "Keep walking, and keep Hopeful speaking. A sleeping pilgrim does not renounce the City; he simply forgets to desire it."
+  ],
+  "order": 14,
+  "scene_path": "res://scenes/chapters/enchanted_ground/EnchantedGround.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "river_of_death",
+  "previous_chapter_id": "delectable_mountains",
+  "spiritual_theme": "Watchfulness against comfortable forgetfulness",
+  "core_mechanic": "A heavy drowse drains watchfulness; keep moving, resist soft couches, and let Hopeful's testimony keep desire for the City awake.",
+  "required_flags": [
+    "left_mountains"
+  ],
+  "entry_effects": {
+    "weariness": 15
+  },
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "crossed_enchanted",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "watchfulness": 12,
+    "weariness": -20
+  },
+  "quests": [
+    "cross_enchanted"
+  ],
+  "music": "res://assets/audio/music/enchanted_ground.ogg",
+  "ambient": "res://assets/audio/ambient/enchanted_ground.ogg"
+}

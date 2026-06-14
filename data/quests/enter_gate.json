@@ -1,0 +1,10 @@
+{
+  "id": "enter_gate",
+  "title": "Knock at the Wicket Gate",
+  "description": "Accusation says you have no right to ask. Come as burdened, and knock anyway.",
+  "steps": [
+    { "id": "knock", "description": "Knock while the arrows still fly.", "required_flag": "knocked_gate" },
+    { "id": "enter", "description": "Let Goodwill draw you through.", "required_flag": "passed_wicket_gate" }
+  ],
+  "rewards": { "faith": 5 }
+}

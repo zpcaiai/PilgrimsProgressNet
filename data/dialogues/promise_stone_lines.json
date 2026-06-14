@@ -1,0 +1,9 @@
+{
+  "id": "promise_stone_lines",
+  "comment": "Short paraphrased lines of encouragement (original wording, public-domain themes). Used by PromiseStone interactables.",
+  "lines": {
+    "hope": "Carved on the stone: 'Mist can hide the road, but it cannot erase it.'",
+    "faith": "Carved on the stone: 'You do not stand because the mud is weak, but because mercy is strong.'",
+    "perseverance": "Carved on the stone: 'One true step is still obedience. Take it.'"
+  }
+}

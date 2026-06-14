@@ -1,0 +1,42 @@
+{
+  "id": "slough_of_despond",
+  "title": "Slough of Despond",
+  "subtitle": "When guilt sinks and pride refuses the hand",
+  "intro": [
+    "The path disappears beneath cold mire, and every frightened thought grows heavier than the last.",
+    "Here the burden tells you to thrash, hide, blame, and sink. Pride calls that strength; despair calls it truth.",
+    "Promise stones stand in the fog, and Help is already reaching down. The question is not whether grace is near, but whether you will take its hand."
+  ],
+  "order": 3,
+  "scene_path": "res://scenes/chapters/slough_of_despond/SloughOfDespond.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "wicket_gate",
+  "previous_chapter_id": "wilderness_road",
+  "spiritual_theme": "Contrition, helplessness, and receiving mercy",
+  "core_mechanic": "Mud raises despair and slows every step; promise stones give footing, Pliable turns back, and Help pulls the humble out.",
+  "required_flags": [
+    "entered_slough"
+  ],
+  "entry_effects": {
+    "despair": 5
+  },
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "left_slough",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "humility": 10,
+    "hope": 10,
+    "despair": -20
+  },
+  "quests": [
+    "escape_slough"
+  ],
+  "music": "res://assets/audio/music/slough_of_despond.ogg",
+  "ambient": "res://assets/audio/ambient/slough_of_despond.ogg"
+}

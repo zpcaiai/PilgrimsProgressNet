@@ -1,0 +1,56 @@
+# Observability overlay. Run alongside the main stack:
+#   docker compose -f docker-compose.yml -f docker-compose.observability.yml up
+# Prometheus scrapes app:8000/metrics; Grafana auto-provisions the datasource
+# and the "Pilgrim API" dashboard.
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
+      - promdata:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - app
+      - alertmanager
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    volumes:
+      - ./observability/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports:
+      - "9093:9093"
+    depends_on:
+      - alert-bridge
+
+  # Alertmanager -> Feishu / DingTalk. Set the webhook env vars to enable.
+  alert-bridge:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./observability/alert_bridge:/app:ro
+    environment:
+      PORT: "8080"
+      FEISHU_WEBHOOK: "${FEISHU_WEBHOOK:-}"
+      DINGTALK_WEBHOOK: "${DINGTALK_WEBHOOK:-}"
+      DINGTALK_SECRET: "${DINGTALK_SECRET:-}"
+    command: ["python", "bridge.py"]
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin   # change in production
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafanadata:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  promdata:
+  grafanadata:

@@ -1,0 +1,37 @@
+{
+  "id": "wife_concern",
+  "nodes": {
+    "start": {
+      "speaker": "Your Family",
+      "text": "Why do you speak as if the whole city were already burning? Come inside. Sit by the table. Surely this dread will pass by morning.",
+      "choices": [
+        {
+          "id": "i_must_go",
+          "text": "I cannot quiet what the book has awakened. The city will not stand.",
+          "effects": { "perseverance": 4, "despair": 3 },
+          "flags": { "warned_family": true },
+          "next": "plead"
+        },
+        {
+          "id": "stay_quiet",
+          "text": "Say nothing for a moment, and look toward the distant light.",
+          "effects": { "humility": 2 },
+          "next": "end"
+        }
+      ]
+    },
+    "plead": {
+      "speaker": "Your Family",
+      "text": "Then go, if you must. But know this: love makes your leaving hurt more, not less.",
+      "choices": [
+        {
+          "id": "ill_return_for_you",
+          "text": "I will not forget you. I go because mercy still calls; pray that you hear it too.",
+          "effects": { "hope": 4, "humility": 3 },
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

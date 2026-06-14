@@ -1,0 +1,59 @@
+{
+  "id": "obstinate_confrontation",
+  "nodes": {
+    "start": {
+      "speaker": "Obstinate",
+      "text": "So you would leave your house, your trade, and your name for a rumor of a Celestial City? Come back before shame becomes the only thing you own.",
+      "choices": [
+        {
+          "id": "press_on",
+          "text": "I must go forward. Staying would only make my fear look respectable.",
+          "effects": { "faith": 5, "perseverance": 5 },
+          "flags": { "obstinate_confronted": true },
+          "next": "leaves"
+        },
+        {
+          "id": "mock_him",
+          "text": "You are blind if you cannot see the fire.",
+          "effects": { "pride": 10, "humility": -5 },
+          "flags": { "obstinate_confronted": true },
+          "next": "leaves_angry"
+        },
+        {
+          "id": "waver",
+          "text": "Maybe you are right. Maybe I am only frightened.",
+          "effects": { "fear": 5, "despair": 5 },
+          "next": "tempt"
+        }
+      ]
+    },
+    "tempt": {
+      "speaker": "Obstinate",
+      "text": "At last, sense. Put down the book, lose the burden, and become ordinary again.",
+      "choices": [
+        {
+          "id": "refuse",
+          "text": "No. The burden remains, and the light is still there. I am going.",
+          "effects": { "faith": 6, "perseverance": 4, "fear": -3 },
+          "flags": { "obstinate_confronted": true },
+          "next": "leaves"
+        }
+      ]
+    },
+    "leaves": {
+      "speaker": "Obstinate",
+      "text": "Then go your way. I will not chase a man determined to be ruined by hope.",
+      "choices": [
+        { "id": "ok", "text": "Continue toward the gate.", "next": "end" }
+      ]
+    },
+    "leaves_angry": {
+      "speaker": "Obstinate",
+      "text": "Proud words from a burdened man. Go, then, and see how long your courage lasts.",
+      "choices": [
+        { "id": "ok2", "text": "Continue toward the gate.", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

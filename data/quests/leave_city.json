@@ -1,0 +1,10 @@
+{
+  "id": "leave_city",
+  "title": "Flee the City of Destruction",
+  "description": "Stop pretending the burden is harmless. Receive Evangelist's direction, then leave while mercy still calls.",
+  "steps": [
+    { "id": "speak_evangelist", "description": "Tell Evangelist the truth about your burden.", "required_flag": "talked_to_evangelist" },
+    { "id": "exit_city", "description": "Leave through the eastern gate without turning back.", "required_flag": "left_city" }
+  ],
+  "rewards": { "faith": 5, "perseverance": 5 }
+}

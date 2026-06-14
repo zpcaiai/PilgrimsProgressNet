@@ -1,0 +1,32 @@
+{
+  "id": "pliable_doubting",
+  "nodes": {
+    "start": {
+      "speaker": "Pliable",
+      "text": "Tell me again about the crowns, the music, and the golden city. I do hope the road stays open and bright like this.",
+      "choices": [
+        {
+          "id": "honest",
+          "text": "The reward is real, but the road is not a tale told to flatter us.",
+          "effects": { "discernment": 4, "humility": 3 },
+          "flags": { "pliable_warned": true },
+          "next": "uneasy"
+        },
+        {
+          "id": "flatter",
+          "text": "Stay close, and we will face the road as it comes.",
+          "effects": { "hope": 3 },
+          "next": "uneasy"
+        }
+      ]
+    },
+    "uneasy": {
+      "speaker": "Pliable",
+      "text": "Not a tale? Hard? Well... let us hurry through the unpleasant parts, then.",
+      "choices": [
+        { "id": "ok", "text": "Keep walking toward the swamp.", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

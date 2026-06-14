@@ -1,0 +1,39 @@
+{
+  "id": "celestial_city",
+  "title": "The Celestial City",
+  "subtitle": "The welcome the whole road promised",
+  "intro": [
+    "Beyond the river, the road itself seems made of morning, and the gate ahead is not guarded by suspicion.",
+    "The burden, the shame, the fear, the false names, the drowsy forgetfulness — all are behind you, unable to cross.",
+    "You did not arrive because you were strong. You arrive because grace brought you all the way home. Come in, beloved pilgrim."
+  ],
+  "order": 16,
+  "scene_path": "res://scenes/chapters/celestial_city/CelestialCity.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "",
+  "previous_chapter_id": "river_of_death",
+  "spiritual_theme": "Welcome, completion, and grace remembered from beginning to end",
+  "core_mechanic": "Walk the shining road, pass through the opened gate, and let the final welcome gather every chapter into praise.",
+  "required_flags": [
+    "crossed_river"
+  ],
+  "entry_effects": {
+    "hope": 20,
+    "faith": 20
+  },
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "entered_city",
+      "value": true
+    }
+  ],
+  "completion_effects": {},
+  "quests": [
+    "enter_celestial_city"
+  ],
+  "music": "res://assets/audio/music/celestial_city.ogg",
+  "ambient": "res://assets/audio/ambient/celestial_city.ogg"
+}

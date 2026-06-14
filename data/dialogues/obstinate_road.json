@@ -1,0 +1,45 @@
+{
+  "id": "obstinate_road",
+  "nodes": {
+    "start": {
+      "speaker": "Obstinate",
+      "text": "Still walking? Look behind you: the city is near enough to return, and ahead there is nothing but mud, hunger, and sermons from strangers.",
+      "choices": [
+        {
+          "id": "forward",
+          "text": "I will not return to a familiar ruin.",
+          "effects": { "faith": 5, "perseverance": 5, "fear": -3 },
+          "flags": { "obstinate_left": true },
+          "next": "gives_up"
+        },
+        {
+          "id": "doubt",
+          "text": "What if the light is only distance and wishful thinking?",
+          "effects": { "fear": 5, "despair": 5 },
+          "next": "press_doubt"
+        }
+      ]
+    },
+    "press_doubt": {
+      "speaker": "Obstinate",
+      "text": "Exactly. Nothing. Come home while you can still laugh at this tomorrow.",
+      "choices": [
+        {
+          "id": "still_go",
+          "text": "No. Even trembling, I would rather seek the light than make peace with the fire.",
+          "effects": { "faith": 6, "hope": 4 },
+          "flags": { "obstinate_left": true },
+          "next": "gives_up"
+        }
+      ]
+    },
+    "gives_up": {
+      "speaker": "Obstinate",
+      "text": "Then keep your burden and your little light. I am done following sorrow.",
+      "choices": [
+        { "id": "ok", "text": "Walk on alone.", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

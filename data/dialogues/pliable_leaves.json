@@ -1,0 +1,33 @@
+{
+  "id": "pliable_leaves",
+  "nodes": {
+    "start": {
+      "speaker": "Pliable",
+      "text": "Mud to my knees, cold in my bones, and no city in sight. If this is the beginning of your promise, you may keep the rest. I am going home.",
+      "choices": [
+        {
+          "id": "plead",
+          "text": "Do not turn back at the first wound. The gate is still ahead.",
+          "effects": { "humility": 3, "despair": 5 },
+          "flags": { "pliable_left": true },
+          "next": "gone"
+        },
+        {
+          "id": "let_go",
+          "text": "Then go. I grieve for you, but I cannot repent in your place.",
+          "effects": { "perseverance": 4, "despair": 4 },
+          "flags": { "pliable_left": true },
+          "next": "gone"
+        }
+      ]
+    },
+    "gone": {
+      "speaker": "",
+      "text": "Pliable scrambles back toward the city, choosing familiar ground over promised grace. The fog swallows him, and you are alone in the swamp.",
+      "choices": [
+        { "id": "ok", "text": "Press on.", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

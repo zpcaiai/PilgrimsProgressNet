@@ -1,0 +1,36 @@
+{
+  "id": "valley_humiliation",
+  "title": "Valley of Humiliation",
+  "subtitle": "Where the old master demands you back",
+  "intro": [
+    "The road drops into a bruised valley, low enough for old shame to speak loudly.",
+    "Apollyon waits there with a ledger of your failures, hoping you will mistake accusation for truth.",
+    "Do not answer him with boasting. Answer him with the Cross, with prayer, and with a trembling stand that refuses to turn back."
+  ],
+  "order": 9,
+  "scene_path": "res://scenes/chapters/valley_humiliation/ValleyHumiliation.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "valley_shadow_death",
+  "previous_chapter_id": "palace_beautiful",
+  "spiritual_theme": "Humility under accusation and victory through promised grace",
+  "core_mechanic": "Face Apollyon's intimidation, shame, and assault; stand firm, pray for light, and answer every lie with promises until his claim breaks.",
+  "required_flags": [
+    "left_palace"
+  ],
+  "entry_effects": {},
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "defeated_apollyon",
+      "value": true
+    }
+  ],
+  "completion_effects": {},
+  "quests": [
+    "valley_humiliation"
+  ],
+  "music": "res://assets/audio/music/valley_humiliation.ogg",
+  "ambient": "res://assets/audio/ambient/valley_humiliation.ogg"
+}

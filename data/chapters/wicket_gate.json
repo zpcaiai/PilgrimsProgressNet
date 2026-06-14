@@ -1,0 +1,40 @@
+{
+  "id": "wicket_gate",
+  "title": "The Wicket Gate",
+  "subtitle": "Knocking while accusation flies",
+  "intro": [
+    "The gate is smaller than your fear expected, and brighter than your shame can bear.",
+    "Behind you, accusations fly: not clean enough, not sincere enough, not one of the welcomed ones.",
+    "A narrow gate does not ask you to become worthy in the road dust. It asks you to knock."
+  ],
+  "order": 4,
+  "scene_path": "res://scenes/chapters/wicket_gate/WicketGate.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "cross_and_tomb",
+  "previous_chapter_id": "slough_of_despond",
+  "spiritual_theme": "Faith that asks, and grace that receives",
+  "core_mechanic": "Press through arrows of accusation, refuse the urge to look back, and knock until Goodwill draws you safely through.",
+  "required_flags": [
+    "left_slough"
+  ],
+  "entry_effects": {},
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "passed_wicket_gate",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "faith": 10,
+    "fear": -10,
+    "despair": -10
+  },
+  "quests": [
+    "enter_gate"
+  ],
+  "music": "res://assets/audio/music/wicket_gate.ogg",
+  "ambient": "res://assets/audio/ambient/wicket_gate.ogg"
+}

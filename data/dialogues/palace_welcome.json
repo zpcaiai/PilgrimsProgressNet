@@ -1,0 +1,38 @@
+{
+  "id": "palace_welcome",
+  "nodes": {
+    "start": {
+      "speaker": "Watchful",
+      "text": "You have climbed the hard hill. Come in and rest without apology. Below lies the Valley of Humiliation, where accusation wounds those who enter unarmed.",
+      "choices": [
+        {
+          "id": "rest",
+          "text": "I am weary. I will receive rest as provision, not failure.",
+          "effects": { "weariness": -15, "despair": -10, "hope": 8 },
+          "next": "armour"
+        },
+        {
+          "id": "armour_first",
+          "text": "Tell me how to enter the valley without trusting myself.",
+          "effects": { "discernment": 4 },
+          "next": "armour"
+        }
+      ]
+    },
+    "armour": {
+      "speaker": "Watchful",
+      "text": "Take the armour kept for pilgrims: faith for the front of you, promise for the dark around you, and humility for the accusations behind you. Stand, and do not flee.",
+      "choices": [
+        {
+          "id": "take",
+          "text": "I take it up, because I will need grace in the fight.",
+          "effects": { "faith": 8 },
+          "special": { "grant_promise_key": true },
+          "flags": { "took_armour": true },
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

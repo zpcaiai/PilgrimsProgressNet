@@ -1,0 +1,9 @@
+{
+  "id": "valley_humiliation",
+  "title": "Stand Against Apollyon",
+  "description": "The accuser names your past; answer with the Cross, prayer, and promises.",
+  "steps": [
+    { "id": "defeat", "description": "Endure intimidation and accusation until Apollyon's claim breaks.", "required_flag": "defeated_apollyon" }
+  ],
+  "rewards": {}
+}

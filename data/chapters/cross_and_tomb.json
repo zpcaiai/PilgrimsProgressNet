@@ -1,0 +1,36 @@
+{
+  "id": "cross_and_tomb",
+  "title": "The Cross and the Tomb",
+  "subtitle": "Where guilt is answered by grace",
+  "intro": [
+    "The road bends upward to a green hill. On it stands the Cross; beside it, an open tomb.",
+    "You arrive with no defense left, only the truth: the burden is yours, and you cannot remove it.",
+    "Grace does not ask you to lift what crushed you. It asks you to come near and watch the burden fall."
+  ],
+  "order": 5,
+  "scene_path": "res://scenes/chapters/cross_and_tomb/CrossAndTomb.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "interpreter_house",
+  "previous_chapter_id": "wicket_gate",
+  "spiritual_theme": "Atonement, pardon, and the gift that cannot be earned",
+  "core_mechanic": "Approach the Cross, let the burden fall without bargaining, and receive the scroll, seal, and new garment for the road ahead.",
+  "required_flags": [
+    "passed_wicket_gate"
+  ],
+  "entry_effects": {},
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "burden_fallen",
+      "value": true
+    }
+  ],
+  "completion_effects": {},
+  "quests": [
+    "reach_the_cross"
+  ],
+  "music": "res://assets/audio/music/cross_and_tomb.ogg",
+  "ambient": "res://assets/audio/ambient/cross_and_tomb.ogg"
+}

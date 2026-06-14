@@ -1,0 +1,9 @@
+{
+  "id": "cross_wilderness",
+  "title": "Press On Down the Wilderness Road",
+  "description": "The city still argues through familiar voices. Answer without pride, and keep the light ahead.",
+  "steps": [
+    { "id": "reach_slough", "description": "Walk past the last voices calling you home.", "required_flag": "entered_slough" }
+  ],
+  "rewards": { "perseverance": 5 }
+}

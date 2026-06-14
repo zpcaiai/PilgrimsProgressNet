@@ -1,0 +1,12 @@
+{
+  "id": "despair_wraith",
+  "display_name": "Despair Wraith",
+  "enemy_type": "despair",
+  "influence": 80,
+  "move_speed": 1.8,
+  "attack_range": 3.0,
+  "attack_cooldown": 3.5,
+  "color": [0.3, 0.4, 0.4],
+  "weaknesses": { "promise": 1.5, "prayer": 1.4, "faith_guard": 1.0, "light_attack": 0.5 },
+  "attack_effects": { "despair": 15, "hope": -8 }
+}

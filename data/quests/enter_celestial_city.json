@@ -1,0 +1,9 @@
+{
+  "id": "enter_celestial_city",
+  "title": "Enter the Celestial City",
+  "description": "Walk the shining road as one carried home by grace from first awakening to final welcome.",
+  "steps": [
+    { "id": "enter", "description": "Pass through the opened gate and be welcomed in.", "required_flag": "entered_city" }
+  ],
+  "rewards": {}
+}

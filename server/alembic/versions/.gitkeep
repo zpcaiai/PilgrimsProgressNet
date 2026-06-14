@@ -1,0 +1,4 @@
+# Alembic migration scripts live here.
+# Generate the first one after the DB is up:
+#   alembic revision --autogenerate -m "init"
+#   alembic upgrade head

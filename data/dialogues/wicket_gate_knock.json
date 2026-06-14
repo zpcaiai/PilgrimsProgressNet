@@ -1,0 +1,64 @@
+{
+  "id": "wicket_gate_knock",
+  "nodes": {
+    "start": {
+      "speaker": "Pilgrim",
+      "text": "The gate is small enough to humble you, and the arrows of the old life are close enough to make shame sound convincing. A voice in you says you have no right to knock.",
+      "choices": [
+        {
+          "id": "knock",
+          "text": "Knock anyway, firmly, without negotiating with shame.",
+          "effects": { "faith": 10, "fear": -5 },
+          "flags": { "knocked_gate": true },
+          "next": "opened"
+        },
+        {
+          "id": "hesitate",
+          "text": "Hesitate at the threshold, hand half raised.",
+          "effects": { "fear": 5, "despair": 3 },
+          "next": "hesitation"
+        },
+        {
+          "id": "look_back",
+          "text": "Glance back toward the city that still knows your name.",
+          "effects": { "despair": 5, "shame": 5 },
+          "next": "look_back"
+        }
+      ]
+    },
+    "hesitation": {
+      "speaker": "Pilgrim",
+      "text": "The arrows hiss nearer. The light around the gate waits without panic, as if mercy were not surprised by your trembling.",
+      "choices": [
+        {
+          "id": "knock_now",
+          "text": "Stop waiting to feel worthy. Knock as one who needs mercy.",
+          "effects": { "faith": 6, "fear": -5, "humility": 3 },
+          "flags": { "knocked_gate": true },
+          "next": "opened"
+        }
+      ]
+    },
+    "look_back": {
+      "speaker": "Pilgrim",
+      "text": "The old city is dark and burning at its edges, yet familiar enough to ache. Then the light at the gate touches your face, and the ache loses its authority.",
+      "choices": [
+        {
+          "id": "turn_gate",
+          "text": "Turn from the city again, and knock.",
+          "effects": { "perseverance": 6, "shame": -4 },
+          "flags": { "knocked_gate": true },
+          "next": "opened"
+        }
+      ]
+    },
+    "opened": {
+      "speaker": "Goodwill",
+      "text": "Come in, quickly, come in. You knocked, and that is all that was asked of you. The arrows of the old life cannot follow through this gate. You are received by mercy, not by merit.",
+      "flags": { "goodwill_received_player": true, "passed_wicket_gate": true },
+      "effects": { "fear": -12, "hope": 12, "shame": -8 },
+      "next": "end"
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

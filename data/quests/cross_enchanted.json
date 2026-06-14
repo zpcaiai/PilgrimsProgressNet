@@ -1,0 +1,9 @@
+{
+  "id": "cross_enchanted",
+  "title": "Cross the Enchanted Ground Awake",
+  "description": "Comfort can dull desire for the City. Keep moving and keep Hopeful speaking.",
+  "steps": [
+    { "id": "reach_edge", "description": "Reach the far edge awake, with desire still alive.", "required_flag": "crossed_enchanted" }
+  ],
+  "rewards": { "watchfulness": 10 }
+}

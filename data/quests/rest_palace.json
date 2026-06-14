@@ -1,0 +1,10 @@
+{
+  "id": "rest_palace",
+  "title": "Prepare at Palace Beautiful",
+  "description": "Rest without guilt, hear Watchful, and take up armour before accusation comes.",
+  "steps": [
+    { "id": "take_armour", "description": "Receive the armour and promise for the valley.", "required_flag": "took_armour" },
+    { "id": "leave", "description": "Descend from the palace prepared, not proud.", "required_flag": "left_palace" }
+  ],
+  "rewards": { "faith": 5 }
+}

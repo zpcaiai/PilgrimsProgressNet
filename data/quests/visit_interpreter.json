@@ -1,0 +1,10 @@
+{
+  "id": "visit_interpreter",
+  "title": "Learn in the Interpreter's House",
+  "description": "Grace has welcomed you; now let truth train your sight before the harder road.",
+  "steps": [
+    { "id": "see_lesson", "description": "Consider a room and let it question your heart.", "required_flag": "saw_interpreter_lesson" },
+    { "id": "leave", "description": "Leave by the far door with clearer sight.", "required_flag": "left_interpreter" }
+  ],
+  "rewards": { "discernment": 5 }
+}

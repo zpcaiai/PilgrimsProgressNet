@@ -1,0 +1,40 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/LeaderboardPanel.gd" id="1_lb"]
+[ext_resource type="Script" path="res://scripts/ui/CompanionOverlay.gd" id="2_co"]
+[ext_resource type="Script" path="res://scripts/ui/CloudSyncDialog.gd" id="3_cs"]
+[ext_resource type="Script" path="res://scripts/ui/MarkerInput.gd" id="4_mi"]
+[ext_resource type="Script" path="res://scripts/ui/AccountPanel.gd" id="5_ac"]
+[ext_resource type="Script" path="res://scripts/ui/RewardPopup.gd" id="6_rp"]
+[ext_resource type="Script" path="res://scripts/ui/ReviewPanel.gd" id="7_rv"]
+[ext_resource type="Script" path="res://scripts/ui/ChatPanel.gd" id="8_ch"]
+[ext_resource type="Script" path="res://scripts/ui/ConversationPanel.gd" id="9_cv"]
+
+[node name="NetUI" type="Node"]
+
+[node name="LeaderboardPanel" type="CanvasLayer" parent="."]
+script = ExtResource("1_lb")
+
+[node name="CompanionOverlay" type="CanvasLayer" parent="."]
+script = ExtResource("2_co")
+
+[node name="CloudSyncDialog" type="CanvasLayer" parent="."]
+script = ExtResource("3_cs")
+
+[node name="MarkerInput" type="CanvasLayer" parent="."]
+script = ExtResource("4_mi")
+
+[node name="AccountPanel" type="CanvasLayer" parent="."]
+script = ExtResource("5_ac")
+
+[node name="RewardPopup" type="CanvasLayer" parent="."]
+script = ExtResource("6_rp")
+
+[node name="ReviewPanel" type="CanvasLayer" parent="."]
+script = ExtResource("7_rv")
+
+[node name="ChatPanel" type="CanvasLayer" parent="."]
+script = ExtResource("8_ch")
+
+[node name="ConversationPanel" type="CanvasLayer" parent="."]
+script = ExtResource("9_cv")

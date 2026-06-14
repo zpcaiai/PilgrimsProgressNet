@@ -1,0 +1,9 @@
+{
+  "id": "reach_the_cross",
+  "title": "Come to the Cross",
+  "description": "Bring the whole burden into the light. Grace will do what effort never could.",
+  "steps": [
+    { "id": "burden_falls", "description": "Approach the Cross and let the burden fall.", "required_flag": "burden_fallen" }
+  ],
+  "rewards": {}
+}

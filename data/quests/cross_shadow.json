@@ -1,0 +1,9 @@
+{
+  "id": "cross_shadow",
+  "title": "Cross the Valley of the Shadow",
+  "description": "Sight fails here. Keep to the narrow path, read the Word's light, and walk toward dawn.",
+  "steps": [
+    { "id": "reach_dawn", "description": "Reach the dawn without believing the whispers.", "required_flag": "crossed_shadow" }
+  ],
+  "rewards": { "faith": 8 }
+}

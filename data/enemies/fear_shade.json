@@ -1,0 +1,12 @@
+{
+  "id": "fear_shade",
+  "display_name": "Fear Shade",
+  "enemy_type": "fear",
+  "influence": 60,
+  "move_speed": 2.8,
+  "attack_range": 2.0,
+  "attack_cooldown": 2.5,
+  "color": [0.25, 0.3, 0.55],
+  "weaknesses": { "faith_guard": 1.5, "prayer": 1.3, "promise": 1.0, "light_attack": 0.7 },
+  "attack_effects": { "fear": 10, "faith": -3 }
+}

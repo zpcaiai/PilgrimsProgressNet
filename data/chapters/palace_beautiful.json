@@ -1,0 +1,42 @@
+{
+  "id": "palace_beautiful",
+  "title": "Palace Beautiful",
+  "subtitle": "Rest that prepares courage",
+  "intro": [
+    "At the summit, lamplight spills from a house where pilgrims are not shamed for being tired.",
+    "Here rest is not escape. It is obedience to the One who knows what waits in the valley.",
+    "Listen to Watchful, read the records, and take up the armour of faith before accusation learns your name again."
+  ],
+  "order": 8,
+  "scene_path": "res://scenes/chapters/palace_beautiful/PalaceBeautiful.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "valley_humiliation",
+  "previous_chapter_id": "hill_difficulty",
+  "spiritual_theme": "Fellowship, holy rest, and preparation for accusation",
+  "core_mechanic": "Rest, receive Watchful's counsel, read the testimony of former pilgrims, and take up armour before descending into the Valley of Humiliation.",
+  "required_flags": [
+    "reached_summit"
+  ],
+  "entry_effects": {
+    "despair": -10,
+    "weariness": -10,
+    "hope": 5
+  },
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "left_palace",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "faith": 8
+  },
+  "quests": [
+    "rest_palace"
+  ],
+  "music": "res://assets/audio/music/palace_beautiful.ogg",
+  "ambient": "res://assets/audio/ambient/palace_beautiful.ogg"
+}

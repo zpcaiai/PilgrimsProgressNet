@@ -1,0 +1,38 @@
+{
+  "id": "wilderness_road",
+  "title": "Wilderness Road",
+  "subtitle": "Leaving the old life while its voices still follow",
+  "intro": [
+    "The city has fallen behind you, but its arguments have not. They travel in familiar voices and reasonable words.",
+    "One companion mocks what he cannot see; another loves the promise only while the road is easy.",
+    "You cannot repent for them, and they cannot walk for you. Fix your eyes on the little light and keep moving."
+  ],
+  "order": 2,
+  "scene_path": "res://scenes/chapters/wilderness_road/WildernessRoad.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "slough_of_despond",
+  "previous_chapter_id": "city_of_destruction",
+  "spiritual_theme": "Resolve, separation, and the cost of beginning",
+  "core_mechanic": "Answer Obstinate without pride, steady Pliable without flattery, and keep the distant light ahead until the ground begins to fail.",
+  "required_flags": [
+    "left_city"
+  ],
+  "entry_effects": {},
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "entered_slough",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "perseverance": 5
+  },
+  "quests": [
+    "cross_wilderness"
+  ],
+  "music": "res://assets/audio/music/wilderness_road.ogg",
+  "ambient": "res://assets/audio/ambient/wilderness_road.ogg"
+}

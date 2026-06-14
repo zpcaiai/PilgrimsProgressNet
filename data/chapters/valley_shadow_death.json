@@ -1,0 +1,42 @@
+{
+  "id": "valley_shadow_death",
+  "title": "Valley of the Shadow of Death",
+  "subtitle": "Walking when sight is taken away",
+  "intro": [
+    "Beyond the battle, the road narrows into a valley where the dark presses close enough to breathe.",
+    "Here faith is no longer a feeling of brightness. It is one obedient step while the next is still hidden.",
+    "The whispers will preach fear as wisdom. Keep to the path; the dawn is not less real because you cannot yet see it."
+  ],
+  "order": 10,
+  "scene_path": "res://scenes/chapters/valley_shadow_death/ValleyShadowDeath.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "vanity_fair",
+  "previous_chapter_id": "valley_humiliation",
+  "spiritual_theme": "Faith without sight, courage under fear, and clinging to the Word",
+  "core_mechanic": "Your lantern shrinks with fear and grows with faith; resist whispers, read lanterns of the Word, and press through fear-shades toward dawn.",
+  "required_flags": [
+    "defeated_apollyon"
+  ],
+  "entry_effects": {
+    "fear": 10
+  },
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "crossed_shadow",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "faith": 10,
+    "fear": -15,
+    "perseverance": 8
+  },
+  "quests": [
+    "cross_shadow"
+  ],
+  "music": "res://assets/audio/music/valley_shadow_death.ogg",
+  "ambient": "res://assets/audio/ambient/valley_shadow_death.ogg"
+}

@@ -1,0 +1,39 @@
+{
+  "id": "hill_difficulty",
+  "title": "The Hill Difficulty",
+  "subtitle": "The road that costs more because it is true",
+  "intro": [
+    "Three ways open from the same ground. Two flatter your tired legs; one tells you the truth by being steep.",
+    "The easy roads do not announce their ruin. They simply ask you to prefer comfort over obedience, one step at a time.",
+    "Take the hard way with a humble heart. The climb cannot save you, but it can teach you to keep trusting."
+  ],
+  "order": 7,
+  "scene_path": "res://scenes/chapters/hill_difficulty/HillDifficulty.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "palace_beautiful",
+  "previous_chapter_id": "interpreter_house",
+  "spiritual_theme": "Costly obedience, endurance, and resisting shortcuts",
+  "core_mechanic": "Choose the steep middle path, recognize Danger and Destruction as merciful warnings, and pass the rest arbor without surrendering watchfulness.",
+  "required_flags": [
+    "left_interpreter"
+  ],
+  "entry_effects": {},
+  "on_start_flags": {},
+  "on_complete_flags": {},
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "reached_summit",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "perseverance": 12,
+    "faith": 5
+  },
+  "quests": [
+    "climb_hill"
+  ],
+  "music": "res://assets/audio/music/hill_difficulty.ogg",
+  "ambient": "res://assets/audio/ambient/hill_difficulty.ogg"
+}

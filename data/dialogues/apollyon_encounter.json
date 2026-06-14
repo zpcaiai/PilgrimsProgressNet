@@ -1,0 +1,51 @@
+{
+  "id": "apollyon_encounter",
+  "nodes": {
+    "start": {
+      "speaker": "Apollyon",
+      "text": "Where do you think you are going, deserter? You were born in my city, wore my colors, and served me with more eagerness than you now admit. I know the promises you broke and the sins you once defended.",
+      "choices": [
+        {
+          "id": "stand",
+          "text": "All of that is true. And all of it was carried to the Cross behind me.",
+          "effects": { "faith": 10, "shame": -10, "fear": -4 },
+          "flags": { "apollyon_challenged": true },
+          "next": "accuse"
+        },
+        {
+          "id": "afraid",
+          "text": "My knees shake, but I will not make fear my master again.",
+          "effects": { "perseverance": 8, "fear": 4 },
+          "flags": { "apollyon_challenged": true },
+          "next": "accuse"
+        }
+      ]
+    },
+    "accuse": {
+      "speaker": "Apollyon",
+      "text": "A Cross? You think a hill and borrowed words undo what you are? You will fail again. You always do. Come back before your new Master is ashamed of you.",
+      "choices": [
+        {
+          "id": "grace",
+          "text": "I may stumble, but I am not kept by my strength. You have no claim on a pardoned pilgrim.",
+          "effects": { "faith": 10, "hope": 8, "pride": -4 },
+          "next": "rage"
+        },
+        {
+          "id": "silent",
+          "text": "You speak my old name. I answer to the One who renamed me.",
+          "effects": { "faith": 8, "shame": -8 },
+          "next": "rage"
+        }
+      ]
+    },
+    "rage": {
+      "speaker": "Apollyon",
+      "text": "Then stand there and be broken. If I cannot own you, I will drown you in fear and shame.",
+      "choices": [
+        { "id": "fight", "text": "Stand firm, pray, and answer with promise. (The fight begins.)", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "cross_river",
+  "title": "Cross the River of Death",
+  "description": "There is no bridge for the final crossing. Receive faith, take Hopeful's hand, and step in.",
+  "steps": [
+    { "id": "reach_far_bank", "description": "Reach the far bank by mercy, not mastery.", "required_flag": "crossed_river" }
+  ],
+  "rewards": { "faith": 12 }
+}

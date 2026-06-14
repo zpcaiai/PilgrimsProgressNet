@@ -1,0 +1,12 @@
+{
+  "id": "shame_accuser",
+  "display_name": "Shame Accuser",
+  "enemy_type": "shame",
+  "influence": 70,
+  "move_speed": 2.0,
+  "attack_range": 4.0,
+  "attack_cooldown": 3.0,
+  "color": [0.45, 0.2, 0.3],
+  "weaknesses": { "promise": 1.6, "prayer": 1.1, "faith_guard": 1.2, "light_attack": 0.6 },
+  "attack_effects": { "shame": 12, "hope": -5 }
+}

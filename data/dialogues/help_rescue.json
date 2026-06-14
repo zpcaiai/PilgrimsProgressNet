@@ -1,0 +1,63 @@
+{
+  "id": "help_rescue",
+  "nodes": {
+    "start": {
+      "speaker": "Help",
+      "text": "Steady, friend. I have pulled many from this hollow. Give me your hand; the mire has no bottom for the one determined to be his own savior.",
+      "choices": [
+        {
+          "id": "accept",
+          "text": "Please. I cannot save myself from this. Help me.",
+          "effects": { "humility": 12, "hope": 10, "despair": -20 },
+          "flags": { "accepted_help": true, "left_slough": true },
+          "next": "pull"
+        },
+        {
+          "id": "self",
+          "text": "Stand back. I got myself into this; I should climb out myself.",
+          "effects": { "pride": 10, "despair": 6 },
+          "next": "warn"
+        },
+        {
+          "id": "why",
+          "text": "Why is this place so deep? I thought obedience would feel cleaner than this.",
+          "effects": { "humility": 4 },
+          "next": "explain"
+        }
+      ]
+    },
+    "warn": {
+      "speaker": "Help",
+      "text": "Look at your feet. Every proud push sinks you deeper. Mercy is not insulted when the helpless reach for it; mercy came here for that very reason.",
+      "choices": [
+        {
+          "id": "relent",
+          "text": "You are right. I am sinking. Help me, please.",
+          "effects": { "humility": 12, "pride": -12, "hope": 8, "despair": -16 },
+          "flags": { "accepted_help": true, "left_slough": true },
+          "next": "pull"
+        }
+      ]
+    },
+    "explain": {
+      "speaker": "Help",
+      "text": "Warnings were given, and stones were laid. But fear and guilt drain into this hollow, and beginners often meet them before they know how to stand. This is not the end of you. It is the beginning learning to receive help.",
+      "choices": [
+        {
+          "id": "hand",
+          "text": "Then take my hand before despair teaches me to stop asking.",
+          "effects": { "humility": 12, "hope": 10, "despair": -20 },
+          "flags": { "accepted_help": true, "left_slough": true },
+          "next": "pull"
+        }
+      ]
+    },
+    "pull": {
+      "speaker": "Help",
+      "text": "There. Solid stone under your feet again. Breathe. Remember this: repentance is not proving you can rise alone; it is consenting to be lifted. The gate is ahead. Go on.",
+      "flags": { "rescued_from_slough": true },
+      "next": "end"
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

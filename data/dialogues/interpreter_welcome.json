@@ -1,0 +1,32 @@
+{
+  "id": "interpreter_welcome",
+  "nodes": {
+    "start": {
+      "speaker": "The Interpreter",
+      "text": "Welcome, pilgrim. The burden has fallen, but the heart still needs teaching. Walk these rooms slowly; each one names a danger mercy intends to heal.",
+      "choices": [
+        {
+          "id": "ready",
+          "text": "I will look, and let truth search me.",
+          "effects": { "discernment": 4, "watchfulness": 3 },
+          "flags": { "met_interpreter": true },
+          "next": "guide"
+        },
+        {
+          "id": "hurry",
+          "text": "I am eager to press on, but I will not despise instruction.",
+          "effects": { "perseverance": 3 },
+          "next": "guide"
+        }
+      ]
+    },
+    "guide": {
+      "speaker": "The Interpreter",
+      "text": "Consider the lamp fed in secret, the dust only water can settle, and patience that waits without envy. What you learn here will meet you again on the road.",
+      "choices": [
+        { "id": "ok", "text": "Thank you.", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

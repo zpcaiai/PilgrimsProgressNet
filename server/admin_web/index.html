@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>天路历程 · 管理后台</title>
+<style>
+  :root { --bg:#0d0f15; --panel:#161a24; --line:#252b3a; --txt:#dfe4ee; --muted:#8a93a6;
+          --gold:#f0d488; --good:#6fc77e; --bad:#e06868; --warn:#e0c24f; --blue:#6fa8e0; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif; }
+  header { background:var(--panel); border-bottom:1px solid var(--line); padding:14px 20px;
+           display:flex; gap:12px; align-items:center; flex-wrap:wrap; position:sticky; top:0; z-index:5; }
+  header h1 { font-size:18px; margin:0 16px 0 0; color:var(--gold); }
+  input, button, select { font:inherit; color:var(--txt); background:#0f1320; border:1px solid var(--line);
+           border-radius:7px; padding:7px 10px; }
+  button { cursor:pointer; background:#1d2433; }
+  button:hover { border-color:var(--gold); }
+  button.good { border-color:var(--good); } button.bad { border-color:var(--bad); }
+  main { padding:20px; max-width:1100px; margin:0 auto; display:grid; gap:18px; }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px; }
+  section h2 { margin:0 0 12px; font-size:16px; color:var(--gold); }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); font-size:13px; vertical-align:middle; }
+  th { color:var(--muted); font-weight:600; }
+  .tag { padding:2px 8px; border-radius:20px; font-size:12px; }
+  .s-pending{ background:#3a350f; color:var(--warn); } .s-appealed{ background:#10283f; color:var(--blue); }
+  .s-rejected{ background:#3a1414; color:var(--bad); } .s-approved{ background:#10301a; color:var(--good); }
+  .muted { color:var(--muted); }
+  .bar { height:8px; background:#0f1320; border-radius:4px; overflow:hidden; }
+  .bar > i { display:block; height:100%; background:var(--blue); }
+  #toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1d2433;
+           border:1px solid var(--line); border-radius:8px; padding:10px 16px; opacity:0; transition:.3s; }
+  #toast.show { opacity:1; }
+  .pill { font-size:12px; color:var(--muted); }
+  #login { position:fixed; inset:0; background:rgba(8,10,15,.92); display:flex;
+           align-items:center; justify-content:center; z-index:10; }
+  #login .card { background:var(--panel); border:1px solid var(--line); border-radius:14px;
+           padding:28px 30px; width:340px; display:grid; gap:12px; }
+  #login h2 { margin:0 0 4px; color:var(--gold); }
+  #login input { width:100%; }
+  .hide { display:none !important; }
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="card">
+    <h2>管理后台登录</h2>
+    <input id="li_base" placeholder="API base，如 /api/v1" />
+    <input id="li_user" placeholder="用户名" autocomplete="username" />
+    <input id="li_pass" type="password" placeholder="密码" autocomplete="current-password"
+           onkeydown="if(event.key==='Enter')doLogin()" />
+    <button class="good" onclick="doLogin()">登录</button>
+    <span id="li_err" class="muted"></span>
+  </div>
+</div>
+
+<header>
+  <h1>天路历程 · 管理后台</h1>
+  <span id="conn" class="pill">未连接</span>
+  <span style="flex:1"></span>
+  <button onclick="logout()">退出登录</button>
+</header>
+
+<main>
+  <section>
+    <h2>成绩复核队列</h2>
+    <div class="row">
+      <label>状态
+        <select id="rstatus" onchange="loadReviews()">
+          <option value="pending">待重算 pending</option>
+          <option value="appealed">申诉中 appealed</option>
+          <option value="rejected">已拒绝 rejected</option>
+          <option value="approved">已通过 approved</option>
+        </select>
+      </label>
+      <button onclick="loadReviews()">刷新</button>
+      <button class="good" onclick="recompute()">运行重算队列</button>
+      <span id="rcount" class="muted"></span>
+    </div>
+    <table>
+      <thead><tr><th>玩家</th><th>榜/难度</th><th>分数</th><th>赛季</th><th>状态</th><th>原因</th><th>操作</th></tr></thead>
+      <tbody id="reviews"><tr><td colspan="7" class="muted">填好 API 与 token 后点刷新。</td></tr></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>赛季结算</h2>
+    <div class="row">
+      <input id="season" size="12" placeholder="赛季 id，如 2026-S1" />
+      <button onclick="settle()">结算该赛季</button>
+      <button onclick="rollover()">结算上一季（rollover）</button>
+    </div>
+    <pre id="settleOut" class="muted" style="white-space:pre-wrap;margin:0"></pre>
+  </section>
+
+  <section>
+    <h2>聊天管理（禁言）</h2>
+    <div class="row">
+      <input id="mute_pid" size="30" placeholder="玩家 player_id" />
+      <input id="mute_min" size="6" type="number" value="60" /> 分钟
+      <button class="bad" onclick="mute()">禁言</button>
+      <button onclick="unmute()">解除</button>
+      <span id="muteOut" class="muted"></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>章节漏斗（数据统计）</h2>
+    <div class="row"><button onclick="loadFunnel()">刷新</button></div>
+    <table>
+      <thead><tr><th>章节</th><th>开始</th><th>完成</th><th>完成率</th><th style="width:35%"></th></tr></thead>
+      <tbody id="funnel"><tr><td colspan="5" class="muted">点刷新加载。</td></tr></tbody>
+    </table>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let cfg = { base: localStorage.getItem("pp_base") || "/api/v1", session: localStorage.getItem("pp_session") || "" };
+
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 2600); }
+
+function showLogin(show) { $("login").classList.toggle("hide", !show); }
+async function doLogin() {
+  cfg.base = ($("li_base").value.trim() || "/api/v1").replace(/\/$/, "");
+  const username = $("li_user").value.trim(), password = $("li_pass").value;
+  try {
+    const r = await fetch(cfg.base + "/admin/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }) });
+    if (!r.ok) { $("li_err").textContent = r.status === 401 ? "用户名或密码错误" : ("登录失败 " + r.status); return; }
+    const data = await r.json();
+    cfg.session = data.token;
+    localStorage.setItem("pp_base", cfg.base); localStorage.setItem("pp_session", cfg.session);
+    $("li_err").textContent = ""; showLogin(false); toast("已登录"); loadReviews();
+  } catch (e) { $("li_err").textContent = "无法连接 " + cfg.base; }
+}
+function logout() { cfg.session = ""; localStorage.removeItem("pp_session"); showLogin(true); }
+
+async function api(method, path, body) {
+  const opt = { method, headers: { "Authorization": "Bearer " + cfg.session } };
+  if (body !== undefined) { opt.headers["Content-Type"] = "application/json"; opt.body = JSON.stringify(body); }
+  const r = await fetch(cfg.base + path, opt);
+  $("conn").textContent = r.ok ? "已连接" : ("错误 " + r.status);
+  $("conn").style.color = r.ok ? "var(--good)" : "var(--bad)";
+  if (r.status === 401 || r.status === 403) { toast("会话过期，请重新登录"); showLogin(true); throw new Error("auth"); }
+  if (!r.ok) { toast("请求失败 " + r.status); throw new Error(r.status); }
+  const ct = r.headers.get("content-type") || "";
+  return ct.includes("json") ? r.json() : r.text();
+}
+const esc = (s) => String(s).replace(/[&<>]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;" }[c]));
+
+async function loadReviews() {
+  const status = $("rstatus").value;
+  let rows;
+  try { rows = await api("GET", `/admin/reviews?status=${status}&limit=200`); } catch { return; }
+  $("rcount").textContent = `${rows.length} 条`;
+  const tb = $("reviews");
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="7" class="muted">无记录。</td></tr>`; return; }
+  tb.innerHTML = rows.map(r => `
+    <tr>
+      <td title="${esc(r.player_id)}">${esc(r.player_id.slice(0,8))}…</td>
+      <td>${esc(r.board)} / ${esc(r.difficulty)}</td>
+      <td>${r.score}</td>
+      <td>${esc(r.season)}</td>
+      <td><span class="tag s-${esc(r.status)}">${esc(r.status)}</span></td>
+      <td class="muted" title="${esc(r.reason)}">${esc((r.reason||"").slice(0,40))}</td>
+      <td>${ r.status === "appealed"
+        ? `<button class="good" onclick="resolve('${r.id}','approve')">批准</button>
+           <button class="bad" onclick="resolve('${r.id}','reject')">拒绝</button>`
+        : "" }</td>
+    </tr>`).join("");
+}
+async function recompute() { const r = await api("POST", "/admin/reviews/recompute"); toast(`处理 ${r.processed}：通过 ${r.approved}，拒绝 ${r.rejected}`); loadReviews(); }
+async function resolve(id, decision) { await api("POST", `/admin/reviews/${id}/resolve`, { decision, note: "后台人工复核" }); toast(decision === "approve" ? "已批准并进榜" : "已拒绝"); loadReviews(); }
+
+async function settle() {
+  const s = $("season").value.trim(); if (!s) { toast("请输入赛季 id"); return; }
+  const r = await api("POST", `/admin/seasons/${s}/settle`);
+  $("settleOut").textContent = JSON.stringify(r, null, 2); toast(r.already_settled ? "该赛季已结算" : `发放 ${r.granted} 份奖励`);
+}
+async function rollover() {
+  const r = await api("POST", "/admin/seasons/rollover");
+  $("settleOut").textContent = JSON.stringify(r, null, 2); toast("rollover 完成");
+}
+
+async function mute() {
+  const pid = $("mute_pid").value.trim(); const min = $("mute_min").value || 60;
+  if (!pid) { toast("请输入 player_id"); return; }
+  await api("POST", `/admin/mute/${encodeURIComponent(pid)}?minutes=${min}`);
+  $("muteOut").textContent = `已禁言 ${pid}（${min} 分钟）`; toast("已禁言");
+}
+async function unmute() {
+  const pid = $("mute_pid").value.trim(); if (!pid) { toast("请输入 player_id"); return; }
+  await api("DELETE", `/admin/mute/${encodeURIComponent(pid)}`);
+  $("muteOut").textContent = `已解除 ${pid}`; toast("已解除禁言");
+}
+
+async function loadFunnel() {
+  let rows; try { rows = await api("GET", "/stats/overview"); } catch { return; }
+  const tb = $("funnel");
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="5" class="muted">暂无数据。</td></tr>`; return; }
+  tb.innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(r.chapter_id)}</td><td>${r.started}</td><td>${r.completed}</td>
+      <td>${(r.completion_rate*100).toFixed(1)}%</td>
+      <td><div class="bar"><i style="width:${Math.round(r.completion_rate*100)}%"></i></div></td>
+    </tr>`).join("");
+}
+
+// Boot: prefill base, show login unless we already have a session.
+$("li_base").value = cfg.base;
+if (cfg.session) { showLogin(false); loadReviews(); } else { showLogin(true); }
+</script>
+</body>
+</html>

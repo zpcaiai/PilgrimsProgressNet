@@ -1,0 +1,31 @@
+{
+  "id": "shepherds_counsel",
+  "nodes": {
+    "start": {
+      "speaker": "The Shepherds",
+      "text": "Welcome to the Delectable Mountains, pilgrims. You have escaped a dark house; breathe the clear air. From here, mercy lets the tired see the City before they reach it.",
+      "choices": [
+        {
+          "id": "show_me",
+          "text": "Show us the City, and teach us how to finish well.",
+          "effects": { "hope": 10, "faith": 5 },
+          "flags": { "saw_celestial_city": true },
+          "next": "warn"
+        }
+      ]
+    },
+    "warn": {
+      "speaker": "The Shepherds",
+      "text": "Two dangers remain. The Enchanted Ground will not roar; it will soothe you into forgetting. Beyond it runs a river with no bridge; only faith receives the crossing. Keep Hopeful close, and keep the City before you.",
+      "choices": [
+        {
+          "id": "thanks",
+          "text": "We will remember: warnings are mercy, and the City is real.",
+          "effects": { "watchfulness": 6, "discernment": 6 },
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

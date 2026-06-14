@@ -1,0 +1,33 @@
+{
+  "id": "pliable_joins",
+  "nodes": {
+    "start": {
+      "speaker": "Pliable",
+      "text": "A shining city, crowns, and joy without end? I will come too. Surely a road to such a place must be pleasant enough.",
+      "choices": [
+        {
+          "id": "welcome",
+          "text": "Walk with me, then. Keep your eyes on more than the reward.",
+          "effects": { "hope": 5 },
+          "flags": { "pliable_joined": true },
+          "next": "end"
+        },
+        {
+          "id": "warn",
+          "text": "The promise is great, but the road will test whether you love truth or only comfort.",
+          "effects": { "discernment": 3, "humility": 3 },
+          "flags": { "pliable_joined": true },
+          "next": "light"
+        }
+      ]
+    },
+    "light": {
+      "speaker": "Pliable",
+      "text": "Hard? Perhaps a little. But why dwell on mud when we can speak of gold? Come, let us hurry to the pleasant parts.",
+      "choices": [
+        { "id": "continue", "text": "Let us continue.", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

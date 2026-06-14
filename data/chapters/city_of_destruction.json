@@ -1,0 +1,42 @@
+{
+  "id": "city_of_destruction",
+  "title": "City of Destruction",
+  "subtitle": "Awakening under a burden no home can soothe",
+  "intro": [
+    "You wake before dawn with the book open in your hands and a burden on your back that no sleep can soften.",
+    "The city calls this fear, but the words on the page name it truth: judgment is coming, and your heart is not ready.",
+    "Those you love ask you to stay and be reasonable. Repentance begins when you stop pretending the house is safe because it is familiar."
+  ],
+  "order": 1,
+  "scene_path": "res://scenes/chapters/city_of_destruction/CityOfDestruction.tscn",
+  "entry_checkpoint": "start",
+  "next_chapter_id": "wilderness_road",
+  "previous_chapter_id": "",
+  "spiritual_theme": "Awakening, honest fear, and the first turn toward life",
+  "core_mechanic": "Carry the burden through a familiar city, answer loved ones and mockers, and receive Evangelist's call to flee toward the narrow gate.",
+  "required_flags": [],
+  "entry_effects": {},
+  "on_start_flags": {
+    "city_started": true
+  },
+  "on_complete_flags": {
+    "city_completed": true
+  },
+  "completion_conditions": [
+    {
+      "type": "flag",
+      "key": "left_city",
+      "value": true
+    }
+  ],
+  "completion_effects": {
+    "faith": 5,
+    "perseverance": 5,
+    "despair": -5
+  },
+  "quests": [
+    "leave_city"
+  ],
+  "music": "res://assets/audio/music/city_of_destruction.ogg",
+  "ambient": "res://assets/audio/ambient/city_of_destruction.ogg"
+}
