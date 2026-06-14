@@ -164,9 +164,11 @@ func _maybe_send(delta: float) -> void:
 	_ws.send_text(JSON.stringify({"type": "pos", "x": pos.x, "y": pos.y, "z": pos.z, "yaw": yaw}))
 
 
-## Send a chat message. channel: "chapter" | "world" | "dm" (dm needs `to`).
-## Either text or image_url (a "/media/..." path) must be present.
-func send_chat(text: String, channel: String = "chapter", to: String = "", image_url: String = "") -> void:
+## Send a chat message. channel: "chapter" | "world" | "dm" (needs `to`) |
+## "room" (needs `room`). Either text or image_url must be present. Optionally
+## quote a message via reply_to + reply_preview.
+func send_chat(text: String, channel: String = "chapter", to: String = "", image_url: String = "",
+		room: String = "", reply_to: String = "", reply_preview: String = "") -> void:
 	var t := text.strip_edges()
 	if _ws == null or not _open or (t == "" and image_url == ""):
 		return
@@ -175,7 +177,23 @@ func send_chat(text: String, channel: String = "chapter", to: String = "", image
 		msg["image_url"] = image_url
 	if channel == "dm" and to != "":
 		msg["to"] = to
+	if channel == "room" and room != "":
+		msg["room"] = room
+	if reply_to != "":
+		msg["reply_to"] = reply_to
+		msg["reply_preview"] = reply_preview
 	_ws.send_text(JSON.stringify(msg))
+
+
+## Join / leave an ad-hoc group room (so you receive its messages).
+func room_join(room: String) -> void:
+	if _ws != null and _open and room != "":
+		_ws.send_text(JSON.stringify({"type": "room_join", "room": room}))
+
+
+func room_leave(room: String) -> void:
+	if _ws != null and _open and room != "":
+		_ws.send_text(JSON.stringify({"type": "room_leave", "room": room}))
 
 
 ## Recall (delete) one of your own messages by id.

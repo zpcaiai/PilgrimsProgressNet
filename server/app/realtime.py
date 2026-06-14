@@ -46,6 +46,27 @@ class RoomManager:
             self._rooms.setdefault(k, set()).add(ws)
             await self._ensure_subscriber(k)
 
+    async def join(self, room_key: str, ws: WebSocket) -> None:
+        """Dynamically add a socket to an extra room (e.g. an ad-hoc group)."""
+        keys = self._socket_keys.setdefault(ws, [])
+        if room_key not in keys:
+            keys.append(room_key)
+        self._rooms.setdefault(room_key, set()).add(ws)
+        await self._ensure_subscriber(room_key)
+
+    def leave(self, room_key: str, ws: WebSocket) -> None:
+        keys = self._socket_keys.get(ws, [])
+        if room_key in keys:
+            keys.remove(room_key)
+        room = self._rooms.get(room_key)
+        if room is not None:
+            room.discard(ws)
+            if not room:
+                self._rooms.pop(room_key, None)
+                task = self._tasks.pop(room_key, None)
+                if task:
+                    task.cancel()
+
     def disconnect(self, ws: WebSocket) -> None:
         for k in self._socket_keys.pop(ws, []):
             room = self._rooms.get(k)

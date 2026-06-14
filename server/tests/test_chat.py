@@ -309,6 +309,67 @@ def test_recall_rejects_others_message():
             assert got_sys
 
 
+def test_group_room_broadcast():
+    with TestClient(app) as client:
+        a = client.post("/api/v1/auth/device", json={"device_id": "room-player-A"}).json()
+        b = client.post("/api/v1/auth/device", json={"device_id": "room-player-B"}).json()
+        ha = {"Authorization": f"Bearer {a['access_token']}"}
+        # A creates a room code (B could be told out of band).
+        room = client.post("/api/v1/chat/room/create", headers=ha).json()["room"]
+        # A and B are in different chapters but both join the same room.
+        with client.websocket_connect(f"/api/v1/ws/ghosts/north?token={a['access_token']}") as wsa, \
+             client.websocket_connect(f"/api/v1/ws/ghosts/south?token={b['access_token']}") as wsb:
+            wsa.send_json({"type": "room_join", "room": room})
+            wsb.send_json({"type": "room_join", "room": room})
+
+            def _await_system(ws):
+                for _ in range(8):
+                    if ws.receive_json().get("type") == "system":
+                        return True
+                return False
+            assert _await_system(wsa) and _await_system(wsb)
+            wsa.send_json({"type": "chat", "channel": "room", "room": room, "text": "群里好"})
+            got = False
+            for _ in range(8):
+                m = wsb.receive_json()
+                if m.get("type") == "chat" and m.get("channel") == "room":
+                    assert m["text"] == "群里好" and m.get("room") == room
+                    got = True
+                    break
+            assert got, "room member B did not receive the group message"
+
+
+def test_quote_reply_roundtrip():
+    with TestClient(app) as client:
+        a = client.post("/api/v1/auth/device", json={"device_id": "reply-player-A"}).json()
+        b = client.post("/api/v1/auth/device", json={"device_id": "reply-player-B"}).json()
+        with client.websocket_connect(f"/api/v1/ws/ghosts/field?token={a['access_token']}") as wsa:
+            wsa.send_json({"type": "chat", "channel": "chapter", "text": "原始消息"})
+            mid = None
+            for _ in range(8):
+                m = wsa.receive_json()
+                if m.get("type") == "chat":
+                    mid = m.get("mid")
+                    break
+            wsa.send_json({"type": "chat", "channel": "chapter", "text": "回应",
+                           "reply_to": mid, "reply_preview": "原始消息"})
+            got = False
+            for _ in range(8):
+                m = wsa.receive_json()
+                if m.get("type") == "chat" and m.get("reply_to") == mid:
+                    assert m.get("reply_preview") == "原始消息"
+                    got = True
+                    break
+            assert got
+        # history carries the reply linkage
+        with client.websocket_connect(f"/api/v1/ws/ghosts/field?token={b['access_token']}") as wsb:
+            for _ in range(5):
+                m = wsb.receive_json()
+                if m.get("type") == "chat_history":
+                    assert any(it.get("reply_to") == mid for it in m.get("items", []))
+                    break
+
+
 def test_admin_mute_endpoint():
     with TestClient(app) as client:
         r = client.post("/api/v1/admin/mute/some-player-id?minutes=5", headers=ADMIN)

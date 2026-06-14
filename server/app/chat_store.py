@@ -35,11 +35,17 @@ def dm_scope(a: str, b: str) -> str:
     return f"dm:{lo}:{hi}"
 
 
+def room_scope(room: str) -> str:
+    return f"room:{room}"
+
+
 async def save(scope: str, channel: str, sender_id: str, sender_name: str,
-               text: str, image_url: str | None) -> ChatMessage:
+               text: str, image_url: str | None,
+               reply_to: str | None = None, reply_preview: str | None = None) -> ChatMessage:
     async with SessionLocal() as session:
         msg = ChatMessage(scope=scope, channel=channel, sender_id=sender_id,
-                          sender_name=sender_name, text=text, image_url=image_url)
+                          sender_name=sender_name, text=text, image_url=image_url,
+                          reply_to=reply_to, reply_preview=reply_preview)
         session.add(msg)
         await session.commit()
         await session.refresh(msg)
@@ -58,6 +64,7 @@ async def recent(scope: str, limit: int | None = None) -> list[dict]:
     return [
         {"type": "chat", "mid": m.id, "id": m.sender_id, "name": m.sender_name, "channel": m.channel,
          "text": m.text, "image_url": m.image_url, "deleted": m.deleted,
+         "reply_to": m.reply_to, "reply_preview": m.reply_preview,
          "ts": int(m.created_at.timestamp() * 1000)}
         for m in rows
     ]

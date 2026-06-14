@@ -249,7 +249,11 @@ func _add_history_line(m: Dictionary) -> void:
 		var body := String(m.get("text", ""))
 		if String(m.get("image_url", "")) != "":
 			body += "  [图片]"
-		lbl.text = "[color=%s]%s[/color]：%s" % [col, _safe(String(m.get("name", "朝圣者"))), _safe(body)]
+		var quote := ""
+		var rp := String(m.get("reply_preview", ""))
+		if rp != "":
+			quote = "[color=#6b7790]┃ %s[/color]\n" % _safe(rp)
+		lbl.text = "%s[color=%s]%s[/color]：%s" % [quote, col, _safe(String(m.get("name", "朝圣者"))), _safe(body)]
 	_history_box.add_child(lbl)
 	var mid := String(m.get("mid", ""))
 	if mid != "":

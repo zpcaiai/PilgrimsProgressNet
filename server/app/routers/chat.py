@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import secrets
 import time
 import uuid
 from pathlib import Path
@@ -122,6 +123,7 @@ async def history(
     scope: str = Query(default="world", description="'world', 'chapter:<id>', or 'dm' with ?to="),
     to: str = Query(default=""),
     chapter_id: str = Query(default=""),
+    room_id: str = Query(default=""),
     player: Player = Depends(current_player),
 ) -> list[dict]:
     if scope == "world":
@@ -130,6 +132,15 @@ async def history(
         key = chat_store.dm_scope(player.id, to)
     elif scope == "chapter" and chapter_id:
         key = chat_store.chapter_scope(chapter_id)
+    elif scope == "room" and room_id:
+        key = chat_store.room_scope(room_id)
     else:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "无效的会话范围")
     return await chat_store.recent(key)
+
+
+@router.post("/room/create")
+async def room_create(player: Player = Depends(current_player)) -> dict:
+    """Generate a short, shareable ad-hoc group-room code."""
+    code = secrets.token_hex(3).upper()  # 6 hex chars, e.g. "A1B2C3"
+    return {"room": code}

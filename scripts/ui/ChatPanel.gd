@@ -22,6 +22,16 @@ var _open: bool = false
 var _channel: String = "chapter"
 var _peers: Dictionary = {}   # peer_id -> name (for DM targets)
 var _img_http: HTTPRequest
+var _room_edit: LineEdit
+var _room_box: HBoxContainer
+var _current_room: String = ""
+var _reply_bar: Panel
+var _reply_label: Label
+var _reply_to: String = ""
+var _reply_preview: String = ""
+var _sticker_grid: GridContainer
+var _stickers: Array = []     # list of "/media/..." sticker urls
+const STICKER_FILE := "user://chat_stickers.json"
 var _badge: Label
 var _unread_total: int = 0
 var _unread_by_peer: Dictionary = {}   # peer_id -> count
@@ -107,6 +117,28 @@ func _build() -> void:
 	_badge.visible = false
 	_log_panel.add_child(_badge)
 
+	# Reply context bar (shown above the input when quoting a message).
+	_reply_bar = Panel.new()
+	_reply_bar.add_theme_stylebox_override("panel", _bg(Color(0.10, 0.12, 0.16, 0.97), 6))
+	_reply_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_reply_bar.position = Vector2(20, -120)
+	_reply_bar.size = Vector2(720, 30)
+	_reply_bar.visible = false
+	add_child(_reply_bar)
+	var rb := HBoxContainer.new()
+	rb.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rb.add_theme_constant_override("separation", 8)
+	_reply_bar.add_child(rb)
+	_reply_label = Label.new()
+	_reply_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_reply_label.add_theme_font_size_override("font_size", 13)
+	_reply_label.add_theme_color_override("font_color", Color(0.7, 0.8, 0.95))
+	rb.add_child(_reply_label)
+	var rx := Button.new()
+	rx.text = "×"
+	rx.pressed.connect(_clear_reply)
+	rb.add_child(rx)
+
 	_input_row = Panel.new()
 	_input_row.add_theme_stylebox_override("panel", _bg(Color(0.06, 0.07, 0.11, 0.97), 8))
 	_input_row.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
@@ -122,6 +154,7 @@ func _build() -> void:
 	_channel_btn.add_item("本关", 0)
 	_channel_btn.add_item("世界", 1)
 	_channel_btn.add_item("私聊", 2)
+	_channel_btn.add_item("群聊", 3)
 	_channel_btn.item_selected.connect(_on_channel_selected)
 	hb.add_child(_channel_btn)
 
@@ -129,6 +162,27 @@ func _build() -> void:
 	_dm_btn.visible = false
 	_dm_btn.item_selected.connect(_on_dm_target_selected)
 	hb.add_child(_dm_btn)
+
+	# Group-room controls (visible when channel == "room").
+	_room_box = HBoxContainer.new()
+	_room_box.add_theme_constant_override("separation", 4)
+	_room_box.visible = false
+	hb.add_child(_room_box)
+	_room_edit = LineEdit.new()
+	_room_edit.placeholder_text = "房间码"
+	_room_edit.custom_minimum_size = Vector2(110, 0)
+	_room_edit.add_theme_font_size_override("font_size", FONT_BODY)
+	_room_box.add_child(_room_edit)
+	var join_b := Button.new()
+	join_b.text = "进"
+	join_b.tooltip_text = "加入房间"
+	join_b.pressed.connect(_join_room)
+	_room_box.add_child(join_b)
+	var new_b := Button.new()
+	new_b.text = "建"
+	new_b.tooltip_text = "创建新房间"
+	new_b.pressed.connect(_create_room)
+	_room_box.add_child(new_b)
 
 	_input = LineEdit.new()
 	_input.max_length = 200
@@ -200,6 +254,28 @@ func _build() -> void:
 		var pc := String(p)
 		pb.pressed.connect(func(): _insert_text(pc); _hide_emoji())
 		ev.add_child(pb)
+
+	# Custom sticker pack (saved image URLs).
+	var sep := HSeparator.new()
+	ev.add_child(sep)
+	var srow := HBoxContainer.new()
+	srow.add_theme_constant_override("separation", 6)
+	ev.add_child(srow)
+	var slabel := Label.new()
+	slabel.text = "贴图"
+	slabel.add_theme_font_size_override("font_size", 12)
+	slabel.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75))
+	srow.add_child(slabel)
+	var add_st := Button.new()
+	add_st.text = "＋添加"
+	add_st.tooltip_text = "上传一张图片加入贴图包"
+	add_st.pressed.connect(_add_sticker)
+	srow.add_child(add_st)
+	_sticker_grid = GridContainer.new()
+	_sticker_grid.columns = 5
+	ev.add_child(_sticker_grid)
+	_load_stickers()
+	_rebuild_stickers()
 
 	_file_dialog = FileDialog.new()
 	_file_dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -279,10 +355,39 @@ func _on_peer_seen(peer_id: String, peer_name: String, _p: Vector3, _y: float) -
 
 
 func _on_channel_selected(idx: int) -> void:
-	_channel = ["chapter", "world", "dm"][idx]
+	_channel = ["chapter", "world", "dm", "room"][idx]
 	_dm_btn.visible = _channel == "dm"
+	_room_box.visible = _channel == "room"
 	if _channel == "dm":
 		_rebuild_dm_targets()
+
+
+# --- Group rooms ---
+func _create_room() -> void:
+	if not AuthService.is_online:
+		_system("离线状态：无法创建房间。")
+		return
+	var res: Dictionary = await ApiClient.request_json("POST", "/chat/room/create", {})
+	if res.ok and res.data is Dictionary:
+		_room_edit.text = String((res.data as Dictionary).get("room", ""))
+		_join_room()
+
+
+func _join_room() -> void:
+	var room := _room_edit.text.strip_edges()
+	if room == "":
+		return
+	if _current_room != "" and _current_room != room:
+		RealtimeService.room_leave(_current_room)
+	_current_room = room
+	RealtimeService.room_join(room)
+	# Load this room's recent history.
+	var res: Dictionary = await ApiClient.request_json("GET", "/chat/history?scope=room&room_id=%s" % room)
+	if res.ok and res.data is Array:
+		_system("—— 群聊「%s」历史 ——" % room)
+		for m in res.data:
+			if m is Dictionary:
+				_add_row(m, false)
 
 
 func _rebuild_dm_targets() -> void:
@@ -371,10 +476,70 @@ func _on_submit(text: String) -> void:
 			return
 	var t := text.strip_edges()
 	if t != "":
-		RealtimeService.send_chat(t, _channel, _dm_target())
+		RealtimeService.send_chat(t, _channel, _dm_target(), "", _current_room, _reply_to, _reply_preview)
 	_input.text = ""
+	_clear_reply()
 	_hide_autocomplete()
 	_set_input_open(false)
+
+
+# --- Quote reply ---
+func _set_reply(mid: String, who: String, preview: String) -> void:
+	_reply_to = mid
+	_reply_preview = preview
+	_reply_label.text = "回复 %s：%s" % [who, preview.left(28)]
+	_reply_bar.visible = true
+	_set_input_open(true)
+
+
+func _clear_reply() -> void:
+	_reply_to = ""
+	_reply_preview = ""
+	_reply_bar.visible = false
+
+
+# --- Custom stickers ---
+func _add_sticker() -> void:
+	if not AuthService.is_online:
+		_system("离线状态：无法添加贴图。")
+		return
+	_file_dialog.set_meta("mode", "sticker")
+	_file_dialog.popup_centered_ratio(0.6)
+
+
+func _send_sticker(url: String) -> void:
+	RealtimeService.send_chat("", _channel, _dm_target(), url, _current_room)
+	_hide_emoji()
+
+
+func _rebuild_stickers() -> void:
+	for c in _sticker_grid.get_children():
+		c.queue_free()
+	for url in _stickers:
+		var b := Button.new()
+		b.text = "🖼"
+		b.tooltip_text = "发送贴图（右键删除）"
+		b.add_theme_font_size_override("font_size", 18)
+		var u := String(url)
+		b.pressed.connect(func(): _send_sticker(u))
+		b.gui_input.connect(func(e):
+			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_RIGHT:
+				_stickers.erase(u); _save_stickers(); _rebuild_stickers())
+		_sticker_grid.add_child(b)
+
+
+func _load_stickers() -> void:
+	if FileAccess.file_exists(STICKER_FILE):
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(STICKER_FILE))
+		if parsed is Array:
+			_stickers = parsed
+
+
+func _save_stickers() -> void:
+	var f := FileAccess.open(STICKER_FILE, FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(_stickers))
+		f.close()
 
 
 # --- @-mention autocomplete ---
@@ -538,11 +703,22 @@ func _on_file_chosen(path: String) -> void:
 		return
 	var ext := path.get_extension().to_lower()
 	var b64 := Marshalls.raw_to_base64(bytes)
+	var as_sticker := String(_file_dialog.get_meta("mode", "image")) == "sticker"
+	_file_dialog.set_meta("mode", "image")
 	var res: Dictionary = await ApiClient.request_json("POST", "/chat/image", {"data": b64, "ext": ext})
 	if res.ok and res.data is Dictionary:
 		var url := String((res.data as Dictionary).get("url", ""))
-		if url != "":
-			RealtimeService.send_chat("", _channel, _dm_target(), url)
+		if url == "":
+			return
+		if as_sticker:
+			if not _stickers.has(url):
+				_stickers.push_front(url)
+				_save_stickers()
+				_rebuild_stickers()
+			_system("已加入贴图包。")
+		else:
+			RealtimeService.send_chat("", _channel, _dm_target(), url, _current_room, _reply_to, _reply_preview)
+			_clear_reply()
 	else:
 		_system("图片上传失败。")
 
@@ -641,22 +817,46 @@ func _add_row(msg: Dictionary, _live: bool) -> void:
 			hb.set("corner_radius_" + side, 4)
 		lbl.add_theme_stylebox_override("normal", hb)
 
-	# Own recent messages get a recall (×) button; wrap text + button in a row.
+	# Build the row: [text (expand)] [引 quote] [× recall if own & recent].
 	var mid := String(msg.get("mid", ""))
+	var who := String(msg.get("name", "朝圣者"))
 	var recallable := mine and mid != "" and (Time.get_unix_time_from_system() * 1000 - int(msg.get("ts", 0))) < RECALL_WINDOW_MS
-	var container: Control = lbl
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(lbl)
+	if mid != "":
+		var q := Button.new()
+		q.text = "引"
+		q.tooltip_text = "引用回复"
+		q.add_theme_color_override("font_color", Color(0.6, 0.78, 0.95))
+		var preview := text if text != "" else "[图片]"
+		q.pressed.connect(func(): _set_reply(mid, who, preview))
+		row.add_child(q)
 	if recallable:
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 6)
-		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(lbl)
 		var x := Button.new()
 		x.text = "×"
 		x.tooltip_text = "撤回"
 		x.add_theme_color_override("font_color", Color(0.85, 0.5, 0.5))
 		x.pressed.connect(func(): RealtimeService.recall(mid))
 		row.add_child(x)
-		container = row
+
+	# Wrap with a quoted-preview line above, if this message quotes another.
+	var container: Control = row
+	var rp := String(msg.get("reply_preview", ""))
+	if rp != "":
+		var vb := VBoxContainer.new()
+		vb.add_theme_constant_override("separation", 0)
+		var quote := RichTextLabel.new()
+		quote.bbcode_enabled = true
+		quote.fit_content = true
+		quote.scroll_active = false
+		quote.add_theme_font_size_override("normal_font_size", 12)
+		quote.text = "[color=#6b7790]┃ %s[/color]" % _bbsafe(rp)
+		vb.add_child(quote)
+		vb.add_child(row)
+		container = vb
+
 	_append(container)
 	if mid != "":
 		_rows_by_mid[mid] = container
@@ -815,6 +1015,7 @@ func _set_input_open(v: bool) -> void:
 	else:
 		_hide_autocomplete()
 		_hide_emoji()
+		_clear_reply()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

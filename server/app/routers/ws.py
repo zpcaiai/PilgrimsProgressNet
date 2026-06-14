@@ -29,6 +29,8 @@ def _audience_keys(channel: str, scope: str, chapter_id: str) -> list[str]:
         if len(parts) == 3:
             return [dm_key(parts[1]), dm_key(parts[2])]
         return []
+    if channel == "room":
+        return [scope]  # scope is already "room:<id>"
     return [chapter_id]
 
 
@@ -80,6 +82,18 @@ async def ws_ghosts(websocket: WebSocket, chapter_id: str, token: str = Query(de
                 await _handle_chat(websocket, raw, chapter_id, player_id, name)
             elif kind == "chat_delete":
                 await _handle_delete(websocket, raw, chapter_id, player_id)
+            elif kind == "room_join":
+                room = str(raw.get("room", "")).strip()[:32]
+                if room:
+                    await manager.join(chat_store.room_scope(room), websocket)
+                    await websocket.send_json({
+                        "type": "system",
+                        "text": "已加入群聊「%s」（%d 人在线）" % (
+                            room, manager.room_size(chat_store.room_scope(room)))})
+            elif kind == "room_leave":
+                room = str(raw.get("room", "")).strip()[:32]
+                if room:
+                    manager.leave(chat_store.room_scope(room), websocket)
             elif kind == "ping":
                 await websocket.send_json({"type": "pong", "t": raw.get("t")})
     except WebSocketDisconnect:
@@ -99,22 +113,34 @@ async def _handle_chat(websocket: WebSocket, raw: dict, chapter_id: str, player_
         return
     text = moderation.filter_text(text) if text else text
     channel = str(raw.get("channel", "chapter"))
+    reply_to = str(raw.get("reply_to", "")) or None
+    reply_preview = (str(raw.get("reply_preview", ""))[:120] or None) if reply_to else None
     ts = int(time.time() * 1000)
     base = {"type": "chat", "id": player_id, "name": name, "text": text,
-            "image_url": image_url, "ts": ts, "channel": channel}
+            "image_url": image_url, "ts": ts, "channel": channel,
+            "reply_to": reply_to, "reply_preview": reply_preview}
 
     if channel == "world":
         scope = chat_store.world_scope()
-        saved = await chat_store.save(scope, "world", player_id, name, text, image_url)
+        saved = await chat_store.save(scope, "world", player_id, name, text, image_url, reply_to, reply_preview)
         base["mid"] = saved.id
         await manager.publish(WORLD_KEY, base)
+    elif channel == "room":
+        room = str(raw.get("room", "")).strip()[:32]
+        if not room:
+            return
+        scope = chat_store.room_scope(room)
+        base["room"] = room
+        saved = await chat_store.save(scope, "room", player_id, name, text, image_url, reply_to, reply_preview)
+        base["mid"] = saved.id
+        await manager.publish(scope, base)
     elif channel == "dm":
         to = str(raw.get("to", ""))
         if not to:
             return
         base["to"] = to
         scope = chat_store.dm_scope(player_id, to)
-        saved = await chat_store.save(scope, "dm", player_id, name, text, image_url)
+        saved = await chat_store.save(scope, "dm", player_id, name, text, image_url, reply_to, reply_preview)
         base["mid"] = saved.id
         await manager.publish(dm_key(to), base)
         if to != player_id:
@@ -122,7 +148,7 @@ async def _handle_chat(websocket: WebSocket, raw: dict, chapter_id: str, player_
             await manager.publish(dm_key(player_id), base)  # echo to sender
     else:
         scope = chat_store.chapter_scope(chapter_id)
-        saved = await chat_store.save(scope, "chapter", player_id, name, text, image_url)
+        saved = await chat_store.save(scope, "chapter", player_id, name, text, image_url, reply_to, reply_preview)
         base["mid"] = saved.id
         await manager.publish(chapter_id, base)
 

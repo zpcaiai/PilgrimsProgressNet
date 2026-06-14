@@ -153,6 +153,8 @@ class ChatMessage(Base):
     text: Mapped[str] = mapped_column(Text, default="")
     image_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
     deleted: Mapped[bool] = mapped_column(default=False)  # recalled -> show placeholder
+    reply_to: Mapped[str | None] = mapped_column(String(36), nullable=True)      # quoted message id
+    reply_preview: Mapped[str | None] = mapped_column(String(120), nullable=True)  # quoted snippet
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
