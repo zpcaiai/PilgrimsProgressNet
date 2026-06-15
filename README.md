@@ -24,8 +24,11 @@ narrative-quality sweep across the complete pilgrimage:
 - **In-level prompts and toasts** now reinforce the chapter theme without changing
   the existing flags, quest flow, or mechanics.
 
-What remains is polish that needs external assets (real low-poly art, audio) and
-optional balancing — see *Suggested next tasks* at the end.
+An **original asset pack now ships** (music, ambience, SFX, ground textures,
+chapter backdrops, character portraits, key art, and animation flipbooks — all
+procedurally generated and wired in fail-safe; see [`docs/ASSETS.md`](docs/ASSETS.md)).
+What remains is polish — replacing the painterly-placeholder art with hand-made
+work and optional balancing — see *Suggested next tasks* at the end.
 
 ---
 
@@ -196,14 +199,19 @@ the three-phase `ApollyonBoss`.
 
 ## Known limitations
 
-- Greybox visuals: capsules and boxes with stylized lighting/fog and light
-  particle VFX (cross/prayer/promise). Real low-poly art is not shipped — it needs
-  external assets — so the look is intentionally placeholder.
-- Audio is **wired but silent until you add files**: `AudioManager` plays each
-  chapter's music/ambience and event SFX, every path is existence-checked, and the
-  chapter JSON already points at `res://assets/audio/music/<chapter>.ogg` etc. Drop
-  `.ogg` files into `assets/audio/{music,ambient,sfx}/` and they play automatically
-  — no code changes. (No audio files ship with the project.)
+- An **original asset pack now ships** under `assets/` — 16 chapter music loops
+  + 16 ambience beds + 17 SFX (`.ogg`), 16 tileable ground textures, 16 painterly
+  chapter backdrops, 12 character portraits, title key art, token icons, and 5
+  animation flipbooks. All are procedurally generated (see `tools/gen_audio.py`,
+  `tools/gen_art.py`) and **100% original / public-domain-safe**. They are wired
+  in **fail-safe**: every asset is existence-checked, so the project still runs
+  if `assets/` is emptied, falling back to the greybox look and silence. See
+  [`docs/ASSETS.md`](docs/ASSETS.md). The art is stylized "painterly placeholder"
+  quality — a big step up from bare greybox, and trivially swappable for hand-made
+  art by overwriting the matching file names.
+- Visuals remain otherwise procedural: capsules and boxes with stylized
+  lighting/fog, textured ground, particle VFX (cross/prayer/promise), portraits in
+  dialogue, and per-chapter backdrops on the title card.
 - Combat is a working, unbalanced slice. It is wired into the **Valley of
   Humiliation** chapter and the standalone test arena.
 - GPU particles may appear faint or absent under the OpenGL compatibility
@@ -214,11 +222,16 @@ the three-phase `ApollyonBoss`.
 
 ## Suggested next tasks
 
-1. Replace greybox props with low-poly assets, per-chapter lighting, and audio
-   (music/ambience paths are already referenced in the chapter data).
+1. Upgrade the shipped procedural asset pack (`assets/`, see `docs/ASSETS.md`)
+   with hand-made low-poly props and recorded/composed audio — just overwrite the
+   matching file names; all paths are wired and existence-checked.
 2. Balance and expand combat: more enemy behaviours, add fights to the dark
    valleys, and add the retreat/repentance loop inside the boss fight.
-3. Add a settings/options screen (volume, sensitivity) and controller support.
+3. An **Options screen** now ships (title + pause): Master/Music/Ambience/SFX
+   volume sliders, **mouse-look + controller-look sensitivity**, invert-Y, and a
+   fullscreen toggle, persisted to `user://settings.cfg`. **Gamepad support** is
+   wired (stick/d-pad move, A jump, X interact, right-stick camera orbit, A/B menu
+   nav), and the camera now supports optional right-mouse / right-stick orbit.
 4. Localization pass — all player-facing text already lives in JSON dialogue and
    chapter data, ready to be translated.
 

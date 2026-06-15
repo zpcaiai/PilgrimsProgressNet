@@ -8,23 +8,53 @@
         {
           "id": "burden",
           "text": "I read that I am condemned, and the guilt will not leave me alone.",
-          "effects": { "humility": 6, "despair": -4 },
-          "flags": { "told_evangelist_burden": true },
-          "next": "name_it"
+          "effects": {
+            "humility": 6,
+            "despair": -4
+          },
+          "flags": {
+            "told_evangelist_burden": true
+          },
+          "next": "name_it",
+          "text_zh": "我读到自己已被定罪，那愧疚再不肯放过我。"
         },
         {
           "id": "afraid",
           "text": "I am afraid of judgment, of leaving, of being deceived by my own heart. All of it at once.",
-          "effects": { "fear": 4, "humility": 4 },
-          "next": "name_it"
+          "effects": {
+            "fear": 4,
+            "humility": 4
+          },
+          "next": "name_it",
+          "text_zh": "我惧怕审判、惧怕离开、惧怕被自己的心欺骗。一时全涌上来。"
         },
         {
           "id": "deny",
           "text": "Perhaps I have made too much of it. Perhaps the city will stand after all.",
-          "effects": { "deception": 5 },
-          "next": "press"
+          "effects": {
+            "deception": 5
+          },
+          "next": "press",
+          "text_zh": "也许我把它看得太重了。也许那城终究还是会存留。"
         }
-      ]
+      ],
+      "text_variants": [
+        {
+          "conditions": {
+            "despair_min": 70
+          },
+          "text": "Your eyes are nearly without hope, friend. Hear me before despair speaks first: there is a wicket gate, and a light beyond it. Now — what has truth uncovered in you?",
+          "text_zh": "朋友，你的眼里几乎没有盼望了。趁绝望抢先开口，先听我说：有一道窄门，门后有光。现在——真理在你里面揭出了什么？"
+        },
+        {
+          "conditions": {
+            "shame_min": 65
+          },
+          "text": "You will not lift your face. But I did not come to add to your shame; I came to point you to mercy. Look at me, and tell me plainly: what has truth uncovered in you?",
+          "text_zh": "你不肯抬起脸。但我不是来添你的羞耻；我是来为你指出怜悯。看着我，坦白告诉我：真理在你里面揭出了什么？"
+        }
+      ],
+      "text_zh": "你立在路上，手里拿着一本书，脸上有泪，背上压着重担。坦白告诉我：真理在你里面揭出了什么？"
     },
     "press": {
       "speaker": "Evangelist",
@@ -33,10 +63,16 @@
         {
           "id": "admit",
           "text": "No. I feel the burden every hour. I cannot keep pretending.",
-          "effects": { "humility": 8, "deception": -8, "despair": -3 },
-          "next": "name_it"
+          "effects": {
+            "humility": 8,
+            "deception": -8,
+            "despair": -3
+          },
+          "next": "name_it",
+          "text_zh": "不。我每个钟头都感到那重担。我无法再假装下去。"
         }
-      ]
+      ],
+      "text_zh": "你当真这样信，还是只因这样说更省事？人可以把烟唤作晨雾，火却不会被说服。"
     },
     "name_it": {
       "speaker": "Evangelist",
@@ -45,16 +81,24 @@
         {
           "id": "where",
           "text": "Where can I be rid of it? Tell me the way, and I will go.",
-          "effects": { "hope": 6 },
-          "next": "point_light"
+          "effects": {
+            "hope": 6
+          },
+          "next": "point_light",
+          "text_zh": "我能在哪里卸下它？告诉我那路，我就去。"
         },
         {
           "id": "unworthy",
           "text": "But you do not know what I have done. Surely this road is for cleaner people.",
-          "effects": { "shame": 4, "humility": 4 },
-          "next": "even_you"
+          "effects": {
+            "shame": 4,
+            "humility": 4
+          },
+          "next": "even_you",
+          "text_zh": "可你不知道我做过什么。这条路想必是给更洁净的人走的。"
         }
-      ]
+      ],
+      "text_zh": "那么你已迈出了真正的第一步：你不再欺骗自己。重担是真的，但它从来不该作你的主。"
     },
     "even_you": {
       "speaker": "Evangelist",
@@ -63,10 +107,16 @@
         {
           "id": "ok",
           "text": "Especially me?",
-          "effects": { "shame": -8, "hope": 8, "faith": 4 },
-          "next": "point_light"
+          "effects": {
+            "shame": -8,
+            "hope": 8,
+            "faith": 4
+          },
+          "next": "point_light",
+          "text_zh": "尤其是为我？"
         }
-      ]
+      ],
+      "text_zh": "我从未见过哪个真朝圣者是先配得才来的。那门不是为洁净之人来欣赏而造，乃是为背重担之人进入而设——尤其是为你。"
     },
     "point_light": {
       "speaker": "Evangelist",
@@ -75,17 +125,27 @@
         {
           "id": "family",
           "text": "And what of those I love, who beg me to stay?",
-          "effects": { "humility": 3 },
-          "next": "family_answer"
+          "effects": {
+            "humility": 3
+          },
+          "next": "family_answer",
+          "text_zh": "那我所爱、苦苦求我留下的人，又怎么办？"
         },
         {
           "id": "i_go",
           "text": "Then I will go now, before fear teaches me another excuse.",
-          "effects": { "faith": 10, "perseverance": 6 },
-          "flags": { "talked_to_evangelist": true },
-          "next": "blessing"
+          "effects": {
+            "faith": 10,
+            "perseverance": 6
+          },
+          "flags": {
+            "talked_to_evangelist": true
+          },
+          "next": "blessing",
+          "text_zh": "那我现在就走，趁恐惧还没教我又编一个借口。"
         }
-      ]
+      ],
+      "text_zh": "看那里，东门之外。你看见那点微光了吗？把你的眼定在它上面。走向窄门。叩门，别在门开之前与怜悯争辩。"
     },
     "family_answer": {
       "speaker": "Evangelist",
@@ -94,19 +154,36 @@
         {
           "id": "understand",
           "text": "I understand. I will go.",
-          "effects": { "faith": 8, "perseverance": 5 },
-          "flags": { "talked_to_evangelist": true },
-          "next": "blessing"
+          "effects": {
+            "faith": 8,
+            "perseverance": 5
+          },
+          "flags": {
+            "talked_to_evangelist": true
+          },
+          "next": "blessing",
+          "text_zh": "我明白了。我这就去。"
         }
-      ]
+      ],
+      "text_zh": "真心爱他们，却别让他们的惧怕把你的脚锁在一座将倾的城里。先走；为他们跟上来祷告。你不能靠陪他们一同灭亡来救他们。"
     },
     "blessing": {
       "speaker": "Evangelist",
       "text": "Then go, and do not turn back. The road will uncover more than you expect, but grace will meet you before every necessary step. Keep the light before your eyes.",
       "choices": [
-        { "id": "amen", "text": "I will keep it before me.", "next": "end" }
-      ]
+        {
+          "id": "amen",
+          "text": "I will keep it before me.",
+          "next": "end",
+          "text_zh": "我必把它常存眼前。"
+        }
+      ],
+      "text_zh": "那就去吧，别回头。这路要揭开的，比你所料的更多，但每一步必须迈出之前，恩典都会先与你相遇。把那光常存在你眼前。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

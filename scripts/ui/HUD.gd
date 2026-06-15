@@ -9,23 +9,32 @@ var _quest_label: RichTextLabel
 var _faith_bar: ProgressBar
 var _hope_bar: ProgressBar
 var _despair_bar: ProgressBar
+var _weariness_bar: ProgressBar
+var _load_label: Label
 var _burden_label: Label
 var _prompt_label: Label
 var _toast_label: Label
 var _toast_timer: float = 0.0
+var _stat_labels: Array = []
+var _lang_btn: Button
 
 # Dialogue
 var _dialogue_panel: Panel
+var _portrait: TextureRect
 var _speaker_label: Label
 var _text_label: RichTextLabel
 var _choice_box: VBoxContainer
 var _current_choices: Array = []
+
+# Grace / glory animation overlay (optional flipbook)
+var _grace_anim: AnimatedSprite2D
 
 const FONT_TITLE := 22
 const FONT_BODY := 18
 
 # Title card
 var _title_card: Control
+var _title_bg: TextureRect
 var _title_main: Label
 var _title_sub: Label
 
@@ -56,7 +65,9 @@ func _ready() -> void:
 	_build_title_card()
 	_build_char_panel()
 	_build_narration()
+	_build_grace_anim()
 	_connect_signals()
+	_build_lang_toggle()
 	_refresh_quest()
 
 
@@ -71,6 +82,9 @@ func _connect_signals() -> void:
 	EventBus.quest_completed.connect(func(_id): _refresh_quest())
 	EventBus.notify.connect(_on_toast)
 	EventBus.chapter_started.connect(_on_chapter_started)
+	if EventBus.has_signal("cross_grace_applied"):
+		EventBus.cross_grace_applied.connect(_on_cross_grace)
+	EventBus.locale_changed.connect(_on_locale_changed)
 
 
 # ---------------------------------------------------------------------------
@@ -126,22 +140,31 @@ func _build_spiritual_panel() -> void:
 	vb.add_theme_constant_override("separation", 6)
 	panel.add_child(vb)
 
-	_faith_bar = _add_stat_row(vb, "Faith", Color(0.95, 0.85, 0.4))
-	_hope_bar = _add_stat_row(vb, "Hope", Color(0.45, 0.8, 0.95))
-	_despair_bar = _add_stat_row(vb, "Despair", Color(0.55, 0.35, 0.6))
+	_faith_bar = _add_stat_row(vb, "hud.faith", "Faith", Color(0.95, 0.85, 0.4))
+	_hope_bar = _add_stat_row(vb, "hud.hope", "Hope", Color(0.45, 0.8, 0.95))
+	_despair_bar = _add_stat_row(vb, "hud.despair", "Despair", Color(0.55, 0.35, 0.6))
+	_weariness_bar = _add_stat_row(vb, "hud.weariness", "Weariness", Color(0.6, 0.55, 0.4))
 
 	_burden_label = Label.new()
 	_burden_label.add_theme_font_size_override("font_size", FONT_BODY)
-	_burden_label.text = "Burden: carried"
+	_burden_label.text = LocaleManager.t("hud.burden_carried", "Burden: carried")
 	_burden_label.modulate = Color(0.85, 0.7, 0.6)
 	vb.add_child(_burden_label)
 
+	_load_label = Label.new()
+	_load_label.add_theme_font_size_override("font_size", FONT_BODY)
+	_load_label.modulate = Color(0.8, 0.8, 0.88)
+	vb.add_child(_load_label)
 
-func _add_stat_row(parent: VBoxContainer, label_text: String, color: Color) -> ProgressBar:
+
+func _add_stat_row(parent: VBoxContainer, key: String, fallback: String, color: Color) -> ProgressBar:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	var lbl := Label.new()
-	lbl.text = label_text
+	lbl.text = LocaleManager.t(key, fallback)
+	lbl.set_meta("i18n_key", key)
+	lbl.set_meta("i18n_fb", fallback)
+	_stat_labels.append(lbl)
 	lbl.custom_minimum_size = Vector2(70, 0)
 	lbl.add_theme_font_size_override("font_size", FONT_BODY)
 	row.add_child(lbl)
@@ -206,10 +229,23 @@ func _build_dialogue() -> void:
 	_dialogue_panel.visible = false
 	add_child(_dialogue_panel)
 
+	var hb := HBoxContainer.new()
+	hb.set_anchors_preset(Control.PRESET_FULL_RECT)
+	hb.add_theme_constant_override("separation", 16)
+	_dialogue_panel.add_child(hb)
+
+	# Optional speaker portrait (hidden when no art exists for the speaker).
+	_portrait = TextureRect.new()
+	_portrait.custom_minimum_size = Vector2(168, 168)
+	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_portrait.visible = false
+	hb.add_child(_portrait)
+
 	var vb := VBoxContainer.new()
-	vb.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_theme_constant_override("separation", 8)
-	_dialogue_panel.add_child(vb)
+	hb.add_child(vb)
 
 	_speaker_label = Label.new()
 	_speaker_label.add_theme_font_size_override("font_size", FONT_TITLE)
@@ -238,6 +274,20 @@ func _build_title_card() -> void:
 	_title_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_title_card.modulate = Color(1, 1, 1, 0)
 	add_child(_title_card)
+	# Optional per-chapter backdrop art, drawn behind the title text and dimmed
+	# so the text stays readable. Fades with the title card.
+	_title_bg = TextureRect.new()
+	_title_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_title_bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_title_bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_title_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_title_bg.visible = false
+	_title_card.add_child(_title_bg)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.32)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_title_card.add_child(dim)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_CENTER)
 	center.position = Vector2(-300, -80)
@@ -264,7 +314,13 @@ func _build_title_card() -> void:
 
 func _on_chapter_started(chapter_id: String) -> void:
 	var data := ChapterManager.load_chapter_data(chapter_id)
+	var art := AssetLib.scene_art(chapter_id)
+	_title_bg.texture = art
+	_title_bg.visible = art != null
 	_title_main.text = String(data.get("title", chapter_id))
+	var mech := String(data.get("core_mechanic", ""))
+	if mech != "":
+		get_tree().create_timer(7.5).timeout.connect(func(): EventBus.toast("✦ " + mech.left(140)))
 	_title_sub.text = String(data.get("subtitle", ""))
 	var tw := create_tween()
 	tw.tween_property(_title_card, "modulate:a", 1.0, 0.6)
@@ -275,6 +331,32 @@ func _on_chapter_started(chapter_id: String) -> void:
 	if not intro.is_empty():
 		_pending_intro = intro.duplicate()
 		_intro_delay = 3.4
+
+
+# ---------------------------------------------------------------------------
+# Grace / glory animation overlay (optional flipbook sprite sheet)
+# ---------------------------------------------------------------------------
+func _build_grace_anim() -> void:
+	var sf := AssetLib.sprite_frames("grace_glory", 8, 16.0, false)
+	if sf == null:
+		return  # no sheet shipped: silently skip (greybox particles still play)
+	_grace_anim = AnimatedSprite2D.new()
+	_grace_anim.sprite_frames = sf
+	_grace_anim.centered = true
+	_grace_anim.scale = Vector2(2.4, 2.4)
+	_grace_anim.visible = false
+	_grace_anim.z_index = 50
+	add_child(_grace_anim)
+	_grace_anim.animation_finished.connect(func(): _grace_anim.visible = false)
+
+
+func _on_cross_grace() -> void:
+	if _grace_anim == null:
+		return
+	_grace_anim.position = get_viewport().get_visible_rect().size * 0.5
+	_grace_anim.visible = true
+	_grace_anim.frame = 0
+	_grace_anim.play("default")
 
 
 # ---------------------------------------------------------------------------
@@ -381,26 +463,26 @@ func _toggle_char_panel() -> void:
 
 func _refresh_char_panel() -> void:
 	var s := SpiritualStateManager
-	var mode_label := "Children's Journey" if GameState.is_child_mode() else "Devout Journey (敬虔版)"
-	var t := "[b]The Pilgrim's Heart[/b]   [color=#888888](C to close)[/color]\n"
+	var mode_label := LocaleManager.t("char.mode_child", "Children's Journey") if GameState.is_child_mode() else LocaleManager.t("char.mode_devout", "Devout Journey")
+	var t := "[b]" + LocaleManager.t("char.title", "The Pilgrim's Heart") + "[/b]   [color=#888888]" + LocaleManager.t("char.close_hint", "(C to close)") + "[/color]\n"
 	t += "[color=#9aa6c0]" + mode_label + "[/color]\n\n"
-	t += "[color=#f0e0a0]Graces[/color]\n"
-	t += "  Faith %d   Hope %d   Humility %d\n" % [s.faith, s.hope, s.humility]
-	t += "  Discernment %d   Perseverance %d   Watchfulness %d\n\n" % [s.discernment, s.perseverance, s.watchfulness]
-	t += "[color=#d0a0c0]Burdens[/color]\n"
-	t += "  Despair %d   Shame %d   Fear %d\n" % [s.despair, s.shame, s.fear]
-	t += "  Pride %d   Deception %d   Weariness %d\n\n" % [s.pride, s.deception, s.weariness]
-	t += "[color=#a0d0f0]Tokens[/color]\n"
+	t += "[color=#f0e0a0]" + LocaleManager.t("char.graces", "Graces") + "[/color]\n"
+	t += "  %s %d   %s %d   %s %d\n" % [LocaleManager.t("hud.faith","Faith"), s.faith, LocaleManager.t("hud.hope","Hope"), s.hope, LocaleManager.t("hud.humility","Humility"), s.humility]
+	t += "  %s %d   %s %d   %s %d\n\n" % [LocaleManager.t("hud.discernment","Discernment"), s.discernment, LocaleManager.t("hud.perseverance","Perseverance"), s.perseverance, LocaleManager.t("hud.watchfulness","Watchfulness"), s.watchfulness]
+	t += "[color=#d0a0c0]" + LocaleManager.t("char.burdens", "Burdens") + "[/color]\n"
+	t += "  %s %d   %s %d   %s %d\n" % [LocaleManager.t("hud.despair","Despair"), s.despair, LocaleManager.t("hud.shame","Shame"), s.shame, LocaleManager.t("hud.fear","Fear"), s.fear]
+	t += "  %s %d   %s %d   %s %d\n\n" % [LocaleManager.t("hud.pride","Pride"), s.pride, LocaleManager.t("hud.deception","Deception"), s.deception, LocaleManager.t("hud.weariness","Weariness"), s.weariness]
+	t += "[color=#a0d0f0]" + LocaleManager.t("char.tokens", "Tokens") + "[/color]\n"
 	var tokens: Array = []
-	if s.has_burden: tokens.append("Burden (carried)")
-	if s.has_scroll: tokens.append("Scroll")
-	if s.has_seal: tokens.append("Seal")
-	if s.has_new_garment: tokens.append("New Garment")
-	if s.has_promise_key: tokens.append("Key of Promise")
-	t += "  " + (", ".join(PackedStringArray(tokens)) if not tokens.is_empty() else "none yet") + "\n\n"
-	t += "[color=#a0f0c0]Companions[/color]\n"
+	if s.has_burden: tokens.append(LocaleManager.t("token.burden", "Burden (carried)"))
+	if s.has_scroll: tokens.append(LocaleManager.t("token.scroll", "Scroll"))
+	if s.has_seal: tokens.append(LocaleManager.t("token.seal", "Seal"))
+	if s.has_new_garment: tokens.append(LocaleManager.t("token.new_garment", "New Garment"))
+	if s.has_promise_key: tokens.append(LocaleManager.t("token.promise_key", "Key of Promise"))
+	t += "  " + (", ".join(PackedStringArray(tokens)) if not tokens.is_empty() else LocaleManager.t("char.none_yet", "none yet")) + "\n\n"
+	t += "[color=#a0f0c0]" + LocaleManager.t("char.companions", "Companions") + "[/color]\n"
 	var comps: Array = GameState.companions.keys()
-	t += "  " + (", ".join(PackedStringArray(comps)) if not comps.is_empty() else "walking alone") + "\n"
+	t += "  " + (", ".join(PackedStringArray(comps)) if not comps.is_empty() else LocaleManager.t("char.walking_alone", "walking alone")) + "\n"
 	_char_label.text = t
 
 
@@ -412,7 +494,11 @@ func _process(delta: float) -> void:
 		_faith_bar.value = SpiritualStateManager.faith
 		_hope_bar.value = SpiritualStateManager.hope
 		_despair_bar.value = SpiritualStateManager.despair
-		_burden_label.text = "Burden: carried" if SpiritualStateManager.has_burden else "Burden: fallen"
+		_weariness_bar.value = SpiritualStateManager.weariness
+		var load_pct := int(round(SpiritualStateManager.get_movement_penalty() * 100.0))
+		_load_label.text = (LocaleManager.t("hud.load_slower", "Load: %d%% slower") % load_pct) if load_pct > 0 else LocaleManager.t("hud.load_light", "Load: light")
+		_load_label.modulate = Color(0.9, 0.6, 0.55) if load_pct >= 25 else Color(0.78, 0.8, 0.88)
+		_burden_label.text = LocaleManager.t("hud.burden_carried", "Burden: carried") if SpiritualStateManager.has_burden else LocaleManager.t("hud.burden_fallen", "Burden: fallen")
 		_burden_label.modulate = Color(0.85, 0.7, 0.6) if SpiritualStateManager.has_burden else Color(0.7, 0.95, 0.7)
 
 	if is_instance_valid(_darkness_overlay):
@@ -439,7 +525,7 @@ func _refresh_quest() -> void:
 		return
 	var quest := QuestManager.get_primary_active_quest()
 	if quest.is_empty():
-		_quest_label.text = "[color=#aaaaaa]The road is quiet.[/color]"
+		_quest_label.text = "[color=#aaaaaa]" + LocaleManager.t("hud.quest_quiet", "The road is quiet.") + "[/color]"
 		return
 	var qid := String(quest.get("id", ""))
 	var step := QuestManager.get_next_incomplete_step_text(qid)
@@ -481,7 +567,14 @@ func _on_toast(message: String) -> void:
 func _on_dialogue_node(node: Dictionary) -> void:
 	_dialogue_panel.visible = true
 	_hide_prompt()
-	_speaker_label.text = String(node.get("speaker", ""))
+	var spk := String(node.get("speaker", ""))
+	var pic := AssetLib.portrait(spk)
+	if pic != null:
+		_portrait.texture = pic
+		_portrait.visible = true
+	else:
+		_portrait.visible = false
+	_speaker_label.text = spk
 	_text_label.text = String(node.get("text", ""))
 	_rebuild_choices()
 
@@ -493,7 +586,8 @@ func _rebuild_choices() -> void:
 	var idx := 1
 	for choice in _current_choices:
 		var btn := Button.new()
-		btn.text = "%d.  %s" % [idx, String(choice.get("text", ""))]
+		var hint := DialogueManager.get_choice_effect_hint(choice)
+		btn.text = "%d.  %s%s" % [idx, String(choice.get("text", "")), ("    〔" + hint + "〕" if hint != "" else "")]
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.add_theme_font_size_override("font_size", FONT_BODY)
 		var cid := String(choice.get("id", ""))
@@ -503,7 +597,7 @@ func _rebuild_choices() -> void:
 	# If a node has no choices, allow Space/E to continue (auto-end).
 	if _current_choices.is_empty():
 		var btn := Button.new()
-		btn.text = "(Continue)"
+		btn.text = LocaleManager.t("hud.continue", "(Continue)")
 		btn.add_theme_font_size_override("font_size", FONT_BODY)
 		btn.pressed.connect(func(): DialogueManager.end_dialogue())
 		_choice_box.add_child(btn)
@@ -542,3 +636,25 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		elif (event.keycode == KEY_SPACE or event.keycode == KEY_E) and _current_choices.is_empty():
 			DialogueManager.end_dialogue()
 			get_viewport().set_input_as_handled()
+
+
+func _build_lang_toggle() -> void:
+	_lang_btn = Button.new()
+	_lang_btn.text = LocaleManager.switch_label()
+	_lang_btn.tooltip_text = "切换语言 / Switch language"
+	_lang_btn.add_theme_font_size_override("font_size", 14)
+	_lang_btn.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_lang_btn.position = Vector2(20, -40)
+	_lang_btn.pressed.connect(func(): LocaleManager.toggle())
+	add_child(_lang_btn)
+
+
+func _on_locale_changed(_loc: String) -> void:
+	if is_instance_valid(_lang_btn):
+		_lang_btn.text = LocaleManager.switch_label()
+	for lbl in _stat_labels:
+		if is_instance_valid(lbl):
+			lbl.text = LocaleManager.t(String(lbl.get_meta("i18n_key", "")), String(lbl.get_meta("i18n_fb", "")))
+	_refresh_quest()
+	if _char_visible:
+		_refresh_char_panel()

@@ -23,11 +23,28 @@ const SFX := {
 	"collapse": "res://assets/audio/sfx/collapse.ogg",
 	"victory": "res://assets/audio/sfx/victory.ogg",
 	"save": "res://assets/audio/sfx/save.ogg",
+	"chapel_kneel": "res://assets/audio/sfx/chapel_kneel.ogg",
+	"blessing": "res://assets/audio/sfx/blessing.ogg",
+	"lantern_word": "res://assets/audio/sfx/lantern_word.ogg",
+	"vanity_buy": "res://assets/audio/sfx/vanity_buy.ogg",
+	"vanity_lay_down": "res://assets/audio/sfx/vanity_lay_down.ogg",
+	"river_cross": "res://assets/audio/sfx/river_cross.ogg",
+	"sleep_fail": "res://assets/audio/sfx/sleep_fail.ogg",
+	"shadow_snuff": "res://assets/audio/sfx/shadow_snuff.ogg",
+	"message_in": "res://assets/audio/sfx/message_in.ogg",
+	"mention": "res://assets/audio/sfx/mention.ogg",
+	"sticker_send": "res://assets/audio/sfx/sticker_send.ogg",
 }
 
 @export var music_volume_db: float = -8.0
 @export var ambient_volume_db: float = -14.0
 @export var sfx_volume_db: float = -4.0
+
+# User volume settings (linear 0..1) applied via audio buses and persisted to
+# disk. These sit on top of the per-player mix above (the buses default to 0 dB).
+const SETTINGS_PATH := "user://settings.cfg"
+const BUS := {"music": "Music", "ambient": "Ambient", "sfx": "SFX"}
+var _vol := {"master": 1.0, "music": 0.85, "ambient": 0.8, "sfx": 0.9}
 
 var _music_a: AudioStreamPlayer
 var _music_b: AudioStreamPlayer
@@ -37,16 +54,21 @@ var _sfx_pool: Array[AudioStreamPlayer] = []
 var _sfx_idx: int = 0
 var _current_music_path: String = ""
 var _current_ambient_path: String = ""
+var _sfx_trim: Dictionary = {}  # per-sfx volume_db from assets/audio/sfx_config.json
 
 
 func _ready() -> void:
-	_music_a = _make_player()
-	_music_b = _make_player()
+	_ensure_buses()
+	_music_a = _make_player("Music")
+	_music_b = _make_player("Music")
 	_active_music = _music_a
-	_ambient = _make_player()
+	_ambient = _make_player("Ambient")
 	_ambient.volume_db = ambient_volume_db
 	for i in range(6):
-		_sfx_pool.append(_make_player())
+		_sfx_pool.append(_make_player("SFX"))
+	_load_sfx_config()
+	load_settings()
+	apply_all_volumes()
 
 	EventBus.chapter_started.connect(_on_chapter_started)
 	EventBus.choice_selected.connect(func(_id): play_sfx("ui_select"))
@@ -58,10 +80,66 @@ func _ready() -> void:
 	EventBus.save_completed.connect(func(_slot): play_sfx("save"))
 
 
-func _make_player() -> AudioStreamPlayer:
+func _make_player(bus_name: String = "Master") -> AudioStreamPlayer:
 	var p := AudioStreamPlayer.new()
+	p.bus = bus_name
 	add_child(p)
 	return p
+
+
+# ---------------------------------------------------------------------------
+# Volume buses & persisted settings
+# ---------------------------------------------------------------------------
+func _ensure_buses() -> void:
+	for b in [BUS["music"], BUS["ambient"], BUS["sfx"]]:
+		if AudioServer.get_bus_index(b) == -1:
+			AudioServer.add_bus()
+			var idx := AudioServer.get_bus_count() - 1
+			AudioServer.set_bus_name(idx, b)
+			AudioServer.set_bus_send(idx, "Master")
+
+
+func get_volume(which: String) -> float:
+	return float(_vol.get(which, 1.0))
+
+
+func set_volume(which: String, value: float) -> void:
+	if not _vol.has(which):
+		return
+	_vol[which] = clampf(value, 0.0, 1.0)
+	_apply_volume(which)
+
+
+func apply_all_volumes() -> void:
+	for k in _vol.keys():
+		_apply_volume(k)
+
+
+func _apply_volume(which: String) -> void:
+	var raw: float = float(_vol.get(which, 1.0))
+	var db := linear_to_db(maxf(raw, 0.0001))
+	var idx := 0  # Master
+	if which != "master":
+		idx = AudioServer.get_bus_index(String(BUS.get(which, "")))
+	if idx >= 0:
+		AudioServer.set_bus_volume_db(idx, db)
+		AudioServer.set_bus_mute(idx, raw <= 0.0)
+
+
+func load_settings() -> void:
+	var cf := ConfigFile.new()
+	if cf.load(SETTINGS_PATH) != OK:
+		return
+	for k in _vol.keys():
+		_vol[k] = clampf(float(cf.get_value("audio", k, _vol[k])), 0.0, 1.0)
+
+
+func save_settings() -> void:
+	var cf := ConfigFile.new()
+	cf.load(SETTINGS_PATH)  # preserve other sections (e.g. [video])
+	for k in _vol.keys():
+		cf.set_value("audio", k, _vol[k])
+	cf.save(SETTINGS_PATH)
 
 
 # ---------------------------------------------------------------------------
@@ -130,6 +208,19 @@ func _fade(player: AudioStreamPlayer, to_db: float, dur: float, stop_after: bool
 # ---------------------------------------------------------------------------
 # SFX (round-robin pool)
 # ---------------------------------------------------------------------------
+## Load per-SFX volume trims from the JSON config (existence-checked; absent -> 0 dB).
+func _load_sfx_config() -> void:
+	var p := "res://assets/audio/sfx_config.json"
+	if not FileAccess.file_exists(p):
+		return
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(p))
+	if parsed is Dictionary and parsed.has("sfx"):
+		for k in (parsed["sfx"] as Dictionary).keys():
+			var e: Variant = parsed["sfx"][k]
+			if e is Dictionary and e.has("volume_db"):
+				_sfx_trim[String(k)] = float(e["volume_db"])
+
+
 func play_sfx(sfx_name: String) -> void:
 	var path: String = SFX.get(sfx_name, "")
 	var stream := _load_audio(path)
@@ -138,7 +229,7 @@ func play_sfx(sfx_name: String) -> void:
 	var player := _sfx_pool[_sfx_idx]
 	_sfx_idx = (_sfx_idx + 1) % _sfx_pool.size()
 	player.stream = stream
-	player.volume_db = sfx_volume_db
+	player.volume_db = sfx_volume_db + float(_sfx_trim.get(sfx_name, 0.0))
 	player.play()
 
 

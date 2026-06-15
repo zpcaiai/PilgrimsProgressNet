@@ -8,11 +8,48 @@
         {
           "id": "show_me",
           "text": "Show us the City, and teach us how to finish well.",
-          "effects": { "hope": 10, "faith": 5 },
-          "flags": { "saw_celestial_city": true },
-          "next": "warn"
+          "effects": {
+            "hope": 10,
+            "faith": 5
+          },
+          "flags": {
+            "saw_celestial_city": true
+          },
+          "next": "warn",
+          "text_zh": "把圣城指给我们看，也教我们如何善始善终。"
         }
-      ]
+      ],
+      "text_variants": [
+        {
+          "conditions": {
+            "requires_flag": "interpreter_full"
+          },
+          "text": "You have the look of one who lingered in the Interpreter's house and weighed every room — the lamp, the dust, the patient way. That kind of sight is welcome here. From these mountains, mercy lets the clear-eyed see the City most plainly of all.",
+          "text_zh": "你有那种在释经者之家里逗留、把每一间房都掂量过的眼神——那灯、那尘、那忍耐之道。这样的眼光在此处受欢迎。从这些山上，清眼之人看圣城看得最是分明。"
+        },
+        {
+          "conditions": {
+            "requires_flag": "chapel_pilgrim"
+          },
+          "text": "You have the unhurried look of one who knelt at every wayside chapel the road offered — even those no eye but Heaven's could see. Such quiet faithfulness sees far; from these mountains, the City will not hide from you.",
+          "text_zh": "你有那种不慌不忙的神情，像是在路上每一座小堂都跪过——连那些无人、唯有天看得见的也跪过。这般静默的忠心看得很远；从这些山上，圣城不会向你藏躲。"
+        },
+        {
+          "conditions": {
+            "pride_min": 55
+          },
+          "text": "You carry yourself like one who has already arrived. Mercy still lets the tired see the City — but pride is a poor telescope. Look again, and lower your eyes a little.",
+          "text_zh": "你的举止像是已经到达。怜悯仍让疲乏的人看见圣城——但骄傲是个糟糕的望远镜。再看一眼，把眼睛放低一点。"
+        },
+        {
+          "conditions": {
+            "discernment_min": 55
+          },
+          "text": "You have learned to see truly on the road; it shows in your face. From here, mercy lets the clear-eyed see the City most plainly of all. Look, and be glad.",
+          "text_zh": "你在路上学会了真正地看；这写在你脸上。从这里，怜悯让清眼之人看圣城看得最是分明。看吧，且欢喜。"
+        }
+      ],
+      "text_zh": "欢迎来到喜悦山，朝圣者。你们逃出了一座黑暗的房子；呼吸这清新的空气吧。从这里，怜悯让疲乏的人在抵达之前先看见圣城。"
     },
     "warn": {
       "speaker": "The Shepherds",
@@ -21,11 +58,20 @@
         {
           "id": "thanks",
           "text": "We will remember: warnings are mercy, and the City is real.",
-          "effects": { "watchfulness": 6, "discernment": 6 },
-          "next": "end"
+          "effects": {
+            "watchfulness": 6,
+            "discernment": 6
+          },
+          "next": "end",
+          "text_zh": "我们必记得：警告是怜悯，圣城是真实的。"
         }
-      ]
+      ],
+      "text_zh": "还有两样危险。迷魂地不会咆哮；它会把你哄睡，叫你忘记。过了它，有一条无桥之河；唯有信心能领受那渡过。把盼望带在身边，把圣城常存眼前。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

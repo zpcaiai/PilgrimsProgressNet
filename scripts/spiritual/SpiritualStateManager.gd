@@ -172,6 +172,8 @@ func get_movement_multiplier() -> float:
 	penalty += weariness * 0.002
 	penalty -= hope * 0.001
 	penalty -= perseverance * 0.001
+	# Vanity bought at the fair clings and weighs on the road (~3% each).
+	penalty += GameState.get_item_count("vanity_token") * 0.03
 	penalty = clampf(penalty, 0.0, 0.5)
 	# Children's Journey: the burden and despair slow you only half as much.
 	if GameState.is_child_mode():

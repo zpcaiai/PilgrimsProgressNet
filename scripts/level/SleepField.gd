@@ -9,8 +9,8 @@ var threshold: float = 10.0
 var entry_point: Vector3 = Vector3.ZERO
 var _player: PlayerController = null
 var _drowse: float = 0.0
-var _overlay: ColorRect
-var _layer: CanvasLayer
+var _warned: bool = false
+var _vignette: DarkVignette
 
 
 func setup(size: Vector3, edge_point: Vector3) -> void:
@@ -40,15 +40,11 @@ func setup(size: Vector3, edge_point: Vector3) -> void:
 	mat.emission_energy_multiplier = 0.4
 	mesh.material_override = mat
 	add_child(mesh)
-	# Sleep overlay.
-	_layer = CanvasLayer.new()
-	_layer.layer = 9
-	add_child(_layer)
-	_overlay = ColorRect.new()
-	_overlay.color = Color(0.0, 0.0, 0.05, 0.0)
-	_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_layer.add_child(_overlay)
+	# Sleep overlay: a reusable edge-darkening vignette that closes in as the
+	# drowse gathers (tunnel vision); the node eases its own alpha.
+	_vignette = DarkVignette.new()
+	_vignette.edge_color = Color(0.10, 0.06, 0.02)
+	add_child(_vignette)
 	body_entered.connect(_on_enter)
 	body_exited.connect(_on_exit)
 
@@ -61,6 +57,7 @@ func _on_enter(body: Node) -> void:
 func _on_exit(body: Node) -> void:
 	if body == _player:
 		_player = null
+		_warned = false
 
 
 func _companion_near() -> bool:
@@ -71,7 +68,6 @@ func _companion_near() -> bool:
 
 
 func _process(delta: float) -> void:
-	var target_alpha := 0.0
 	if _player != null:
 		var rate := 1.0 - SpiritualStateManager.watchfulness * 0.006
 		rate = clampf(rate, 0.25, 1.0)
@@ -82,18 +78,37 @@ func _process(delta: float) -> void:
 		SpiritualStateManager.modify_state("weariness", 0) # touch, keeps state live
 		if _drowse >= threshold:
 			_fall_asleep()
-		target_alpha = clampf(_drowse / threshold * 0.9, 0.0, 0.9)
 	else:
 		_drowse = max(0.0, _drowse - delta * 1.5)
-		target_alpha = clampf(_drowse / threshold * 0.9, 0.0, 0.9)
-	if is_instance_valid(_overlay):
-		_overlay.color.a = lerp(_overlay.color.a, target_alpha, delta * 3.0)
+	# Edges close in as the drowse gathers; the vignette eases itself.
+	if is_instance_valid(_vignette):
+		_vignette.set_intensity(clampf(_drowse / threshold, 0.0, 1.0))
 
 
 func _fall_asleep() -> void:
+	_blackout()
+	AudioManager.play_sfx("sleep_fail")
 	_drowse = 0.0
+	_warned = false
 	SpiritualStateManager.apply_effects({"watchfulness": -10, "weariness": 10})
 	GameState.set_flag("slept_on_enchanted_ground", true)
 	EventBus.toast("You drift to sleep... and wake further back than you began.")
 	if _player != null:
 		_player.teleport(entry_point)
+
+
+## A brief full-screen black blink — the moment the drowse wins and you 'sleep'.
+func _blackout() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 20
+	add_child(layer)
+	var rect := ColorRect.new()
+	rect.color = Color(0, 0, 0, 0)
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(rect)
+	var tw := create_tween()
+	tw.tween_property(rect, "color:a", 1.0, 0.12)
+	tw.tween_interval(0.15)
+	tw.tween_property(rect, "color:a", 0.0, 0.5)
+	tw.tween_callback(layer.queue_free)

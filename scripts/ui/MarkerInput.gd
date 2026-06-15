@@ -49,14 +49,14 @@ func _build() -> void:
 	_panel.add_child(vb)
 
 	var title := Label.new()
-	title.text = "在此留一句话，赠予后来的同行者"
+	title.text = LocaleManager.t("marker.prompt", "在此留一句话，赠予后来的同行者")
 	title.add_theme_font_size_override("font_size", FONT_TITLE)
 	title.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7))
 	vb.add_child(title)
 
 	_edit = LineEdit.new()
 	_edit.max_length = MAX_LEN
-	_edit.placeholder_text = "例如：白日将尽，仍要前行……"
+	_edit.placeholder_text = LocaleManager.t("marker.example", "例如：白日将尽，仍要前行……")
 	_edit.add_theme_font_size_override("font_size", FONT_BODY)
 	_edit.custom_minimum_size = Vector2(0, 44)
 	_edit.text_submitted.connect(func(_t): _submit())
@@ -68,14 +68,14 @@ func _build() -> void:
 	vb.add_child(row)
 
 	var send := Button.new()
-	send.text = "留下路标 (Enter)"
+	send.text = LocaleManager.t("marker.leave", "留下路标 (Enter)")
 	send.add_theme_font_size_override("font_size", FONT_BODY)
 	send.custom_minimum_size = Vector2(220, 42)
 	send.pressed.connect(_submit)
 	row.add_child(send)
 
 	var cancel := Button.new()
-	cancel.text = "取消 (Esc)"
+	cancel.text = LocaleManager.t("marker.cancel", "取消 (Esc)")
 	cancel.add_theme_font_size_override("font_size", FONT_BODY)
 	cancel.custom_minimum_size = Vector2(150, 42)
 	cancel.pressed.connect(func(): _set_open(false))
@@ -100,7 +100,7 @@ func _submit() -> void:
 		_set_open(false)
 		return
 	GhostService.leave_marker(text)
-	EventBus.toast("你的路标已留在此处。")
+	EventBus.toast(LocaleManager.t("marker.left", "你的路标已留在此处。"))
 	_edit.text = ""
 	_set_open(false)
 
@@ -111,7 +111,7 @@ func _set_open(v: bool) -> void:
 	_panel.visible = v
 	get_tree().paused = v
 	if v:
-		_hint.text = "其他朝圣者下次走到这一关时，会看到你留下的话。"
+		_hint.text = LocaleManager.t("marker.note", "其他朝圣者下次走到这一关时，会看到你留下的话。")
 		_edit.grab_focus()
 
 
@@ -124,7 +124,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		return
 	if event.keycode == KEY_M and not _open:
 		if not _can_use():
-			EventBus.toast("离线状态：联网后才能留下路标。")
+			EventBus.toast(LocaleManager.t("marker.offline", "离线状态：联网后才能留下路标。"))
 			get_viewport().set_input_as_handled()
 			return
 		_set_open(true)

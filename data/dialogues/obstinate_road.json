@@ -8,17 +8,29 @@
         {
           "id": "forward",
           "text": "I will not return to a familiar ruin.",
-          "effects": { "faith": 5, "perseverance": 5, "fear": -3 },
-          "flags": { "obstinate_left": true },
-          "next": "gives_up"
+          "effects": {
+            "faith": 5,
+            "perseverance": 5,
+            "fear": -3
+          },
+          "flags": {
+            "obstinate_left": true
+          },
+          "next": "gives_up",
+          "text_zh": "我不会回到一座熟悉的废墟里去。"
         },
         {
           "id": "doubt",
           "text": "What if the light is only distance and wishful thinking?",
-          "effects": { "fear": 5, "despair": 5 },
-          "next": "press_doubt"
+          "effects": {
+            "fear": 5,
+            "despair": 5
+          },
+          "next": "press_doubt",
+          "text_zh": "万一那光只是距离和一厢情愿呢？"
         }
-      ]
+      ],
+      "text_zh": "还在走？回头看看：那城近得还能折返，前头却只有泥泞、饥饿，和陌生人的说教。"
     },
     "press_doubt": {
       "speaker": "Obstinate",
@@ -27,19 +39,36 @@
         {
           "id": "still_go",
           "text": "No. Even trembling, I would rather seek the light than make peace with the fire.",
-          "effects": { "faith": 6, "hope": 4 },
-          "flags": { "obstinate_left": true },
-          "next": "gives_up"
+          "effects": {
+            "faith": 6,
+            "hope": 4
+          },
+          "flags": {
+            "obstinate_left": true
+          },
+          "next": "gives_up",
+          "text_zh": "不。哪怕颤抖，我也宁愿寻那光，也不愿与那火言和。"
         }
-      ]
+      ],
+      "text_zh": "正是。什么都没有。趁你明天还笑得出来，回家吧。"
     },
     "gives_up": {
       "speaker": "Obstinate",
       "text": "Then keep your burden and your little light. I am done following sorrow.",
       "choices": [
-        { "id": "ok", "text": "Walk on alone.", "next": "end" }
-      ]
+        {
+          "id": "ok",
+          "text": "Walk on alone.",
+          "next": "end",
+          "text_zh": "独自前行。"
+        }
+      ],
+      "text_zh": "那就留着你的重担和你那点微光吧。我不奉陪愁苦了。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

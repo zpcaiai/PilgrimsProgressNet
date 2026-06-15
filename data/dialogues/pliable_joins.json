@@ -8,26 +8,48 @@
         {
           "id": "welcome",
           "text": "Walk with me, then. Keep your eyes on more than the reward.",
-          "effects": { "hope": 5 },
-          "flags": { "pliable_joined": true },
-          "next": "end"
+          "effects": {
+            "hope": 5
+          },
+          "flags": {
+            "pliable_joined": true
+          },
+          "next": "end",
+          "text_zh": "那就与我同行。把眼目放在赏赐之外更多的事上。"
         },
         {
           "id": "warn",
           "text": "The promise is great, but the road will test whether you love truth or only comfort.",
-          "effects": { "discernment": 3, "humility": 3 },
-          "flags": { "pliable_joined": true },
-          "next": "light"
+          "effects": {
+            "discernment": 3,
+            "humility": 3
+          },
+          "flags": {
+            "pliable_joined": true
+          },
+          "next": "light",
+          "text_zh": "应许极大，但这路要试验：你爱的是真理，还是只爱安逸。"
         }
-      ]
+      ],
+      "text_zh": "一座闪耀的城、冠冕、无尽的喜乐？那我也来。通往那等地方的路，想必够惬意吧。"
     },
     "light": {
       "speaker": "Pliable",
       "text": "Hard? Perhaps a little. But why dwell on mud when we can speak of gold? Come, let us hurry to the pleasant parts.",
       "choices": [
-        { "id": "continue", "text": "Let us continue.", "next": "end" }
-      ]
+        {
+          "id": "continue",
+          "text": "Let us continue.",
+          "next": "end",
+          "text_zh": "我们继续吧。"
+        }
+      ],
+      "text_zh": "难？或许有一点。可既能谈论黄金，何必纠缠泥泞？来，我们快往惬意的部分去。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

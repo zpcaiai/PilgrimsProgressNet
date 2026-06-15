@@ -21,7 +21,7 @@ func _ready() -> void:
 	_set_visible(false)
 	if NetConfig.enabled:
 		CloudSaveService.cloud_conflict.connect(_on_conflict)
-		CloudSaveService.cloud_downloaded.connect(func(_s): EventBus.toast("已从云端恢复存档。"))
+		CloudSaveService.cloud_downloaded.connect(func(_s): EventBus.toast(LocaleManager.t("cloud.restored", "已从云端恢复存档。")))
 		CloudSaveService.cloud_uploaded.connect(func(_s, _v): pass)
 
 
@@ -52,7 +52,7 @@ func _build() -> void:
 	_panel.add_child(vb)
 
 	var title := Label.new()
-	title.text = "云端存档冲突"
+	title.text = LocaleManager.t("cloud.conflict", "云端存档冲突")
 	title.add_theme_font_size_override("font_size", FONT_TITLE)
 	title.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7))
 	vb.add_child(title)
@@ -72,14 +72,14 @@ func _build() -> void:
 	vb.add_child(row)
 
 	var take_cloud := Button.new()
-	take_cloud.text = "下载云端存档"
+	take_cloud.text = LocaleManager.t("cloud.download", "下载云端存档")
 	take_cloud.add_theme_font_size_override("font_size", FONT_BODY)
 	take_cloud.custom_minimum_size = Vector2(220, 44)
 	take_cloud.pressed.connect(_take_cloud)
 	row.add_child(take_cloud)
 
 	var keep_local := Button.new()
-	keep_local.text = "保留本地（覆盖云端）"
+	keep_local.text = LocaleManager.t("cloud.keep_local", "保留本地（覆盖云端）")
 	keep_local.add_theme_font_size_override("font_size", FONT_BODY)
 	keep_local.custom_minimum_size = Vector2(220, 44)
 	keep_local.pressed.connect(_keep_local)
@@ -89,9 +89,9 @@ func _build() -> void:
 func _on_conflict(slot_id: String, server_version: int) -> void:
 	_slot_id = slot_id
 	_server_version = server_version
-	_body.text = ("云端有一份[b]更新的存档[/b]（版本 %d），可能来自你的另一台设备。\n\n"
-		+ "[color=#cfd6ea]下载云端[/color]：用云端进度覆盖本地。\n"
-		+ "[color=#cfd6ea]保留本地[/color]：用当前设备进度覆盖云端。") % server_version
+	_body.text = (LocaleManager.t("cloud.conflict_msg", "云端有一份[b]更新的存档[/b]（版本 %d），可能来自你的另一台设备。\n\n")
+		+ LocaleManager.t("cloud.opt_download", "[color=#cfd6ea]下载云端[/color]：用云端进度覆盖本地。\n")
+		+ LocaleManager.t("cloud.opt_keep", "[color=#cfd6ea]保留本地[/color]：用当前设备进度覆盖云端。")) % server_version
 	_set_visible(true)
 	get_tree().paused = true
 
@@ -104,7 +104,7 @@ func _take_cloud() -> void:
 func _keep_local() -> void:
 	_close()
 	CloudSaveService.resolve_keep_local(_slot_id, _server_version)
-	EventBus.toast("已用本地存档覆盖云端。")
+	EventBus.toast(LocaleManager.t("cloud.overwrote", "已用本地存档覆盖云端。"))
 
 
 func _close() -> void:

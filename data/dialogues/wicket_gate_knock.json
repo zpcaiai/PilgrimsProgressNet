@@ -8,23 +8,38 @@
         {
           "id": "knock",
           "text": "Knock anyway, firmly, without negotiating with shame.",
-          "effects": { "faith": 10, "fear": -5 },
-          "flags": { "knocked_gate": true },
-          "next": "opened"
+          "effects": {
+            "faith": 10,
+            "fear": -5
+          },
+          "flags": {
+            "knocked_gate": true
+          },
+          "next": "opened",
+          "text_zh": "照样叩门，坚定地，不与羞耻讨价还价。"
         },
         {
           "id": "hesitate",
           "text": "Hesitate at the threshold, hand half raised.",
-          "effects": { "fear": 5, "despair": 3 },
-          "next": "hesitation"
+          "effects": {
+            "fear": 5,
+            "despair": 3
+          },
+          "next": "hesitation",
+          "text_zh": "在门槛前迟疑，手举到一半。"
         },
         {
           "id": "look_back",
           "text": "Glance back toward the city that still knows your name.",
-          "effects": { "despair": 5, "shame": 5 },
-          "next": "look_back"
+          "effects": {
+            "despair": 5,
+            "shame": 5
+          },
+          "next": "look_back",
+          "text_zh": "回头望向那座仍叫得出你名字的城。"
         }
-      ]
+      ],
+      "text_zh": "这门小得足以叫你谦卑，旧日生活的箭也近得足以让羞耻听来颇有道理。你里面有个声音说，你没有资格叩门。"
     },
     "hesitation": {
       "speaker": "Pilgrim",
@@ -33,11 +48,19 @@
         {
           "id": "knock_now",
           "text": "Stop waiting to feel worthy. Knock as one who needs mercy.",
-          "effects": { "faith": 6, "fear": -5, "humility": 3 },
-          "flags": { "knocked_gate": true },
-          "next": "opened"
+          "effects": {
+            "faith": 6,
+            "fear": -5,
+            "humility": 3
+          },
+          "flags": {
+            "knocked_gate": true
+          },
+          "next": "opened",
+          "text_zh": "别再等到觉得自己配得。像一个需要怜悯的人那样叩门。"
         }
-      ]
+      ],
+      "text_zh": "箭嘶嘶地更近了。门四围的光不慌不忙地等候，仿佛怜悯并不因你的颤抖而意外。"
     },
     "look_back": {
       "speaker": "Pilgrim",
@@ -46,19 +69,38 @@
         {
           "id": "turn_gate",
           "text": "Turn from the city again, and knock.",
-          "effects": { "perseverance": 6, "shame": -4 },
-          "flags": { "knocked_gate": true },
-          "next": "opened"
+          "effects": {
+            "perseverance": 6,
+            "shame": -4
+          },
+          "flags": {
+            "knocked_gate": true
+          },
+          "next": "opened",
+          "text_zh": "再一次从那城转身，叩门。"
         }
-      ]
+      ],
+      "text_zh": "旧城黑暗，边缘燃烧，却熟悉得叫人心疼。随后门前的光触到你的脸，那心疼便失了它的权柄。"
     },
     "opened": {
       "speaker": "Goodwill",
       "text": "Come in, quickly, come in. You knocked, and that is all that was asked of you. The arrows of the old life cannot follow through this gate. You are received by mercy, not by merit.",
-      "flags": { "goodwill_received_player": true, "passed_wicket_gate": true },
-      "effects": { "fear": -12, "hope": 12, "shame": -8 },
-      "next": "end"
+      "flags": {
+        "goodwill_received_player": true,
+        "passed_wicket_gate": true
+      },
+      "effects": {
+        "fear": -12,
+        "hope": 12,
+        "shame": -8
+      },
+      "next": "end",
+      "text_zh": "进来，快，进来。你叩了门，所求于你的不过如此。旧日生活的箭无法穿过这门追来。接纳你的是怜悯，不是功劳。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

@@ -9,6 +9,7 @@ var effects_per_tick: Dictionary = {"despair": 1, "weariness": 1}
 var tick_interval: float = 2.0
 var _player: PlayerController = null
 var _accum: float = 0.0
+var _tick_count: int = 0
 
 
 func setup(size: Vector3, deep: bool = false, tint: Color = Color(0, 0, 0, 0)) -> void:
@@ -54,6 +55,7 @@ func _on_exit(body: Node) -> void:
 		_player.terrain_multiplier = 1.0
 		_player = null
 		_accum = 0.0
+		_tick_count = 0
 
 
 func _process(delta: float) -> void:
@@ -63,3 +65,6 @@ func _process(delta: float) -> void:
 	if _accum >= tick_interval:
 		_accum = 0.0
 		SpiritualStateManager.apply_effects(effects_per_tick)
+		_tick_count += 1
+		if _tick_count % 2 == 1:
+			EventBus.toast("绝望从泥里渗上来，脚步更沉。")

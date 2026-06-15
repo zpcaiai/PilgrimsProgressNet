@@ -10,12 +10,14 @@ signal email_code_sent(dev_code: String)     # dev_code non-empty only in dev mo
 signal email_bound(email: String)
 signal account_recovered(player_id: String)
 signal account_error(reason: String)
+signal avatar_changed(avatar_url: String)
 
 const DEVICE_FILE := "user://device_id.txt"
 
 var player_id: String = ""
 var display_name: String = ""
 var email: String = ""
+var avatar_url: String = ""
 var refresh_token: String = ""
 var is_online: bool = false
 
@@ -54,8 +56,24 @@ func login() -> void:
 	refresh_token = String(data.get("refresh_token", ""))
 	player_id = String(data.get("player_id", ""))
 	display_name = String(data.get("display_name", ""))
+	avatar_url = String(data.get("avatar_url", "")) if data.get("avatar_url") != null else ""
 	is_online = true
 	authenticated.emit(player_id, display_name)
+
+
+## Upload (and save) the player's avatar. `image_b64` is base64 image bytes.
+func upload_avatar(image_b64: String, ext: String) -> void:
+	if not is_online:
+		account_error.emit("离线状态：无法上传头像。")
+		return
+	var res: Dictionary = await ApiClient.request_json(
+		"POST", "/players/avatar", {"data": image_b64, "ext": ext}
+	)
+	if res.ok and res.data is Dictionary:
+		avatar_url = String((res.data as Dictionary).get("avatar_url", ""))
+		avatar_changed.emit(avatar_url)
+	else:
+		account_error.emit("头像上传失败。")
 
 
 # --- Email binding & account recovery ---

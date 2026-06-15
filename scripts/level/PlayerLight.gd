@@ -6,6 +6,7 @@ class_name PlayerLight
 
 var _light: OmniLight3D
 var boost: float = 0.0
+var snuff: float = 0.0
 var base_range: float = 6.0
 var base_energy: float = 1.2
 
@@ -22,9 +23,15 @@ func add_boost(amount: float) -> void:
 	EventBus.toast("Light gathers around you.")
 
 
+## Shadows pressing close drain the lamp; it recovers when you move clear.
+func apply_snuff(amount: float) -> void:
+	snuff = min(snuff + amount, 6.0)
+
+
 func _process(delta: float) -> void:
 	boost = max(0.0, boost - delta * 1.2)
+	snuff = max(0.0, snuff - delta * 0.8)
 	var faith := float(SpiritualStateManager.faith)
 	var fear := float(SpiritualStateManager.fear)
-	_light.light_energy = clampf(base_energy + faith * 0.025 - fear * 0.02 + boost, 0.25, 8.0)
-	_light.omni_range = clampf(base_range + faith * 0.12 - fear * 0.06 + boost * 2.0, 3.0, 20.0)
+	_light.light_energy = clampf(base_energy + faith * 0.025 - fear * 0.02 + boost - snuff, 0.1, 8.0)
+	_light.omni_range = clampf(base_range + faith * 0.12 - fear * 0.06 + boost * 2.0 - snuff * 1.5, 2.0, 20.0)

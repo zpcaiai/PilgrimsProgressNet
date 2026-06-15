@@ -16,6 +16,8 @@ func _build_chapter() -> void:
 	make_block(Vector3(1, 4, 70), Color(0.24, 0.22, 0.28), Vector3(-10, 2, -20))
 	make_block(Vector3(1, 4, 70), Color(0.24, 0.22, 0.28), Vector3(10, 2, -20))
 
+	make_wayside_chapel(Vector3(-8, 0, -30), "enchanted", {"watchfulness": 8, "weariness": -6, "hope": 3}, "A waking-chapel at the field's edge; its light is loud. Sleep loosens its hold.")
+
 	spawn_player(Vector3(0, 1, 14))
 	# Ensure Hopeful is present to rouse the pilgrim (joined back at Vanity Fair).
 	if companion == null and not GameState.has_companion("hopeful"):

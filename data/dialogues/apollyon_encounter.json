@@ -8,18 +8,56 @@
         {
           "id": "stand",
           "text": "All of that is true. And all of it was carried to the Cross behind me.",
-          "effects": { "faith": 10, "shame": -10, "fear": -4 },
-          "flags": { "apollyon_challenged": true },
-          "next": "accuse"
+          "effects": {
+            "faith": 10,
+            "shame": -10,
+            "fear": -4
+          },
+          "flags": {
+            "apollyon_challenged": true
+          },
+          "next": "accuse",
+          "text_zh": "那一切都是真的。而那一切，都已被带到我身后的十字架上了。"
         },
         {
           "id": "afraid",
           "text": "My knees shake, but I will not make fear my master again.",
-          "effects": { "perseverance": 8, "fear": 4 },
-          "flags": { "apollyon_challenged": true },
-          "next": "accuse"
+          "effects": {
+            "perseverance": 8,
+            "fear": 4
+          },
+          "flags": {
+            "apollyon_challenged": true
+          },
+          "next": "accuse",
+          "text_zh": "我的膝在抖，但我不会再让恐惧作我的主。"
         }
-      ]
+      ],
+      "text_variants": [
+        {
+          "conditions": {
+            "shame_min": 60
+          },
+          "text": "I can see the shame still clinging to you, deserter — you wear it like my old colors. Where do you think you are going? I know the promises you broke.",
+          "text_zh": "我看得见那羞耻仍黏在你身上，逃兵——你像穿着我旧日的衣色。你以为你要往哪儿去？你毁过的诺言我都知道。"
+        },
+        {
+          "conditions": {
+            "pride_min": 60
+          },
+          "text": "Still so certain of your own strength? Good. Pride was always the easiest leash to hold. Where do you think you are going, deserter? You served me well once.",
+          "text_zh": "还这么笃定自己的力量？很好。骄傲向来是最好牵的绳。你以为你要往哪儿去，逃兵？你曾经事奉我事奉得不错。"
+        },
+        {
+          "conditions": {
+            "faith_min": 60,
+            "hope_min": 55
+          },
+          "text": "You stand steadier than most who pass this way. No matter — I know the promises you broke and the sins you once defended. Where do you think you are going, deserter?",
+          "text_zh": "你站得比多数路过此地的人都稳。无妨——你毁过的诺言、你曾维护的罪，我都记得。你以为你要往哪儿去，逃兵？"
+        }
+      ],
+      "text_zh": "你以为你要往哪儿去，逃兵？你生在我的城里，穿过我的衣色，事奉我比你如今肯承认的还要殷勤。你毁过的诺言、你曾经维护的罪，我都记得。"
     },
     "accuse": {
       "speaker": "Apollyon",
@@ -28,24 +66,44 @@
         {
           "id": "grace",
           "text": "I may stumble, but I am not kept by my strength. You have no claim on a pardoned pilgrim.",
-          "effects": { "faith": 10, "hope": 8, "pride": -4 },
-          "next": "rage"
+          "effects": {
+            "faith": 10,
+            "hope": 8,
+            "pride": -4
+          },
+          "next": "rage",
+          "text_zh": "我或许会跌倒，但保守我的不是我的力量。你对一个已蒙赦免的朝圣者，毫无所有权。"
         },
         {
           "id": "silent",
           "text": "You speak my old name. I answer to the One who renamed me.",
-          "effects": { "faith": 8, "shame": -8 },
-          "next": "rage"
+          "effects": {
+            "faith": 8,
+            "shame": -8
+          },
+          "next": "rage",
+          "text_zh": "你叫的是我的旧名。我只回应那位为我改名的主。"
         }
-      ]
+      ],
+      "text_zh": "十字架？你以为一座山、几句借来的话，就能抹去你的本相？你还会再失败，你总是如此。趁你的新主还没为你蒙羞，回来吧。"
     },
     "rage": {
       "speaker": "Apollyon",
       "text": "Then stand there and be broken. If I cannot own you, I will drown you in fear and shame.",
       "choices": [
-        { "id": "fight", "text": "Stand firm, pray, and answer with promise. (The fight begins.)", "next": "end" }
-      ]
+        {
+          "id": "fight",
+          "text": "Stand firm, pray, and answer with promise. (The fight begins.)",
+          "next": "end",
+          "text_zh": "站稳、祷告，以应许回应。（战斗开始。）"
+        }
+      ],
+      "text_zh": "那就站在那里，被打碎吧。我若不能拥有你，就用恐惧与羞耻把你淹没。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

@@ -25,12 +25,19 @@ var _img_http: HTTPRequest
 var _room_edit: LineEdit
 var _room_box: HBoxContainer
 var _current_room: String = ""
+var _room_name: String = ""
+var _members_popup: PanelContainer
+var _members_box: VBoxContainer
 var _reply_bar: Panel
 var _reply_label: Label
 var _reply_to: String = ""
 var _reply_preview: String = ""
 var _sticker_grid: GridContainer
-var _stickers: Array = []     # list of "/media/..." sticker urls
+var _sticker_group_btn: OptionButton
+var _sticker_data: Dictionary = {"groups": {LocaleManager.t("chat.default_group", "默认"): []}, "active": LocaleManager.t("chat.default_group", "默认")}
+var _builtin_packs: Dictionary = {}
+var _builtin_label_to_id: Dictionary = {}
+var _muted: bool = false
 const STICKER_FILE := "user://chat_stickers.json"
 var _badge: Label
 var _unread_total: int = 0
@@ -39,6 +46,8 @@ var _mention_re: RegEx
 var _ac_popup: PanelContainer          # @-mention autocomplete
 var _ac_list: VBoxContainer
 var _rows_by_mid: Dictionary = {}      # mid -> the row Control (for recall)
+var _avatar_url_cache: Dictionary = {} # player_id -> avatar url
+var _avatar_tex_cache: Dictionary = {} # url -> ImageTexture
 var _emoji_popup: PanelContainer
 var _recent_grid: GridContainer
 var _recent_emojis: Array = []
@@ -72,6 +81,7 @@ func _ready() -> void:
 		RealtimeService.chat_deleted.connect(_on_chat_deleted)
 		RealtimeService.peer_updated.connect(_on_peer_seen)
 		RealtimeService.peer_left.connect(func(pid): _peers.erase(pid))
+		RealtimeService.room_members.connect(_on_room_members)
 		AuthService.authenticated.connect(func(_id, _n): _refresh_unread(); _refresh_mentions())
 		EventBus.chapter_started.connect(func(_c): _clear())
 		if AuthService.is_online:
@@ -137,6 +147,7 @@ func _build() -> void:
 	var rx := Button.new()
 	rx.text = "×"
 	rx.pressed.connect(_clear_reply)
+	_seticon(rx, "close", "×")
 	rb.add_child(rx)
 
 	_input_row = Panel.new()
@@ -151,10 +162,10 @@ func _build() -> void:
 	_input_row.add_child(hb)
 
 	_channel_btn = OptionButton.new()
-	_channel_btn.add_item("本关", 0)
-	_channel_btn.add_item("世界", 1)
-	_channel_btn.add_item("私聊", 2)
-	_channel_btn.add_item("群聊", 3)
+	_channel_btn.add_item(LocaleManager.t("chat.ch_local", "本关"), 0)
+	_channel_btn.add_item(LocaleManager.t("chat.ch_world", "世界"), 1)
+	_channel_btn.add_item(LocaleManager.t("chat.ch_dm", "私聊"), 2)
+	_channel_btn.add_item(LocaleManager.t("chat.ch_room", "群聊"), 3)
 	_channel_btn.item_selected.connect(_on_channel_selected)
 	hb.add_child(_channel_btn)
 
@@ -169,24 +180,39 @@ func _build() -> void:
 	_room_box.visible = false
 	hb.add_child(_room_box)
 	_room_edit = LineEdit.new()
-	_room_edit.placeholder_text = "房间码"
+	_room_edit.placeholder_text = LocaleManager.t("chat.room_code", "房间码")
 	_room_edit.custom_minimum_size = Vector2(110, 0)
 	_room_edit.add_theme_font_size_override("font_size", FONT_BODY)
 	_room_box.add_child(_room_edit)
 	var join_b := Button.new()
-	join_b.text = "进"
-	join_b.tooltip_text = "加入房间"
+	join_b.text = LocaleManager.t("chat.join_btn", "进")
+	join_b.tooltip_text = LocaleManager.t("chat.join_room", "加入房间")
 	join_b.pressed.connect(_join_room)
 	_room_box.add_child(join_b)
 	var new_b := Button.new()
-	new_b.text = "建"
-	new_b.tooltip_text = "创建新房间"
+	new_b.text = LocaleManager.t("chat.create_btn", "建")
+	new_b.tooltip_text = LocaleManager.t("chat.create_room_tip", "在房间码栏填名字再点建，创建带名群聊")
 	new_b.pressed.connect(_create_room)
 	_room_box.add_child(new_b)
+	var mem_b := Button.new()
+	mem_b.text = LocaleManager.t("chat.members", "成员")
+	mem_b.pressed.connect(_toggle_members)
+	_room_box.add_child(mem_b)
+
+	# Members popup (room name + member list).
+	_members_popup = PanelContainer.new()
+	_members_popup.add_theme_stylebox_override("panel", _bg(Color(0.08, 0.09, 0.13, 0.99), 8))
+	_members_popup.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_members_popup.position = Vector2(360, -260)
+	_members_popup.visible = false
+	add_child(_members_popup)
+	_members_box = VBoxContainer.new()
+	_members_box.add_theme_constant_override("separation", 3)
+	_members_popup.add_child(_members_box)
 
 	_input = LineEdit.new()
 	_input.max_length = 200
-	_input.placeholder_text = "说点什么…（Enter 发送）"
+	_input.placeholder_text = LocaleManager.t("chat.input_ph", "说点什么…（Enter 发送）")
 	_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_input.add_theme_font_size_override("font_size", FONT_BODY)
 	_input.text_submitted.connect(_on_submit)
@@ -206,15 +232,36 @@ func _build() -> void:
 
 	var emoji_btn := Button.new()
 	emoji_btn.text = "😀"
-	emoji_btn.tooltip_text = "表情 / 快捷短语"
+	emoji_btn.tooltip_text = LocaleManager.t("chat.emoji_tip", "表情 / 快捷短语")
 	emoji_btn.pressed.connect(_toggle_emoji)
+	_seticon(emoji_btn, "emoji", "😀")
 	hb.add_child(emoji_btn)
 
 	var img_btn := Button.new()
-	img_btn.text = "图"
-	img_btn.tooltip_text = "发送图片"
+	img_btn.text = LocaleManager.t("chat.img_btn", "图")
+	img_btn.tooltip_text = LocaleManager.t("chat.send_image", "发送图片")
 	img_btn.pressed.connect(_pick_image)
+	_seticon(img_btn, "image", LocaleManager.t("chat.img_btn", "图"))
 	hb.add_child(img_btn)
+
+	var at_btn := Button.new()
+	at_btn.tooltip_text = LocaleManager.t("chat.at_mention", "@ 提及")
+	at_btn.pressed.connect(func(): _insert_text("@"))
+	_seticon(at_btn, "at", "@")
+	hb.add_child(at_btn)
+
+	var bell_btn := Button.new()
+	bell_btn.tooltip_text = LocaleManager.t("chat.toggle_sound", "开/关 新消息提示音")
+	bell_btn.toggle_mode = true
+	bell_btn.toggled.connect(func(on): _muted = on)
+	_seticon(bell_btn, "bell", "🔔")
+	hb.add_child(bell_btn)
+
+	var send_btn := Button.new()
+	send_btn.tooltip_text = LocaleManager.t("common.send", "发送")
+	send_btn.pressed.connect(func(): _on_submit(_input.text))
+	_seticon(send_btn, "send", "↵")
+	hb.add_child(send_btn)
 
 	# Emoji / quick-phrase picker popup.
 	_emoji_popup = PanelContainer.new()
@@ -228,7 +275,7 @@ func _build() -> void:
 	_emoji_popup.add_child(ev)
 	# "Recently used" row (filled from disk, updated on use).
 	var recent_lbl := Label.new()
-	recent_lbl.text = "最近"
+	recent_lbl.text = LocaleManager.t("chat.recent", "最近")
 	recent_lbl.add_theme_font_size_override("font_size", 12)
 	recent_lbl.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75))
 	ev.add_child(recent_lbl)
@@ -249,7 +296,7 @@ func _build() -> void:
 	_rebuild_recent()
 	for p in QUICK_PHRASES:
 		var pb := Button.new()
-		pb.text = String(p)
+		pb.text = LocaleManager.t("chat.phrase." + String(p), String(p))
 		pb.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		var pc := String(p)
 		pb.pressed.connect(func(): _insert_text(pc); _hide_emoji())
@@ -262,19 +309,29 @@ func _build() -> void:
 	srow.add_theme_constant_override("separation", 6)
 	ev.add_child(srow)
 	var slabel := Label.new()
-	slabel.text = "贴图"
+	slabel.text = LocaleManager.t("chat.stickers", "贴图")
 	slabel.add_theme_font_size_override("font_size", 12)
 	slabel.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75))
 	srow.add_child(slabel)
+	_sticker_group_btn = OptionButton.new()
+	_sticker_group_btn.add_theme_font_size_override("font_size", 12)
+	_sticker_group_btn.item_selected.connect(_on_sticker_group_selected)
+	srow.add_child(_sticker_group_btn)
+	var new_grp := Button.new()
+	new_grp.text = LocaleManager.t("chat.new_group", "新建组")
+	new_grp.pressed.connect(_new_sticker_group)
+	srow.add_child(new_grp)
 	var add_st := Button.new()
-	add_st.text = "＋添加"
-	add_st.tooltip_text = "上传一张图片加入贴图包"
+	add_st.text = LocaleManager.t("chat.add", "＋添加")
+	add_st.tooltip_text = LocaleManager.t("chat.add_sticker_tip", "上传图片加入当前分组")
 	add_st.pressed.connect(_add_sticker)
 	srow.add_child(add_st)
 	_sticker_grid = GridContainer.new()
 	_sticker_grid.columns = 5
 	ev.add_child(_sticker_grid)
 	_load_stickers()
+	_builtin_packs = AssetLib.sticker_manifest()
+	_rebuild_sticker_groups()
 	_rebuild_stickers()
 
 	_file_dialog = FileDialog.new()
@@ -319,8 +376,8 @@ func _build() -> void:
 	for spec in [["－", Callable(self, "_zoom_by").bind(1.0 / 1.25)],
 			["100%", Callable(self, "_zoom_reset")],
 			["＋", Callable(self, "_zoom_by").bind(1.25)],
-			["保存", Callable(self, "_save_image")],
-			["关闭", Callable(self, "_close_viewer")]]:
+			[LocaleManager.t("common.save", "保存"), Callable(self, "_save_image")],
+			[LocaleManager.t("common.close", "关闭"), Callable(self, "_close_viewer")]]:
 		var b := Button.new()
 		b.text = String(spec[0])
 		b.add_theme_font_size_override("font_size", FONT_BODY)
@@ -350,14 +407,18 @@ func _bg(color: Color, radius: int) -> StyleBoxFlat:
 	return s
 
 
-func _on_peer_seen(peer_id: String, peer_name: String, _p: Vector3, _y: float) -> void:
+func _on_peer_seen(peer_id: String, peer_name: String, avatar: String, _p: Vector3, _y: float) -> void:
 	_peers[peer_id] = peer_name
+	if avatar != "":
+		_avatar_url_cache[peer_id] = avatar
 
 
 func _on_channel_selected(idx: int) -> void:
 	_channel = ["chapter", "world", "dm", "room"][idx]
 	_dm_btn.visible = _channel == "dm"
 	_room_box.visible = _channel == "room"
+	if _channel != "room":
+		_members_popup.visible = false
 	if _channel == "dm":
 		_rebuild_dm_targets()
 
@@ -365,9 +426,11 @@ func _on_channel_selected(idx: int) -> void:
 # --- Group rooms ---
 func _create_room() -> void:
 	if not AuthService.is_online:
-		_system("离线状态：无法创建房间。")
+		_system(LocaleManager.t("chat.offline_room", "离线状态：无法创建房间。"))
 		return
-	var res: Dictionary = await ApiClient.request_json("POST", "/chat/room/create", {})
+	# Text in the room field (if any) is used as the new room's name.
+	var wanted_name := _room_edit.text.strip_edges()
+	var res: Dictionary = await ApiClient.request_json("POST", "/chat/room/create", {"name": wanted_name})
 	if res.ok and res.data is Dictionary:
 		_room_edit.text = String((res.data as Dictionary).get("room", ""))
 		_join_room()
@@ -384,16 +447,62 @@ func _join_room() -> void:
 	# Load this room's recent history.
 	var res: Dictionary = await ApiClient.request_json("GET", "/chat/history?scope=room&room_id=%s" % room)
 	if res.ok and res.data is Array:
-		_system("—— 群聊「%s」历史 ——" % room)
+		_system(LocaleManager.t("chat.room_history", "—— 群聊「%s」历史 ——") % room)
 		for m in res.data:
 			if m is Dictionary:
 				_add_row(m, false)
 
 
+func _on_room_members(room: String, room_name: String, members: Array) -> void:
+	if room != _current_room:
+		return
+	if room_name != "":
+		_room_name = room_name
+	_render_members(members)
+
+
+func _toggle_members() -> void:
+	_members_popup.visible = not _members_popup.visible
+
+
+func _render_members(members: Array) -> void:
+	for c in _members_box.get_children():
+		c.queue_free()
+	var title := Label.new()
+	var label := _room_name if _room_name != "" else _current_room
+	title.text = LocaleManager.t("chat.room_title", "群聊「%s」 · %d 人") % [label, members.size()]
+	title.add_theme_font_size_override("font_size", 14)
+	title.add_theme_color_override("font_color", Color(0.95, 0.9, 0.6))
+	_members_box.add_child(title)
+	for mm in members:
+		if mm is Dictionary:
+			var mrow := HBoxContainer.new()
+			mrow.add_theme_constant_override("separation", 6)
+			var av := String(mm.get("avatar", ""))
+			var mid := String(mm.get("id", ""))
+			if av != "":
+				_avatar_url_cache[mid] = av
+			var ar := TextureRect.new()
+			ar.custom_minimum_size = Vector2(20, 20)
+			ar.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			ar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			_apply_avatar(ar, av, mid)
+			mrow.add_child(ar)
+			var l := Label.new()
+			var nm := String(mm.get("name", LocaleManager.t("lb.pilgrim", "朝圣者")))
+			if String(mm.get("id", "")) == AuthService.player_id:
+				nm += LocaleManager.t("chat.you", "（你）")
+			l.text = nm
+			l.add_theme_font_size_override("font_size", 13)
+			l.add_theme_color_override("font_color", Color(0.8, 0.85, 0.95))
+			mrow.add_child(l)
+			_members_box.add_child(mrow)
+
+
 func _rebuild_dm_targets() -> void:
 	_dm_btn.clear()
 	if _peers.is_empty():
-		_dm_btn.add_item("（本关暂无他人）", 0)
+		_dm_btn.add_item(LocaleManager.t("chat.no_others", "（本关暂无他人）"), 0)
 		_dm_btn.set_item_disabled(0, true)
 		return
 	var i := 0
@@ -436,7 +545,7 @@ func _refresh_unread() -> void:
 
 func _update_badge() -> void:
 	if _unread_total > 0:
-		_badge.text = "私信 %d" % _unread_total
+		_badge.text = LocaleManager.t("chat.dm_n", "私信 %d") % _unread_total
 		_badge.visible = true
 	else:
 		_badge.visible = false
@@ -459,7 +568,7 @@ func _refresh_mentions() -> void:
 	var items: Array = res.data
 	for m in items:
 		if m is Dictionary:
-			EventBus.toast("[@] %s 在%s里提到了你：%s" % [
+			EventBus.toast(LocaleManager.t("chat.mention_notif", "[@] %s 在%s里提到了你：%s") % [
 				String(m.get("from_name", "")), _channel_tag_plain(String(m.get("channel", ""))),
 				String(m.get("text", "")).left(24)])
 	# Acknowledge so they don't notify again.
@@ -487,7 +596,7 @@ func _on_submit(text: String) -> void:
 func _set_reply(mid: String, who: String, preview: String) -> void:
 	_reply_to = mid
 	_reply_preview = preview
-	_reply_label.text = "回复 %s：%s" % [who, preview.left(28)]
+	_reply_label.text = LocaleManager.t("chat.reply_to", "回复 %s：%s") % [who, preview.left(28)]
 	_reply_bar.visible = true
 	_set_input_open(true)
 
@@ -501,7 +610,7 @@ func _clear_reply() -> void:
 # --- Custom stickers ---
 func _add_sticker() -> void:
 	if not AuthService.is_online:
-		_system("离线状态：无法添加贴图。")
+		_system(LocaleManager.t("chat.offline_sticker", "离线状态：无法添加贴图。"))
 		return
 	_file_dialog.set_meta("mode", "sticker")
 	_file_dialog.popup_centered_ratio(0.6)
@@ -509,36 +618,117 @@ func _add_sticker() -> void:
 
 func _send_sticker(url: String) -> void:
 	RealtimeService.send_chat("", _channel, _dm_target(), url, _current_room)
+	AudioManager.play_sfx("sticker_send")
 	_hide_emoji()
+
+
+func _active_group() -> String:
+	return String(_sticker_data.get("active", LocaleManager.t("chat.default_group", "默认")))
+
+
+func _active_stickers() -> Array:
+	var groups: Dictionary = _sticker_data.get("groups", {})
+	return groups.get(_active_group(), [])
+
+
+func _rebuild_sticker_groups() -> void:
+	_sticker_group_btn.clear()
+	var groups: Dictionary = _sticker_data.get("groups", {})
+	var i := 0
+	var active := _active_group()
+	for g in groups.keys():
+		_sticker_group_btn.add_item(String(g), i)
+		if String(g) == active:
+			_sticker_group_btn.select(i)
+		i += 1
+	_builtin_label_to_id.clear()
+	var packs: Dictionary = _builtin_packs.get("packs", {})
+	for pid in packs.keys():
+		var label := "📦" + String(packs[pid].get("label", pid))
+		_sticker_group_btn.add_item(label, i)
+		_builtin_label_to_id[label] = String(pid)
+		if label == active:
+			_sticker_group_btn.select(i)
+		i += 1
+
+
+func _on_sticker_group_selected(idx: int) -> void:
+	_sticker_data["active"] = _sticker_group_btn.get_item_text(idx)
+	_save_stickers()
+	_rebuild_stickers()
+
+
+func _new_sticker_group() -> void:
+	var groups: Dictionary = _sticker_data.get("groups", {})
+	var base := LocaleManager.t("chat.group_n", "分组%d") % (groups.size() + 1)
+	groups[base] = []
+	_sticker_data["groups"] = groups
+	_sticker_data["active"] = base
+	_save_stickers()
+	_rebuild_sticker_groups()
+	_rebuild_stickers()
 
 
 func _rebuild_stickers() -> void:
 	for c in _sticker_grid.get_children():
 		c.queue_free()
-	for url in _stickers:
+	if _builtin_label_to_id.has(_active_group()):
+		_build_builtin_stickers(_builtin_label_to_id[_active_group()])
+		return
+	for url in _active_stickers():
 		var b := Button.new()
 		b.text = "🖼"
-		b.tooltip_text = "发送贴图（右键删除）"
+		b.tooltip_text = LocaleManager.t("chat.send_sticker", "发送贴图（右键删除）")
 		b.add_theme_font_size_override("font_size", 18)
 		var u := String(url)
 		b.pressed.connect(func(): _send_sticker(u))
 		b.gui_input.connect(func(e):
 			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_RIGHT:
-				_stickers.erase(u); _save_stickers(); _rebuild_stickers())
+				_active_stickers().erase(u); _save_stickers(); _rebuild_stickers())
 		_sticker_grid.add_child(b)
 
 
+func _build_builtin_stickers(pid: String) -> void:
+	var names: Array = _builtin_packs.get("packs", {}).get(pid, {}).get("names", [])
+	for nm in names:
+		var b := Button.new()
+		var st := AssetLib.sticker(pid, String(nm))
+		if st != null:
+			b.icon = st
+			b.expand_icon = true
+			b.custom_minimum_size = Vector2(44, 44)
+		else:
+			b.text = "🖼"
+			b.tooltip_text = String(nm)
+		var token := "sticker://%s/%s" % [pid, String(nm)]
+		b.pressed.connect(func(): _send_sticker(token))
+		_sticker_grid.add_child(b)
+
+
+func _add_to_active_group(url: String) -> void:
+	var arr := _active_stickers()
+	if not arr.has(url):
+		arr.push_front(url)
+		_save_stickers()
+		_rebuild_stickers()
+
+
 func _load_stickers() -> void:
-	if FileAccess.file_exists(STICKER_FILE):
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(STICKER_FILE))
-		if parsed is Array:
-			_stickers = parsed
+	if not FileAccess.file_exists(STICKER_FILE):
+		return
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(STICKER_FILE))
+	if parsed is Dictionary and parsed.has("groups"):
+		_sticker_data = parsed
+	elif parsed is Array:
+		# Migrate the old flat list into the default group.
+		_sticker_data = {"groups": {LocaleManager.t("chat.default_group", "默认"): parsed}, "active": LocaleManager.t("chat.default_group", "默认")}
+		_save_stickers()
 
 
 func _save_stickers() -> void:
 	var f := FileAccess.open(STICKER_FILE, FileAccess.WRITE)
 	if f:
-		f.store_string(JSON.stringify(_stickers))
+		f.store_string(JSON.stringify(_sticker_data))
 		f.close()
 
 
@@ -664,7 +854,7 @@ func _zoom_reset() -> void:
 
 func _save_image() -> void:
 	if _viewer_bytes.is_empty():
-		_system("图片尚未加载完成。")
+		_system(LocaleManager.t("chat.img_loading", "图片尚未加载完成。"))
 		return
 	_save_dialog.current_file = "pilgrim_image.%s" % _viewer_ext
 	_save_dialog.popup_centered_ratio(0.6)
@@ -675,9 +865,9 @@ func _on_save_path(path: String) -> void:
 	if f:
 		f.store_buffer(_viewer_bytes)
 		f.close()
-		_system("图片已保存。")
+		_system(LocaleManager.t("chat.img_saved", "图片已保存。"))
 	else:
-		_system("保存失败。")
+		_system(LocaleManager.t("chat.save_failed", "保存失败。"))
 
 
 func _close_viewer() -> void:
@@ -688,7 +878,7 @@ func _close_viewer() -> void:
 
 func _pick_image() -> void:
 	if not AuthService.is_online:
-		_system("离线状态：无法发送图片。")
+		_system(LocaleManager.t("chat.offline_image", "离线状态：无法发送图片。"))
 		return
 	_file_dialog.popup_centered_ratio(0.6)
 
@@ -696,10 +886,10 @@ func _pick_image() -> void:
 func _on_file_chosen(path: String) -> void:
 	var bytes := FileAccess.get_file_as_bytes(path)
 	if bytes.is_empty():
-		_system("无法读取图片。")
+		_system(LocaleManager.t("account.img_unreadable", "无法读取图片。"))
 		return
 	if bytes.size() > 2 * 1024 * 1024:
-		_system("图片过大（上限 2MB）。")
+		_system(LocaleManager.t("account.img_too_big", "图片过大（上限 2MB）。"))
 		return
 	var ext := path.get_extension().to_lower()
 	var b64 := Marshalls.raw_to_base64(bytes)
@@ -711,16 +901,13 @@ func _on_file_chosen(path: String) -> void:
 		if url == "":
 			return
 		if as_sticker:
-			if not _stickers.has(url):
-				_stickers.push_front(url)
-				_save_stickers()
-				_rebuild_stickers()
-			_system("已加入贴图包。")
+			_add_to_active_group(url)
+			_system(LocaleManager.t("chat.sticker_group_added", "已加入贴图分组「%s」。") % _active_group())
 		else:
 			RealtimeService.send_chat("", _channel, _dm_target(), url, _current_room, _reply_to, _reply_preview)
 			_clear_reply()
 	else:
-		_system("图片上传失败。")
+		_system(LocaleManager.t("chat.img_upload_failed", "图片上传失败。"))
 
 
 # --- Receiving ---
@@ -730,9 +917,41 @@ func _clear() -> void:
 
 
 func _on_history(items: Array) -> void:
+	# Pre-fetch avatars for all senders so history rows can show them.
+	var ids: Array = []
+	for it in items:
+		if it is Dictionary:
+			var pid := String(it.get("id", ""))
+			if pid != "" and not _avatar_url_cache.has(pid) and not ids.has(pid):
+				ids.append(pid)
+	if not ids.is_empty() and AuthService.is_online:
+		var res: Dictionary = await ApiClient.request_json("GET", "/players/avatars?ids=%s" % ",".join(ids))
+		if res.ok and res.data is Dictionary:
+			for pid in (res.data as Dictionary).keys():
+				_avatar_url_cache[String(pid)] = String((res.data as Dictionary)[pid])
 	for it in items:
 		if it is Dictionary:
 			_add_row(it, false)
+
+
+func _apply_avatar(rect: TextureRect, url: String, seed: String = "") -> void:
+	if url == "":
+		rect.texture = AvatarUtil.default_texture(seed)
+		return
+	if _avatar_tex_cache.has(url):
+		rect.texture = _avatar_tex_cache[url]
+		return
+	var http := HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(func(_r, code, _h, body):
+		if code == 200:
+			var tex := AvatarUtil.circle_from_buffer(body, url.get_extension())
+			if tex != null:
+				_avatar_tex_cache[url] = tex
+				if is_instance_valid(rect):
+					rect.texture = tex
+		http.queue_free())
+	http.request(NetConfig.media_url(url))
 
 
 func _on_chat(msg: Dictionary) -> void:
@@ -747,10 +966,26 @@ func _on_chat(msg: Dictionary) -> void:
 		_refresh_unread()
 	# @mention of me -> a stronger notice.
 	if _mentions_me(text):
-		EventBus.toast("有人在%s里@了你：%s" % [_channel_tag_plain(channel), String(msg.get("name", ""))])
+		if not _muted:
+			AudioManager.play_sfx("mention")
+		EventBus.toast(LocaleManager.t("chat.mention_toast", "有人在%s里@了你：%s") % [_channel_tag_plain(channel), String(msg.get("name", ""))])
 	elif not _open:
-		var preview := text if text != "" else "[图片]"
+		if not _muted:
+			AudioManager.play_sfx("message_in")
+		var preview := text if text != "" else LocaleManager.t("chat.image_tag", "[图片]")
 		EventBus.toast("%s%s：%s" % [_channel_tag(channel), String(msg.get("name", "")), preview])
+
+
+func _seticon(btn: Button, ui_name: String, fallback: String) -> void:
+	var t: Texture2D = AssetLib.ui(ui_name)
+	if t != null:
+		btn.icon = t
+		btn.text = ""
+		btn.expand_icon = true
+		if btn.custom_minimum_size == Vector2.ZERO:
+			btn.custom_minimum_size = Vector2(30, 30)
+	else:
+		btn.text = fallback
 
 
 func _mentions_me(text: String) -> bool:
@@ -767,9 +1002,9 @@ func _mentions_me(text: String) -> bool:
 
 func _channel_tag_plain(channel: String) -> String:
 	match channel:
-		"world": return "世界频道"
-		"dm": return "私聊"
-		_: return "本关"
+		"world": return LocaleManager.t("chat.world_channel", "世界频道")
+		"dm": return LocaleManager.t("chat.ch_dm", "私聊")
+		_: return LocaleManager.t("chat.ch_local", "本关")
 
 
 func _system(text: String) -> void:
@@ -784,8 +1019,8 @@ func _system(text: String) -> void:
 
 func _channel_tag(channel: String) -> String:
 	match channel:
-		"world": return "[世界] "
-		"dm": return "[私聊] "
+		"world": return LocaleManager.t("chat.tag_world", "[世界] ")
+		"dm": return LocaleManager.t("chat.tag_dm", "[私聊] ")
 		_: return ""
 
 
@@ -808,7 +1043,7 @@ func _add_row(msg: Dictionary, _live: bool) -> void:
 	lbl.scroll_active = false
 	lbl.add_theme_font_size_override("normal_font_size", 14)
 	lbl.text = "[color=#7c93b8]%s[/color][color=%s]%s[/color]：%s" % [
-		tag, name_col, _bbsafe(String(msg.get("name", "朝圣者"))), _highlight_mentions(text)]
+		tag, name_col, _bbsafe(String(msg.get("name", LocaleManager.t("lb.pilgrim", "朝圣者")))), _highlight_mentions(text)]
 	if mentions_me:
 		# Tint the whole row so a mention stands out.
 		var hb := StyleBoxFlat.new()
@@ -819,40 +1054,57 @@ func _add_row(msg: Dictionary, _live: bool) -> void:
 
 	# Build the row: [text (expand)] [引 quote] [× recall if own & recent].
 	var mid := String(msg.get("mid", ""))
-	var who := String(msg.get("name", "朝圣者"))
+	var who := String(msg.get("name", LocaleManager.t("lb.pilgrim", "朝圣者")))
 	var recallable := mine and mid != "" and (Time.get_unix_time_from_system() * 1000 - int(msg.get("ts", 0))) < RECALL_WINDOW_MS
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# Sender avatar (live messages carry it; history is filled via batch cache).
+	var av_url := String(msg.get("avatar", ""))
+	if av_url == "":
+		av_url = String(_avatar_url_cache.get(String(msg.get("id", "")), ""))
+	var sender_id := String(msg.get("id", ""))
+	if av_url != "":
+		_avatar_url_cache[sender_id] = av_url
+	var av_rect := TextureRect.new()
+	av_rect.custom_minimum_size = Vector2(22, 22)
+	av_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	av_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_apply_avatar(av_rect, av_url, sender_id)
+	row.add_child(av_rect)
 	row.add_child(lbl)
 	if mid != "":
 		var q := Button.new()
-		q.text = "引"
-		q.tooltip_text = "引用回复"
+		q.text = LocaleManager.t("chat.quote_btn", "引")
+		q.tooltip_text = LocaleManager.t("chat.quote_reply", "引用回复")
 		q.add_theme_color_override("font_color", Color(0.6, 0.78, 0.95))
-		var preview := text if text != "" else "[图片]"
+		var preview := text if text != "" else LocaleManager.t("chat.image_tag", "[图片]")
 		q.pressed.connect(func(): _set_reply(mid, who, preview))
 		row.add_child(q)
 	if recallable:
 		var x := Button.new()
 		x.text = "×"
-		x.tooltip_text = "撤回"
+		x.tooltip_text = LocaleManager.t("chat.recall", "撤回")
 		x.add_theme_color_override("font_color", Color(0.85, 0.5, 0.5))
 		x.pressed.connect(func(): RealtimeService.recall(mid))
+		_seticon(x, "recall", "×")
 		row.add_child(x)
 
-	# Wrap with a quoted-preview line above, if this message quotes another.
+	# Wrap with a clickable quoted-preview line above (jumps to the original).
 	var container: Control = row
 	var rp := String(msg.get("reply_preview", ""))
 	if rp != "":
 		var vb := VBoxContainer.new()
 		vb.add_theme_constant_override("separation", 0)
-		var quote := RichTextLabel.new()
-		quote.bbcode_enabled = true
-		quote.fit_content = true
-		quote.scroll_active = false
-		quote.add_theme_font_size_override("normal_font_size", 12)
-		quote.text = "[color=#6b7790]┃ %s[/color]" % _bbsafe(rp)
+		var quote := Button.new()
+		quote.flat = true
+		quote.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		quote.add_theme_font_size_override("font_size", 12)
+		quote.add_theme_color_override("font_color", Color(0.42, 0.47, 0.56))
+		quote.text = "┃ " + rp
+		quote.tooltip_text = LocaleManager.t("chat.jump_orig", "点击跳转原消息")
+		var ref := String(msg.get("reply_to", ""))
+		quote.pressed.connect(func(): _jump_to(ref))
 		vb.add_child(quote)
 		vb.add_child(row)
 		container = vb
@@ -874,13 +1126,35 @@ func _on_chat_deleted(mid: String) -> void:
 		_rows_by_mid[mid] = ph
 
 
+func _jump_to(mid: String) -> void:
+	var node: Control = _rows_by_mid.get(mid)
+	if node == null or not is_instance_valid(node):
+		_system(LocaleManager.t("chat.orig_gone", "原消息已不在当前记录中。"))
+		return
+	await get_tree().process_frame
+	# Scroll the log so the target row is visible.
+	_log_scroll.ensure_control_visible(node)
+	# Brief highlight flash.
+	var flash := StyleBoxFlat.new()
+	flash.bg_color = Color(0.35, 0.32, 0.12, 0.7)
+	for side in ["top_left", "top_right", "bottom_left", "bottom_right"]:
+		flash.set("corner_radius_" + side, 4)
+	if node is Control:
+		node.add_theme_stylebox_override("panel", flash)
+		var tw := create_tween()
+		tw.tween_interval(0.9)
+		tw.tween_callback(func():
+			if is_instance_valid(node):
+				node.remove_theme_stylebox_override("panel"))
+
+
 func _make_placeholder() -> RichTextLabel:
 	var lbl := RichTextLabel.new()
 	lbl.bbcode_enabled = true
 	lbl.fit_content = true
 	lbl.scroll_active = false
 	lbl.add_theme_font_size_override("normal_font_size", 13)
-	lbl.text = "[color=#7a8090][i]此消息已撤回[/i][/color]"
+	lbl.text = LocaleManager.t("chat.recalled", "[color=#7a8090][i]此消息已撤回[/i][/color]")
 	return lbl
 
 
@@ -972,11 +1246,14 @@ func _thumb_of(url: String) -> String:
 
 
 func _append_image(image_url: String) -> void:
+	if image_url.begins_with("sticker://"):
+		_append_builtin_sticker(image_url)
+		return
 	var rect := TextureRect.new()
 	rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rect.custom_minimum_size = Vector2(0, 120)
-	rect.tooltip_text = "点击查看原图"
+	rect.tooltip_text = LocaleManager.t("chat.view_full", "点击查看原图")
 	rect.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	rect.gui_input.connect(func(e):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
@@ -1000,6 +1277,21 @@ func _append_image(image_url: String) -> void:
 	http.request(NetConfig.media_url(thumb))
 
 
+func _append_builtin_sticker(token: String) -> void:
+	var parts := token.substr(10).split("/")
+	var rect := TextureRect.new()
+	rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.custom_minimum_size = Vector2(0, 96)
+	if parts.size() >= 2:
+		var st := AssetLib.sticker(parts[0], parts[1])
+		if st != null:
+			rect.texture = st
+		else:
+			rect.tooltip_text = token
+	_append(rect)
+
+
 func _bbsafe(s: String) -> String:
 	return s.replace("[", "(").replace("]", ")")
 
@@ -1016,6 +1308,7 @@ func _set_input_open(v: bool) -> void:
 		_hide_autocomplete()
 		_hide_emoji()
 		_clear_reply()
+		_members_popup.visible = false
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

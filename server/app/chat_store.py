@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import delete, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from . import cache
 from .config import get_settings
 from .db import SessionLocal
 from .models import ChatMessage, DmPin, DmUnread, Mention, Player
@@ -37,6 +38,28 @@ def dm_scope(a: str, b: str) -> str:
 
 def room_scope(room: str) -> str:
     return f"room:{room}"
+
+
+# In-memory fallback for room names when Redis is unavailable (dev/test).
+_LOCAL_ROOM_NAMES: dict[str, str] = {}
+
+
+async def set_room_name(code: str, name: str) -> None:
+    _LOCAL_ROOM_NAMES[code] = name
+    try:
+        await cache.redis_client.set(f"room:name:{code}", name, ex=settings.chat_retention_days * 86400)
+    except Exception:
+        pass
+
+
+async def get_room_name(code: str) -> str:
+    try:
+        val = await cache.redis_client.get(f"room:name:{code}")
+        if val:
+            return val
+    except Exception:
+        pass
+    return _LOCAL_ROOM_NAMES.get(code, "")
 
 
 async def save(scope: str, channel: str, sender_id: str, sender_name: str,

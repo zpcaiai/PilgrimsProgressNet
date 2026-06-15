@@ -12,6 +12,7 @@ os.environ.setdefault("PP_DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 os.environ.setdefault("PP_ENV", "dev")
 os.environ.setdefault("PP_REDIS_URL", "redis://localhost:6390/0")
 
+import pytest
 from starlette.testclient import TestClient
 
 from app.main import app
@@ -93,6 +94,35 @@ def test_ws_chat_and_ping():
                     got_pong = True
                     break
             assert got_pong, "A did not receive a pong"
+
+
+@pytest.mark.asyncio
+async def test_room_member_recency_and_eviction():
+    import asyncio
+    import time as _t
+
+    from app.realtime import ROOM_MEMBER_TTL, RoomManager
+
+    m = RoomManager()
+    await m.add_member("room:X", "a", "Alice", "/media/a_thumb.png")
+    await asyncio.sleep(0.01)
+    await m.add_member("room:X", "b", "Bob")
+
+    # Most-recently-active first, with avatar carried through.
+    mem = await m.members("room:X")
+    assert [x["id"] for x in mem] == ["b", "a"]
+    by_id = {x["id"]: x for x in mem}
+    assert by_id["a"]["avatar"] == "/media/a_thumb.png"
+    assert by_id["b"]["avatar"] == ""
+
+    # Make "a" stale -> heartbeat sweep evicts it.
+    m._room_members["room:X"]["a"]["ts"] = _t.time() - ROOM_MEMBER_TTL - 5
+    assert await m.sweep("room:X") is True
+    assert [x["id"] for x in await m.members("room:X")] == ["b"]
+
+    # A heartbeat brings "a" back to the top.
+    await m.touch_member("room:X", "a", "Alice")
+    assert (await m.members("room:X"))[0]["id"] == "a"
 
 
 def test_ws_rejects_bad_token():

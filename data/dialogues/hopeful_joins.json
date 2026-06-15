@@ -8,17 +8,50 @@
         {
           "id": "welcome",
           "text": "Gladly. The road has taught me I was not made to walk alone.",
-          "effects": { "hope": 10, "perseverance": 5 },
-          "flags": { "hopeful_joined": true },
-          "next": "set_out"
+          "effects": {
+            "hope": 10,
+            "perseverance": 5
+          },
+          "flags": {
+            "hopeful_joined": true
+          },
+          "next": "set_out",
+          "text_zh": "求之不得。这路教会我：我本不是被造来独自行走的。"
         },
         {
           "id": "warn",
           "text": "The way ahead is darker than the fair admits. Are you sure?",
-          "effects": { "humility": 4 },
-          "next": "sure"
+          "effects": {
+            "humility": 4
+          },
+          "next": "sure",
+          "text_zh": "前路比这集市所承认的更黑暗。你确定吗？"
         }
-      ]
+      ],
+      "text_variants": [
+        {
+          "conditions": {
+            "requires_flag": "interpreter_full"
+          },
+          "text": "Some pilgrims hurry past the Interpreter's rooms; you stayed and considered them all — I heard it on the road, and I see it now in how you refused this fair. Let me walk the rest of the way with one who learned to look.",
+          "text_zh": "有些朝圣者匆匆掠过释经者的房间；你却留下、把每一间都细细参详——这我在路上听说过，如今从你拒绝这集市的样子也看得出。让我与一个学会了看的人同行。"
+        },
+        {
+          "conditions": {
+            "requires_flag": "chapel_pilgrim"
+          },
+          "text": "The wayside-keepers tell of a pilgrim who knelt at every little chapel on the road — even the ones tucked where no eye but Heaven's could see. That was you. A heart that still stops to pray is one I would gladly walk beside; let me come with you.",
+          "text_zh": "路边小堂的守护者说起一位朝圣者，在路上每一座小堂都跪过——连那些无人、唯有天看得见的也跪过。那就是你。肯停下祷告的心，我愿与之同行；让我同你去吧。"
+        },
+        {
+          "conditions": {
+            "discernment_min": 50
+          },
+          "text": "I watched your clear eyes turn from every glittering lie this fair could shout. That kind of sight is rare and costly. Something in me woke when I saw it — let me walk the rest of the road with you.",
+          "text_zh": "我看着你清明的眼，从这集市所能叫嚷的每一句闪亮谎言上转开。那样的眼光稀有而昂贵。我看见时，心里有什么醒了过来——让我陪你走完余下的路。"
+        }
+      ],
+      "text_zh": "我看着你拒绝了这集市所卖的——不是因它丑陋，而是因平安更可贵。我看见时，心里有什么醒了过来。让我陪你走完余下的路。"
     },
     "sure": {
       "speaker": "Hopeful",
@@ -27,19 +60,36 @@
         {
           "id": "then_come",
           "text": "Then come, Hopeful. We will keep each other awake.",
-          "effects": { "hope": 10, "perseverance": 5 },
-          "flags": { "hopeful_joined": true },
-          "next": "set_out"
+          "effects": {
+            "hope": 10,
+            "perseverance": 5
+          },
+          "flags": {
+            "hopeful_joined": true
+          },
+          "next": "set_out",
+          "text_zh": "那就来吧，盼望。我们彼此叫醒。"
         }
-      ]
+      ],
+      "text_zh": "黑暗与艰难，正是盼望必须超过一句空话之处。我确定。"
     },
     "set_out": {
       "speaker": "Hopeful",
       "text": "Lead on. When your courage runs low, I will remember aloud what we have already seen.",
       "choices": [
-        { "id": "ok", "text": "Together, then.", "next": "end" }
-      ]
+        {
+          "id": "ok",
+          "text": "Together, then.",
+          "next": "end",
+          "text_zh": "那就同行。"
+        }
+      ],
+      "text_zh": "你带路。你勇气低落时，我会把我们已经见过的，大声替你记起来。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

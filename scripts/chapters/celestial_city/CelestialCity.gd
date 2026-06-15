@@ -32,6 +32,12 @@ func _build_chapter() -> void:
 
 	make_floating_label("The Celestial City", Vector3(0, 11, -30), Color(1.0, 0.97, 0.82))
 
+	# Those who walked with you, waiting at the gate to welcome you in.
+	make_npc("Evangelist", Vector3(-3, 0, -27), Color(0.85, 0.82, 0.7))
+	make_npc("Shepherd", Vector3(3, 0, -27), Color(0.7, 0.78, 0.6))
+	if GameState.has_companion("hopeful"):
+		make_npc("Hopeful", Vector3(0, 0, -25), Color(0.55, 0.8, 0.7))
+
 	spawn_player(Vector3(0, 1, 14))
 
 	make_trigger(Vector3(0, 1.5, -27), Vector3(10, 5, 2), func(_b): _arrive(), true)
@@ -46,6 +52,16 @@ func _arrive() -> void:
 	GameState.set_flag("entered_city", true)
 	QuestManager.update_quest_progress("enter_celestial_city")
 	ChapterManager.complete_chapter("celestial_city")
-	EventBus.toast("The gates open. Grace has brought you home, and you are welcomed in.")
-	await get_tree().create_timer(2.5).timeout
+	EventBus.toast("The gates open, and those who walked with you turn to welcome you home.")
+	await get_tree().create_timer(2.6).timeout
+	if GameState.has_flag("interpreter_full"):
+		EventBus.toast("The Interpreter is among them: 'You looked at every lamp in my house. Now you stand in the Light they were lit from.'")
+		await get_tree().create_timer(3.0).timeout
+	if GameState.has_flag("chapel_pilgrim"):
+		EventBus.toast("A Shepherd smiles: 'You knelt at the wayside chapels no one saw you enter. Heaven kept every one. Welcome.'")
+		await get_tree().create_timer(3.0).timeout
+	EventBus.toast("You did not arrive by your own strength, but were carried by grace — every step held.")
+	await get_tree().create_timer(3.0).timeout
+	EventBus.toast("The burden is long gone. The journey is finished. Enter into rest.")
+	await get_tree().create_timer(2.8).timeout
 	EventBus.demo_completed.emit()

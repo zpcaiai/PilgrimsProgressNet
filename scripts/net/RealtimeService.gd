@@ -13,7 +13,7 @@ extends Node
 ## This is the live upgrade of the async-ghost layer; if the WebSocket can't
 ## connect (offline, or NetConfig.realtime = false), the async ghosts still work.
 
-signal peer_updated(peer_id: String, peer_name: String, pos: Vector3, yaw: float)
+signal peer_updated(peer_id: String, peer_name: String, avatar: String, pos: Vector3, yaw: float)
 signal peer_left(peer_id: String)
 signal realtime_connected(chapter_id: String)
 signal realtime_disconnected()
@@ -22,6 +22,7 @@ signal chat_history(items: Array)
 signal chat_system(text: String)
 signal chat_deleted(mid: String)
 signal dm_read(reader_id: String, ts: int)   # the peer read your DMs
+signal room_members(room: String, room_name: String, members: Array)
 signal net_stats(latency_ms: int, quality: String)   # quality: good|fair|poor
 
 const SEND_INTERVAL := 0.12          # max send rate
@@ -246,7 +247,7 @@ func _handle(msg: Dictionary) -> void:
 			if peer_id == "" or peer_id == AuthService.player_id:
 				return  # ignore self
 			peer_updated.emit(
-				peer_id, String(msg.get("name", "朝圣者")),
+				peer_id, String(msg.get("name", "朝圣者")), String(msg.get("avatar", "")),
 				Vector3(float(msg.get("x", 0.0)), float(msg.get("y", 0.0)), float(msg.get("z", 0.0))),
 				float(msg.get("yaw", 0.0)))
 		"leave":
@@ -261,6 +262,9 @@ func _handle(msg: Dictionary) -> void:
 			chat_deleted.emit(String(msg.get("mid", "")))
 		"read":
 			dm_read.emit(String(msg.get("reader", "")), int(msg.get("ts", 0)))
+		"room_members":
+			room_members.emit(String(msg.get("room", "")), String(msg.get("name", "")),
+				msg.get("members", []))
 		"system":
 			chat_system.emit(String(msg.get("text", "")))
 		"pong":

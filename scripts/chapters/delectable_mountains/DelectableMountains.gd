@@ -36,6 +36,8 @@ func _build_chapter() -> void:
 	make_distant_light(Vector3(0, 8, -46), Color(1.0, 0.95, 0.7))
 	make_floating_label("The Celestial City", Vector3(0, 5, -40), Color(1.0, 0.96, 0.75))
 
+	make_wayside_chapel(Vector3(12, 0, -6), "mountains", {"hope": 8, "faith": 4}, "A shepherds' oratory among the heights; you pray, and the City seems nearer.")
+
 	spawn_player(Vector3(0, 1, 10))
 
 	make_trigger(Vector3(0, 1.5, -26), Vector3(20, 4, 2), func(_b):

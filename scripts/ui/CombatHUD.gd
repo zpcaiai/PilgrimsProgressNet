@@ -30,7 +30,7 @@ func _ready() -> void:
 
 	var row := HBoxContainer.new()
 	var lbl := Label.new()
-	lbl.text = "Resolve"
+	lbl.text = LocaleManager.t("combat.resolve", "Resolve")
 	lbl.custom_minimum_size = Vector2(80, 0)
 	row.add_child(lbl)
 	_resolve_bar = ProgressBar.new()
@@ -64,4 +64,4 @@ func _process(_delta: float) -> void:
 	var enemies := get_tree().get_nodes_in_group("enemy").size()
 	var cd: float = _combat.prayer_cooldown
 	var cd_txt := "ready" if cd <= 0.0 else "%.1fs" % cd
-	_info.text = "[b]Promise:[/b] %d   [b]Prayer:[/b] %s   [b]Foes:[/b] %d\n[color=#aaaaaa]J strike  K dodge  L stand firm  U promise  P pray[/color]" % [_combat.promise_charge, cd_txt, enemies]
+	_info.text = LocaleManager.t("combat.hud", "[b]Promise:[/b] %d   [b]Prayer:[/b] %s   [b]Foes:[/b] %d\n[color=#aaaaaa]J strike  K dodge  L stand firm  U promise  P pray[/color]") % [_combat.promise_charge, cd_txt, enemies]

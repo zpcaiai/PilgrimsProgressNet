@@ -339,6 +339,33 @@ def test_group_room_broadcast():
             assert got, "room member B did not receive the group message"
 
 
+def test_room_name_and_members():
+    with TestClient(app) as client:
+        a = client.post("/api/v1/auth/device", json={"device_id": "rname-player-A"}).json()
+        b = client.post("/api/v1/auth/device", json={"device_id": "rname-player-B"}).json()
+        ha = {"Authorization": f"Bearer {a['access_token']}"}
+        created = client.post("/api/v1/chat/room/create", json={"name": "天路小队"}, headers=ha).json()
+        room = created["room"]
+        assert created["name"] == "天路小队"
+        # the name is retrievable
+        assert client.get(f"/api/v1/chat/room/{room}", headers=ha).json()["name"] == "天路小队"
+
+        with client.websocket_connect(f"/api/v1/ws/ghosts/east?token={a['access_token']}") as wsa, \
+             client.websocket_connect(f"/api/v1/ws/ghosts/west?token={b['access_token']}") as wsb:
+            wsa.send_json({"type": "room_join", "room": room})
+            wsb.send_json({"type": "room_join", "room": room})
+            # B should see a room_members update that includes both players
+            members = None
+            for _ in range(12):
+                m = wsb.receive_json()
+                if m.get("type") == "room_members" and len(m.get("members", [])) >= 2:
+                    members = m["members"]
+                    break
+            assert members is not None
+            ids = {x["id"] for x in members}
+            assert a["player_id"] in ids and b["player_id"] in ids
+
+
 def test_quote_reply_roundtrip():
     with TestClient(app) as client:
         a = client.post("/api/v1/auth/device", json={"device_id": "reply-player-A"}).json()

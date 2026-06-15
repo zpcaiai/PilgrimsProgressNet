@@ -64,10 +64,10 @@ func bind_player(player: Node3D) -> void:
 
 
 # --- Live (real-time) companions ---
-func _on_peer_updated(peer_id: String, peer_name: String, pos: Vector3, yaw: float) -> void:
-	var avatar: Node3D = _peers.get(peer_id)
-	if avatar == null:
-		avatar = _make_capsule(LIVE_COLOR)
+func _on_peer_updated(peer_id: String, peer_name: String, avatar_url: String, pos: Vector3, yaw: float) -> void:
+	var node: Node3D = _peers.get(peer_id)
+	if node == null:
+		node = _make_capsule(LIVE_COLOR)
 		var tag := Label3D.new()
 		tag.text = peer_name
 		tag.modulate = Color(0.7, 1.0, 0.8, 0.9)
@@ -75,11 +75,14 @@ func _on_peer_updated(peer_id: String, peer_name: String, pos: Vector3, yaw: flo
 		tag.no_depth_test = true
 		tag.position = Vector3(0, 2.2, 0)
 		tag.pixel_size = 0.012
-		avatar.add_child(tag)
-		avatar.position = pos      # snap on first sighting
-		avatar.rotation.y = yaw
-		_peer_root.add_child(avatar)
-		_peers[peer_id] = avatar
+		node.add_child(tag)
+		# Floating circular avatar above the head, if the peer has one.
+		if avatar_url != "":
+			_attach_avatar_sprite(node, avatar_url)
+		node.position = pos      # snap on first sighting
+		node.rotation.y = yaw
+		_peer_root.add_child(node)
+		_peers[peer_id] = node
 		_buffers[peer_id] = []
 	# Append a timestamped snapshot to the peer's interpolation buffer.
 	var buf: Array = _buffers[peer_id]
@@ -140,15 +143,45 @@ func _apply_interpolated(avatar: Node3D, buf: Array, render_t: int) -> void:
 func _on_ghosts(_chapter_id: String, ghosts: Array) -> void:
 	for c in _ghost_root.get_children():
 		c.queue_free()
+	# Batch-fetch avatars for the ghost authors.
+	var avatars: Dictionary = {}
+	if NetConfig.enabled and AuthService.is_online:
+		var ids: Array = []
+		for g in ghosts:
+			var pid := String(g.get("player_id", ""))
+			if pid != "" and not ids.has(pid):
+				ids.append(pid)
+		if not ids.is_empty():
+			var res: Dictionary = await ApiClient.request_json("GET", "/players/avatars?ids=%s" % ",".join(ids))
+			if res.ok and res.data is Dictionary:
+				avatars = res.data
 	for g in ghosts:
-		var kind := String(g.get("kind", "trail"))
-		if kind == "marker":
+		var av := String(avatars.get(String(g.get("player_id", "")), ""))
+		if String(g.get("kind", "trail")) == "marker":
 			_spawn_marker(g)
 		else:
-			_spawn_trail_walker(g)
+			_spawn_trail_walker(g, av)
 
 
-func _spawn_trail_walker(g: Dictionary) -> void:
+func _attach_avatar_sprite(parent: Node3D, url: String) -> void:
+	var sp := Sprite3D.new()
+	sp.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	sp.no_depth_test = true
+	sp.pixel_size = 0.01
+	sp.position = Vector3(0, 2.7, 0)
+	parent.add_child(sp)
+	var http := HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(func(_r, code, _h, body):
+		if code == 200:
+			var tex := AvatarUtil.circle_from_buffer(body, url.get_extension())
+			if tex != null and is_instance_valid(sp):
+				sp.texture = tex
+		http.queue_free())
+	http.request(NetConfig.media_url(url))
+
+
+func _spawn_trail_walker(g: Dictionary, avatar_url: String = "") -> void:
 	var points: Array = g.get("points", [])
 	if points.size() < 2:
 		return
@@ -172,6 +205,8 @@ func _spawn_trail_walker(g: Dictionary) -> void:
 	tag.position = Vector3(0, 2.2, 0)
 	tag.pixel_size = 0.012
 	body.add_child(tag)
+	if avatar_url != "":
+		_attach_avatar_sprite(body, avatar_url)
 
 	# Walk the path on a looping tween so the ghost retraces the route.
 	var tw := create_tween()

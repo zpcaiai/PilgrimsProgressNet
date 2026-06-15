@@ -1,6 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <rect width="128" height="128" rx="20" fill="#2a2440"/>
-  <rect x="58" y="28" width="12" height="72" rx="3" fill="#f4e9c8"/>
-  <rect x="40" y="46" width="48" height="12" rx="3" fill="#f4e9c8"/>
-  <circle cx="64" cy="104" r="10" fill="#caa14b"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#26345f"/>
+      <stop offset="0.5" stop-color="#785a8c"/>
+      <stop offset="1" stop-color="#f5c878"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#sky)"/>
+  <g fill="#fff5d2" opacity="0.10">
+      <polygon points="256,150 776,150 774,195"/>
+      <polygon points="256,150 738,345 719,386"/>
+      <polygon points="256,150 630,511 597,542"/>
+      <polygon points="256,150 468,625 425,642"/>
+      <polygon points="256,150 274,670 229,669"/>
+      <polygon points="256,150 78,639 36,621"/>
+      <polygon points="256,150 -92,536 -124,505"/>
+      <polygon points="256,150 -211,378 -229,336"/>
+      <polygon points="256,150 -263,186 -264,141"/>
+      <polygon points="256,150 -239,-11 -223,-53"/>
+      <polygon points="256,150 -142,-184 -112,-218"/>
+      <polygon points="256,150 12,-309 53,-329"/>
+      <polygon points="256,150 202,-367 247,-370"/>
+      <polygon points="256,150 399,-350 442,-335"/>
+      <polygon points="256,150 576,-260 611,-230"/>
+      <polygon points="256,150 706,-110 727,-70"/>
+      <polygon points="256,150 771,78 775,123"/>
+  </g>
+  <polygon points="218,512 294,512 270,300 242,300" fill="#f5e1a5"/>
+  <path d="M178,392 L178,196 A78,118 0 0 1 334,196 L334,392 Z" fill="#f2d482"/>
+  <path d="M198,392 L198,206 A58,96 0 0 1 314,206 L314,392 Z" fill="#fff8cd"/>
+  <rect x="249" y="86" width="14" height="72" fill="#fff8cd"/>
+  <rect x="232" y="104" width="48" height="16" fill="#fff8cd"/>
 </svg>

@@ -9,9 +9,9 @@ extends CanvasLayer
 ## "offline" notice instead of erroring.
 
 const BOARDS := [
-	{"id": "fastest_run", "title": "最快通关"},
-	{"id": "fewest_falls", "title": "最少倒下"},
-	{"id": "devout_score", "title": "敬虔之心"},
+	{"id": "fastest_run", "title": LocaleManager.t("lb.board_fastest", "最快通关")},
+	{"id": "fewest_falls", "title": LocaleManager.t("lb.board_fewest", "最少倒下")},
+	{"id": "devout_score", "title": LocaleManager.t("lb.board_devout", "敬虔之心")},
 ]
 const FONT_TITLE := 24
 const FONT_BODY := 18
@@ -50,7 +50,7 @@ func _build() -> void:
 	_panel.add_child(vb)
 
 	var header := Label.new()
-	header.text = "天路榜  ·  Pilgrim Boards"
+	header.text = LocaleManager.t("lb.title", "天路榜  ·  Pilgrim Boards")
 	header.add_theme_font_size_override("font_size", FONT_TITLE)
 	header.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7))
 	vb.add_child(header)
@@ -69,7 +69,7 @@ func _build() -> void:
 	_season_tabs = HBoxContainer.new()
 	_season_tabs.add_theme_constant_override("separation", 8)
 	vb.add_child(_season_tabs)
-	for s in [{"id": "current", "title": "本赛季"}, {"id": "all", "title": "历史总榜"}]:
+	for s in [{"id": "current", "title": LocaleManager.t("lb.this_season", "本赛季")}, {"id": "all", "title": LocaleManager.t("lb.alltime", "历史总榜")}]:
 		var sbtn := Button.new()
 		sbtn.text = String(s.title)
 		sbtn.toggle_mode = true
@@ -94,7 +94,7 @@ func _build() -> void:
 	scroll.add_child(_list)
 
 	var hint := Label.new()
-	hint.text = "B 关闭"
+	hint.text = LocaleManager.t("lb.close_b", "B 关闭")
 	hint.add_theme_font_size_override("font_size", 14)
 	hint.add_theme_color_override("font_color", Color(0.55, 0.6, 0.7))
 	vb.add_child(hint)
@@ -119,9 +119,9 @@ func _refresh() -> void:
 	for c in _list.get_children():
 		c.queue_free()
 	if not NetConfig.enabled or not AuthService.is_online:
-		_status.text = "离线模式 — 联网后可查看天路榜。"
+		_status.text = LocaleManager.t("lb.offline", "离线模式 — 联网后可查看天路榜。")
 		return
-	_status.text = "加载中…  （难度：%s）" % _difficulty_label()
+	_status.text = LocaleManager.t("lb.loading", "加载中…  （难度：%s）") % _difficulty_label()
 	if _active_season == "current":
 		LeaderboardService.fetch_current_season()
 	LeaderboardService.fetch(_active_board, "", _active_season)
@@ -137,23 +137,43 @@ func _on_board_received(board: String, rows: Array, my_rank: int) -> void:
 	for c in _list.get_children():
 		c.queue_free()
 	if rows.is_empty():
-		_status.text = "还没有人上榜，去成为第一位吧。"
+		_status.text = LocaleManager.t("lb.empty", "还没有人上榜，去成为第一位吧。")
 		return
-	var season_txt := ("本赛季 " + _season_label) if _active_season == "current" else "历史总榜"
-	_status.text = "%s    难度：%s    我的排名：%s" % [
-		season_txt, _difficulty_label(), ("#%d" % my_rank) if my_rank > 0 else "未上榜"]
+	var season_txt := (LocaleManager.t("lb.this_season_sp", "本赛季 ") + _season_label) if _active_season == "current" else "历史总榜"
+	_status.text = LocaleManager.t("lb.header", "%s    难度：%s    我的排名：%s") % [
+		season_txt, _difficulty_label(), ("#%d" % my_rank) if my_rank > 0 else LocaleManager.t("lb.unranked", "未上榜")]
+	# Batch-fetch avatars for the listed players, then render rows.
+	var ids: Array = []
 	for row in rows:
-		_add_row(int(row.get("rank", 0)), String(row.get("display_name", "朝圣者")),
-			int(row.get("score", 0)), int(row.get("rank", 0)) == my_rank)
+		var pid := String(row.get("player_id", ""))
+		if pid != "":
+			ids.append(pid)
+	var avatars: Dictionary = {}
+	if not ids.is_empty() and AuthService.is_online:
+		var res: Dictionary = await ApiClient.request_json("GET", "/players/avatars?ids=%s" % ",".join(ids))
+		if res.ok and res.data is Dictionary:
+			avatars = res.data
+	for row in rows:
+		_add_row(int(row.get("rank", 0)), String(row.get("display_name", LocaleManager.t("lb.pilgrim", "朝圣者"))),
+			int(row.get("score", 0)), int(row.get("rank", 0)) == my_rank,
+			String(avatars.get(String(row.get("player_id", "")), "")))
 
 
-func _add_row(rank: int, name: String, score: int, mine: bool) -> void:
+func _add_row(rank: int, name: String, score: int, mine: bool, avatar_url: String = "") -> void:
 	var hb := HBoxContainer.new()
 	hb.add_theme_constant_override("separation", 12)
 	var rank_lbl := Label.new()
 	rank_lbl.text = "%d" % rank
-	rank_lbl.custom_minimum_size = Vector2(50, 0)
+	rank_lbl.custom_minimum_size = Vector2(40, 0)
 	rank_lbl.add_theme_font_size_override("font_size", FONT_BODY)
+	hb.add_child(rank_lbl)
+	if avatar_url != "":
+		var ar := TextureRect.new()
+		ar.custom_minimum_size = Vector2(26, 26)
+		ar.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		_load_avatar(ar, avatar_url)
+		hb.add_child(ar)
 	var name_lbl := Label.new()
 	name_lbl.text = name
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -164,14 +184,25 @@ func _add_row(rank: int, name: String, score: int, mine: bool) -> void:
 	var col := Color(0.97, 0.92, 0.6) if mine else Color(0.85, 0.88, 0.95)
 	for l in [rank_lbl, name_lbl, score_lbl]:
 		l.add_theme_color_override("font_color", col)
-	hb.add_child(rank_lbl)
 	hb.add_child(name_lbl)
 	hb.add_child(score_lbl)
 	_list.add_child(hb)
 
 
+func _load_avatar(rect: TextureRect, url: String) -> void:
+	var http := HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(func(_r, code, _h, body):
+		if code == 200:
+			var tex := AvatarUtil.circle_from_buffer(body, url.get_extension())
+			if tex != null and is_instance_valid(rect):
+				rect.texture = tex
+		http.queue_free())
+	http.request(NetConfig.media_url(url))
+
+
 func _difficulty_label() -> String:
-	return "童趣" if GameState.is_child_mode() else "敬虔"
+	return LocaleManager.t("lb.child", "童趣") if GameState.is_child_mode() else LocaleManager.t("lb.devout", "敬虔")
 
 
 func _style(bg: Color) -> StyleBoxFlat:

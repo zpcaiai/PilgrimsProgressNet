@@ -43,6 +43,12 @@ signal load_completed(slot_id: String)
 # --- Generic notification (toast text on the HUD) ---
 signal notify(message: String)
 
+# --- Settings (volume / input changed via the Options screen) ---
+signal settings_changed()
+
+## Language switched (zh/en). UIs rebuild their text in the new locale.
+signal locale_changed(locale: String)
+
 
 func toast(message: String) -> void:
 	emit_signal("notify", message)

@@ -2,7 +2,13 @@ extends ChapterBase
 class_name ValleyShadowDeath
 ## Chapter 10. A pitch-dark, narrow path. Your lantern of faith lights only a
 ## small circle; fear shrinks it, faith and the lanterns of the Word restore it.
-## Whispers from the dark raise fear. Keep to the path and reach the dawn.
+## Whispers from the dark raise fear. Pools of deeper dark press on (snuff) the
+## lamp until you move clear. Keep to the path and reach the dawn.
+
+var _lantern: PlayerLight = null
+var _shadow_player: PlayerController = null
+var _shadow_accum: float = 0.0
+var _vignette: DarkVignette = null
 
 
 func _build_chapter() -> void:
@@ -17,9 +23,12 @@ func _build_chapter() -> void:
 	make_block(Vector3(1, 8, 90), Color(0.08, 0.08, 0.1), Vector3(-4.5, 4, -20))
 	make_block(Vector3(1, 8, 90), Color(0.08, 0.08, 0.1), Vector3(4.5, 4, -20))
 
+	make_wayside_chapel(Vector3(2.4, 0, -37), "shadow", {"faith": 8, "fear": -12, "hope": 4}, "A lit chapel in a cleft of the cliff. The dark cannot enter here; your lamp remembers.")
+
 	spawn_player(Vector3(0, 1, 12))
 	var lantern := PlayerLight.new()
 	player.add_child(lantern)
+	_lantern = lantern
 
 	# Combat is optional here: two weak fear-shades haunt the path. Stand firm
 	# (L), pray (P), or simply press on past them to the dawn.
@@ -41,9 +50,17 @@ func _build_chapter() -> void:
 	_lantern(Vector3(2.5, 0, -20), lantern)
 	_lantern(Vector3(-2.5, 0, -32), lantern)
 
+	# Pools of deeper dark that snuff the lamp while you linger in them.
+	_shadow(Vector3(0, 1, -16))
+	_shadow(Vector3(0, 1, -30))
+
 	# The dawn ahead.
 	make_distant_light(Vector3(0, 5, -48), Color(1.0, 0.9, 0.7))
 	make_floating_label("Toward the dawn you cannot yet see", Vector3(0, 3, -40), Color(0.8, 0.8, 0.7))
+
+	# Closing-dark vignette (reusable node): edges drown as the lamp is snuffed.
+	_vignette = DarkVignette.new()
+	add_child(_vignette)
 
 	make_trigger(Vector3(0, 1.5, -44), Vector3(8, 4, 2), func(_b):
 		GameState.set_flag("crossed_shadow", true)
@@ -52,6 +69,43 @@ func _build_chapter() -> void:
 		_advance_after_delay()
 	, false)
 
+
+func _shadow(pos: Vector3) -> void:
+	make_decor(Vector3(7, 0.08, 6), Color(0.0, 0.0, 0.02), pos + Vector3(0, -0.45, 0))
+	var area := Area3D.new()
+	area.collision_layer = 0
+	area.collision_mask = 1
+	area.monitoring = true
+	var col := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(7, 4, 6)
+	col.shape = box
+	area.add_child(col)
+	area.position = pos
+	area.body_entered.connect(func(b):
+		if b is PlayerController:
+			_shadow_player = b
+			EventBus.toast("The dark thickens and leans on your lamp. Keep moving.")
+	)
+	area.body_exited.connect(func(b):
+		if b == _shadow_player:
+			_shadow_player = null
+	)
+	add_child(area)
+
+
+func _process(delta: float) -> void:
+	if _lantern == null:
+		return
+	if _shadow_player != null:
+		_lantern.apply_snuff(delta * 3.0)
+		_shadow_accum += delta
+		if _shadow_accum >= 2.0:
+			_shadow_accum = 0.0
+			SpiritualStateManager.apply_effects({"fear": 4})
+	# Edge-darkening rises with how snuffed the lamp is; the node eases it.
+	if is_instance_valid(_vignette):
+		_vignette.set_intensity(_lantern.snuff / 6.0)
 
 func _spawn_fear_shade(pos: Vector3) -> void:
 	var e := SymbolicEnemy.new()
@@ -76,4 +130,5 @@ func _lantern(pos: Vector3, lantern: PlayerLight) -> void:
 			lantern.add_boost(4.0)
 			SpiritualStateManager.apply_effects({"fear": -10, "faith": 5})
 			EventBus.toast("The Word steadies the lamp, and the next step appears.")
+			AudioManager.play_sfx("lantern_word")
 		, null, Color(1.0, 0.9, 0.6), 1.5, 1.3, true)

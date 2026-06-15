@@ -73,9 +73,9 @@ func _on_presence(chapter_id: String, online: int) -> void:
 	# "online" includes me; show others walking alongside.
 	var others: int = max(0, online - 1)
 	if others <= 0:
-		_presence_label.text = "此路你独行（暂无同行者）"
+		_presence_label.text = LocaleManager.t("comp.alone", "此路你独行（暂无同行者）")
 	else:
-		_presence_label.text = "此刻 %d 位朝圣者与你同行" % others
+		_presence_label.text = LocaleManager.t("comp.count", "此刻 %d 位朝圣者与你同行") % others
 
 
 func _on_net_stats(latency_ms: int, quality: String) -> void:
@@ -85,14 +85,14 @@ func _on_net_stats(latency_ms: int, quality: String) -> void:
 func _set_net(latency_ms: int, quality: String) -> void:
 	_panel.visible = true
 	_net_label.visible = true
-	var label := {"good": "通畅", "fair": "一般", "poor": "不稳"}.get(quality, quality)
+	var label := {"good": LocaleManager.t("net.good", "通畅"), "fair": LocaleManager.t("net.fair", "一般"), "poor": LocaleManager.t("net.unstable", "不稳")}.get(quality, quality)
 	var col := {"good": Color(0.6, 0.9, 0.7), "fair": Color(0.9, 0.85, 0.5),
 		"poor": Color(0.9, 0.55, 0.55)}.get(quality, Color(0.7, 0.7, 0.8))
 	_net_label.add_theme_color_override("font_color", col)
 	if latency_ms >= 0:
-		_net_label.text = "实时连接：%s（%d ms）" % [label, latency_ms]
+		_net_label.text = LocaleManager.t("comp.realtime_ms", "实时连接：%s（%d ms）") % [label, latency_ms]
 	else:
-		_net_label.text = "实时连接：%s" % label
+		_net_label.text = LocaleManager.t("comp.realtime", "实时连接：%s") % label
 
 
 func _on_ghosts(chapter_id: String, ghosts: Array) -> void:
@@ -101,8 +101,8 @@ func _on_ghosts(chapter_id: String, ghosts: Array) -> void:
 	for g in ghosts:
 		if String(g.get("kind", "")) == "marker" and String(g.get("message", "")) != "":
 			markers.append("[color=#cfd6ea]%s[/color] —— [i]%s[/i]" % [
-				String(g.get("display_name", "朝圣者")), String(g.get("message", ""))])
+				String(g.get("display_name", LocaleManager.t("lb.pilgrim", "朝圣者"))), String(g.get("message", ""))])
 	if markers.is_empty():
-		_ghost_label.text = "[color=#7a8090]前人的足迹隐约可见……[/color]"
+		_ghost_label.text = LocaleManager.t("comp.ghosts", "[color=#7a8090]前人的足迹隐约可见……[/color]")
 	else:
 		_ghost_label.text = "\n".join(PackedStringArray(markers.slice(0, 3)))

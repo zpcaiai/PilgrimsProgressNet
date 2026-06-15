@@ -8,25 +8,45 @@
         {
           "id": "honest",
           "text": "The reward is real, but the road is not a tale told to flatter us.",
-          "effects": { "discernment": 4, "humility": 3 },
-          "flags": { "pliable_warned": true },
-          "next": "uneasy"
+          "effects": {
+            "discernment": 4,
+            "humility": 3
+          },
+          "flags": {
+            "pliable_warned": true
+          },
+          "next": "uneasy",
+          "text_zh": "那赏赐是真的，但这路不是一则讨好我们的故事。"
         },
         {
           "id": "flatter",
           "text": "Stay close, and we will face the road as it comes.",
-          "effects": { "hope": 3 },
-          "next": "uneasy"
+          "effects": {
+            "hope": 3
+          },
+          "next": "uneasy",
+          "text_zh": "靠紧些，这路来什么，我们就一同面对。"
         }
-      ]
+      ],
+      "text_zh": "再跟我说说那些冠冕、那音乐、那金色的城吧。我真盼这路能一直这样敞亮。"
     },
     "uneasy": {
       "speaker": "Pliable",
       "text": "Not a tale? Hard? Well... let us hurry through the unpleasant parts, then.",
       "choices": [
-        { "id": "ok", "text": "Keep walking toward the swamp.", "next": "end" }
-      ]
+        {
+          "id": "ok",
+          "text": "Keep walking toward the swamp.",
+          "next": "end",
+          "text_zh": "继续朝泥沼走去。"
+        }
+      ],
+      "text_zh": "不是故事？很难？好吧……那我们就快些穿过那些不愉快的部分。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

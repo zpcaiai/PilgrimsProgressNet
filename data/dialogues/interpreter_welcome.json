@@ -8,25 +8,45 @@
         {
           "id": "ready",
           "text": "I will look, and let truth search me.",
-          "effects": { "discernment": 4, "watchfulness": 3 },
-          "flags": { "met_interpreter": true },
-          "next": "guide"
+          "effects": {
+            "discernment": 4,
+            "watchfulness": 3
+          },
+          "flags": {
+            "met_interpreter": true
+          },
+          "next": "guide",
+          "text_zh": "我愿细看，让真理察验我。"
         },
         {
           "id": "hurry",
           "text": "I am eager to press on, but I will not despise instruction.",
-          "effects": { "perseverance": 3 },
-          "next": "guide"
+          "effects": {
+            "perseverance": 3
+          },
+          "next": "guide",
+          "text_zh": "我急着赶路，却也不轻看教训。"
         }
-      ]
+      ],
+      "text_zh": "欢迎，朝圣者。重担已经落下，但心仍需教导。慢慢走过这些房间；每一间都点出一种怜悯有意医治的危险。"
     },
     "guide": {
       "speaker": "The Interpreter",
       "text": "Consider the lamp fed in secret, the dust only water can settle, and patience that waits without envy. What you learn here will meet you again on the road.",
       "choices": [
-        { "id": "ok", "text": "Thank you.", "next": "end" }
-      ]
+        {
+          "id": "ok",
+          "text": "Thank you.",
+          "next": "end",
+          "text_zh": "谢谢你。"
+        }
+      ],
+      "text_zh": "想想那盏暗中添油的灯、那唯有水才能压住的尘、那不带嫉妒静候的忍耐。你在此所学的，会在路上再与你相遇。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

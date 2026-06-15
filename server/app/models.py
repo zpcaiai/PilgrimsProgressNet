@@ -37,6 +37,7 @@ class Player(Base):
     device_id: Mapped[str] = mapped_column(String(128), unique=True, index=True)
     display_name: Mapped[str] = mapped_column(String(64), default="无名的朝圣者")
     email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String(255), nullable=True)  # self-uploaded avatar
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_seen_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

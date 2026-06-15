@@ -5,6 +5,7 @@ class_name DoubtingCastle
 ## castle — find it (or remember you carry it) and escape.
 
 var _aura: float = 0.0
+var _vignette: DarkVignette = null
 
 
 func _build_chapter() -> void:
@@ -54,8 +55,17 @@ func _build_chapter() -> void:
 
 	make_distant_light(Vector3(0, 5, -30), Color(0.7, 0.75, 0.9))
 
+	# The cell's oppression drowns the screen edges as despair mounts.
+	_vignette = DarkVignette.new()
+	_vignette.edge_color = Color(0.03, 0.05, 0.12)
+	add_child(_vignette)
+
 
 func _process(delta: float) -> void:
+	# Edge-darkening tracks despair, easing off once you escape into clean air.
+	if is_instance_valid(_vignette):
+		var d := 0.0 if GameState.has_flag("escaped_castle") else float(SpiritualStateManager.despair) / 100.0
+		_vignette.set_intensity(d * 0.85)
 	# The Giant's oppressive presence presses despair on you until you escape.
 	if GameState.has_flag("escaped_castle"):
 		return

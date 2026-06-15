@@ -15,10 +15,24 @@ var terrain_multiplier: float = 1.0  # set by hazards (mud, etc.)
 var _mesh_root: Node3D
 var _body_mesh: MeshInstance3D
 var _burden_mesh: MeshInstance3D
+var _vanity_root: Node3D
 var _camera: Camera3D
 var _interactor: Area3D
 var _current_target: Interactable = null
 var _breath_timer: float = 0.0
+var _glancing: bool = false
+
+# Camera orbit (right-mouse drag / right stick) + look settings
+@export var mouse_sensitivity: float = 0.25
+@export var controller_look_sensitivity: float = 150.0
+var invert_look_y: bool = false
+var _cam_pivot: Node3D
+var _cam_yaw: float = 0.0
+var _cam_pitch: float = 0.0
+var _looking_mouse: bool = false
+const CAM_BASE_PITCH := -38.0
+const CAM_PITCH_MIN := -18.0
+const CAM_PITCH_MAX := 22.0
 
 
 func _ready() -> void:
@@ -49,6 +63,9 @@ func _ensure_inputs() -> void:
 	EventBus.player_control_locked.connect(_on_control_locked)
 	EventBus.burden_removed.connect(_on_burden_removed)
 	_update_burden_visual()
+	_load_input_settings()
+	if EventBus.has_signal("settings_changed"):
+		EventBus.settings_changed.connect(_load_input_settings)
 
 
 func _build() -> void:
@@ -93,16 +110,21 @@ func _build() -> void:
 	_burden_mesh.material_override = _make_material(Color(0.25, 0.2, 0.18))
 	_mesh_root.add_child(_burden_mesh)
 
+	# Vanity trinkets bought at the fair hang on the back as visible weight.
+	_vanity_root = Node3D.new()
+	_mesh_root.add_child(_vanity_root)
+	refresh_vanity()
+
 	# Fixed-orientation follow camera (child, but parented to player so it
 	# tracks position; the player body never rotates, so the view stays stable)
-	var cam_pivot := Node3D.new()
-	cam_pivot.name = "CameraPivot"
-	add_child(cam_pivot)
+	_cam_pivot = Node3D.new()
+	_cam_pivot.name = "CameraPivot"
+	add_child(_cam_pivot)
 	_camera = Camera3D.new()
 	_camera.position = Vector3(0, 6.5, 8.0)
-	_camera.rotation_degrees = Vector3(-38, 0, 0)
+	_camera.rotation_degrees = Vector3(CAM_BASE_PITCH, 0, 0)
 	_camera.current = true
-	cam_pivot.add_child(_camera)
+	_cam_pivot.add_child(_camera)
 
 	# Interactor
 	_interactor = Area3D.new()
@@ -119,11 +141,60 @@ func _build() -> void:
 	add_child(_interactor)
 
 
+## Rebuild the hanging trinkets to match how much vanity you bought.
+func refresh_vanity() -> void:
+	if not is_instance_valid(_vanity_root):
+		return
+	for c in _vanity_root.get_children():
+		c.queue_free()
+	var count: int = GameState.get_item_count("vanity_token")
+	var tints := [Color(0.9, 0.8, 0.2), Color(0.8, 0.2, 0.4), Color(0.5, 0.3, 0.9), Color(0.3, 0.8, 0.9)]
+	for i in range(min(count, 4)):
+		var t := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.22, 0.22, 0.22)
+		t.mesh = bm
+		t.position = Vector3(-0.25 + (i % 2) * 0.5, 1.35 - (i / 2) * 0.45, 0.52)
+		var m := _make_material(tints[i % tints.size()])
+		m.emission_enabled = true
+		m.emission = tints[i % tints.size()]
+		m.emission_energy_multiplier = 0.6
+		t.material_override = m
+		_vanity_root.add_child(t)
+
 func _make_material(color: Color) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
 	m.roughness = 0.9
 	return m
+
+
+func _load_input_settings() -> void:
+	var cf := ConfigFile.new()
+	if cf.load("user://settings.cfg") != OK:
+		return
+	mouse_sensitivity = float(cf.get_value("input", "mouse_sensitivity", mouse_sensitivity))
+	controller_look_sensitivity = float(cf.get_value("input", "controller_look_sensitivity", controller_look_sensitivity))
+	invert_look_y = bool(cf.get_value("input", "invert_look_y", invert_look_y))
+
+
+func _apply_look(dyaw: float, dpitch: float) -> void:
+	_cam_yaw += dyaw
+	if invert_look_y:
+		dpitch = -dpitch
+	_cam_pitch = clampf(_cam_pitch + dpitch, CAM_PITCH_MIN, CAM_PITCH_MAX)
+
+
+func _update_camera(delta: float) -> void:
+	if not control_locked and InputMap.has_action("look_left"):
+		var lx := Input.get_action_strength("look_right") - Input.get_action_strength("look_left")
+		var ly := Input.get_action_strength("look_down") - Input.get_action_strength("look_up")
+		if absf(lx) > 0.05 or absf(ly) > 0.05:
+			_apply_look(-lx * controller_look_sensitivity * delta, -ly * controller_look_sensitivity * delta)
+	if is_instance_valid(_cam_pivot):
+		_cam_pivot.rotation.y = deg_to_rad(_cam_yaw)
+	if is_instance_valid(_camera):
+		_camera.rotation_degrees.x = CAM_BASE_PITCH + _cam_pitch
 
 
 func _on_control_locked(locked: bool) -> void:
@@ -147,6 +218,8 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
+	_update_camera(delta)
+
 	var input_dir := Vector3.ZERO
 	if not control_locked:
 		var x := Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
@@ -154,6 +227,9 @@ func _physics_process(delta: float) -> void:
 		input_dir = Vector3(x, 0, z)
 		if input_dir.length() > 1.0:
 			input_dir = input_dir.normalized()
+		# Make movement relative to where the camera is looking (orbit yaw).
+		if absf(_cam_yaw) > 0.01:
+			input_dir = input_dir.rotated(Vector3.UP, deg_to_rad(_cam_yaw))
 
 		if Input.is_action_just_pressed("jump") and is_on_floor():
 			velocity.y = jump_velocity
@@ -163,7 +239,7 @@ func _physics_process(delta: float) -> void:
 	velocity.z = input_dir.z * speed
 
 	# Rotate mesh toward movement
-	if input_dir.length() > 0.1 and is_instance_valid(_mesh_root):
+	if input_dir.length() > 0.1 and is_instance_valid(_mesh_root) and not _glancing:
 		var target_yaw := atan2(input_dir.x, input_dir.z)
 		_mesh_root.rotation.y = lerp_angle(_mesh_root.rotation.y, target_yaw, rotation_speed * delta)
 
@@ -199,10 +275,34 @@ func _update_interaction() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Hold right mouse button to orbit the camera (mouse-look without grabbing
+	# the cursor, so menus and clicking stay usable).
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		_looking_mouse = event.pressed
 	if control_locked:
 		return
+	if event is InputEventMouseMotion and _looking_mouse:
+		_apply_look(-event.relative.x * mouse_sensitivity, -event.relative.y * mouse_sensitivity)
 	if event.is_action_pressed("interact") and _current_target != null:
 		_current_target.interact(self)
+
+
+## Briefly turn to face a point (a look-back beat), then ease back to forward.
+func glance_toward(point: Vector3) -> void:
+	if not is_instance_valid(_mesh_root):
+		return
+	var to := point - global_position
+	to.y = 0.0
+	if to.length() < 0.05:
+		return
+	var yaw := atan2(to.x, to.z)
+	var start := _mesh_root.rotation.y
+	_glancing = true
+	var tw := create_tween()
+	tw.tween_property(_mesh_root, "rotation:y", yaw, 0.45).set_trans(Tween.TRANS_SINE)
+	tw.tween_interval(1.1)
+	tw.tween_property(_mesh_root, "rotation:y", start, 0.5).set_trans(Tween.TRANS_SINE)
+	tw.tween_callback(func(): _glancing = false)
 
 
 func teleport(pos: Vector3) -> void:

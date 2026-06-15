@@ -22,6 +22,16 @@ class TokenOut(BaseModel):
     token_type: str = "bearer"
     player_id: str
     display_name: str
+    avatar_url: str | None = None
+
+
+class AvatarUploadIn(BaseModel):
+    data: str = Field(description="base64-encoded image bytes")
+    ext: str = Field(default="png", max_length=8)
+
+
+class AvatarOut(BaseModel):
+    avatar_url: str
 
 
 class RefreshIn(BaseModel):

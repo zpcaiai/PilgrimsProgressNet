@@ -62,6 +62,16 @@ func _begin_cross_event() -> void:
 
 	await get_tree().create_timer(0.6).timeout
 
+	# When despair is overwhelming, the burden trembles but will not fall until the
+	# pilgrim names the truth. Grace is still not earned — confession only precedes it.
+	if SpiritualStateManager.despair >= 85:
+		EventBus.toast("The burden trembles at the Cross, but does not fall — first, name your true state.")
+		await get_tree().create_timer(1.8).timeout
+		EventBus.toast("\"What I carry is too heavy; I cannot set it down myself. Have mercy.\"")
+		await get_tree().create_timer(2.0).timeout
+		EventBus.toast("And as the words are spoken, the burden loosens.")
+		await get_tree().create_timer(0.9).timeout
+
 	# Grace: the burden falls regardless of the pilgrim's strength.
 	make_light_burst(Vector3(0, 1.5, -18), Color(1.0, 0.96, 0.75), 64)
 	SpiritualStateManager.apply_cross_grace()

@@ -14,7 +14,7 @@ from . import cache, metrics
 from .config import get_settings
 from .db import Base, engine
 from .deps import rate_limit
-from .routers import admin, auth, chat, ghosts, health, leaderboard, reviews, rewards, saves, stats, ws
+from .routers import admin, auth, chat, ghosts, health, leaderboard, players, reviews, rewards, saves, stats, ws
 
 settings = get_settings()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -74,6 +74,7 @@ app.include_router(stats.router, prefix=settings.api_prefix, dependencies=api_de
 app.include_router(rewards.router, prefix=settings.api_prefix, dependencies=api_deps)
 app.include_router(reviews.router, prefix=settings.api_prefix, dependencies=api_deps)
 app.include_router(chat.router, prefix=settings.api_prefix, dependencies=api_deps)
+app.include_router(players.router, prefix=settings.api_prefix, dependencies=api_deps)
 app.include_router(admin.login_router, prefix=settings.api_prefix, dependencies=api_deps)
 app.include_router(admin.router, prefix=settings.api_prefix, dependencies=api_deps)
 # WebSocket router: no HTTP rate-limit dependency (those use Request).

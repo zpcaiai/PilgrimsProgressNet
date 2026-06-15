@@ -8,26 +8,49 @@
         {
           "id": "plead",
           "text": "Do not turn back at the first wound. The gate is still ahead.",
-          "effects": { "humility": 3, "despair": 5 },
-          "flags": { "pliable_left": true },
-          "next": "gone"
+          "effects": {
+            "humility": 3,
+            "despair": 5
+          },
+          "flags": {
+            "pliable_left": true
+          },
+          "next": "gone",
+          "text_zh": "别在第一道伤口前就回头。门还在前头。"
         },
         {
           "id": "let_go",
           "text": "Then go. I grieve for you, but I cannot repent in your place.",
-          "effects": { "perseverance": 4, "despair": 4 },
-          "flags": { "pliable_left": true },
-          "next": "gone"
+          "effects": {
+            "perseverance": 4,
+            "despair": 4
+          },
+          "flags": {
+            "pliable_left": true
+          },
+          "next": "gone",
+          "text_zh": "那就走吧。我为你难过，却不能替你悔改。"
         }
-      ]
+      ],
+      "text_zh": "泥到膝盖，寒入骨头，又看不见城。你的应许若是这般开头，余下的你自己留着吧。我要回家了。"
     },
     "gone": {
       "speaker": "",
       "text": "Pliable scrambles back toward the city, choosing familiar ground over promised grace. The fog swallows him, and you are alone in the swamp.",
       "choices": [
-        { "id": "ok", "text": "Press on.", "next": "end" }
-      ]
+        {
+          "id": "ok",
+          "text": "Press on.",
+          "next": "end",
+          "text_zh": "奋力前行。"
+        }
+      ],
+      "text_zh": "易迁连滚带爬地奔回城去，宁取熟悉的旧地，不要应许的恩典。雾把他吞没，你独自留在泥沼中。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

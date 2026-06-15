@@ -5,8 +5,7 @@ class_name HillDifficulty
 ## A rest arbor on the middle path tempts you to linger and grow drowsy.
 
 var _arbor_player: PlayerController = null
-var _arbor_time: float = 0.0
-var _arbor_warned: bool = false
+var _arbor_prompted: bool = false
 
 
 func _build_chapter() -> void:
@@ -48,9 +47,12 @@ func _build_chapter() -> void:
 	# Middle: the true, steep way — slow going, with a tempting rest arbor.
 	_add_steep_zone(Vector3(0, 1, -14), Vector3(10, 2, 22))
 	_build_rest_arbor(Vector3(0, 0, -22))
+	_decorate_paths()
 
 	make_distant_light(Vector3(0, 7, -44), Color(1.0, 0.95, 0.7))
 	make_floating_label("The Summit", Vector3(0, 4, -36), Color(1, 0.97, 0.8))
+
+	make_wayside_chapel(Vector3(-3.5, 0, -6), "hill", {"perseverance": 8, "hope": 4, "weariness": -4}, "A true chapel at the climb — not the arbor's false ease. You rise stronger.")
 
 	spawn_player(Vector3(0, 1, 9))
 
@@ -60,6 +62,40 @@ func _build_chapter() -> void:
 		EventBus.toast("You crest the summit, breathless and kept. Palace lights glow ahead.")
 		_advance_after_delay()
 	, false)
+
+
+# Make the three ways read at a glance: Danger looks ominous, Destruction looks
+# the most inviting (and is the trap), Difficulty is plain but lit by the summit.
+func _decorate_paths() -> void:
+	# Left — Danger: cold, dim, thorned. A discerning pilgrim feels the wrongness.
+	var dlight := OmniLight3D.new()
+	dlight.position = Vector3(-12, 3, -14)
+	dlight.light_color = Color(0.35, 0.4, 0.6)
+	dlight.light_energy = 0.5
+	dlight.omni_range = 16.0
+	add_child(dlight)
+	make_decor(Vector3(11, 0.05, 30), Color(0.12, 0.12, 0.16), Vector3(-12, 0.06, -16))
+	for tz in [-8, -14, -20]:
+		make_decor(Vector3(0.3, 1.6, 0.3), Color(0.08, 0.1, 0.09), Vector3(-12 + randf_range(-2.0, 2.0), 0.8, tz))
+	make_floating_label("(shadow and thorn)", Vector3(-12, 1.8, -16), Color(0.5, 0.55, 0.7))
+
+	# Right — Destruction: warm, wide, golden — the most appealing path, and false.
+	for lz in [-8, -18]:
+		var wl := OmniLight3D.new()
+		wl.position = Vector3(12, 3.5, lz)
+		wl.light_color = Color(1.0, 0.82, 0.45)
+		wl.light_energy = 3.2
+		wl.omni_range = 18.0
+		add_child(wl)
+	make_decor(Vector3(11, 0.05, 30), Color(0.7, 0.55, 0.3), Vector3(12, 0.07, -16), 0.5)
+	make_floating_label("(easy and broad)", Vector3(12, 1.8, -12), Color(1.0, 0.85, 0.55))
+	# ...but a sudden black drop waits at its end.
+	make_decor(Vector3(10, 0.4, 5), Color(0.02, 0.02, 0.03), Vector3(12, -0.18, -25))
+	make_floating_label("!", Vector3(12, 1.4, -25), Color(0.95, 0.3, 0.25))
+
+	# Middle — Difficulty: plain stone, but guiding motes lead up toward the summit.
+	for mz in [-10, -18, -26]:
+		make_decor(Vector3(0.25, 0.25, 0.25), Color(1.0, 0.95, 0.7), Vector3(0, 1.4, mz), 2.5)
 
 
 func _add_steep_zone(pos: Vector3, size: Vector3) -> void:
@@ -92,24 +128,12 @@ func _build_rest_arbor(pos: Vector3) -> void:
 func _on_arbor_enter(body: Node) -> void:
 	if body is PlayerController:
 		_arbor_player = body
-		_arbor_time = 0.0
-		_arbor_warned = false
+		if not _arbor_prompted and not DialogueManager.is_active():
+			_arbor_prompted = true
+			DialogueManager.start_dialogue("rest_arbor")
 
 
 func _on_arbor_exit(body: Node) -> void:
 	if body == _arbor_player:
 		_arbor_player = null
 
-
-func _process(delta: float) -> void:
-	if _arbor_player == null:
-		return
-	_arbor_time += delta
-	if _arbor_time > 6.0 and not _arbor_warned:
-		_arbor_warned = true
-		EventBus.toast("Rest begins turning into forgetfulness. Rise before comfort masters you.")
-	if _arbor_time > 12.0:
-		_arbor_time = 0.0
-		SpiritualStateManager.apply_effects({"weariness": 10, "watchfulness": -8})
-		GameState.set_flag("drowsed_on_hill", true)
-		EventBus.toast("You drowse in the arbor, and watchfulness leaks away for a while.")

@@ -49,6 +49,8 @@ func _build_chapter() -> void:
 	# Safe path out.
 	_add_safe_stone(Vector3(0, 0, -46))
 
+	make_wayside_chapel(Vector3(-14, 0, -34), "slough", {"hope": 8, "despair": -10, "faith": 4}, "In the swamp's far corner, a dry chapel: mercy is firmer than the mud. Your heart steadies.")
+
 	spawn_player(Vector3(0, 1, 10))
 
 	# Pliable abandons you when you reach the mud's edge.

@@ -60,16 +60,27 @@ func _build() -> void:
 	left.add_theme_constant_override("separation", 6)
 	root.add_child(left)
 	var lh := Label.new()
-	lh.text = "私聊会话"
+	lh.text = LocaleManager.t("conv.title", "私聊会话")
 	lh.add_theme_font_size_override("font_size", 20)
 	lh.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7))
 	left.add_child(lh)
+	var srow := HBoxContainer.new()
+	srow.add_theme_constant_override("separation", 4)
+	left.add_child(srow)
+	var sicon := TextureRect.new()
+	var stex: Texture2D = AssetLib.ui("search")
+	if stex != null:
+		sicon.texture = stex
+		sicon.custom_minimum_size = Vector2(20, 20)
+		sicon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		srow.add_child(sicon)
 	_search = LineEdit.new()
-	_search.placeholder_text = "搜索昵称…"
+	_search.placeholder_text = LocaleManager.t("conv.search_ph", "搜索昵称…")
 	_search.clear_button_enabled = true
+	_search.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_search.add_theme_font_size_override("font_size", 14)
 	_search.text_changed.connect(func(_t): _render_threads())
-	left.add_child(_search)
+	srow.add_child(_search)
 	var lscroll := ScrollContainer.new()
 	lscroll.custom_minimum_size = Vector2(0, 430)
 	lscroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -85,7 +96,7 @@ func _build() -> void:
 	right.add_theme_constant_override("separation", 8)
 	root.add_child(right)
 	_title = Label.new()
-	_title.text = "选择左侧的会话"
+	_title.text = LocaleManager.t("conv.select", "选择左侧的会话")
 	_title.add_theme_font_size_override("font_size", 18)
 	_title.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 	right.add_child(_title)
@@ -110,14 +121,16 @@ func _build() -> void:
 	right.add_child(rrow)
 	_reply = LineEdit.new()
 	_reply.max_length = 200
-	_reply.placeholder_text = "回复…（Enter 发送）"
+	_reply.placeholder_text = LocaleManager.t("conv.reply_ph", "回复…（Enter 发送）")
 	_reply.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_reply.add_theme_font_size_override("font_size", FONT_BODY)
 	_reply.text_submitted.connect(func(_t): _send_reply())
 	rrow.add_child(_reply)
 	var close := Button.new()
-	close.text = "关闭 (Y)"
+	close.text = LocaleManager.t("conv.close_y", "关闭 (Y)")
+	close.tooltip_text = LocaleManager.t("conv.close_y", "关闭 (Y)")
 	close.pressed.connect(func(): _set_open(false))
+	_seticon(close, "close", LocaleManager.t("conv.close_y", "关闭 (Y)"))
 	rrow.add_child(close)
 
 
@@ -137,7 +150,7 @@ func _refresh_threads() -> void:
 	if not (NetConfig.enabled and AuthService.is_online):
 		for c in _thread_list.get_children():
 			c.queue_free()
-		_title.text = "离线模式 — 联网后可查看私聊。"
+		_title.text = LocaleManager.t("conv.offline", "离线模式 — 联网后可查看私聊。")
 		return
 	var res: Dictionary = await ApiClient.request_json("GET", "/chat/threads")
 	if res.ok and res.data is Array:
@@ -159,14 +172,14 @@ func _render_threads() -> void:
 		shown += 1
 	if shown == 0:
 		var none := Label.new()
-		none.text = "没有匹配的会话。" if q != "" else "还没有私聊会话。"
+		none.text = LocaleManager.t("conv.no_match", "没有匹配的会话。") if q != "" else LocaleManager.t("conv.none", "还没有私聊会话。")
 		none.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75))
 		_thread_list.add_child(none)
 
 
 func _add_thread_button(t: Dictionary) -> void:
 	var pid := String(t.get("peer_id", ""))
-	var pname := String(t.get("peer_name", "朝圣者"))
+	var pname := String(t.get("peer_name", LocaleManager.t("lb.pilgrim", "朝圣者")))
 	var pinned := bool(t.get("pinned", false))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 4)
@@ -174,8 +187,10 @@ func _add_thread_button(t: Dictionary) -> void:
 
 	var pin := Button.new()
 	pin.text = "★" if pinned else "☆"
-	pin.tooltip_text = "取消置顶" if pinned else "置顶"
+	pin.tooltip_text = LocaleManager.t("conv.unpin", "取消置顶") if pinned else LocaleManager.t("conv.pin", "置顶")
 	pin.custom_minimum_size = Vector2(34, 48)
+	_seticon(pin, "pin", pin.text)
+	pin.modulate = Color(1, 0.85, 0.3) if pinned else Color(0.6, 0.6, 0.68)
 	pin.add_theme_color_override("font_color", Color(0.95, 0.8, 0.4) if pinned else Color(0.6, 0.62, 0.7))
 	pin.pressed.connect(func(): _toggle_pin(pid, not pinned))
 	row.add_child(pin)
@@ -200,7 +215,7 @@ func _toggle_pin(peer_id: String, pinned: bool) -> void:
 func _open_thread(peer_id: String, peer_name: String) -> void:
 	_active_peer = peer_id
 	_active_name = peer_name
-	_title.text = "与 %s 的私聊" % peer_name
+	_title.text = LocaleManager.t("conv.dm_with", "与 %s 的私聊") % peer_name
 	_read_label.text = ""
 	_my_last_ts = 0
 	_rows_by_mid.clear()
@@ -223,7 +238,7 @@ func _open_thread(peer_id: String, peer_name: String) -> void:
 
 func _apply_read_state(read_ts: int) -> void:
 	if _my_last_ts > 0 and read_ts >= _my_last_ts:
-		_read_label.text = "对方已读"
+		_read_label.text = LocaleManager.t("conv.read", "对方已读")
 	else:
 		_read_label.text = ""
 
@@ -243,17 +258,17 @@ func _add_history_line(m: Dictionary) -> void:
 	lbl.scroll_active = false
 	lbl.add_theme_font_size_override("normal_font_size", 14)
 	if bool(m.get("deleted", false)):
-		lbl.text = "[color=#7a8090][i]此消息已撤回[/i][/color]"
+		lbl.text = LocaleManager.t("chat.recalled", "[color=#7a8090][i]此消息已撤回[/i][/color]")
 	else:
 		var col := "#9fe0c0" if mine else "#cfd6ea"
 		var body := String(m.get("text", ""))
 		if String(m.get("image_url", "")) != "":
-			body += "  [图片]"
+			body += LocaleManager.t("conv.image_tag", "  [图片]")
 		var quote := ""
 		var rp := String(m.get("reply_preview", ""))
 		if rp != "":
 			quote = "[color=#6b7790]┃ %s[/color]\n" % _safe(rp)
-		lbl.text = "%s[color=%s]%s[/color]：%s" % [quote, col, _safe(String(m.get("name", "朝圣者"))), _safe(body)]
+		lbl.text = "%s[color=%s]%s[/color]：%s" % [quote, col, _safe(String(m.get("name", LocaleManager.t("lb.pilgrim", "朝圣者")))), _safe(body)]
 	_history_box.add_child(lbl)
 	var mid := String(m.get("mid", ""))
 	if mid != "":
@@ -265,7 +280,7 @@ func _add_history_line(m: Dictionary) -> void:
 func _on_chat_deleted(mid: String) -> void:
 	var node: Control = _rows_by_mid.get(mid)
 	if node != null and is_instance_valid(node) and node is RichTextLabel:
-		(node as RichTextLabel).text = "[color=#7a8090][i]此消息已撤回[/i][/color]"
+		(node as RichTextLabel).text = LocaleManager.t("chat.recalled", "[color=#7a8090][i]此消息已撤回[/i][/color]")
 
 
 func _send_reply() -> void:
@@ -318,3 +333,15 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event.keycode == KEY_Y:
 		_set_open(not _open)
 		get_viewport().set_input_as_handled()
+
+
+func _seticon(btn: Button, ui_name: String, fallback: String) -> void:
+	var t: Texture2D = AssetLib.ui(ui_name)
+	if t != null:
+		btn.icon = t
+		btn.text = ""
+		btn.expand_icon = true
+		if btn.custom_minimum_size == Vector2.ZERO:
+			btn.custom_minimum_size = Vector2(30, 30)
+	else:
+		btn.text = fallback

@@ -103,7 +103,15 @@ func make_ground(size: Vector2, color: Color, pos: Vector3 = Vector3.ZERO) -> St
 	plane.size = Vector3(size.x, 0.5, size.y)
 	mesh.mesh = plane
 	mesh.position = Vector3(0, -0.25, 0)
-	mesh.material_override = make_material(color)
+	# Optional per-chapter ground texture (existence-checked; falls back to the
+	# flat color when the asset is absent).
+	var gmat := make_material(color)
+	var gtex := AssetLib.ground(ChapterManager.current_chapter_id)
+	if gtex != null:
+		gmat.albedo_color = Color(1, 1, 1)
+		gmat.albedo_texture = gtex
+		gmat.uv1_scale = Vector3(maxf(1.0, size.x / 4.0), maxf(1.0, size.y / 4.0), 1.0)
+	mesh.material_override = gmat
 	body.add_child(mesh)
 
 	var col := CollisionShape3D.new()
@@ -198,6 +206,11 @@ func make_light_burst(pos: Vector3, color: Color = Color(1.0, 0.95, 0.7), amount
 	dmat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	dmat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	dmat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	# Optional soft particle sprite (existence-checked).
+	var ptex := AssetLib.particle("mote")
+	if ptex != null:
+		dmat.albedo_texture = ptex
+		dmat.emission_texture = ptex
 	draw.material = dmat
 	p.draw_pass_1 = draw
 	add_child(p)
@@ -372,3 +385,78 @@ func make_distant_light(pos: Vector3, color: Color = Color(1.0, 0.95, 0.7)) -> v
 	glow.position = pos
 	glow.material_override = make_material(color, 3.0)
 	add_child(glow)
+
+
+# ---------------------------------------------------------------------------
+# Wayside chapel — an optional, secluded shrine. Pausing near it gives a small
+# blessing; kneeling inside gives a one-time grace and lights its candle.
+# ---------------------------------------------------------------------------
+func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Dictionary, kneel_text: String) -> void:
+	var wall := Color(0.5, 0.48, 0.44)
+	make_block(Vector3(3.4, 3.0, 0.4), wall, pos + Vector3(0, 1.5, -1.6))
+	make_block(Vector3(0.4, 3.0, 3.2), wall, pos + Vector3(-1.5, 1.5, 0))
+	make_block(Vector3(0.4, 3.0, 3.2), wall, pos + Vector3(1.5, 1.5, 0))
+	make_decor(Vector3(3.8, 0.5, 3.8), wall.darkened(0.1), pos + Vector3(0, 3.2, 0))
+	make_decor(Vector3(0.18, 1.0, 0.18), Color(0.7, 0.6, 0.4), pos + Vector3(0, 4.2, 0))
+	make_decor(Vector3(0.7, 0.18, 0.18), Color(0.7, 0.6, 0.4), pos + Vector3(0, 4.35, 0))
+	var glow := OmniLight3D.new()
+	glow.position = pos + Vector3(0, 1.6, 0)
+	glow.light_color = Color(1.0, 0.85, 0.55)
+	glow.light_energy = 1.0
+	glow.omni_range = 7.0
+	add_child(glow)
+	var candle := MeshInstance3D.new()
+	var cm := BoxMesh.new()
+	cm.size = Vector3(0.2, 0.5, 0.2)
+	candle.mesh = cm
+	candle.position = pos + Vector3(0, 0.55, -1.0)
+	candle.material_override = make_material(Color(0.4, 0.38, 0.3))
+	add_child(candle)
+
+	# Pausing near the chapel is itself a small blessing (once).
+	var pause := Area3D.new()
+	pause.collision_layer = 0
+	pause.collision_mask = 1
+	pause.monitoring = true
+	var pcol := CollisionShape3D.new()
+	var pbox := BoxShape3D.new()
+	pbox.size = Vector3(5, 4, 5)
+	pcol.shape = pbox
+	pause.add_child(pcol)
+	pause.position = pos + Vector3(0, 1, 1.5)
+	var pflag := "paused_chapel_" + chapel_id
+	pause.body_entered.connect(func(b):
+		if b is PlayerController and not GameState.has_flag(pflag):
+			GameState.set_flag(pflag, true)
+			SpiritualStateManager.apply_effects({"watchfulness": 2})
+			EventBus.toast("A small chapel stands off the road. You slow, and breathe.")
+	)
+	add_child(pause)
+
+	# Kneeling gives a one-time grace and lights the candle.
+	make_floating_label("A wayside chapel", pos + Vector3(0, 2.7, 1.5), Color(0.85, 0.82, 0.7))
+	make_interactable(pos + Vector3(0, 0, 1.0), "Kneel a moment",
+		func(_p):
+			if GameState.has_flag("found_chapel_" + chapel_id):
+				return
+			GameState.set_flag("found_chapel_" + chapel_id, true)
+			SpiritualStateManager.apply_effects(kneel_effects)
+			GameState.add_inventory_item("chapels_found", 1)
+			var lit := make_material(Color(1.0, 0.9, 0.6))
+			lit.emission_enabled = true
+			lit.emission = Color(1.0, 0.85, 0.5)
+			lit.emission_energy_multiplier = 3.0
+			if is_instance_valid(candle):
+				candle.material_override = lit
+			make_light_burst(pos + Vector3(0, 1.0, -1.0), Color(1.0, 0.9, 0.6), 26)
+			EventBus.toast(kneel_text)
+			AudioManager.play_sfx("chapel_kneel")
+			_check_chapel_meta()
+		, null, Color(0.7, 0.65, 0.5), 0.6, 1.4, true)
+
+
+func _check_chapel_meta() -> void:
+	if GameState.get_item_count("chapels_found") >= 4 and not GameState.has_flag("chapel_pilgrim"):
+		GameState.set_flag("chapel_pilgrim", true)
+		EventBus.toast("You have not passed one prayer-place by. This quiet faithfulness will be remembered at the end.")
+		AudioManager.play_sfx("blessing")

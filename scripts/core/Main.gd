@@ -20,6 +20,7 @@ var _in_game: bool = false
 
 func _ready() -> void:
 	_ensure_input_actions()
+	_load_video_settings()
 
 	_world_root = Node3D.new()
 	_world_root.name = "World"
@@ -72,6 +73,45 @@ func _ensure_input_actions() -> void:
 			var ev := InputEventKey.new()
 			ev.physical_keycode = keycode
 			InputMap.action_add_event(action, ev)
+	# --- Gamepad bindings (left stick + d-pad move, A jump, X interact) ---
+	_bind_axis("move_left", JOY_AXIS_LEFT_X, -1.0)
+	_bind_axis("move_right", JOY_AXIS_LEFT_X, 1.0)
+	_bind_axis("move_forward", JOY_AXIS_LEFT_Y, -1.0)
+	_bind_axis("move_back", JOY_AXIS_LEFT_Y, 1.0)
+	_bind_button("move_left", JOY_BUTTON_DPAD_LEFT)
+	_bind_button("move_right", JOY_BUTTON_DPAD_RIGHT)
+	_bind_button("move_forward", JOY_BUTTON_DPAD_UP)
+	_bind_button("move_back", JOY_BUTTON_DPAD_DOWN)
+	_bind_button("jump", JOY_BUTTON_A)
+	_bind_button("interact", JOY_BUTTON_X)
+	# --- Camera look (right stick) ---
+	for a in ["look_left", "look_right", "look_up", "look_down"]:
+		if not InputMap.has_action(a):
+			InputMap.add_action(a, 0.2)
+	_bind_axis("look_left", JOY_AXIS_RIGHT_X, -1.0)
+	_bind_axis("look_right", JOY_AXIS_RIGHT_X, 1.0)
+	_bind_axis("look_up", JOY_AXIS_RIGHT_Y, -1.0)
+	_bind_axis("look_down", JOY_AXIS_RIGHT_Y, 1.0)
+	# --- Menu navigation on a controller ---
+	_bind_button("ui_accept", JOY_BUTTON_A)
+	_bind_button("ui_cancel", JOY_BUTTON_B)
+
+
+func _bind_button(action: String, button: int) -> void:
+	if not InputMap.has_action(action):
+		InputMap.add_action(action)
+	var ev := InputEventJoypadButton.new()
+	ev.button_index = button
+	InputMap.action_add_event(action, ev)
+
+
+func _bind_axis(action: String, axis: int, value: float) -> void:
+	if not InputMap.has_action(action):
+		InputMap.add_action(action)
+	var ev := InputEventJoypadMotion.new()
+	ev.axis = axis
+	ev.axis_value = value
+	InputMap.action_add_event(action, ev)
 
 
 # ---------------------------------------------------------------------------
@@ -133,21 +173,36 @@ func _show_title() -> void:
 	_hud.visible = false
 	_clear_menu()
 	var panel := _make_fullscreen_panel(Color(0.04, 0.04, 0.08, 1.0))
+	# Optional title key art behind the menu (existence-checked; dimmed for text).
+	var key_art := AssetLib.ui("title_key_art")
+	if key_art != null:
+		var bg := TextureRect.new()
+		bg.texture = key_art
+		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+		bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		bg.modulate = Color(1, 1, 1, 0.55)
+		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.add_child(bg)
+	# Optional title-screen music (silently skipped if the file is absent).
+	AudioManager.play_music("res://assets/audio/music/title.ogg")
 	var vb := _make_centered_box(panel)
-	_add_title(vb, "PILGRIM'S ROAD", 48, Color(0.95, 0.88, 0.6))
-	_add_title(vb, "Burden Fallen", 26, Color(0.7, 0.78, 0.9))
+	_add_title(vb, LocaleManager.t("menu.title", "PILGRIM'S ROAD"), 48, Color(0.95, 0.88, 0.6))
+	_add_title(vb, LocaleManager.t("menu.subtitle", "Burden Fallen"), 26, Color(0.7, 0.78, 0.9))
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 20)
 	vb.add_child(spacer)
-	_add_title(vb, "Choose your journey", 18, Color(0.7, 0.72, 0.82))
-	_add_button(vb, "Devout Journey  (敬虔版 · full)", _start_standard)
-	_add_button(vb, "Children's Journey  (gentle, easy to finish)", _start_child)
+	_add_title(vb, LocaleManager.t("menu.choose", "Choose your journey"), 18, Color(0.7, 0.72, 0.82))
+	_add_button(vb, LocaleManager.t("menu.devout", "Devout Journey  (full)"), _start_standard)
+	_add_button(vb, LocaleManager.t("menu.child", "Children's Journey  (gentle, easy to finish)"), _start_child)
 	if SaveManager.has_save("slot_1"):
 		var summary := SaveManager.get_save_summary("slot_1")
-		_add_button(vb, "Continue (%s)" % String(summary.get("chapter", "")), continue_game)
-	_add_button(vb, "Quit", func(): get_tree().quit())
+		_add_button(vb, LocaleManager.t("menu.continue", "Continue (%s)") % String(summary.get("chapter", "")), continue_game)
+	_add_button(vb, LocaleManager.t("menu.options", "Options"), _options_from_title)
+	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
+	_add_button(vb, LocaleManager.switch_label(), func(): LocaleManager.toggle(); _show_title())
 	var hint := Label.new()
-	hint.text = "WASD move · Space jump · E interact · 1-4 choose · C heart · Tab map · Esc pause"
+	hint.text = LocaleManager.t("menu.hint", "WASD move · Space jump · E interact · 1-4 choose · C heart · Tab map · Esc pause")
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
 	vb.add_child(hint)
@@ -171,7 +226,7 @@ func start_new_game(mode: String = "standard") -> void:
 	_in_game = true
 	EventBus.game_started.emit()
 	if mode == "child":
-		EventBus.toast("Children's Journey — a gentle road. Take your time.")
+		EventBus.toast(LocaleManager.t("toast.child_mode", "Children's Journey — a gentle road. Take your time."))
 	ChapterManager.start_chapter("city_of_destruction")
 
 
@@ -197,15 +252,15 @@ func _on_demo_completed() -> void:
 	_clear_menu()
 	var panel := _make_fullscreen_panel(Color(0.06, 0.05, 0.03, 1.0))
 	var vb := _make_centered_box(panel)
-	_add_title(vb, "You have crossed the river and entered in.", 32, Color(0.98, 0.94, 0.72))
-	_add_title(vb, "From first awakening to final welcome,", 20, Color(0.8, 0.82, 0.9))
-	_add_title(vb, "grace has carried the pilgrim home.", 20, Color(0.8, 0.82, 0.9))
-	_add_title(vb, "The burden is gone. The City is before you.", 18, Color(0.65, 0.65, 0.75))
+	_add_title(vb, LocaleManager.t("end.title", "You have crossed the river and entered in."), 32, Color(0.98, 0.94, 0.72))
+	_add_title(vb, LocaleManager.t("end.l1", "From first awakening to final welcome,"), 20, Color(0.8, 0.82, 0.9))
+	_add_title(vb, LocaleManager.t("end.l2", "grace has carried the pilgrim home."), 20, Color(0.8, 0.82, 0.9))
+	_add_title(vb, LocaleManager.t("end.l3", "The burden is gone. The City is before you."), 18, Color(0.65, 0.65, 0.75))
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 20)
 	vb.add_child(spacer)
-	_add_button(vb, "Return to Title", _show_title)
-	_add_button(vb, "Quit", func(): get_tree().quit())
+	_add_button(vb, LocaleManager.t("menu.return_title", "Return to Title"), _show_title)
+	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
 
 
 # ---------------------------------------------------------------------------
@@ -219,22 +274,22 @@ func _on_collapse() -> void:
 	_clear_menu()
 	var panel := _make_fullscreen_panel(Color(0.02, 0.0, 0.04, 0.86))
 	var vb := _make_centered_box(panel)
-	_add_title(vb, "You have sunk down under the weight.", 28, Color(0.85, 0.75, 0.85))
-	_add_title(vb, "Trying harder cannot raise a heart that needs mercy.", 20, Color(0.78, 0.72, 0.82))
-	_add_title(vb, "But the way back was never closed. Tell the truth, and receive help:", 18, Color(0.75, 0.8, 0.9))
+	_add_title(vb, LocaleManager.t("collapse.title", "You have sunk down under the weight."), 28, Color(0.85, 0.75, 0.85))
+	_add_title(vb, LocaleManager.t("collapse.l1", "Trying harder cannot raise a heart that needs mercy."), 20, Color(0.78, 0.72, 0.82))
+	_add_title(vb, LocaleManager.t("collapse.l2", "But the way back was never closed. Tell the truth, and receive help:"), 18, Color(0.75, 0.8, 0.9))
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 16)
 	vb.add_child(spacer)
 	# Each confession is an honest naming, not a payment. Grace does the lifting.
-	var confessions := {
-		"\"I was afraid, and I obeyed fear as if it were truth.\"": {"fear": -25, "faith": 10},
-		"\"I trusted myself, and called refusal to receive help strength.\"": {"pride": -22, "humility": 16},
-		"\"I believed despair when it said mercy was finished with me.\"": {"despair": -40, "hope": 20},
-		"\"I wanted the easy way more than the true one.\"": {"deception": -18, "perseverance": 12},
-	}
-	for line in confessions.keys():
-		var effects: Dictionary = confessions[line]
-		_add_button(vb, line, func(): _confess(effects))
+	var confessions := [
+		{"k": "repent.afraid", "en": "\"I was afraid, and I obeyed fear as if it were truth.\"", "eff": {"fear": -25, "faith": 10}},
+		{"k": "repent.pride", "en": "\"I trusted myself, and called refusal to receive help strength.\"", "eff": {"pride": -22, "humility": 16}},
+		{"k": "repent.despair", "en": "\"I believed despair when it said mercy was finished with me.\"", "eff": {"despair": -40, "hope": 20}},
+		{"k": "repent.easy", "en": "\"I wanted the easy way more than the true one.\"", "eff": {"deception": -18, "perseverance": 12}},
+	]
+	for c in confessions:
+		var effects: Dictionary = c["eff"]
+		_add_button(vb, LocaleManager.t(String(c["k"]), String(c["en"])), func(): _confess(effects))
 
 
 func _confess(effects: Dictionary) -> void:
@@ -245,7 +300,168 @@ func _confess(effects: Dictionary) -> void:
 	_clear_menu()
 	EventBus.player_control_locked.emit(false)
 	EventBus.repentance_completed.emit()
-	EventBus.toast("You are lifted by grace, not by self-rescue. Walk on.")
+	EventBus.toast(LocaleManager.t("toast.lifted", "You are lifted by grace, not by self-rescue. Walk on."))
+
+
+# ---------------------------------------------------------------------------
+# Options / settings screen (volume sliders + fullscreen)
+# ---------------------------------------------------------------------------
+func _options_from_title() -> void:
+	_clear_menu()
+	_build_options(_menu_layer, _show_title)
+
+
+func _pause_to_options() -> void:
+	for c in _pause_layer.get_children():
+		c.queue_free()
+	_build_options(_pause_layer, _open_pause)
+
+
+func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
+	var panel := Control.new()
+	panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var bg := ColorRect.new()
+	bg.color = Color(0.03, 0.03, 0.06, 0.94)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	panel.add_child(bg)
+	layer.add_child(panel)
+
+	var vb := _make_centered_box(panel)
+	_add_title(vb, "Options", 36, Color(0.95, 0.9, 0.7))
+	_add_title(vb, "Volume", 20, Color(0.75, 0.8, 0.92))
+	_add_volume_slider(vb, "Master", "master")
+	_add_volume_slider(vb, "Music", "music")
+	_add_volume_slider(vb, "Ambience", "ambient")
+	_add_volume_slider(vb, "Sound FX", "sfx")
+
+	var spacer := Control.new()
+	spacer.custom_minimum_size = Vector2(0, 12)
+	vb.add_child(spacer)
+
+	_add_title(vb, "Controls", 20, Color(0.75, 0.8, 0.92))
+	_add_range_slider(vb, "Mouse Look", "mouse_sensitivity", 0.05, 0.6, 0.01, 0.25, true)
+	_add_range_slider(vb, "Controller Look", "controller_look_sensitivity", 60.0, 360.0, 10.0, 150.0, false)
+	var inv := CheckButton.new()
+	inv.text = "Invert Look Y"
+	inv.add_theme_font_size_override("font_size", 18)
+	inv.button_pressed = bool(_get_input_setting("invert_look_y", false))
+	inv.toggled.connect(func(on): _set_input_setting("invert_look_y", on))
+	vb.add_child(inv)
+
+	var spacer2 := Control.new()
+	spacer2.custom_minimum_size = Vector2(0, 12)
+	vb.add_child(spacer2)
+
+	var cb := CheckButton.new()
+	cb.text = "Fullscreen"
+	cb.button_pressed = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
+	cb.add_theme_font_size_override("font_size", 18)
+	cb.toggled.connect(func(on):
+		DisplayServer.window_set_mode(
+			DisplayServer.WINDOW_MODE_FULLSCREEN if on else DisplayServer.WINDOW_MODE_WINDOWED)
+		_save_fullscreen(on)
+	)
+	vb.add_child(cb)
+
+	_add_button(vb, "Back", func():
+		AudioManager.save_settings()
+		on_back.call()
+	)
+
+
+func _add_volume_slider(vb: VBoxContainer, label_text: String, key: String) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	var lbl := Label.new()
+	lbl.text = label_text
+	lbl.custom_minimum_size = Vector2(130, 0)
+	lbl.add_theme_font_size_override("font_size", 18)
+	row.add_child(lbl)
+	var slider := HSlider.new()
+	slider.min_value = 0.0
+	slider.max_value = 1.0
+	slider.step = 0.01
+	slider.value = AudioManager.get_volume(key)
+	slider.custom_minimum_size = Vector2(260, 24)
+	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(slider)
+	var val := Label.new()
+	val.custom_minimum_size = Vector2(52, 0)
+	val.text = "%d%%" % int(round(slider.value * 100.0))
+	val.add_theme_font_size_override("font_size", 16)
+	row.add_child(val)
+	slider.value_changed.connect(func(v):
+		AudioManager.set_volume(key, v)
+		val.text = "%d%%" % int(round(v * 100.0))
+	)
+	slider.drag_ended.connect(func(_changed):
+		if key == "sfx" or key == "master":
+			AudioManager.play_sfx("ui_select")
+	)
+	vb.add_child(row)
+
+
+func _get_input_setting(key: String, default):
+	var cf := ConfigFile.new()
+	cf.load("user://settings.cfg")
+	return cf.get_value("input", key, default)
+
+
+func _set_input_setting(key: String, value) -> void:
+	var cf := ConfigFile.new()
+	cf.load("user://settings.cfg")
+	cf.set_value("input", key, value)
+	cf.save("user://settings.cfg")
+	if EventBus.has_signal("settings_changed"):
+		EventBus.settings_changed.emit()
+
+
+func _add_range_slider(vb: VBoxContainer, label_text: String, key: String,
+		mn: float, mx: float, step: float, default: float, as_percent: bool) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	var lbl := Label.new()
+	lbl.text = label_text
+	lbl.custom_minimum_size = Vector2(130, 0)
+	lbl.add_theme_font_size_override("font_size", 18)
+	row.add_child(lbl)
+	var slider := HSlider.new()
+	slider.min_value = mn
+	slider.max_value = mx
+	slider.step = step
+	slider.value = float(_get_input_setting(key, default))
+	slider.custom_minimum_size = Vector2(260, 24)
+	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(slider)
+	var val := Label.new()
+	val.custom_minimum_size = Vector2(52, 0)
+	val.add_theme_font_size_override("font_size", 16)
+	var fmt := func(v: float) -> String:
+		if as_percent:
+			return "%d%%" % int(round((v - mn) / (mx - mn) * 100.0))
+		return "%d" % int(round(v))
+	val.text = fmt.call(slider.value)
+	row.add_child(val)
+	slider.value_changed.connect(func(v):
+		_set_input_setting(key, v)
+		val.text = fmt.call(v)
+	)
+	vb.add_child(row)
+
+
+func _save_fullscreen(on: bool) -> void:
+	var cf := ConfigFile.new()
+	cf.load("user://settings.cfg")
+	cf.set_value("video", "fullscreen", on)
+	cf.save("user://settings.cfg")
+
+
+func _load_video_settings() -> void:
+	var cf := ConfigFile.new()
+	if cf.load("user://settings.cfg") != OK:
+		return
+	if bool(cf.get_value("video", "fullscreen", false)):
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 
 
 # ---------------------------------------------------------------------------
@@ -271,8 +487,9 @@ func _open_pause() -> void:
 	_add_button(vb, "Route Map", _pause_to_route)
 	_add_button(vb, "Save", _pause_save)
 	_add_button(vb, "Load", _load_from_pause)
+	_add_button(vb, "Options", _pause_to_options)
 	_add_button(vb, "Return to Title", _pause_to_title)
-	_add_button(vb, "Quit", func(): get_tree().quit())
+	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
 
 
 func _pause_to_route() -> void:

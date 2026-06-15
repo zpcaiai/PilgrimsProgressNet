@@ -5,14 +5,14 @@ extends CanvasLayer
 ## No-op when offline.
 
 const TOKEN_NAMES := {
-	"crown_of_life": "生命冠冕",
-	"palm_branch": "棕榈枝",
-	"pilgrims_staff": "朝圣杖",
+	"crown_of_life": LocaleManager.t("reward.crown", "生命冠冕"),
+	"palm_branch": LocaleManager.t("reward.palm", "棕榈枝"),
+	"pilgrims_staff": LocaleManager.t("reward.staff", "朝圣杖"),
 }
 const BOARD_NAMES := {
-	"fastest_run": "最快通关",
-	"fewest_falls": "最少倒下",
-	"devout_score": "敬虔之心",
+	"fastest_run": LocaleManager.t("lb.board_fastest", "最快通关"),
+	"fewest_falls": LocaleManager.t("lb.board_fewest", "最少倒下"),
+	"devout_score": LocaleManager.t("lb.board_devout", "敬虔之心"),
 }
 
 var _dim: ColorRect
@@ -70,7 +70,7 @@ func _build() -> void:
 	_panel.add_child(vb)
 
 	var title := Label.new()
-	title.text = "赛季嘉奖"
+	title.text = LocaleManager.t("reward.title", "赛季嘉奖")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 30)
 	title.add_theme_color_override("font_color", Color(0.98, 0.9, 0.55))
@@ -85,7 +85,7 @@ func _build() -> void:
 	vb.add_child(_body)
 
 	var btn := Button.new()
-	btn.text = "感谢，收下"
+	btn.text = LocaleManager.t("reward.accept", "感谢，收下")
 	btn.add_theme_font_size_override("font_size", 18)
 	btn.custom_minimum_size = Vector2(0, 46)
 	btn.pressed.connect(_dismiss)
@@ -95,14 +95,14 @@ func _build() -> void:
 func _on_unseen(rewards: Array) -> void:
 	if rewards.is_empty():
 		return
-	var lines: Array = ["[center]你在上个赛季的征途中名列前茅，[/center]",
-		"[center]这些恩典之记号赐予你：[/center]\n"]
+	var lines: Array = [LocaleManager.t("reward.l1", "[center]你在上个赛季的征途中名列前茅，[/center]"),
+		LocaleManager.t("reward.l2", "[center]这些恩典之记号赐予你：[/center]\n")]
 	for r in rewards:
 		var token := String(r.get("token", ""))
 		var token_name: String = TOKEN_NAMES.get(token, token)
 		var board_name: String = BOARD_NAMES.get(String(r.get("board", "")), String(r.get("board", "")))
-		var diff := "童趣" if String(r.get("difficulty", "")) == "child" else "敬虔"
-		lines.append("[center][color=#f0e0a0]%s[/color]　— %s · %s · 第 %d 名（%s）[/center]" % [
+		var diff := LocaleManager.t("lb.child", "童趣") if String(r.get("difficulty", "")) == "child" else LocaleManager.t("lb.devout", "敬虔")
+		lines.append(LocaleManager.t("reward.cite", "[center][color=#f0e0a0]%s[/color]　— %s · %s · 第 %d 名（%s）[/center]") % [
 			token_name, String(r.get("season", "")), board_name, int(r.get("rank", 0)), diff])
 	_body.text = "\n".join(PackedStringArray(lines))
 	_set_visible(true)

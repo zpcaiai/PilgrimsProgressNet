@@ -34,7 +34,7 @@ def _audience_keys(channel: str, scope: str, chapter_id: str) -> list[str]:
     return [chapter_id]
 
 
-async def _authenticate(token: str) -> tuple[str, str] | None:
+async def _authenticate(token: str) -> tuple[str, str, str | None] | None:
     try:
         player_id = decode_token(token, "access")
     except jwt.PyJWTError:
@@ -43,7 +43,7 @@ async def _authenticate(token: str) -> tuple[str, str] | None:
         player = await session.get(Player, player_id)
         if player is None:
             return None
-        return player.id, player.display_name
+        return player.id, player.display_name, player.avatar_url
 
 
 def _safe_image(url) -> str | None:
@@ -59,13 +59,14 @@ async def ws_ghosts(websocket: WebSocket, chapter_id: str, token: str = Query(de
     if auth is None:
         await websocket.close(code=4401)
         return
-    player_id, name = auth
+    player_id, name, avatar = auth
 
     await manager.connect(chapter_id, websocket, player_id)
     history = await chat_store.recent(chat_store.chapter_scope(chapter_id))
     if history:
         await websocket.send_json({"type": "chat_history", "channel": "chapter", "items": history})
     await manager.publish(chapter_id, {"type": "join", "id": player_id, "name": name})
+    joined_rooms: set[str] = set()
     try:
         while True:
             raw = await websocket.receive_json()
@@ -74,36 +75,61 @@ async def ws_ghosts(websocket: WebSocket, chapter_id: str, token: str = Query(de
             kind = raw.get("type")
             if kind == "pos":
                 await manager.publish(chapter_id, {
-                    "type": "peer", "id": player_id, "name": name,
+                    "type": "peer", "id": player_id, "name": name, "avatar": avatar,
                     "x": float(raw.get("x", 0.0)), "y": float(raw.get("y", 0.0)),
                     "z": float(raw.get("z", 0.0)), "yaw": float(raw.get("yaw", 0.0)),
                 })
             elif kind == "chat":
-                await _handle_chat(websocket, raw, chapter_id, player_id, name)
+                await _handle_chat(websocket, raw, chapter_id, player_id, name, avatar)
             elif kind == "chat_delete":
                 await _handle_delete(websocket, raw, chapter_id, player_id)
             elif kind == "room_join":
                 room = str(raw.get("room", "")).strip()[:32]
                 if room:
-                    await manager.join(chat_store.room_scope(room), websocket)
+                    key = chat_store.room_scope(room)
+                    await manager.join(key, websocket)
+                    await manager.add_member(key, player_id, name, avatar or "")
+                    joined_rooms.add(room)
+                    rname = await chat_store.get_room_name(room)
+                    mlist = await manager.members(key)
                     await websocket.send_json({
                         "type": "system",
-                        "text": "已加入群聊「%s」（%d 人在线）" % (
-                            room, manager.room_size(chat_store.room_scope(room)))})
+                        "text": "已加入群聊「%s」（%d 人）" % (rname or room, len(mlist))})
+                    await manager.publish(key, {"type": "room_members", "room": room,
+                                                "name": rname, "members": mlist})
             elif kind == "room_leave":
                 room = str(raw.get("room", "")).strip()[:32]
                 if room:
-                    manager.leave(chat_store.room_scope(room), websocket)
+                    key = chat_store.room_scope(room)
+                    manager.leave(key, websocket)
+                    await manager.remove_member(key, player_id)
+                    joined_rooms.discard(room)
+                    await manager.publish(key, {"type": "room_members", "room": room,
+                                                "members": await manager.members(key)})
             elif kind == "ping":
                 await websocket.send_json({"type": "pong", "t": raw.get("t")})
+                # Heartbeat keeps room membership fresh; evict stale members and
+                # tell the room when someone drops off without a clean leave.
+                for room in joined_rooms:
+                    key = chat_store.room_scope(room)
+                    await manager.touch_member(key, player_id, name, avatar or "")
+                    if await manager.sweep(key):
+                        await manager.publish(key, {"type": "room_members", "room": room,
+                                                    "members": await manager.members(key)})
     except WebSocketDisconnect:
         pass
     finally:
         manager.disconnect(websocket)
         await manager.publish(chapter_id, {"type": "leave", "id": player_id})
+        for room in joined_rooms:
+            key = chat_store.room_scope(room)
+            await manager.remove_member(key, player_id)
+            await manager.publish(key, {"type": "room_members", "room": room,
+                                        "members": await manager.members(key)})
 
 
-async def _handle_chat(websocket: WebSocket, raw: dict, chapter_id: str, player_id: str, name: str) -> None:
+async def _handle_chat(websocket: WebSocket, raw: dict, chapter_id: str, player_id: str,
+                       name: str, avatar: str | None = None) -> None:
     if await moderation.is_muted(player_id):
         await websocket.send_json({"type": "system", "text": "你已被禁言，暂时无法发言。"})
         return
@@ -116,7 +142,7 @@ async def _handle_chat(websocket: WebSocket, raw: dict, chapter_id: str, player_
     reply_to = str(raw.get("reply_to", "")) or None
     reply_preview = (str(raw.get("reply_preview", ""))[:120] or None) if reply_to else None
     ts = int(time.time() * 1000)
-    base = {"type": "chat", "id": player_id, "name": name, "text": text,
+    base = {"type": "chat", "id": player_id, "name": name, "avatar": avatar, "text": text,
             "image_url": image_url, "ts": ts, "channel": channel,
             "reply_to": reply_to, "reply_preview": reply_preview}
 

@@ -50,6 +50,7 @@ async def device_login(body: DeviceAuthIn, session: AsyncSession = Depends(get_s
         refresh_token=make_refresh_token(player.id),
         player_id=player.id,
         display_name=player.display_name,
+        avatar_url=player.avatar_url,
     )
 
 
@@ -67,6 +68,7 @@ async def refresh(body: RefreshIn, session: AsyncSession = Depends(get_session))
         refresh_token=make_refresh_token(player.id),
         player_id=player.id,
         display_name=player.display_name,
+        avatar_url=player.avatar_url,
     )
 
 
@@ -110,6 +112,7 @@ async def bind_email(
         refresh_token=make_refresh_token(player.id),
         player_id=player.id,
         display_name=player.display_name,
+        avatar_url=player.avatar_url,
     )
 
 
@@ -140,4 +143,5 @@ async def recover(body: RecoverIn, session: AsyncSession = Depends(get_session))
         refresh_token=make_refresh_token(player.id),
         player_id=player.id,
         display_name=player.display_name,
+        avatar_url=player.avatar_url,
     )

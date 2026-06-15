@@ -8,24 +8,41 @@
         {
           "id": "press_on",
           "text": "I must go forward. Staying would only make my fear look respectable.",
-          "effects": { "faith": 5, "perseverance": 5 },
-          "flags": { "obstinate_confronted": true },
-          "next": "leaves"
+          "effects": {
+            "faith": 5,
+            "perseverance": 5
+          },
+          "flags": {
+            "obstinate_confronted": true
+          },
+          "next": "leaves",
+          "text_zh": "我必须前行。留下只会让我的惧怕显得体面。"
         },
         {
           "id": "mock_him",
           "text": "You are blind if you cannot see the fire.",
-          "effects": { "pride": 10, "humility": -5 },
-          "flags": { "obstinate_confronted": true },
-          "next": "leaves_angry"
+          "effects": {
+            "pride": 10,
+            "humility": -5
+          },
+          "flags": {
+            "obstinate_confronted": true
+          },
+          "next": "leaves_angry",
+          "text_zh": "你若看不见那火，就是瞎了眼。"
         },
         {
           "id": "waver",
           "text": "Maybe you are right. Maybe I am only frightened.",
-          "effects": { "fear": 5, "despair": 5 },
-          "next": "tempt"
+          "effects": {
+            "fear": 5,
+            "despair": 5
+          },
+          "next": "tempt",
+          "text_zh": "也许你说得对。也许我不过是被吓着了。"
         }
-      ]
+      ],
+      "text_zh": "你竟肯为一座天城的传闻，撇下你的家、你的生意、你的名声？趁羞耻成为你唯一所有之前，回来吧。"
     },
     "tempt": {
       "speaker": "Obstinate",
@@ -34,26 +51,50 @@
         {
           "id": "refuse",
           "text": "No. The burden remains, and the light is still there. I am going.",
-          "effects": { "faith": 6, "perseverance": 4, "fear": -3 },
-          "flags": { "obstinate_confronted": true },
-          "next": "leaves"
+          "effects": {
+            "faith": 6,
+            "perseverance": 4,
+            "fear": -3
+          },
+          "flags": {
+            "obstinate_confronted": true
+          },
+          "next": "leaves",
+          "text_zh": "不。重担还在，光也还在。我要走了。"
         }
-      ]
+      ],
+      "text_zh": "总算讲理了。放下那本书，丢开重担，重新做个平常人。"
     },
     "leaves": {
       "speaker": "Obstinate",
       "text": "Then go your way. I will not chase a man determined to be ruined by hope.",
       "choices": [
-        { "id": "ok", "text": "Continue toward the gate.", "next": "end" }
-      ]
+        {
+          "id": "ok",
+          "text": "Continue toward the gate.",
+          "next": "end",
+          "text_zh": "继续向门走去。"
+        }
+      ],
+      "text_zh": "那就走你的路。我不会去追一个铁了心要被盼望毁掉的人。"
     },
     "leaves_angry": {
       "speaker": "Obstinate",
       "text": "Proud words from a burdened man. Go, then, and see how long your courage lasts.",
       "choices": [
-        { "id": "ok2", "text": "Continue toward the gate.", "next": "end" }
-      ]
+        {
+          "id": "ok2",
+          "text": "Continue toward the gate.",
+          "next": "end",
+          "text_zh": "继续向门走去。"
+        }
+      ],
+      "text_zh": "背重担的人，口气倒不小。去吧，看你的勇气能撑多久。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

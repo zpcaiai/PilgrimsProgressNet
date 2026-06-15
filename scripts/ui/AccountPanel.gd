@@ -4,7 +4,7 @@ extends CanvasLayer
 ## account, and lets the player BIND an email (so the account can be recovered)
 ## or RECOVER an account onto this device via an email code.
 ##
-## Flow: enter email -> "发送验证码" -> enter the 6-digit code -> 绑定/找回.
+## Flow: enter email -> LocaleManager.t("account.send_code", "发送验证码") -> enter the 6-digit code -> 绑定/找回.
 ## In dev the server echoes the code; it's shown in the hint for easy testing.
 ## No-op / shows offline notice when networking is disabled.
 
@@ -21,11 +21,13 @@ var _hint: Label
 var _mode: String = "bind"   # "bind" or "recover"
 var _open: bool = false
 var _mode_btns: Array = []
+var _avatar_rect: TextureRect
+var _avatar_dialog: FileDialog
 
 const TOKEN_NAMES := {
-	"crown_of_life": "生命冠冕",
-	"palm_branch": "棕榈枝",
-	"pilgrims_staff": "朝圣杖",
+	"crown_of_life": LocaleManager.t("reward.crown", "生命冠冕"),
+	"palm_branch": LocaleManager.t("reward.palm", "棕榈枝"),
+	"pilgrims_staff": LocaleManager.t("reward.staff", "朝圣杖"),
 }
 
 
@@ -36,11 +38,44 @@ func _ready() -> void:
 	if NetConfig.enabled:
 		AuthService.authenticated.connect(func(_id, _n): _refresh_identity())
 		AuthService.email_code_sent.connect(_on_code_sent)
-		AuthService.email_bound.connect(func(e): _flash("邮箱已绑定：" + e); _refresh_identity())
-		AuthService.account_recovered.connect(func(_id): _flash("账号已找回，存档随后同步。"); _refresh_identity())
+		AuthService.email_bound.connect(func(e): _flash(LocaleManager.t("account.bound_label", "邮箱已绑定：") + e); _refresh_identity())
+		AuthService.account_recovered.connect(func(_id): _flash(LocaleManager.t("account.recovered", "账号已找回，存档随后同步。")); _refresh_identity())
 		AuthService.account_error.connect(func(msg): _flash(msg))
+		AuthService.avatar_changed.connect(func(url): _load_avatar(url); _flash(LocaleManager.t("account.avatar_updated", "头像已更新。")))
 		LeaderboardService.rewards_received.connect(_on_rewards)
 	_set_open(false)
+
+
+func _pick_avatar() -> void:
+	if not AuthService.is_online:
+		_flash(LocaleManager.t("account.offline_avatar", "离线状态：无法上传头像。"))
+		return
+	_avatar_dialog.popup_centered_ratio(0.6)
+
+
+func _on_avatar_chosen(path: String) -> void:
+	var bytes := FileAccess.get_file_as_bytes(path)
+	if bytes.is_empty():
+		_flash(LocaleManager.t("account.img_unreadable", "无法读取图片。"))
+		return
+	if bytes.size() > 2 * 1024 * 1024:
+		_flash(LocaleManager.t("account.img_too_big", "图片过大（上限 2MB）。"))
+		return
+	AuthService.upload_avatar(Marshalls.raw_to_base64(bytes), path.get_extension().to_lower())
+
+
+func _load_avatar(url: String) -> void:
+	if url == "" or not is_instance_valid(_avatar_rect):
+		return
+	var http := HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(func(_r, code, _h, body):
+		if code == 200:
+			var tex := AvatarUtil.circle_from_buffer(body, url.get_extension())
+			if tex != null and is_instance_valid(_avatar_rect):
+				_avatar_rect.texture = tex
+		http.queue_free())
+	http.request(NetConfig.media_url(url))
 
 
 func _build() -> void:
@@ -70,18 +105,49 @@ func _build() -> void:
 	_panel.add_child(vb)
 
 	var title := Label.new()
-	title.text = "我的账号"
+	title.text = LocaleManager.t("account.title", "我的账号")
 	title.add_theme_font_size_override("font_size", FONT_TITLE)
 	title.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7))
 	vb.add_child(title)
+
+	# Avatar + identity row.
+	var idrow := HBoxContainer.new()
+	idrow.add_theme_constant_override("separation", 12)
+	vb.add_child(idrow)
+	var av := VBoxContainer.new()
+	idrow.add_child(av)
+	_avatar_rect = TextureRect.new()
+	_avatar_rect.custom_minimum_size = Vector2(72, 72)
+	_avatar_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_avatar_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	var av_bg := StyleBoxFlat.new()
+	av_bg.bg_color = Color(0.12, 0.13, 0.17)
+	for side in ["top_left", "top_right", "bottom_left", "bottom_right"]:
+		av_bg.set("corner_radius_" + side, 8)
+	_avatar_rect.add_theme_stylebox_override("panel", av_bg)
+	av.add_child(_avatar_rect)
+	var up_btn := Button.new()
+	up_btn.text = LocaleManager.t("account.upload_avatar", "上传头像")
+	up_btn.add_theme_font_size_override("font_size", 14)
+	up_btn.pressed.connect(_pick_avatar)
+	av.add_child(up_btn)
 
 	_who = RichTextLabel.new()
 	_who.bbcode_enabled = true
 	_who.fit_content = true
 	_who.scroll_active = false
+	_who.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_who.custom_minimum_size = Vector2(0, 64)
 	_who.add_theme_font_size_override("normal_font_size", FONT_BODY)
-	vb.add_child(_who)
+	idrow.add_child(_who)
+
+	_avatar_dialog = FileDialog.new()
+	_avatar_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	_avatar_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	_avatar_dialog.filters = PackedStringArray(["*.png ; PNG", "*.jpg, *.jpeg ; JPEG", "*.webp ; WebP"])
+	_avatar_dialog.process_mode = Node.PROCESS_MODE_ALWAYS
+	_avatar_dialog.file_selected.connect(_on_avatar_chosen)
+	add_child(_avatar_dialog)
 
 	_rewards = RichTextLabel.new()
 	_rewards.bbcode_enabled = true
@@ -95,7 +161,7 @@ func _build() -> void:
 	var modes := HBoxContainer.new()
 	modes.add_theme_constant_override("separation", 8)
 	vb.add_child(modes)
-	for m in [{"id": "bind", "title": "绑定邮箱"}, {"id": "recover", "title": "找回账号"}]:
+	for m in [{"id": "bind", "title": LocaleManager.t("account.bind", "绑定邮箱")}, {"id": "recover", "title": LocaleManager.t("account.recover", "找回账号")}]:
 		var btn := Button.new()
 		btn.text = String(m.title)
 		btn.toggle_mode = true
@@ -107,7 +173,7 @@ func _build() -> void:
 		_mode_btns.append(btn)
 
 	_email_edit = LineEdit.new()
-	_email_edit.placeholder_text = "邮箱地址"
+	_email_edit.placeholder_text = LocaleManager.t("account.email_ph", "邮箱地址")
 	_email_edit.max_length = 255
 	_email_edit.custom_minimum_size = Vector2(0, 42)
 	_email_edit.add_theme_font_size_override("font_size", FONT_BODY)
@@ -117,13 +183,13 @@ func _build() -> void:
 	code_row.add_theme_constant_override("separation", 8)
 	vb.add_child(code_row)
 	_code_edit = LineEdit.new()
-	_code_edit.placeholder_text = "6 位验证码"
+	_code_edit.placeholder_text = LocaleManager.t("account.code_ph", "6 位验证码")
 	_code_edit.max_length = 8
 	_code_edit.custom_minimum_size = Vector2(220, 42)
 	_code_edit.add_theme_font_size_override("font_size", FONT_BODY)
 	code_row.add_child(_code_edit)
 	var send_btn := Button.new()
-	send_btn.text = "发送验证码"
+	send_btn.text = LocaleManager.t("account.send_code", "发送验证码")
 	send_btn.add_theme_font_size_override("font_size", FONT_BODY)
 	send_btn.custom_minimum_size = Vector2(160, 42)
 	send_btn.pressed.connect(_send_code)
@@ -134,13 +200,13 @@ func _build() -> void:
 	act_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	vb.add_child(act_row)
 	var confirm := Button.new()
-	confirm.text = "确认"
+	confirm.text = LocaleManager.t("common.confirm", "确认")
 	confirm.add_theme_font_size_override("font_size", FONT_BODY)
 	confirm.custom_minimum_size = Vector2(200, 44)
 	confirm.pressed.connect(_confirm)
 	act_row.add_child(confirm)
 	var close := Button.new()
-	close.text = "关闭 (N)"
+	close.text = LocaleManager.t("account.close_n", "关闭 (N)")
 	close.add_theme_font_size_override("font_size", FONT_BODY)
 	close.custom_minimum_size = Vector2(140, 44)
 	close.pressed.connect(func(): _set_open(false))
@@ -158,53 +224,55 @@ func _set_mode(mode: String) -> void:
 	_mode = mode
 	for i in _mode_btns.size():
 		_mode_btns[i].button_pressed = (i == (0 if mode == "bind" else 1))
-	_hint.text = ("绑定邮箱后，可在其它设备用邮箱找回此账号。"
-		if mode == "bind" else "在新设备输入已绑定的邮箱，验证后即可把存档找回到本机。")
+	_hint.text = (LocaleManager.t("account.bind_hint", "绑定邮箱后，可在其它设备用邮箱找回此账号。")
+		if mode == "bind" else LocaleManager.t("account.recover_hint", "在新设备输入已绑定的邮箱，验证后即可把存档找回到本机。"))
 
 
 func _refresh_identity() -> void:
-	var name := AuthService.display_name if AuthService.display_name != "" else "（未登录）"
-	var mail := AuthService.email if AuthService.email != "" else "未绑定"
+	var name := AuthService.display_name if AuthService.display_name != "" else LocaleManager.t("account.not_logged_in", "（未登录）")
+	var mail := AuthService.email if AuthService.email != "" else LocaleManager.t("account.unbound", "未绑定")
 	var pid := AuthService.player_id.substr(0, 8) if AuthService.player_id != "" else "—"
-	_who.text = "[b]%s[/b]\n[color=#9aa6c0]ID %s…   邮箱：%s[/color]" % [name, pid, mail]
+	_who.text = LocaleManager.t("account.summary", "[b]%s[/b]\n[color=#9aa6c0]ID %s…   邮箱：%s[/color]") % [name, pid, mail]
+	if AuthService.avatar_url != "":
+		_load_avatar(AuthService.avatar_url)
 	if AuthService.is_online:
 		LeaderboardService.fetch_rewards()
 
 
 func _on_rewards(rewards: Array) -> void:
 	if rewards.is_empty():
-		_rewards.text = "[color=#7a8090]赛季奖励：暂无（进入前三可在赛季结算时获得）[/color]"
+		_rewards.text = LocaleManager.t("account.no_rewards", "[color=#7a8090]赛季奖励：暂无（进入前三可在赛季结算时获得）[/color]")
 		return
 	var parts: Array = []
 	for r in rewards:
 		var token := String(r.get("token", ""))
 		var token_name: String = TOKEN_NAMES.get(token, token)
-		parts.append("[color=#f0e0a0]%s[/color]（%s·第%d名）" % [
+		parts.append(LocaleManager.t("account.reward_line", "[color=#f0e0a0]%s[/color]（%s·第%d名）") % [
 			token_name, String(r.get("season", "")), int(r.get("rank", 0))])
-	_rewards.text = "赛季奖励：" + "， ".join(PackedStringArray(parts))
+	_rewards.text = LocaleManager.t("account.rewards_label", "赛季奖励：") + "， ".join(PackedStringArray(parts))
 
 
 func _send_code() -> void:
 	var email := _email_edit.text.strip_edges()
 	if email == "":
-		_flash("请先填写邮箱。")
+		_flash(LocaleManager.t("account.enter_email", "请先填写邮箱。"))
 		return
 	AuthService.request_email_code(email, _mode)
 
 
 func _on_code_sent(dev_code: String) -> void:
 	if dev_code != "":
-		_flash("验证码已发送（开发模式：%s）。" % dev_code)
+		_flash(LocaleManager.t("account.code_sent_dev", "验证码已发送（开发模式：%s）。") % dev_code)
 		_code_edit.text = dev_code  # convenience in dev
 	else:
-		_flash("验证码已发送，请查收邮箱。")
+		_flash(LocaleManager.t("account.code_sent", "验证码已发送，请查收邮箱。"))
 
 
 func _confirm() -> void:
 	var email := _email_edit.text.strip_edges()
 	var code := _code_edit.text.strip_edges()
 	if email == "" or code == "":
-		_flash("请填写邮箱与验证码。")
+		_flash(LocaleManager.t("account.enter_email_code", "请填写邮箱与验证码。"))
 		return
 	if _mode == "bind":
 		AuthService.bind_email(email, code)
@@ -223,7 +291,7 @@ func _set_open(v: bool) -> void:
 	get_tree().paused = v
 	if v:
 		if not NetConfig.enabled or not AuthService.is_online:
-			_flash("离线模式：联网后才能绑定 / 找回账号。")
+			_flash(LocaleManager.t("account.offline_bind", "离线模式：联网后才能绑定 / 找回账号。"))
 		else:
 			_set_mode(_mode)
 		_refresh_identity()

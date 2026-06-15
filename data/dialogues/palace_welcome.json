@@ -8,16 +8,25 @@
         {
           "id": "rest",
           "text": "I am weary. I will receive rest as provision, not failure.",
-          "effects": { "weariness": -15, "despair": -10, "hope": 8 },
-          "next": "armour"
+          "effects": {
+            "weariness": -15,
+            "despair": -10,
+            "hope": 8
+          },
+          "next": "armour",
+          "text_zh": "我累了。我要把安息当作供应来领受，而非失败。"
         },
         {
           "id": "armour_first",
           "text": "Tell me how to enter the valley without trusting myself.",
-          "effects": { "discernment": 4 },
-          "next": "armour"
+          "effects": {
+            "discernment": 4
+          },
+          "next": "armour",
+          "text_zh": "告诉我，如何不靠自己进入那谷。"
         }
-      ]
+      ],
+      "text_zh": "你已爬过那座难山。进来歇息，不必告罪。下面便是屈辱谷，在那里，控告会伤害赤手而入的人。"
     },
     "armour": {
       "speaker": "Watchful",
@@ -26,13 +35,25 @@
         {
           "id": "take",
           "text": "I take it up, because I will need grace in the fight.",
-          "effects": { "faith": 8 },
-          "special": { "grant_promise_key": true },
-          "flags": { "took_armour": true },
-          "next": "end"
+          "effects": {
+            "faith": 8
+          },
+          "special": {
+            "grant_promise_key": true
+          },
+          "flags": {
+            "took_armour": true
+          },
+          "next": "end",
+          "text_zh": "我接过它，因为这一战我需要恩典。"
         }
-      ]
+      ],
+      "text_zh": "拿起为朝圣者存留的甲胄：信心护你身前，应许护你四围的黑暗，谦卑护你身后的控告。站住，不要逃。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }

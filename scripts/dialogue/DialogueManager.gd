@@ -55,7 +55,7 @@ func get_available_choices() -> Array:
 	var result: Array = []
 	for choice in node.get("choices", []):
 		if _choice_conditions_met(choice):
-			result.append(choice)
+			result.append(_localize_choice(choice))
 	return result
 
 
@@ -78,8 +78,31 @@ func _choice_conditions_met(choice: Dictionary) -> bool:
 		elif key == "requires_item":
 			if not GameState.has_inventory_item(String(cond[key])):
 				return false
+		elif key == "temptation":
+			# {"type":"comfort_shortcut","difficulty":40} — wise choice only if you can resist that temptation.
+			var t: Dictionary = cond[key]
+			if not SpiritualStateManager.can_resist_temptation(String(t.get("type", "")), int(t.get("difficulty", 0))):
+				return false
 	return true
 
+
+## Plain-text signed summary of a choice's spiritual effects (for a HUD hint), e.g. "信+10 惧-5".
+func get_choice_effect_hint(choice: Dictionary) -> String:
+	var eff: Dictionary = {}
+	for key in choice.keys():
+		if SpiritualStateManager.NUMERIC_STATES.has(key):
+			eff[key] = int(eff.get(key, 0)) + int(choice[key])
+	if choice.has("effects") and choice["effects"] is Dictionary:
+		for k in (choice["effects"] as Dictionary).keys():
+			if SpiritualStateManager.NUMERIC_STATES.has(k):
+				eff[k] = int(eff.get(k, 0)) + int(choice["effects"][k])
+	var names := {"faith":"信","hope":"望","humility":"谦","discernment":"辨","perseverance":"毅","watchfulness":"警","despair":"绝","shame":"羞","fear":"惧","pride":"傲","deception":"欺","weariness":"乏"}
+	var parts: Array = []
+	for k in eff.keys():
+		var v := int(eff[k])
+		if v != 0:
+			parts.append("%s%+d" % [names.get(k, k), v])
+	return " ".join(PackedStringArray(parts))
 
 func select_choice(choice_id: String) -> void:
 	if not _active:
@@ -134,7 +157,55 @@ func _emit_current_node() -> void:
 	# Auto-apply node-level on_enter effects (optional).
 	if node.has("on_enter"):
 		SpiritualStateManager.apply_effects(node["on_enter"])
+	node = _resolve_text_variant(node)
+	node = _localize_node(node)
 	EventBus.dialogue_node_changed.emit(node)
+
+## NPCs can read the pilgrim's state: a node may carry `text_variants` (each with
+## `conditions` + `text`); the first whose conditions pass replaces the line.
+func _resolve_text_variant(node: Dictionary) -> Dictionary:
+	if not node.has("text_variants"):
+		return node
+	for v in node["text_variants"]:
+		if v is Dictionary and _choice_conditions_met(v):
+			var copy := node.duplicate(true)
+			copy["text"] = String(v.get("text", node.get("text", "")))
+			if v.has("text_zh"):
+				copy["text_zh"] = String(v["text_zh"])
+			else:
+				copy.erase("text_zh")
+			return copy
+	return node
+
+
+## Bilingual: when the locale is zh, swap in the node's text_zh / speaker_zh if
+## present. Dialogue JSON stays backward-compatible — untranslated nodes simply
+## keep their English text in both languages until a *_zh field is added.
+func _localize_node(node: Dictionary) -> Dictionary:
+	if not LocaleManager.is_zh():
+		return node
+	var copy := node.duplicate(true)
+	if node.has("text_zh") and String(node["text_zh"]) != "":
+		copy["text"] = String(node["text_zh"])
+	var spk := String(node.get("speaker", ""))
+	if spk != "":
+		# Per-node speaker_zh wins; otherwise the central npc.<name> table localizes it.
+		if node.has("speaker_zh") and String(node["speaker_zh"]) != "":
+			copy["speaker"] = String(node["speaker_zh"])
+		else:
+			copy["speaker"] = LocaleManager.t("npc." + spk, spk)
+	return copy
+
+
+func _localize_choice(choice: Dictionary) -> Dictionary:
+	if not LocaleManager.is_zh():
+		return choice
+	var zh := String(choice.get("text_zh", ""))
+	if zh == "":
+		return choice
+	var c := choice.duplicate(true)
+	c["text"] = zh
+	return c
 
 
 func end_dialogue() -> void:

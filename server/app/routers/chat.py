@@ -139,8 +139,21 @@ async def history(
     return await chat_store.recent(key)
 
 
+class RoomCreateIn(BaseModel):
+    name: str = Field(default="", max_length=40)
+
+
 @router.post("/room/create")
-async def room_create(player: Player = Depends(current_player)) -> dict:
-    """Generate a short, shareable ad-hoc group-room code."""
+async def room_create(body: RoomCreateIn | None = None,
+                      player: Player = Depends(current_player)) -> dict:
+    """Generate a short, shareable ad-hoc group-room code (with optional name)."""
     code = secrets.token_hex(3).upper()  # 6 hex chars, e.g. "A1B2C3"
-    return {"room": code}
+    name = (body.name.strip() if body else "")
+    if name:
+        await chat_store.set_room_name(code, name)
+    return {"room": code, "name": name}
+
+
+@router.get("/room/{code}")
+async def room_info(code: str, player: Player = Depends(current_player)) -> dict:
+    return {"room": code, "name": await chat_store.get_room_name(code)}

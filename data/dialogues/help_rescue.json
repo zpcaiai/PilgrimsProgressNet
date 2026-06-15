@@ -8,23 +8,48 @@
         {
           "id": "accept",
           "text": "Please. I cannot save myself from this. Help me.",
-          "effects": { "humility": 12, "hope": 10, "despair": -20 },
-          "flags": { "accepted_help": true, "left_slough": true },
-          "next": "pull"
+          "effects": {
+            "humility": 12,
+            "hope": 10,
+            "despair": -20
+          },
+          "flags": {
+            "accepted_help": true,
+            "left_slough": true
+          },
+          "next": "pull",
+          "text_zh": "求你。我无法自救脱离此地。帮我。"
         },
         {
           "id": "self",
           "text": "Stand back. I got myself into this; I should climb out myself.",
-          "effects": { "pride": 10, "despair": 6 },
-          "next": "warn"
+          "effects": {
+            "pride": 10,
+            "despair": 6
+          },
+          "next": "warn",
+          "text_zh": "退后。是我自己陷进来的；该我自己爬出去。"
         },
         {
           "id": "why",
           "text": "Why is this place so deep? I thought obedience would feel cleaner than this.",
-          "effects": { "humility": 4 },
-          "next": "explain"
+          "effects": {
+            "humility": 4
+          },
+          "next": "explain",
+          "text_zh": "这地方为何这样深？我还以为顺服会比这更清爽些。"
         }
-      ]
+      ],
+      "text_variants": [
+        {
+          "conditions": {
+            "despair_min": 75
+          },
+          "text": "I see despair has nearly closed over your head — all the more reason to take my hand. The mire has no bottom for the one determined to be his own savior, but it has a firm edge for the one who will be helped.",
+          "text_zh": "我看见绝望几乎要没过你的头顶——这就更该拉住我的手。这泥沼对一心要自己作救主的人没有底，但对肯受帮助的人却有一道坚实的岸。"
+        }
+      ],
+      "text_zh": "稳住，朋友。我从这洼里拉上来过许多人。把手给我；这泥沼对一心要自己作救主的人没有底。"
     },
     "warn": {
       "speaker": "Help",
@@ -33,11 +58,21 @@
         {
           "id": "relent",
           "text": "You are right. I am sinking. Help me, please.",
-          "effects": { "humility": 12, "pride": -12, "hope": 8, "despair": -16 },
-          "flags": { "accepted_help": true, "left_slough": true },
-          "next": "pull"
+          "effects": {
+            "humility": 12,
+            "pride": -12,
+            "hope": 8,
+            "despair": -16
+          },
+          "flags": {
+            "accepted_help": true,
+            "left_slough": true
+          },
+          "next": "pull",
+          "text_zh": "你说得对。我在下沉。求你帮我。"
         }
-      ]
+      ],
+      "text_zh": "看你的脚。每一次骄傲的挣扎都让你陷得更深。无助之人伸手求告，怜悯并不以为辱；怜悯正是为这缘故才来到这里。"
     },
     "explain": {
       "speaker": "Help",
@@ -46,18 +81,34 @@
         {
           "id": "hand",
           "text": "Then take my hand before despair teaches me to stop asking.",
-          "effects": { "humility": 12, "hope": 10, "despair": -20 },
-          "flags": { "accepted_help": true, "left_slough": true },
-          "next": "pull"
+          "effects": {
+            "humility": 12,
+            "hope": 10,
+            "despair": -20
+          },
+          "flags": {
+            "accepted_help": true,
+            "left_slough": true
+          },
+          "next": "pull",
+          "text_zh": "那就趁绝望还没教我停止求告，拉住我的手。"
         }
-      ]
+      ],
+      "text_zh": "警告早已给过，踏脚石也曾铺下。但恐惧与愧疚都泄入这洼，初行的人往往还没学会站立就先撞上它们。这不是你的终局，而是学习接受帮助的开端。"
     },
     "pull": {
       "speaker": "Help",
       "text": "There. Solid stone under your feet again. Breathe. Remember this: repentance is not proving you can rise alone; it is consenting to be lifted. The gate is ahead. Go on.",
-      "flags": { "rescued_from_slough": true },
-      "next": "end"
+      "flags": {
+        "rescued_from_slough": true
+      },
+      "next": "end",
+      "text_zh": "好了。脚下又是坚石了。喘口气。记住这个：悔改不是证明你能独自站起，而是甘愿被人扶起。门就在前头。走吧。"
     },
-    "end": { "speaker": "", "text": "", "end": true }
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
   }
 }
