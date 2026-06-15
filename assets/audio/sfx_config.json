@@ -1,0 +1,98 @@
+{
+  "_comment": "Per-SFX tone + volume table. 'tone' picks which synthesized tone family the generator bakes into <name>.ogg — change it and re-run tools/gen_silent_sfx.py --force to swap the sound. 'volume_db' is applied live by AudioManager (negative = quieter); no re-encode needed. Only placeholder SFX are affected by the generator; real audio you drop in is left alone, but its volume_db still applies at runtime.",
+  "tones_available": [
+    "tick",
+    "ding",
+    "chime",
+    "thud",
+    "blip",
+    "pop",
+    "coin"
+  ],
+  "default": {
+    "tone": "tick",
+    "volume_db": 0.0
+  },
+  "sfx": {
+    "blessing": {
+      "tone": "ding",
+      "volume_db": 0.0
+    },
+    "burden_fall": {
+      "tone": "thud",
+      "volume_db": -1.0
+    },
+    "chapel_kneel": {
+      "tone": "ding",
+      "volume_db": 0.0
+    },
+    "collapse": {
+      "tone": "thud",
+      "volume_db": -1.0
+    },
+    "cross_grace": {
+      "tone": "ding",
+      "volume_db": 0.0
+    },
+    "interact": {
+      "tone": "tick",
+      "volume_db": -4.0
+    },
+    "lantern_word": {
+      "tone": "ding",
+      "volume_db": 0.0
+    },
+    "mention": {
+      "tone": "chime",
+      "volume_db": 0.0
+    },
+    "message_in": {
+      "tone": "blip",
+      "volume_db": -5.0
+    },
+    "promise": {
+      "tone": "ding",
+      "volume_db": 0.0
+    },
+    "quest_complete": {
+      "tone": "ding",
+      "volume_db": 0.0
+    },
+    "river_cross": {
+      "tone": "ding",
+      "volume_db": 0.0
+    },
+    "save": {
+      "tone": "tick",
+      "volume_db": -4.0
+    },
+    "shadow_snuff": {
+      "tone": "thud",
+      "volume_db": -1.0
+    },
+    "sleep_fail": {
+      "tone": "thud",
+      "volume_db": -1.0
+    },
+    "sticker_send": {
+      "tone": "pop",
+      "volume_db": -3.0
+    },
+    "ui_select": {
+      "tone": "tick",
+      "volume_db": -4.0
+    },
+    "vanity_buy": {
+      "tone": "coin",
+      "volume_db": -2.0
+    },
+    "vanity_lay_down": {
+      "tone": "ding",
+      "volume_db": 0.0
+    },
+    "victory": {
+      "tone": "chime",
+      "volume_db": 0.0
+    }
+  }
+}

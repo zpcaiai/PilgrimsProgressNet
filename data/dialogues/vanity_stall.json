@@ -1,0 +1,87 @@
+{
+  "id": "vanity_stall",
+  "nodes": {
+    "start": {
+      "speaker": "Merchant",
+      "text": "Step closer, pilgrim! Everyone who is anyone owns one. A small price — only a little of your heart. Will you buy?",
+      "text_variants": [
+        {
+          "conditions": {
+            "discernment_min": 45
+          },
+          "text": "You look at my wares with clear eyes — that won't do. Come, surely even the discerning deserve one fine thing. Will you buy?",
+          "text_zh": "你用清明的眼打量我的货——这可不行。来嘛，纵是明辨之人，也该配一件好东西。买不买？"
+        },
+        {
+          "conditions": {
+            "pride_min": 55
+          },
+          "text": "Ah, a person of taste and standing! This was made for one such as you. Will you buy?",
+          "text_zh": "啊，有品味、有身份的人！这正是为您这般人所造的。买不买？"
+        }
+      ],
+      "choices": [
+        {
+          "id": "buy",
+          "text": "Buy it. Surely one small indulgence won't cost me much.",
+          "effects": {
+            "pride": 6,
+            "deception": 4,
+            "humility": -3
+          },
+          "flags": {
+            "vanity_bought_pending": true
+          },
+          "items": {
+            "vanity_token": 1
+          },
+          "next": "bought",
+          "text_zh": "买下吧。区区一点放纵，想必花不了我多少。"
+        },
+        {
+          "id": "refuse",
+          "text": "No. My peace is not for sale at this fair.",
+          "effects": {
+            "discernment": 6,
+            "perseverance": 3,
+            "humility": 2
+          },
+          "next": "refused",
+          "text_zh": "不。我的平安不在这集市上出售。"
+        }
+      ],
+      "text_zh": "走近些，朝圣者！但凡有头有脸的都备着一件。价钱不高——不过你心的一点点。买不买？"
+    },
+    "bought": {
+      "speaker": "Merchant",
+      "text": "A wise purchase! Wear it well... it suits the crowd, if not the road.",
+      "choices": [
+        {
+          "id": "leave_b",
+          "text": "(Turn away, the bauble already heavier than it looked.)",
+          "next": "end",
+          "text_zh": "（转身离开，那玩意儿已比看上去更沉。）"
+        }
+      ],
+      "text_zh": "明智之选！好好戴着……它配得上人群，纵然配不上这条路。"
+    },
+    "refused": {
+      "speaker": "Merchant",
+      "text": "Suit yourself. The narrow-eyed never could enjoy a good fair.",
+      "choices": [
+        {
+          "id": "leave_r",
+          "text": "(Walk on, lighter than before.)",
+          "next": "end",
+          "text_zh": "（继续前行，比先前轻省。）"
+        }
+      ],
+      "text_zh": "随你便。眯着眼的人，从来就享受不了一场好集市。"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

@@ -1,0 +1,604 @@
+{
+  "audio": {
+    "music": [
+      {
+        "file": "celestial_city.ogg",
+        "sec": 26.4
+      },
+      {
+        "file": "city_of_destruction.ogg",
+        "sec": 24.8
+      },
+      {
+        "file": "cross_and_tomb.ogg",
+        "sec": 27.6
+      },
+      {
+        "file": "delectable_mountains.ogg",
+        "sec": 21.6
+      },
+      {
+        "file": "doubting_castle.ogg",
+        "sec": 25.6
+      },
+      {
+        "file": "enchanted_ground.ogg",
+        "sec": 25.6
+      },
+      {
+        "file": "hill_difficulty.ogg",
+        "sec": 20.0
+      },
+      {
+        "file": "interpreter_house.ogg",
+        "sec": 20.8
+      },
+      {
+        "file": "palace_beautiful.ogg",
+        "sec": 22.4
+      },
+      {
+        "file": "river_of_death.ogg",
+        "sec": 27.2
+      },
+      {
+        "file": "slough_of_despond.ogg",
+        "sec": 26.4
+      },
+      {
+        "file": "title.ogg",
+        "sec": 24.0
+      },
+      {
+        "file": "valley_humiliation.ogg",
+        "sec": 21.6
+      },
+      {
+        "file": "valley_shadow_death.ogg",
+        "sec": 28.0
+      },
+      {
+        "file": "vanity_fair.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "wicket_gate.ogg",
+        "sec": 22.4
+      },
+      {
+        "file": "wilderness_road.ogg",
+        "sec": 24.0
+      }
+    ],
+    "ambient": [
+      {
+        "file": "celestial_city.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "city_of_destruction.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "cross_and_tomb.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "delectable_mountains.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "doubting_castle.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "enchanted_ground.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "hill_difficulty.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "interpreter_house.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "palace_beautiful.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "river_of_death.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "slough_of_despond.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "valley_humiliation.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "valley_shadow_death.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "vanity_fair.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "wicket_gate.ogg",
+        "sec": 18.0
+      },
+      {
+        "file": "wilderness_road.ogg",
+        "sec": 18.0
+      }
+    ],
+    "sfx": [
+      {
+        "file": "blessing.ogg",
+        "sec": 1.1
+      },
+      {
+        "file": "burden_fall.ogg",
+        "sec": 1.3
+      },
+      {
+        "file": "chapel_kneel.ogg",
+        "sec": 1.0
+      },
+      {
+        "file": "collapse.ogg",
+        "sec": 1.1
+      },
+      {
+        "file": "cross_grace.ogg",
+        "sec": 1.8
+      },
+      {
+        "file": "interact.ogg",
+        "sec": 0.2
+      },
+      {
+        "file": "lantern_word.ogg",
+        "sec": 1.3
+      },
+      {
+        "file": "mention.ogg",
+        "sec": 0.5
+      },
+      {
+        "file": "message_in.ogg",
+        "sec": 0.1
+      },
+      {
+        "file": "promise.ogg",
+        "sec": 1.2
+      },
+      {
+        "file": "quest_complete.ogg",
+        "sec": 1.0
+      },
+      {
+        "file": "river_cross.ogg",
+        "sec": 1.2
+      },
+      {
+        "file": "save.ogg",
+        "sec": 0.2
+      },
+      {
+        "file": "shadow_snuff.ogg",
+        "sec": 0.3
+      },
+      {
+        "file": "sleep_fail.ogg",
+        "sec": 1.1
+      },
+      {
+        "file": "ui_select.ogg",
+        "sec": 0.1
+      },
+      {
+        "file": "vanity_buy.ogg",
+        "sec": 0.5
+      },
+      {
+        "file": "vanity_lay_down.ogg",
+        "sec": 0.8
+      },
+      {
+        "file": "victory.ogg",
+        "sec": 1.4
+      }
+    ]
+  },
+  "textures": {
+    "ground": [
+      {
+        "file": "celestial_city.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "city_of_destruction.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "cross_and_tomb.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "delectable_mountains.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "doubting_castle.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "enchanted_ground.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "hill_difficulty.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "interpreter_house.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "palace_beautiful.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "river_of_death.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "slough_of_despond.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "valley_humiliation.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "valley_shadow_death.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "vanity_fair.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "wicket_gate.png",
+        "w": 512,
+        "h": 512
+      },
+      {
+        "file": "wilderness_road.png",
+        "w": 512,
+        "h": 512
+      }
+    ],
+    "particles": [
+      {
+        "file": "dust.png",
+        "w": 128,
+        "h": 128
+      },
+      {
+        "file": "mote.png",
+        "w": 128,
+        "h": 128
+      },
+      {
+        "file": "soft.png",
+        "w": 128,
+        "h": 128
+      },
+      {
+        "file": "spark.png",
+        "w": 128,
+        "h": 128
+      }
+    ]
+  },
+  "scenes": [
+    {
+      "file": "celestial_city.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "city_of_destruction.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "cross_and_tomb.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "delectable_mountains.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "doubting_castle.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "enchanted_ground.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "hill_difficulty.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "interpreter_house.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "palace_beautiful.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "river_of_death.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "slough_of_despond.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "valley_humiliation.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "valley_shadow_death.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "vanity_fair.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "wicket_gate.png",
+      "w": 1280,
+      "h": 720
+    },
+    {
+      "file": "wilderness_road.png",
+      "w": 1280,
+      "h": 720
+    }
+  ],
+  "characters": [
+    {
+      "file": "apollyon.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "evangelist.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "goodwill.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "help.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "hopeful.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "obstinate.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "pilgrim.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "pliable.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "the_interpreter.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "the_shepherds.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "watchful.png",
+      "w": 512,
+      "h": 640
+    },
+    {
+      "file": "your_family.png",
+      "w": 512,
+      "h": 640
+    }
+  ],
+  "ui": [
+    {
+      "file": "icon_burden.png",
+      "w": 128,
+      "h": 128
+    },
+    {
+      "file": "icon_garment.png",
+      "w": 128,
+      "h": 128
+    },
+    {
+      "file": "icon_key.png",
+      "w": 128,
+      "h": 128
+    },
+    {
+      "file": "icon_scroll.png",
+      "w": 128,
+      "h": 128
+    },
+    {
+      "file": "icon_seal.png",
+      "w": 128,
+      "h": 128
+    },
+    {
+      "file": "title_key_art.png",
+      "w": 1280,
+      "h": 720
+    }
+  ],
+  "anim": [
+    {
+      "file": "celestial_rays.png",
+      "w": 2048,
+      "h": 256,
+      "frames": 8
+    },
+    {
+      "file": "dust_motes.png",
+      "w": 1024,
+      "h": 128,
+      "frames": 8
+    },
+    {
+      "file": "flame.png",
+      "w": 1024,
+      "h": 128,
+      "frames": 8
+    },
+    {
+      "file": "grace_glory.png",
+      "w": 2048,
+      "h": 256,
+      "frames": 8
+    },
+    {
+      "file": "water_shimmer.png",
+      "w": 2048,
+      "h": 256,
+      "frames": 8
+    }
+  ],
+  "fonts": [
+    "NotoSansCJKsc-Subset.otf"
+  ],
+  "stickers": {
+    "emote": {
+      "label": "心情",
+      "names": [
+        "amen",
+        "courage",
+        "hope",
+        "joy",
+        "peace",
+        "pray",
+        "together",
+        "watch"
+      ]
+    },
+    "faces": {
+      "label": "表情",
+      "names": [
+        "cry",
+        "fear",
+        "grateful",
+        "hope",
+        "laugh",
+        "smile",
+        "think",
+        "tired"
+      ]
+    },
+    "pilgrim": {
+      "label": "天路",
+      "names": [
+        "almost_home",
+        "amen",
+        "candle",
+        "cross",
+        "crown",
+        "do_not_fear",
+        "dove",
+        "footprints",
+        "gate",
+        "heart",
+        "keep_watch",
+        "key",
+        "lantern",
+        "mountain",
+        "peace",
+        "pray",
+        "press_on",
+        "rejoice",
+        "scroll",
+        "shield",
+        "take_heart",
+        "well_done"
+      ]
+    }
+  },
+  "_counts": {
+    "music": 17,
+    "ambient": 16,
+    "sfx": 19,
+    "ground": 16,
+    "particles": 4,
+    "scenes": 16,
+    "characters": 12,
+    "ui": 6,
+    "anim": 5,
+    "fonts": 1,
+    "sticker_packs": 3,
+    "stickers": 38
+  }
+}

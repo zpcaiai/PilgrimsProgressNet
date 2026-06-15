@@ -1,0 +1,57 @@
+{
+  "packs": {
+    "emote": {
+      "label": "心情",
+      "names": [
+        "amen",
+        "courage",
+        "hope",
+        "joy",
+        "peace",
+        "pray",
+        "together",
+        "watch"
+      ]
+    },
+    "faces": {
+      "label": "表情",
+      "names": [
+        "cry",
+        "fear",
+        "grateful",
+        "hope",
+        "laugh",
+        "smile",
+        "think",
+        "tired"
+      ]
+    },
+    "pilgrim": {
+      "label": "天路",
+      "names": [
+        "almost_home",
+        "amen",
+        "candle",
+        "cross",
+        "crown",
+        "do_not_fear",
+        "dove",
+        "footprints",
+        "gate",
+        "heart",
+        "keep_watch",
+        "key",
+        "lantern",
+        "mountain",
+        "peace",
+        "pray",
+        "press_on",
+        "rejoice",
+        "scroll",
+        "shield",
+        "take_heart",
+        "well_done"
+      ]
+    }
+  }
+}

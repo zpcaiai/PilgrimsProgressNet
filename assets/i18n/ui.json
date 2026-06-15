@@ -1,0 +1,967 @@
+{
+  "_comment": "UI string table for bilingual zh/en. Key -> {en, zh}. Served by LocaleManager.t(key, english_fallback). Add keys freely; missing keys fall back to the English passed in code.",
+  "lang.switch": {
+    "en": "中文",
+    "zh": "English"
+  },
+  "lang.name": {
+    "en": "English",
+    "zh": "中文"
+  },
+  "common.ok": {
+    "en": "OK",
+    "zh": "确定"
+  },
+  "common.cancel": {
+    "en": "Cancel",
+    "zh": "取消"
+  },
+  "common.close": {
+    "en": "Close",
+    "zh": "关闭"
+  },
+  "common.confirm": {
+    "en": "Confirm",
+    "zh": "确认"
+  },
+  "common.back": {
+    "en": "Back",
+    "zh": "返回"
+  },
+  "common.send": {
+    "en": "Send",
+    "zh": "发送"
+  },
+  "common.save": {
+    "en": "Save",
+    "zh": "保存"
+  },
+  "common.loading": {
+    "en": "Loading…",
+    "zh": "加载中…"
+  },
+  "common.offline": {
+    "en": "Offline",
+    "zh": "离线"
+  },
+  "common.online": {
+    "en": "Online",
+    "zh": "在线"
+  },
+  "hud.faith": {
+    "en": "Faith",
+    "zh": "信心"
+  },
+  "hud.hope": {
+    "en": "Hope",
+    "zh": "盼望"
+  },
+  "hud.despair": {
+    "en": "Despair",
+    "zh": "绝望"
+  },
+  "hud.weariness": {
+    "en": "Weariness",
+    "zh": "疲惫"
+  },
+  "hud.humility": {
+    "en": "Humility",
+    "zh": "谦卑"
+  },
+  "hud.discernment": {
+    "en": "Discernment",
+    "zh": "明辨"
+  },
+  "hud.perseverance": {
+    "en": "Perseverance",
+    "zh": "坚忍"
+  },
+  "hud.watchfulness": {
+    "en": "Watchfulness",
+    "zh": "警醒"
+  },
+  "hud.shame": {
+    "en": "Shame",
+    "zh": "羞愧"
+  },
+  "hud.fear": {
+    "en": "Fear",
+    "zh": "恐惧"
+  },
+  "hud.pride": {
+    "en": "Pride",
+    "zh": "骄傲"
+  },
+  "hud.deception": {
+    "en": "Deception",
+    "zh": "欺瞒"
+  },
+  "hud.burden_carried": {
+    "en": "Burden: carried",
+    "zh": "重担：仍背负"
+  },
+  "hud.burden_fallen": {
+    "en": "Burden: fallen",
+    "zh": "重担：已卸下"
+  },
+  "hud.load_slower": {
+    "en": "Load: %d%% slower",
+    "zh": "负重：慢 %d%%"
+  },
+  "hud.load_light": {
+    "en": "Load: light",
+    "zh": "负重：轻省"
+  },
+  "hud.quest_quiet": {
+    "en": "The road is quiet.",
+    "zh": "这条路一片安静。"
+  },
+  "hud.continue": {
+    "en": "(Continue)",
+    "zh": "（继续）"
+  },
+  "char.title": {
+    "en": "The Pilgrim's Heart",
+    "zh": "朝圣者的心"
+  },
+  "char.close_hint": {
+    "en": "(C to close)",
+    "zh": "（按 C 关闭）"
+  },
+  "char.mode_child": {
+    "en": "Children's Journey",
+    "zh": "孩童之旅"
+  },
+  "char.mode_devout": {
+    "en": "Devout Journey",
+    "zh": "敬虔之旅"
+  },
+  "char.graces": {
+    "en": "Graces",
+    "zh": "恩典"
+  },
+  "char.burdens": {
+    "en": "Burdens",
+    "zh": "重担"
+  },
+  "char.tokens": {
+    "en": "Tokens",
+    "zh": "信物"
+  },
+  "char.companions": {
+    "en": "Companions",
+    "zh": "同伴"
+  },
+  "char.none_yet": {
+    "en": "none yet",
+    "zh": "尚无"
+  },
+  "char.walking_alone": {
+    "en": "walking alone",
+    "zh": "独自前行"
+  },
+  "token.burden": {
+    "en": "Burden (carried)",
+    "zh": "重担（背负中）"
+  },
+  "token.scroll": {
+    "en": "Scroll",
+    "zh": "卷轴"
+  },
+  "token.seal": {
+    "en": "Seal",
+    "zh": "印记"
+  },
+  "token.new_garment": {
+    "en": "New Garment",
+    "zh": "新衣"
+  },
+  "token.promise_key": {
+    "en": "Key of Promise",
+    "zh": "应许之钥"
+  },
+  "npc.Apollyon": {
+    "en": "Apollyon",
+    "zh": "亚玻伦"
+  },
+  "npc.Evangelist": {
+    "en": "Evangelist",
+    "zh": "传道者"
+  },
+  "npc.Goodwill": {
+    "en": "Goodwill",
+    "zh": "善意"
+  },
+  "npc.Help": {
+    "en": "Help",
+    "zh": "援手"
+  },
+  "npc.Hopeful": {
+    "en": "Hopeful",
+    "zh": "盼望"
+  },
+  "npc.Merchant": {
+    "en": "Merchant",
+    "zh": "商贩"
+  },
+  "npc.Obstinate": {
+    "en": "Obstinate",
+    "zh": "固执"
+  },
+  "npc.Pilgrim": {
+    "en": "Pilgrim",
+    "zh": "朝圣者"
+  },
+  "npc.Pliable": {
+    "en": "Pliable",
+    "zh": "易迁"
+  },
+  "npc.The Arbor": {
+    "en": "The Arbor",
+    "zh": "凉亭"
+  },
+  "npc.The Interpreter": {
+    "en": "The Interpreter",
+    "zh": "释经者"
+  },
+  "npc.The Shepherds": {
+    "en": "The Shepherds",
+    "zh": "牧人"
+  },
+  "npc.Watchful": {
+    "en": "Watchful",
+    "zh": "守望者"
+  },
+  "npc.Your Family": {
+    "en": "Your Family",
+    "zh": "你的家人"
+  },
+  "menu.title": {
+    "en": "PILGRIM'S ROAD",
+    "zh": "天路"
+  },
+  "menu.subtitle": {
+    "en": "Burden Fallen",
+    "zh": "重担已落"
+  },
+  "menu.choose": {
+    "en": "Choose your journey",
+    "zh": "选择你的旅程"
+  },
+  "menu.devout": {
+    "en": "Devout Journey  (full)",
+    "zh": "敬虔之旅（完整版）"
+  },
+  "menu.child": {
+    "en": "Children's Journey  (gentle, easy to finish)",
+    "zh": "孩童之旅（轻松，易于走完）"
+  },
+  "menu.continue": {
+    "en": "Continue (%s)",
+    "zh": "继续（%s）"
+  },
+  "menu.options": {
+    "en": "Options",
+    "zh": "选项"
+  },
+  "menu.quit": {
+    "en": "Quit",
+    "zh": "退出"
+  },
+  "menu.return_title": {
+    "en": "Return to Title",
+    "zh": "返回标题"
+  },
+  "menu.hint": {
+    "en": "WASD move · Space jump · E interact · 1-4 choose · C heart · Tab map · Esc pause",
+    "zh": "WASD 移动 · 空格跳 · E 互动 · 1-4 选择 · C 心境 · Tab 地图 · Esc 暂停"
+  },
+  "toast.child_mode": {
+    "en": "Children's Journey — a gentle road. Take your time.",
+    "zh": "孩童之旅——一条温柔的路。慢慢来。"
+  },
+  "end.title": {
+    "en": "You have crossed the river and entered in.",
+    "zh": "你已渡过那河，进入其中。"
+  },
+  "end.l1": {
+    "en": "From first awakening to final welcome,",
+    "zh": "从最初的醒觉，到最终的迎接，"
+  },
+  "end.l2": {
+    "en": "grace has carried the pilgrim home.",
+    "zh": "恩典已把朝圣者带回家。"
+  },
+  "end.l3": {
+    "en": "The burden is gone. The City is before you.",
+    "zh": "重担已不在。圣城就在你眼前。"
+  },
+  "collapse.title": {
+    "en": "You have sunk down under the weight.",
+    "zh": "你在重压之下沉了下去。"
+  },
+  "collapse.l1": {
+    "en": "Trying harder cannot raise a heart that needs mercy.",
+    "zh": "更用力，也举不起一颗需要怜悯的心。"
+  },
+  "collapse.l2": {
+    "en": "But the way back was never closed. Tell the truth, and receive help:",
+    "zh": "但归途从未关闭。说出真相，接受帮助："
+  },
+  "toast.lifted": {
+    "en": "You are lifted by grace, not by self-rescue. Walk on.",
+    "zh": "扶你起来的是恩典，不是自救。继续走吧。"
+  },
+  "repent.afraid": {
+    "en": "\"I was afraid, and I obeyed fear as if it were truth.\"",
+    "zh": "“我惧怕了，便顺从恐惧，仿佛它就是真理。”"
+  },
+  "repent.pride": {
+    "en": "\"I trusted myself, and called refusal to receive help strength.\"",
+    "zh": "“我倚靠自己，把拒绝受助唤作刚强。”"
+  },
+  "repent.despair": {
+    "en": "\"I believed despair when it said mercy was finished with me.\"",
+    "zh": "“当绝望说怜悯已与我无分，我竟信了它。”"
+  },
+  "repent.easy": {
+    "en": "\"I wanted the easy way more than the true one.\"",
+    "zh": "“我想要容易的路，胜过真实的路。”"
+  },
+  "combat.resolve": {
+    "en": "Resolve",
+    "zh": "了结"
+  },
+  "combat.hud": {
+    "en": "[b]Promise:[/b] %d   [b]Prayer:[/b] %s   [b]Foes:[/b] %d\n[color=#aaaaaa]J strike  K dodge  L stand firm  U promise  P pray[/color]",
+    "zh": "[b]应许：[/b] %d   [b]祷告：[/b] %s   [b]敌：[/b] %d\n[color=#aaaaaa]J 攻击  K 闪避  L 站稳  U 应许  P 祷告[/color]"
+  },
+  "reward.title": {
+    "en": "Season Reward",
+    "zh": "赛季嘉奖"
+  },
+  "reward.accept": {
+    "en": "Thanks, claim it",
+    "zh": "感谢，收下"
+  },
+  "marker.prompt": {
+    "en": "Leave a word here for the pilgrims who follow",
+    "zh": "在此留一句话，赠予后来的同行者"
+  },
+  "marker.example": {
+    "en": "e.g. The day wanes, yet press on…",
+    "zh": "例如：白日将尽，仍要前行……"
+  },
+  "marker.leave": {
+    "en": "Leave marker (Enter)",
+    "zh": "留下路标 (Enter)"
+  },
+  "marker.cancel": {
+    "en": "Cancel (Esc)",
+    "zh": "取消 (Esc)"
+  },
+  "marker.left": {
+    "en": "Your marker now rests here.",
+    "zh": "你的路标已留在此处。"
+  },
+  "marker.note": {
+    "en": "Other pilgrims will see your words when they next reach this chapter.",
+    "zh": "其他朝圣者下次走到这一关时，会看到你留下的话。"
+  },
+  "marker.offline": {
+    "en": "Offline: connect to leave a marker.",
+    "zh": "离线状态：联网后才能留下路标。"
+  },
+  "comp.alone": {
+    "en": "You walk this road alone (no companions yet)",
+    "zh": "此路你独行（暂无同行者）"
+  },
+  "comp.count": {
+    "en": "%d pilgrims walk with you right now",
+    "zh": "此刻 %d 位朝圣者与你同行"
+  },
+  "comp.realtime_ms": {
+    "en": "Live: %s (%d ms)",
+    "zh": "实时连接：%s（%d ms）"
+  },
+  "comp.realtime": {
+    "en": "Live: %s",
+    "zh": "实时连接：%s"
+  },
+  "comp.ghosts": {
+    "en": "[color=#7a8090]The footprints of those before are faintly visible…[/color]",
+    "zh": "[color=#7a8090]前人的足迹隐约可见……[/color]"
+  },
+  "cloud.restored": {
+    "en": "Save restored from the cloud.",
+    "zh": "已从云端恢复存档。"
+  },
+  "cloud.conflict": {
+    "en": "Cloud save conflict",
+    "zh": "云端存档冲突"
+  },
+  "cloud.download": {
+    "en": "Download cloud save",
+    "zh": "下载云端存档"
+  },
+  "cloud.keep_local": {
+    "en": "Keep local (overwrite cloud)",
+    "zh": "保留本地（覆盖云端）"
+  },
+  "cloud.overwrote": {
+    "en": "Overwrote the cloud with your local save.",
+    "zh": "已用本地存档覆盖云端。"
+  },
+  "review.title": {
+    "en": "Score Review & Appeals",
+    "zh": "成绩复核与申诉"
+  },
+  "review.hint": {
+    "en": "R to close · only rejected scores can be appealed",
+    "zh": "R 关闭　·　仅被拒绝的成绩可申诉"
+  },
+  "review.offline": {
+    "en": "Offline — connect to view review status.",
+    "zh": "离线模式 — 联网后可查看成绩复核状态。"
+  },
+  "review.none": {
+    "en": "No flagged scores — all clear.",
+    "zh": "你没有被标记的成绩，一切清白。"
+  },
+  "review.count": {
+    "en": "%d flagged score(s):",
+    "zh": "共 %d 条被标记的成绩："
+  },
+  "review.row": {
+    "en": "[b]%s[/b]　score %d　[color=#%s]%s[/color]\n[color=#8890a0]%s[/color]",
+    "zh": "[b]%s[/b]　分数 %d　[color=#%s]%s[/color]\n[color=#8890a0]%s[/color]"
+  },
+  "review.appeal": {
+    "en": "Appeal",
+    "zh": "申诉"
+  },
+  "account.title": {
+    "en": "My Account",
+    "zh": "我的账号"
+  },
+  "account.upload_avatar": {
+    "en": "Upload avatar",
+    "zh": "上传头像"
+  },
+  "account.email_ph": {
+    "en": "Email address",
+    "zh": "邮箱地址"
+  },
+  "account.code_ph": {
+    "en": "6-digit code",
+    "zh": "6 位验证码"
+  },
+  "account.send_code": {
+    "en": "Send code",
+    "zh": "发送验证码"
+  },
+  "account.close_n": {
+    "en": "Close (N)",
+    "zh": "关闭 (N)"
+  },
+  "account.summary": {
+    "en": "[b]%s[/b]\n[color=#9aa6c0]ID %s…   Email: %s[/color]",
+    "zh": "[b]%s[/b]\n[color=#9aa6c0]ID %s…   邮箱：%s[/color]"
+  },
+  "account.no_rewards": {
+    "en": "[color=#7a8090]Season rewards: none yet (top 3 earn them at settlement)[/color]",
+    "zh": "[color=#7a8090]赛季奖励：暂无（进入前三可在赛季结算时获得）[/color]"
+  },
+  "account.rewards_label": {
+    "en": "Season rewards: ",
+    "zh": "赛季奖励："
+  },
+  "lb.title": {
+    "en": "Pilgrim Boards",
+    "zh": "天路榜"
+  },
+  "lb.close_b": {
+    "en": "B to close",
+    "zh": "B 关闭"
+  },
+  "lb.offline": {
+    "en": "Offline — connect to view the boards.",
+    "zh": "离线模式 — 联网后可查看天路榜。"
+  },
+  "lb.loading": {
+    "en": "Loading…  (difficulty: %s)",
+    "zh": "加载中…  （难度：%s）"
+  },
+  "lb.empty": {
+    "en": "No one on the board yet — be the first.",
+    "zh": "还没有人上榜，去成为第一位吧。"
+  },
+  "lb.header": {
+    "en": "%s    Difficulty: %s    My rank: %s",
+    "zh": "%s    难度：%s    我的排名：%s"
+  },
+  "lb.child": {
+    "en": "Gentle",
+    "zh": "童趣"
+  },
+  "account.reward_line": {
+    "en": "[color=#f0e0a0]%s[/color] (%s · #%d)",
+    "zh": "[color=#f0e0a0]%s[/color]（%s·第%d名）"
+  },
+  "account.img_too_big": {
+    "en": "Image too large (2MB max).",
+    "zh": "图片过大（上限 2MB）。"
+  },
+  "account.recover_hint": {
+    "en": "On a new device, enter your bound email; after verification your save is restored here.",
+    "zh": "在新设备输入已绑定的邮箱，验证后即可把存档找回到本机。"
+  },
+  "account.avatar_updated": {
+    "en": "Avatar updated.",
+    "zh": "头像已更新。"
+  },
+  "account.recover": {
+    "en": "Recover account",
+    "zh": "找回账号"
+  },
+  "account.img_unreadable": {
+    "en": "Could not read the image.",
+    "zh": "无法读取图片。"
+  },
+  "reward.staff": {
+    "en": "Pilgrim's Staff",
+    "zh": "朝圣杖"
+  },
+  "account.unbound": {
+    "en": "Not bound",
+    "zh": "未绑定"
+  },
+  "reward.palm": {
+    "en": "Palm Branch",
+    "zh": "棕榈枝"
+  },
+  "reward.crown": {
+    "en": "Crown of Life",
+    "zh": "生命冠冕"
+  },
+  "account.offline_bind": {
+    "en": "Offline: connect to bind / recover an account.",
+    "zh": "离线模式：联网后才能绑定 / 找回账号。"
+  },
+  "account.offline_avatar": {
+    "en": "Offline: cannot upload an avatar.",
+    "zh": "离线状态：无法上传头像。"
+  },
+  "account.bind": {
+    "en": "Bind email",
+    "zh": "绑定邮箱"
+  },
+  "account.bind_hint": {
+    "en": "Once bound, you can recover this account by email on other devices.",
+    "zh": "绑定邮箱后，可在其它设备用邮箱找回此账号。"
+  },
+  "account.enter_email": {
+    "en": "Please enter your email first.",
+    "zh": "请先填写邮箱。"
+  },
+  "account.enter_email_code": {
+    "en": "Please enter your email and the code.",
+    "zh": "请填写邮箱与验证码。"
+  },
+  "account.recovered": {
+    "en": "Account recovered; your save will sync shortly.",
+    "zh": "账号已找回，存档随后同步。"
+  },
+  "account.bound_label": {
+    "en": "Email bound: ",
+    "zh": "邮箱已绑定："
+  },
+  "account.code_sent_dev": {
+    "en": "Code sent (dev mode: %s).",
+    "zh": "验证码已发送（开发模式：%s）。"
+  },
+  "account.code_sent": {
+    "en": "Code sent — check your email.",
+    "zh": "验证码已发送，请查收邮箱。"
+  },
+  "account.not_logged_in": {
+    "en": "(not signed in)",
+    "zh": "（未登录）"
+  },
+  "lb.this_season_sp": {
+    "en": "This season ",
+    "zh": "本赛季 "
+  },
+  "lb.alltime": {
+    "en": "All-time",
+    "zh": "历史总榜"
+  },
+  "lb.this_season": {
+    "en": "This season",
+    "zh": "本赛季"
+  },
+  "lb.board_devout": {
+    "en": "Devout Heart",
+    "zh": "敬虔之心"
+  },
+  "lb.board_fewest": {
+    "en": "Fewest Falls",
+    "zh": "最少倒下"
+  },
+  "lb.board_fastest": {
+    "en": "Fastest Run",
+    "zh": "最快通关"
+  },
+  "lb.devout": {
+    "en": "Devout",
+    "zh": "敬虔"
+  },
+  "lb.pilgrim": {
+    "en": "Pilgrim",
+    "zh": "朝圣者"
+  },
+  "lb.unranked": {
+    "en": "Unranked",
+    "zh": "未上榜"
+  },
+  "reward.cite": {
+    "en": "[center][color=#f0e0a0]%s[/color]　— %s · %s · #%d (%s)[/center]",
+    "zh": "[center][color=#f0e0a0]%s[/color]　— %s · %s · 第 %d 名（%s）[/center]"
+  },
+  "reward.l1": {
+    "en": "[center]You finished near the top last season,[/center]",
+    "zh": "[center]你在上个赛季的征途中名列前茅，[/center]"
+  },
+  "reward.l2": {
+    "en": "[center]these tokens of grace are given to you:[/center]\n",
+    "zh": "[center]这些恩典之记号赐予你：[/center]\n"
+  },
+  "net.fair": {
+    "en": "Fair",
+    "zh": "一般"
+  },
+  "net.unstable": {
+    "en": "Unstable",
+    "zh": "不稳"
+  },
+  "net.good": {
+    "en": "Good",
+    "zh": "通畅"
+  },
+  "cloud.opt_download": {
+    "en": "[color=#cfd6ea]Download cloud[/color]: overwrite local with cloud progress.\n",
+    "zh": "[color=#cfd6ea]下载云端[/color]：用云端进度覆盖本地。\n"
+  },
+  "cloud.opt_keep": {
+    "en": "[color=#cfd6ea]Keep local[/color]: overwrite cloud with this device's progress.",
+    "zh": "[color=#cfd6ea]保留本地[/color]：用当前设备进度覆盖云端。"
+  },
+  "cloud.conflict_msg": {
+    "en": "The cloud has a [b]newer save[/b] (version %d), likely from another device.\n\n",
+    "zh": "云端有一份[b]更新的存档[/b]（版本 %d），可能来自你的另一台设备。\n\n"
+  },
+  "review.st_rejected": {
+    "en": "Rejected",
+    "zh": "已拒绝"
+  },
+  "review.st_approved": {
+    "en": "Approved",
+    "zh": "已通过"
+  },
+  "review.st_pending": {
+    "en": "Pending",
+    "zh": "待重算"
+  },
+  "review.st_appealed": {
+    "en": "Appealed",
+    "zh": "申诉中"
+  },
+  "review.submitted": {
+    "en": "Appeal submitted; awaiting manual review.",
+    "zh": "申诉已提交，等待人工复核。"
+  },
+  "review.request": {
+    "en": "Request manual review",
+    "zh": "请求人工复核"
+  },
+  "conv.image_tag": {
+    "en": "  [image]",
+    "zh": "  [图片]"
+  },
+  "chat.recalled": {
+    "en": "[color=#7a8090][i]This message was recalled[/i][/color]",
+    "zh": "[color=#7a8090][i]此消息已撤回[/i][/color]"
+  },
+  "conv.dm_with": {
+    "en": "Private chat with %s",
+    "zh": "与 %s 的私聊"
+  },
+  "conv.close_y": {
+    "en": "Close (Y)",
+    "zh": "关闭 (Y)"
+  },
+  "conv.unpin": {
+    "en": "Unpin",
+    "zh": "取消置顶"
+  },
+  "conv.reply_ph": {
+    "en": "Reply…  (Enter to send)",
+    "zh": "回复…（Enter 发送）"
+  },
+  "conv.read": {
+    "en": "Read",
+    "zh": "对方已读"
+  },
+  "conv.search_ph": {
+    "en": "Search name…",
+    "zh": "搜索昵称…"
+  },
+  "conv.no_match": {
+    "en": "No matching conversations.",
+    "zh": "没有匹配的会话。"
+  },
+  "conv.offline": {
+    "en": "Offline — connect to view private chats.",
+    "zh": "离线模式 — 联网后可查看私聊。"
+  },
+  "conv.title": {
+    "en": "Private Chats",
+    "zh": "私聊会话"
+  },
+  "conv.pin": {
+    "en": "Pin",
+    "zh": "置顶"
+  },
+  "conv.none": {
+    "en": "No private chats yet.",
+    "zh": "还没有私聊会话。"
+  },
+  "conv.select": {
+    "en": "Select a conversation on the left",
+    "zh": "选择左侧的会话"
+  },
+  "chat.at_mention": {
+    "en": "@ mention",
+    "zh": "@ 提及"
+  },
+  "chat.mention_notif": {
+    "en": "[@] %s mentioned you in %s: %s",
+    "zh": "[@] %s 在%s里提到了你：%s"
+  },
+  "chat.tag_world": {
+    "en": "[World] ",
+    "zh": "[世界] "
+  },
+  "chat.image_tag": {
+    "en": "[image]",
+    "zh": "[图片]"
+  },
+  "chat.tag_dm": {
+    "en": "[DM] ",
+    "zh": "[私聊] "
+  },
+  "chat.room_history": {
+    "en": "—— Room \"%s\" history ——",
+    "zh": "—— 群聊「%s」历史 ——"
+  },
+  "chat.add_sticker_tip": {
+    "en": "Upload an image to this group",
+    "zh": "上传图片加入当前分组"
+  },
+  "chat.world_channel": {
+    "en": "World channel",
+    "zh": "世界频道"
+  },
+  "chat.ch_world": {
+    "en": "World",
+    "zh": "世界"
+  },
+  "chat.save_failed": {
+    "en": "Save failed.",
+    "zh": "保存失败。"
+  },
+  "chat.group_n": {
+    "en": "Group %d",
+    "zh": "分组%d"
+  },
+  "chat.join_room": {
+    "en": "Join room",
+    "zh": "加入房间"
+  },
+  "chat.orig_gone": {
+    "en": "The original message is no longer in the log.",
+    "zh": "原消息已不在当前记录中。"
+  },
+  "chat.send_image": {
+    "en": "Send image",
+    "zh": "发送图片"
+  },
+  "chat.send_sticker": {
+    "en": "Send sticker (right-click to delete)",
+    "zh": "发送贴图（右键删除）"
+  },
+  "chat.reply_to": {
+    "en": "Reply to %s: %s",
+    "zh": "回复 %s：%s"
+  },
+  "chat.img_upload_failed": {
+    "en": "Image upload failed.",
+    "zh": "图片上传失败。"
+  },
+  "chat.img_loading": {
+    "en": "Image is still loading.",
+    "zh": "图片尚未加载完成。"
+  },
+  "chat.img_saved": {
+    "en": "Image saved.",
+    "zh": "图片已保存。"
+  },
+  "chat.img_btn": {
+    "en": "Img",
+    "zh": "图"
+  },
+  "chat.create_room_tip": {
+    "en": "Type a name in the room-code box, then Create for a named room",
+    "zh": "在房间码栏填名字再点建，创建带名群聊"
+  },
+  "chat.sticker_group_added": {
+    "en": "Added sticker group \"%s\".",
+    "zh": "已加入贴图分组「%s」。"
+  },
+  "chat.create_btn": {
+    "en": "New",
+    "zh": "建"
+  },
+  "chat.toggle_sound": {
+    "en": "Toggle new-message sound",
+    "zh": "开/关 新消息提示音"
+  },
+  "chat.quote_reply": {
+    "en": "Quote reply",
+    "zh": "引用回复"
+  },
+  "chat.quote_btn": {
+    "en": "Quote",
+    "zh": "引"
+  },
+  "chat.members": {
+    "en": "Members",
+    "zh": "成员"
+  },
+  "chat.room_code": {
+    "en": "Room code",
+    "zh": "房间码"
+  },
+  "chat.recall": {
+    "en": "Recall",
+    "zh": "撤回"
+  },
+  "chat.new_group": {
+    "en": "New group",
+    "zh": "新建组"
+  },
+  "chat.recent": {
+    "en": "Recent",
+    "zh": "最近"
+  },
+  "chat.mention_toast": {
+    "en": "You were @mentioned in %s: %s",
+    "zh": "有人在%s里@了你：%s"
+  },
+  "chat.ch_local": {
+    "en": "Chapter",
+    "zh": "本关"
+  },
+  "chat.view_full": {
+    "en": "Click to view full image",
+    "zh": "点击查看原图"
+  },
+  "chat.jump_orig": {
+    "en": "Click to jump to original",
+    "zh": "点击跳转原消息"
+  },
+  "chat.offline_room": {
+    "en": "Offline: cannot create a room.",
+    "zh": "离线状态：无法创建房间。"
+  },
+  "chat.offline_image": {
+    "en": "Offline: cannot send images.",
+    "zh": "离线状态：无法发送图片。"
+  },
+  "chat.offline_sticker": {
+    "en": "Offline: cannot add stickers.",
+    "zh": "离线状态：无法添加贴图。"
+  },
+  "chat.dm_n": {
+    "en": "DM %d",
+    "zh": "私信 %d"
+  },
+  "chat.ch_dm": {
+    "en": "Private",
+    "zh": "私聊"
+  },
+  "chat.room_title": {
+    "en": "Room \"%s\" · %d members",
+    "zh": "群聊「%s」 · %d 人"
+  },
+  "chat.ch_room": {
+    "en": "Room",
+    "zh": "群聊"
+  },
+  "chat.emoji_tip": {
+    "en": "Emoji / quick phrases",
+    "zh": "表情 / 快捷短语"
+  },
+  "chat.input_ph": {
+    "en": "Say something…  (Enter to send)",
+    "zh": "说点什么…（Enter 发送）"
+  },
+  "chat.stickers": {
+    "en": "Stickers",
+    "zh": "贴图"
+  },
+  "chat.join_btn": {
+    "en": "Join",
+    "zh": "进"
+  },
+  "chat.default_group": {
+    "en": "Default",
+    "zh": "默认"
+  },
+  "chat.you": {
+    "en": "(you)",
+    "zh": "（你）"
+  },
+  "chat.no_others": {
+    "en": "(no one else in this chapter)",
+    "zh": "（本关暂无他人）"
+  },
+  "chat.add": {
+    "en": "+ Add",
+    "zh": "＋添加"
+  },
+  "chat.phrase.一路同行": {
+    "en": "Walk together",
+    "zh": "一路同行"
+  },
+  "chat.phrase.感谢相助": {
+    "en": "Thanks for the help",
+    "zh": "感谢相助"
+  },
+  "chat.phrase.愿你平安": {
+    "en": "Peace to you",
+    "zh": "愿你平安"
+  },
+  "chat.phrase.前面小心": {
+    "en": "Careful ahead",
+    "zh": "前面小心"
+  },
+  "chat.phrase.我先走一步": {
+    "en": "I'll go ahead",
+    "zh": "我先走一步"
+  },
+  "chat.phrase.稍等我": {
+    "en": "Wait for me",
+    "zh": "稍等我"
+  }
+}

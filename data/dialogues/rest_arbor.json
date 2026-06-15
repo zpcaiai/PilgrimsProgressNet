@@ -1,0 +1,76 @@
+{
+  "id": "rest_arbor",
+  "nodes": {
+    "start": {
+      "speaker": "The Arbor",
+      "text": "The shade is cool and the climb is long. Surely you have earned a moment. Sit. Close your eyes. The summit will still be there...",
+      "text_variants": [
+        {
+          "conditions": {
+            "weariness_min": 55
+          },
+          "text": "You are so tired. No one would blame you. Lie back in the cool shade; the summit can wait an hour, or two, or until morning...",
+          "text_zh": "你太累了，没人会怪你。靠进这清凉的树荫里；山顶等一个钟头、两个钟头、或等到天亮，都不迟……"
+        }
+      ],
+      "choices": [
+        {
+          "id": "rest",
+          "text": "Lie down and rest a while. (Comfort now.)",
+          "effects": {
+            "weariness": 8,
+            "watchfulness": -6
+          },
+          "flags": {
+            "drowsed_on_hill": true
+          },
+          "next": "rested",
+          "text_zh": "躺下歇一会儿。（此刻的安逸。）"
+        },
+        {
+          "id": "rise",
+          "text": "Rise and keep climbing. Rest is sweeter at the summit.",
+          "effects": {
+            "perseverance": 6,
+            "hope": 3,
+            "weariness": -3
+          },
+          "next": "rose",
+          "text_zh": "起身，继续攀登。山顶的歇息更甘甜。"
+        }
+      ],
+      "text_zh": "树荫清凉，山路漫长。你总该歇一歇了。坐下吧，闭上眼——山顶又不会跑……"
+    },
+    "rested": {
+      "speaker": "",
+      "text": "You sink into the arbor's cushions. When you stir, the light has shifted and your watchfulness has leaked away.",
+      "choices": [
+        {
+          "id": "wake",
+          "text": "(Wake, a little later than you meant to.)",
+          "next": "end",
+          "text_zh": "（醒来，比你原想的晚了些。）"
+        }
+      ],
+      "text_zh": "你陷进凉亭的软垫里。等你回过神，天光已偏移，警醒也悄悄漏走了。"
+    },
+    "rose": {
+      "speaker": "",
+      "text": "You set your face to the slope again. The shade falls behind, and the summit light seems a fraction nearer.",
+      "choices": [
+        {
+          "id": "climb",
+          "text": "(Climb on.)",
+          "next": "end",
+          "text_zh": "（继续攀登。）"
+        }
+      ],
+      "text_zh": "你重新面向坡道。树荫被甩在身后，山顶的光仿佛近了一分。"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}
