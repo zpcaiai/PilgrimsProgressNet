@@ -10,8 +10,16 @@ var _advancing: bool = false
 
 var companion: Companion = null
 
+# Dominant colours sampled from this chapter's painting (top/sky, mid/horizon,
+# bottom/ground). Used to harmonise the 3D world's materials with the art.
+var _pal_top: Color = Color(0.5, 0.5, 0.5)
+var _pal_mid: Color = Color(0.5, 0.5, 0.5)
+var _pal_bot: Color = Color(0.3, 0.3, 0.3)
+var _pal_ok: bool = false
+
 
 func _ready() -> void:
+	_sample_palette()
 	_build_chapter()
 	_apply_art_palette()
 	_attach_backdrop()
@@ -47,31 +55,41 @@ func _attach_backdrop() -> void:
 	var art := AssetLib.scene_art(ChapterManager.current_chapter_id)
 	if art == null:
 		return
-	var mat := StandardMaterial3D.new()
-	mat.albedo_texture = art
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
-	var dist := 130.0
-	var w := 300.0
-	var h := 150.0
-	var y := 45.0
-	var placements := [
-		[Vector3(0, y, -dist), 0.0],
-		[Vector3(0, y, dist), 180.0],
-		[Vector3(-dist, y, 0), 90.0],
-		[Vector3(dist, y, 0), -90.0],
-	]
-	for p in placements:
-		var quad := QuadMesh.new()
-		quad.size = Vector2(w, h)
-		var mi := MeshInstance3D.new()
-		mi.mesh = quad
-		mi.material_override = mat
-		mi.position = p[0]
-		mi.rotation_degrees = Vector3(0, p[1], 0)
-		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(mi)
+	# Wrap the whole sky in the chapter painting so the 3D world sits inside the
+	# scene from every angle (mode-aware via scene_art). Replaces the procedural
+	# sky created in setup_environment(); ambient light is then drawn from it too.
+	for c in get_children():
+		if c is WorldEnvironment:
+			var env: Environment = (c as WorldEnvironment).environment
+			if env == null:
+				continue
+			var sky := Sky.new()
+			var pano := PanoramaSkyMaterial.new()
+			pano.panorama = art
+			sky.sky_material = pano
+			env.background_mode = Environment.BG_SKY
+			env.sky = sky
+			env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+			return
+
+
+## Sample the chapter painting's dominant colours into _pal_* so geometry built
+## in _build_chapter() can harmonise with the art. Safe no-op if art is absent.
+func _sample_palette() -> void:
+	var tex := AssetLib.scene_art(ChapterManager.current_chapter_id)
+	if tex == null:
+		return
+	var img := tex.get_image()
+	if img == null:
+		return
+	if img.is_compressed():
+		img.decompress()
+	if img.get_width() == 0 or img.get_height() == 0:
+		return
+	_pal_top = _avg_band(img, 0.0, 0.22)
+	_pal_mid = _avg_band(img, 0.40, 0.62)
+	_pal_bot = _avg_band(img, 0.80, 1.0)
+	_pal_ok = true
 
 
 ## Retint the chapter's sky, horizon, ground, ambient, fog and sun from the
@@ -181,6 +199,11 @@ func setup_environment(sky_top: Color, sky_horizon: Color, ambient_energy: float
 
 
 func make_material(color: Color, emission: float = 0.0) -> StandardMaterial3D:
+	# Harmonise with the chapter painting, then soften for the storybook child mode.
+	if _pal_ok:
+		color = color.lerp(_pal_mid, 0.30)
+	if GameState.is_child_mode():
+		color = color.lerp(Color(1, 1, 1), 0.22)
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
 	m.roughness = 0.95
@@ -205,12 +228,17 @@ func make_ground(size: Vector2, color: Color, pos: Vector3 = Vector3.ZERO) -> St
 	plane.size = Vector3(size.x, 0.5, size.y)
 	mesh.mesh = plane
 	mesh.position = Vector3(0, -0.25, 0)
-	# Optional per-chapter ground texture (existence-checked; falls back to the
-	# flat color when the asset is absent).
-	var gmat := make_material(color)
+	# Ground colour pulled toward the painting's ground tone; any texture is then
+	# tinted to that hue (brightness-normalised so it doesn't darken).
+	var gcol := color
+	if _pal_ok:
+		gcol = gcol.lerp(_pal_bot, 0.5)
+	var gmat := make_material(gcol)
 	var gtex := AssetLib.ground(ChapterManager.current_chapter_id)
 	if gtex != null:
-		gmat.albedo_color = Color(1, 1, 1)
+		var t := gmat.albedo_color
+		var mx := maxf(maxf(t.r, t.g), maxf(t.b, 0.001))
+		gmat.albedo_color = Color(t.r / mx, t.g / mx, t.b / mx)
 		gmat.albedo_texture = gtex
 		gmat.uv1_scale = Vector3(maxf(1.0, size.x / 4.0), maxf(1.0, size.y / 4.0), 1.0)
 	mesh.material_override = gmat
