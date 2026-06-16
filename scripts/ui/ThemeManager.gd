@@ -9,6 +9,12 @@ extends Node
 ## (e.g. Noto Sans CJK / Source Han Sans) into res://assets/fonts/ and restart —
 ## it is picked up automatically, no code change needed.
 
+# The CJK font we ship, referenced at compile time so it is guaranteed to be
+# bundled and loadable on every platform (incl. web). Used as the fallback when
+# runtime discovery (AssetLib.font()) finds nothing.
+const SHIPPED_CJK_FONT := preload("res://assets/fonts/NotoSansCJKsc-Subset.otf")
+
+
 func _ready() -> void:
 	var theme: Theme = null
 	if ResourceLoader.exists("res://assets/ui/theme.tres"):
@@ -19,11 +25,16 @@ func _ready() -> void:
 		theme = Theme.new()
 	if theme.default_font_size <= 0:
 		theme.default_font_size = 16
-	var f := AssetLib.font()
+	var f: Font = AssetLib.font()
+	if f == null:
+		# Bulletproof fallback: the font is referenced at compile time (SHIPPED_CJK_FONT),
+		# so it is always bundled and directly usable on web — where DirAccess folder
+		# scans and sometimes ResourceLoader.exists() on the source path silently fail.
+		f = SHIPPED_CJK_FONT
 	if f != null:
 		theme.default_font = f
 		var where := f.resource_path if f.resource_path != "" else "(dynamic)"
 		print("[ThemeManager] CJK font applied: ", where)
 	else:
-		print("[ThemeManager] no font in res://assets/fonts/ — using engine default (CJK will tofu).")
+		print("[ThemeManager] no font found — using engine default (CJK will tofu).")
 	get_tree().root.theme = theme
