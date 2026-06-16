@@ -142,7 +142,10 @@ static func _font_candidates() -> Array:
 				out.append(FONT_DIR + f)
 			f = dir.get_next()
 		dir.list_dir_end()
-	for n in ["main", "cjk", "font", "NotoSansCJKsc-Regular", "NotoSansSC-Regular", "SourceHanSansSC-Regular"]:
+	# Web exports can't reliably list res:// via DirAccess, so the scan above may
+	# come back empty there. These explicit names are loaded via ResourceLoader
+	# (which DOES work on web), so keep the actual shipped filename in this list.
+	for n in ["main", "cjk", "font", "NotoSansCJKsc-Subset", "NotoSansCJKsc-Regular", "NotoSansSC-Regular", "SourceHanSansSC-Regular"]:
 		for ext in ["ttf", "otf"]:
 			out.append(FONT_DIR + n + "." + ext)
 	return out

@@ -25,11 +25,16 @@ godot --headless --export-release "Web" build/web/index.html
 **本地先验一遍**（不能直接双击 index.html，浏览器禁 `file://` 加载 WASM）：
 
 ```bash
-cd build/web && python3 -m http.server 8060   # 打开 http://localhost:8060
+# 线程版必须带 COOP/COEP 头,普通 http.server 不行,用仓库自带的本地服务器:
+python3 tools/serve_web.py 8060        # 打开 http://localhost:8060
 ```
 
-Web 预设已把**线程关闭**（`thread_support=false`），所以是单线程 WASM，
-**普通静态托管即可，无需 COOP/COEP 跨域隔离头**——这正是它能直接上 Vercel 的原因。
+> **关于线程(重要)**:本工程的 Web 预设开启了 **Thread Support**(多线程 WASM,性能更好)。
+> 线程版依赖 SharedArrayBuffer,要求托管端对**所有响应**发送
+> `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Embedder-Policy: require-corp`。
+> 仓库根目录的 [`../vercel.json`](../vercel.json) 已配好这两个头,而 `tools/deploy_vercel.sh`
+> 每次部署会自动把它拷进 `build/web/`——所以线程版能正常跑在 Vercel 上。
+> (若你改回单线程 `thread_support=false`,这两个头有没有都无所谓,普通静态托管即可。)
 
 ---
 
