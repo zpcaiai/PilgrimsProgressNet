@@ -10,14 +10,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+RUN chmod +x entrypoint.sh
 
+# Default 8000 (matches docker-compose/nginx and the HF Space README app_port: 8000).
 EXPOSE 8000
 
-# Gunicorn manages N uvicorn workers per container; scale further by adding
-# container replicas behind Nginx. -w should be ~ (2*CPU)+1, tune per host.
-CMD ["gunicorn", "app.main:app", \
-     "-k", "uvicorn.workers.UvicornWorker", \
-     "-w", "4", \
-     "-b", "0.0.0.0:8000", \
-     "--access-logfile", "-", \
-     "--timeout", "60"]
+# entrypoint.sh: runs `alembic upgrade head` (skip with PP_RUN_MIGRATIONS=0), then
+# launches gunicorn with N uvicorn workers (WEB_CONCURRENCY, default 4) on $PORT
+# (default 8000). Identical behavior for docker-compose and Hugging Face Spaces.
+# Scale further with container replicas behind Nginx; -w ~ (2*CPU)+1, tune per host.
+CMD ["./entrypoint.sh"]

@@ -1,0 +1,60 @@
+name: Migrate Neon (PilgrimsProgressDB)
+
+# Push to GitHub -> run Alembic migrations against Neon, creating/updating the
+# tables in the PilgrimsProgressDB database.
+#
+# ONE-TIME SETUP (otherwise this job fails with a clear message):
+#   1. In Neon, make sure the database "PilgrimsProgressDB" exists.
+#   2. Repo -> Settings -> Secrets and variables -> Actions -> New repository secret:
+#        Name:  PP_DATABASE_URL
+#        Value: postgresql+asyncpg://USER:PASS@HOST/PilgrimsProgressDB?ssl=require
+#      (asyncpg form, ssl=require, Neon DIRECT/non-pooled endpoint)
+#
+# After that, every push that touches server/** runs the migrations automatically.
+# You can also trigger it by hand from the Actions tab (workflow_dispatch).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/alembic/**'
+      - 'server/app/**'
+      - 'server/requirements.txt'
+      - '.github/workflows/migrate-neon.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: neon-migrate
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: alembic upgrade head
+        env:
+          PYTHONPATH: .
+          PP_DATABASE_URL: ${{ secrets.PP_DATABASE_URL }}
+        run: |
+          if [ -z "${PP_DATABASE_URL}" ]; then
+            echo "::error::Missing repo secret PP_DATABASE_URL."
+            echo "Add it under Settings -> Secrets and variables -> Actions:"
+            echo "  postgresql+asyncpg://USER:PASS@HOST/PilgrimsProgressDB?ssl=require"
+            exit 1
+          fi
+          echo "Running migrations against PilgrimsProgressDB ..."
+          alembic upgrade head
+          echo "----- current revision -----"
+          alembic current
