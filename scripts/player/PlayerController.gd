@@ -83,6 +83,9 @@ func _build() -> void:
 	_mesh_root.name = "MeshRoot"
 	add_child(_mesh_root)
 
+	# Painted pilgrim figure (billboard) when available; else greybox capsule.
+	var pilgrim_fig := AssetLib.figure("Pilgrim")
+
 	_body_mesh = MeshInstance3D.new()
 	var capsule := CapsuleMesh.new()
 	capsule.radius = 0.4
@@ -90,6 +93,7 @@ func _build() -> void:
 	_body_mesh.mesh = capsule
 	_body_mesh.position = Vector3(0, 0.9, 0)
 	_body_mesh.material_override = _make_material(Color(0.78, 0.68, 0.5))
+	_body_mesh.visible = pilgrim_fig == null
 	_mesh_root.add_child(_body_mesh)
 
 	var head := MeshInstance3D.new()
@@ -99,7 +103,11 @@ func _build() -> void:
 	head.mesh = sphere
 	head.position = Vector3(0, 1.85, 0)
 	head.material_override = _make_material(Color(0.9, 0.78, 0.62))
+	head.visible = pilgrim_fig == null
 	_mesh_root.add_child(head)
+
+	if pilgrim_fig != null:
+		_mesh_root.add_child(CharacterBillboard.make(pilgrim_fig, 2.0))
 
 	# Burden on the back
 	_burden_mesh = MeshInstance3D.new()

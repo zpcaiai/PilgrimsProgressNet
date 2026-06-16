@@ -21,16 +21,21 @@ const LINES := [
 func setup(display_name: String = "Hopeful", color: Color = Color(0.6, 0.8, 0.7)) -> void:
 	companion_name = display_name
 	add_to_group("companion")
-	var mesh := MeshInstance3D.new()
-	var capsule := CapsuleMesh.new()
-	capsule.radius = 0.38
-	capsule.height = 1.5
-	mesh.mesh = capsule
-	mesh.position = Vector3(0, 0.85, 0)
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
-	mesh.material_override = mat
-	add_child(mesh)
+	# Painted figure billboard when available; else the greybox capsule.
+	var fig := AssetLib.figure(display_name)
+	if fig != null:
+		add_child(CharacterBillboard.make(fig, 1.9))
+	else:
+		var mesh := MeshInstance3D.new()
+		var capsule := CapsuleMesh.new()
+		capsule.radius = 0.38
+		capsule.height = 1.5
+		mesh.mesh = capsule
+		mesh.position = Vector3(0, 0.85, 0)
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = color
+		mesh.material_override = mat
+		add_child(mesh)
 	var label := Label3D.new()
 	label.text = companion_name
 	label.position = Vector3(0, 2.1, 0)

@@ -21,6 +21,7 @@ const GROUND_DIR := "res://assets/textures/ground/"
 const PBR_DIR := "res://assets/textures/pbr/"
 const SCENE_DIR := "res://assets/scenes/"
 const CHAR_DIR := "res://assets/characters/"
+const FIGURE_DIR := "res://assets/characters/figures/"
 const PARTICLE_DIR := "res://assets/textures/particles/"
 const UI_DIR := "res://assets/ui/"
 const ANIM_DIR := "res://assets/anim/"
@@ -96,6 +97,30 @@ static func portrait(speaker: String) -> Texture2D:
 		if child != null:
 			return child
 	return tex(CHAR_DIR + stem + ".png")
+
+
+## Full-figure cutout for standing a character in the 3D world as a billboard
+## (assets/characters/figures/<stem>.webp|png). Prefers a transparent .webp,
+## falls back to .png, and to the child variant in Children's mode. Returns null
+## if no figure art exists (caller then uses the greybox capsule). Drop your own
+## transparent <stem>.webp here to override the auto-generated cutout.
+static func figure(speaker: String) -> Texture2D:
+	var stem := String(SPEAKER_MAP.get(speaker, ""))
+	if stem == "":
+		stem = speaker.to_lower().replace(" ", "_")
+	if _is_child_mode():
+		var child := _first_tex([FIGURE_DIR + stem + "_child.webp", FIGURE_DIR + stem + "_child.png"])
+		if child != null:
+			return child
+	return _first_tex([FIGURE_DIR + stem + ".webp", FIGURE_DIR + stem + ".png"])
+
+
+static func _first_tex(paths: Array) -> Texture2D:
+	for p in paths:
+		var t := tex(String(p))
+		if t != null:
+			return t
+	return null
 
 
 ## True when the pilgrim chose the gentler "Children's Journey". Read from the

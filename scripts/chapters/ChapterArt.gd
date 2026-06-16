@@ -376,7 +376,7 @@ static func _interpreter(parent: Node3D) -> void:
 	for z in [-3.0, -9.0, -15.0]:
 		for s in [-1.0, 1.0]:
 			parent.add_child(_mi(_box(Vector3(0.3, 1.8, 1.4)), _emit(Color(1.0, 0.8, 0.45), 1.0), Vector3(s * 10.6, 3.0, z)))
-			PropKit.lantern_post(parent, Vector3(s * 9.4, 0, z), wood, Color(1.0, 0.78, 0.42), 1.4)
+			PropKit.lantern_post(parent, Vector3(s * 9.4, 0, z), Color(0.32, 0.24, 0.18), Color(1.0, 0.78, 0.42), 1.4)
 	# Hearth.
 	parent.add_child(_mi(_box(Vector3(3, 2.4, 0.6)), MaterialKit.make("stone", Color(0.4, 0.36, 0.32)), Vector3(0, 1.2, -22)))
 	PropKit.fire(parent, Vector3(0, 0.6, -21.6), 0.9, Color(1.0, 0.6, 0.25))
@@ -569,7 +569,7 @@ static func _delectable(parent: Node3D) -> void:
 static func _enchanted(parent: Node3D) -> void:
 	for z in [-12.0, -28.0]:
 		for s in [-1.0, 1.0]:
-			var x := s * 8.0
+			var x: float = s * 8.0
 			PropKit.arch(parent, Vector3(x, 0, z), 3.2, 3.4, Color(0.5, 0.46, 0.4), "wood")
 			parent.add_child(_mi(_dome(2.4), MaterialKit.make("foliage", Color(0.4, 0.5, 0.38)), Vector3(x, 3.6, z)))
 			parent.add_child(_mi(_box(Vector3(2.4, 0.5, 1.0)), MaterialKit.make("cloth", Color(0.6, 0.5, 0.62)), Vector3(x, 0.5, z)))

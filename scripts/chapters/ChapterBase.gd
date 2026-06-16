@@ -396,23 +396,28 @@ func make_npc(npc_name: String, pos: Vector3, color: Color, dialogue_id: String 
 	area.name = npc_name
 	area.position = pos
 	area.prompt = prompt if prompt != "" else "Talk to " + npc_name
-	# Body mesh
-	var mesh := MeshInstance3D.new()
-	var capsule := CapsuleMesh.new()
-	capsule.radius = 0.4
-	capsule.height = 1.6
-	mesh.mesh = capsule
-	mesh.position = Vector3(0, 0.9, 0)
-	mesh.material_override = make_material(color)
-	area.add_child(mesh)
-	var head := MeshInstance3D.new()
-	var sphere := SphereMesh.new()
-	sphere.radius = 0.28
-	sphere.height = 0.56
-	head.mesh = sphere
-	head.position = Vector3(0, 1.85, 0)
-	head.material_override = make_material(color.lightened(0.2))
-	area.add_child(head)
+	# Visual: a billboard of the character's painted figure when available, else
+	# the procedural capsule + head greybox.
+	var fig := AssetLib.figure(npc_name)
+	if fig != null:
+		area.add_child(CharacterBillboard.make(fig, 2.0))
+	else:
+		var mesh := MeshInstance3D.new()
+		var capsule := CapsuleMesh.new()
+		capsule.radius = 0.4
+		capsule.height = 1.6
+		mesh.mesh = capsule
+		mesh.position = Vector3(0, 0.9, 0)
+		mesh.material_override = make_material(color)
+		area.add_child(mesh)
+		var head := MeshInstance3D.new()
+		var sphere := SphereMesh.new()
+		sphere.radius = 0.28
+		sphere.height = 0.56
+		head.mesh = sphere
+		head.position = Vector3(0, 1.85, 0)
+		head.material_override = make_material(color.lightened(0.2))
+		area.add_child(head)
 	# Floating name
 	var label := Label3D.new()
 	label.text = npc_name

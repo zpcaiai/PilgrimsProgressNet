@@ -108,6 +108,27 @@ dressing[ {op:..., ...} ]                                   # 环境点缀清单
 
 ---
 
+## 三-ter、角色立绘 (Character billboards)
+
+主角与 NPC 不再是"胶囊 + 球"灰模,而是用真实人物画当**广告牌立绘**站进 3D 世界
+(主角 = pilgrim,Evangelist = evangelist,等等)。
+
+- `scripts/render/CharacterBillboard.gd`:`make(tex, height)` 生成 Y 轴广告牌 `Sprite3D`
+  (始终面向相机但保持竖直,unshaded,alpha 裁切,脚踩地面)。
+- `AssetLib.figure(speaker)`:按 `SPEAKER_MAP` 解析出 stem,优先加载
+  `assets/characters/figures/<stem>.webp`,回退 `.png`,童趣模式优先 `_child` 变体;
+  没有立绘则返回 null(调用方回退灰模胶囊)。
+- 接入点:`ChapterBase.make_npc()`(NPC)、`PlayerController._build()`(主角,隐藏胶囊+头)、
+  `Companion.setup()`(同伴)。
+- `tools/gen_figures.py`:从 `assets/characters/<stem>.png` 的近匀色画背景**抠图**
+  (边缘 flood-fill + 椭圆羽化)生成透明 `figures/<stem>.webp`。自动抠图是"够用的默认值"。
+
+**想要完美效果**:把你自己的**透明** `pilgrim.webp` 等放进 `assets/characters/figures/`
+即可覆盖自动抠图(`.webp` 优先于 `.png`)。立绘是半身像,站立时呈"半身人像"感;
+要全身请放全身透明图。重生成:`python3 tools/gen_figures.py`。
+
+---
+
 ## 四、PBR 贴图
 
 ### 表面库(MaterialKit)
