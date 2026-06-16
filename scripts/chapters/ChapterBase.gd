@@ -13,6 +13,8 @@ var companion: Companion = null
 
 func _ready() -> void:
 	_build_chapter()
+	_apply_art_palette()
+	_attach_backdrop()
 	if player == null:
 		spawn_player(_spawn_position)
 	# Re-spawn a travelling companion if one has joined the pilgrim.
@@ -35,6 +37,104 @@ func _attach_ghost_layer() -> void:
 	add_child(gr)
 	if gr.has_method("bind_player"):
 		gr.call("bind_player", player)
+
+
+## Painted backdrop that makes the 3D world match the chapter's 2D art. Uses
+## AssetLib.scene_art (mode-aware: standard art in Devout mode, the storybook
+## "_child" art in Children's mode). Large unshaded panels sit far out on every
+## side so the scene reads like the painting from any viewing angle.
+func _attach_backdrop() -> void:
+	var art := AssetLib.scene_art(ChapterManager.current_chapter_id)
+	if art == null:
+		return
+	var mat := StandardMaterial3D.new()
+	mat.albedo_texture = art
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
+	var dist := 130.0
+	var w := 300.0
+	var h := 150.0
+	var y := 45.0
+	var placements := [
+		[Vector3(0, y, -dist), 0.0],
+		[Vector3(0, y, dist), 180.0],
+		[Vector3(-dist, y, 0), 90.0],
+		[Vector3(dist, y, 0), -90.0],
+	]
+	for p in placements:
+		var quad := QuadMesh.new()
+		quad.size = Vector2(w, h)
+		var mi := MeshInstance3D.new()
+		mi.mesh = quad
+		mi.material_override = mat
+		mi.position = p[0]
+		mi.rotation_degrees = Vector3(0, p[1], 0)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(mi)
+
+
+## Retint the chapter's sky, horizon, ground, ambient, fog and sun from the
+## actual colours of the chapter's painting, so the 3D world's whole palette
+## matches the art (mode-aware via scene_art).
+func _apply_art_palette() -> void:
+	var tex := AssetLib.scene_art(ChapterManager.current_chapter_id)
+	if tex == null:
+		return
+	var img := tex.get_image()
+	if img == null:
+		return
+	if img.is_compressed():
+		img.decompress()
+	if img.get_width() == 0 or img.get_height() == 0:
+		return
+	var top := _avg_band(img, 0.0, 0.22)
+	var mid := _avg_band(img, 0.40, 0.62)
+	var bot := _avg_band(img, 0.80, 1.0)
+	for c in get_children():
+		if c is WorldEnvironment:
+			var env: Environment = (c as WorldEnvironment).environment
+			if env != null:
+				if env.sky != null:
+					var pm := env.sky.sky_material as ProceduralSkyMaterial
+					if pm != null:
+						pm.sky_top_color = top
+						pm.sky_horizon_color = mid
+						pm.ground_horizon_color = mid
+						pm.ground_bottom_color = bot
+				env.ambient_light_color = mid
+				if env.fog_enabled:
+					env.fog_light_color = mid
+		elif c is DirectionalLight3D:
+			(c as DirectionalLight3D).light_color = top.lerp(Color(1, 1, 1), 0.5)
+
+
+## Average colour of a horizontal band of the image (y0..y1 as 0-1 fractions).
+func _avg_band(img: Image, y0: float, y1: float) -> Color:
+	var w := img.get_width()
+	var h := img.get_height()
+	var ya := int(y0 * h)
+	var yb := maxi(ya + 1, int(y1 * h))
+	var step_x := maxi(1, int(w / 16.0))
+	var step_y := maxi(1, int((yb - ya) / 4.0))
+	var r := 0.0
+	var g := 0.0
+	var b := 0.0
+	var n := 0
+	var yy := ya
+	while yy < yb:
+		var xx := 0
+		while xx < w:
+			var col := img.get_pixel(xx, yy)
+			r += col.r
+			g += col.g
+			b += col.b
+			n += 1
+			xx += step_x
+		yy += step_y
+	if n == 0:
+		return Color(0.5, 0.5, 0.5)
+	return Color(r / n, g / n, b / n)
 
 
 func spawn_companion(display_name: String, color: Color) -> Companion:

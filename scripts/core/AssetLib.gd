@@ -53,6 +53,12 @@ static func ground(chapter_id: String) -> Texture2D:
 
 
 static func scene_art(chapter_id: String) -> Texture2D:
+	# Children's-journey variant: prefer "<chapter>_child.png" in child mode,
+	# falling back to the standard chapter art when no child variant exists.
+	if _is_child_mode():
+		var child := tex(SCENE_DIR + chapter_id + "_child.png")
+		if child != null:
+			return child
 	return tex(SCENE_DIR + chapter_id + ".png")
 
 
@@ -68,7 +74,24 @@ static func portrait(speaker: String) -> Texture2D:
 	var stem := String(SPEAKER_MAP.get(speaker, ""))
 	if stem == "":
 		stem = speaker.to_lower().replace(" ", "_")
+	# Children's-journey variant: prefer "<stem>_child.png" in child mode, and
+	# fall back to the standard portrait when no child variant exists.
+	if _is_child_mode():
+		var child := tex(CHAR_DIR + stem + "_child.png")
+		if child != null:
+			return child
 	return tex(CHAR_DIR + stem + ".png")
+
+
+## True when the pilgrim chose the gentler "Children's Journey". Read from the
+## GameState autoload via the scene tree so this stays valid in a static context.
+static func _is_child_mode() -> bool:
+	var loop := Engine.get_main_loop()
+	if loop is SceneTree:
+		var gs: Node = (loop as SceneTree).root.get_node_or_null("GameState")
+		if gs != null and gs.has_method("is_child_mode"):
+			return bool(gs.call("is_child_mode"))
+	return false
 
 
 static func anim_sheet(anim_name: String) -> Texture2D:
