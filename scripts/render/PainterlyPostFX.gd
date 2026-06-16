@@ -41,34 +41,34 @@ func _apply_mode_defaults() -> void:
 	if _mat == null:
 		return
 	if GameState.is_child_mode():
-		_set_param("strength", 0.72)
-		_set_param("saturation", 1.18)
-		_set_param("contrast", 0.98)
-		_set_param("brightness", 1.06)
-		_set_param("tint", Vector3(1.0, 0.97, 0.90))
-		_set_param("tint_amount", 0.10)
-		_set_param("vignette_amount", 0.14)
-		_set_param("grain_amount", 0.015)
-		_set_param("brush", 1.25)
+		_apply_param("strength", 0.72)
+		_apply_param("saturation", 1.18)
+		_apply_param("contrast", 0.98)
+		_apply_param("brightness", 1.06)
+		_apply_param("tint", Vector3(1.0, 0.97, 0.90))
+		_apply_param("tint_amount", 0.10)
+		_apply_param("vignette_amount", 0.14)
+		_apply_param("grain_amount", 0.015)
+		_apply_param("brush", 1.25)
 	else:
-		_set_param("strength", 0.90)
-		_set_param("saturation", 1.10)
-		_set_param("contrast", 1.06)
-		_set_param("brightness", 1.0)
-		_set_param("tint", Vector3(1.0, 0.98, 0.94))
-		_set_param("tint_amount", 0.06)
-		_set_param("vignette_amount", 0.32)
-		_set_param("grain_amount", 0.035)
-		_set_param("brush", 1.0)
+		_apply_param("strength", 0.90)
+		_apply_param("saturation", 1.10)
+		_apply_param("contrast", 1.06)
+		_apply_param("brightness", 1.0)
+		_apply_param("tint", Vector3(1.0, 0.98, 0.94))
+		_apply_param("tint_amount", 0.06)
+		_apply_param("vignette_amount", 0.32)
+		_apply_param("grain_amount", 0.035)
+		_apply_param("brush", 1.0)
 
 
 ## Per-chapter overrides (e.g. {"tint": Vector3(...), "vignette_amount": 0.5}).
 func configure(params: Dictionary) -> void:
 	for k in params.keys():
-		_set_param(String(k), params[k])
+		_apply_param(String(k), params[k])
 
 
-func _set_param(param: String, value: Variant) -> void:
+func _apply_param(param: String, value) -> void:
 	if _mat != null:
 		_mat.set_shader_parameter(param, value)
 
