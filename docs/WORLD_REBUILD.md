@@ -72,6 +72,42 @@ dressing[ {op:..., ...} ]                                   # 环境点缀清单
 
 ---
 
+## 三-bis、逐章专属精修 (ChapterArt) — 深度精修层
+
+在通用「档案 + 点缀」之上,每章还有一份**手工编排的标志性主景**,统一由
+`scripts/chapters/ChapterArt.gd` 提供。`ChapterBase._apply_world_rebuild()` 在铺完
+通用点缀后调用一次 `ChapterArt.build(self, id)`,内部 `match id` 分发到各章的 `_<章节>()`
+构建函数。**不需要改任何章节脚本**(天城也走这条统一路径)。
+
+每章主景(均避开玩法主体、碰撞体避开通道):
+
+| 章 | 专属主景 |
+|---|---|
+| city_of_destruction | 身后燃烧的废墟之城(带火光窗)、浓烟、火星雨、前方逃生之门微光 |
+| slough_of_despond | 路侧大片浑浊泥沼水面(动画水)、半沉枯树 |
+| wicket_gate | 把窄门嵌进一道大石墙,门内涌出迎接的暖光束 + 灯 |
+| interpreter_house | 室内化:两侧墙 + 屋梁天花 + 发光寓意画框 + 壁炉火 |
+| hill_difficulty | 山顶巨岩 + 远山脊 + 脚下清泉(动画水)+ 两条入暗的岔路 |
+| palace_beautiful | 宫后高塔群 + 两尊守门石狮 + 旗 |
+| valley_humiliation | 亚玻伦的喷火巨拱 + 火堆 + 火星雨 |
+| valley_shadow_death | 紧贴窄道(x±4)的高耸黑峡 + 两侧黑渊 + 冷焰 + 远处冷色黎明 |
+| vanity_fair | 两列花哨摊位 + 彩旗 bunting + 镀金偶像 |
+| doubting_castle | 笼罩牢房的森严城堡(城垛墙 + 双塔 + 冷光窗)+ 雾 |
+| delectable_mountains | 翠绿丘峦 + 地平线上初见的天城微光 |
+| enchanted_ground | 诱人催眠的发光凉亭(拱 + 叶顶 + 软光 + 长椅)+ 梦尘 |
+| wilderness_road | 远方台地群 + 路边巨石枯骨 + 孤远目标微光 |
+| river_of_death | 彼岸荣光:发光的「天使群」+ 光束 + 河面动画微光 |
+| cross_and_tomb | 十字架后破晓的荣光光束 + 远丘 + 升腾光尘 |
+
+**自定义动画着色器**(全部缺失即优雅回退):
+`assets/shaders/glory_gold.gdshader`(脉动金 + 菲涅尔泛光)、`godray.gdshader`(加性神光柱)、
+`water.gdshader`(波动 + 菲涅尔深浅 + 闪光)。
+
+**专属精修样板**:`celestial_city` 走最丰富的 `CelestialCityArt.build()`(分层金城 + 门洞光帘 +
+6 道神光 + 荣光逆光 + 升腾光尘)。要精修某章,改 `ChapterArt.gd` 里对应的 `_<章节>()` 即可。
+
+---
+
 ## 四、PBR 贴图
 
 ### 表面库(MaterialKit)

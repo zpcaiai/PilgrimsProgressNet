@@ -4,7 +4,9 @@ extends Node
 ## Toggle `enabled` off to run the game purely offline (default-safe).
 
 # Set to your deployed backend. For local docker-compose use http://localhost:8080
-var base_url: String = "http://localhost:8080/api/v1"
+# Production: the Hugging Face Space (owner "stephenzao", Space name "pilgrim-api").
+# If you name the Space differently, change the host below to <owner>-<space>.hf.space.
+var base_url: String = "https://stephenzao-pilgrim-api.hf.space/api/v1"
 
 # Master switch. If false, every NetService becomes a no-op and the game
 # behaves exactly like the single-player build.

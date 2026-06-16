@@ -41,6 +41,8 @@ func _build_chapter() -> void:
 	spawn_player(Vector3(0, 1, 14))
 
 	make_trigger(Vector3(0, 1.5, -27), Vector3(10, 5, 2), func(_b): _arrive(), true)
+	# The bespoke City spectacle (CelestialCityArt) is applied centrally by
+	# ChapterBase._apply_world_rebuild() via ChapterArt, like every chapter.
 
 
 func _arrive() -> void:

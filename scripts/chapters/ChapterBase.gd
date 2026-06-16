@@ -629,6 +629,8 @@ func _apply_world_rebuild() -> void:
 	_apply_environment(prof)
 	_apply_lighting(prof)
 	_apply_dressing(prof.get("dressing", []))
+	# Bespoke per-chapter centrepiece (deep-polish layer) on top of the profile.
+	ChapterArt.build(self, ChapterManager.current_chapter_id)
 	_attach_postfx(prof.get("post", {}))
 
 
