@@ -734,7 +734,7 @@ func _save_stickers() -> void:
 
 # --- @-mention autocomplete ---
 func _on_input_changed(text: String) -> void:
-	var frag := _active_mention_fragment(text)
+	var frag: Variant = _active_mention_fragment(text)
 	if frag == null:
 		_hide_autocomplete()
 		return

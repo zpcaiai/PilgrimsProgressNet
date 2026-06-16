@@ -24,15 +24,17 @@ func _ready() -> void:
 
 
 func _attach_ghost_layer() -> void:
-	var net := get_node_or_null("/root/NetConfig")
-	if net == null or not net.enabled or player == null:
+	# NetConfig is an autoload, so reference it directly (type-safe — avoids the
+	# unsafe-property-access warning that newer Godot escalates to an error).
+	if not NetConfig.enabled or player == null:
 		return
 	var gr_script: Variant = load("res://scripts/level/GhostRenderer.gd")
 	if gr_script == null:
 		return
 	var gr: Node = gr_script.new()
 	add_child(gr)
-	gr.bind_player(player)
+	if gr.has_method("bind_player"):
+		gr.call("bind_player", player)
 
 
 func spawn_companion(display_name: String, color: Color) -> Companion:
@@ -349,12 +351,12 @@ func make_trigger(pos: Vector3, size: Vector3, on_enter: Callable, once: bool = 
 func make_exit_trigger(pos: Vector3, size: Vector3, condition: Callable = Callable(),
 		blocked_message: String = "You are not ready to leave yet.") -> Area3D:
 	# Advances to the next chapter when the player enters, if condition passes.
-	return make_trigger(pos, size, func(_body):
+	var _cb1 := func(_body):
 		if condition.is_valid() and not condition.call():
 			EventBus.toast(blocked_message)
 			return
 		_advance_after_delay()
-	, false)
+	return make_trigger(pos, size, _cb1, false)
 
 
 func _advance_after_delay() -> void:
@@ -435,24 +437,24 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Diction
 
 	# Kneeling gives a one-time grace and lights the candle.
 	make_floating_label("A wayside chapel", pos + Vector3(0, 2.7, 1.5), Color(0.85, 0.82, 0.7))
+	var _cb2 := func(_p):
+		if GameState.has_flag("found_chapel_" + chapel_id):
+			return
+		GameState.set_flag("found_chapel_" + chapel_id, true)
+		SpiritualStateManager.apply_effects(kneel_effects)
+		GameState.add_inventory_item("chapels_found", 1)
+		var lit := make_material(Color(1.0, 0.9, 0.6))
+		lit.emission_enabled = true
+		lit.emission = Color(1.0, 0.85, 0.5)
+		lit.emission_energy_multiplier = 3.0
+		if is_instance_valid(candle):
+			candle.material_override = lit
+		make_light_burst(pos + Vector3(0, 1.0, -1.0), Color(1.0, 0.9, 0.6), 26)
+		EventBus.toast(kneel_text)
+		AudioManager.play_sfx("chapel_kneel")
+		_check_chapel_meta()
 	make_interactable(pos + Vector3(0, 0, 1.0), "Kneel a moment",
-		func(_p):
-			if GameState.has_flag("found_chapel_" + chapel_id):
-				return
-			GameState.set_flag("found_chapel_" + chapel_id, true)
-			SpiritualStateManager.apply_effects(kneel_effects)
-			GameState.add_inventory_item("chapels_found", 1)
-			var lit := make_material(Color(1.0, 0.9, 0.6))
-			lit.emission_enabled = true
-			lit.emission = Color(1.0, 0.85, 0.5)
-			lit.emission_energy_multiplier = 3.0
-			if is_instance_valid(candle):
-				candle.material_override = lit
-			make_light_burst(pos + Vector3(0, 1.0, -1.0), Color(1.0, 0.9, 0.6), 26)
-			EventBus.toast(kneel_text)
-			AudioManager.play_sfx("chapel_kneel")
-			_check_chapel_meta()
-		, null, Color(0.7, 0.65, 0.5), 0.6, 1.4, true)
+		_cb2, null, Color(0.7, 0.65, 0.5), 0.6, 1.4, true)
 
 
 func _check_chapel_meta() -> void:

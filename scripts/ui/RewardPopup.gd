@@ -4,12 +4,12 @@ extends CanvasLayer
 ## celebratory popup, then acknowledges them so they won't show again.
 ## No-op when offline.
 
-const TOKEN_NAMES := {
+var TOKEN_NAMES := {
 	"crown_of_life": LocaleManager.t("reward.crown", "生命冠冕"),
 	"palm_branch": LocaleManager.t("reward.palm", "棕榈枝"),
 	"pilgrims_staff": LocaleManager.t("reward.staff", "朝圣杖"),
 }
-const BOARD_NAMES := {
+var BOARD_NAMES := {
 	"fastest_run": LocaleManager.t("lb.board_fastest", "最快通关"),
 	"fewest_falls": LocaleManager.t("lb.board_fewest", "最少倒下"),
 	"devout_score": LocaleManager.t("lb.board_devout", "敬虔之心"),

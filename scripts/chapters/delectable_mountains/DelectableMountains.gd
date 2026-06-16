@@ -24,13 +24,13 @@ func _build_chapter() -> void:
 	make_npc("The Shepherds", Vector3(0, 0, -10), Color(0.8, 0.78, 0.6), "shepherds_counsel")
 
 	# The viewing glass — look toward the City.
+	var _cb1 := func(_p):
+		GameState.set_flag("saw_celestial_city", true)
+		QuestManager.update_quest_progress("visit_mountains")
+		SpiritualStateManager.apply_effects({"hope": 12, "faith": 6})
+		EventBus.toast("Through the glass: distant gates shining. The City is real, and the road is not vain.")
 	make_interactable(Vector3(4, 0, -10), "Look through the glass",
-		func(_p):
-			GameState.set_flag("saw_celestial_city", true)
-			QuestManager.update_quest_progress("visit_mountains")
-			SpiritualStateManager.apply_effects({"hope": 12, "faith": 6})
-			EventBus.toast("Through the glass: distant gates shining. The City is real, and the road is not vain.")
-		, null, Color(0.7, 0.8, 0.9), 0.5, 1.4, true)
+		_cb1, null, Color(0.7, 0.8, 0.9), 0.5, 1.4, true)
 
 	# The City, faint and golden, far off.
 	make_distant_light(Vector3(0, 8, -46), Color(1.0, 0.95, 0.7))
@@ -40,7 +40,7 @@ func _build_chapter() -> void:
 
 	spawn_player(Vector3(0, 1, 10))
 
-	make_trigger(Vector3(0, 1.5, -26), Vector3(20, 4, 2), func(_b):
+	var _cb2 := func(_b):
 		if not GameState.has_flag("saw_celestial_city"):
 			EventBus.toast("Receive the Shepherds' counsel and look through the glass before descending.")
 			return
@@ -48,4 +48,4 @@ func _build_chapter() -> void:
 		QuestManager.update_quest_progress("visit_mountains")
 		EventBus.toast("Heartened and warned, you descend toward the Enchanted Ground.")
 		_advance_after_delay()
-	, false)
+	make_trigger(Vector3(0, 1.5, -26), Vector3(20, 4, 2), _cb2, false)

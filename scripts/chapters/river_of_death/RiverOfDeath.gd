@@ -64,33 +64,33 @@ func _build_chapter() -> void:
 	# A still place on the near bank to set down the vanity bought at the fair —
 	# you cannot carry it across the last river.
 	make_floating_label("Lay it down here", Vector3(4, 1.8, 11), Color(0.8, 0.85, 0.8))
+	var _cb1 := func(_p):
+		if GameState.get_item_count("vanity_token") > 0:
+			GameState.inventory.erase("vanity_token")
+			SpiritualStateManager.apply_effects({"hope": 5, "pride": -6, "weariness": -4})
+			if is_instance_valid(player):
+				player.refresh_vanity()
+			make_light_burst(Vector3(4, 0.7, 11), Color(0.92, 0.95, 0.85), 44)
+			if is_instance_valid(player):
+				player.glance_toward(Vector3(2, 1.0, 14))
+			EventBus.toast("You set the fair's trinkets on the bank. Your hands are empty, and lighter, for the water.")
+			AudioManager.play_sfx("vanity_lay_down")
+		else:
+			EventBus.toast("Your hands are already empty. You carry nothing the river can take.")
 	make_interactable(Vector3(4, 0, 11), "Lay down what the fair sold you",
-		func(_p):
-			if GameState.get_item_count("vanity_token") > 0:
-				GameState.inventory.erase("vanity_token")
-				SpiritualStateManager.apply_effects({"hope": 5, "pride": -6, "weariness": -4})
-				if is_instance_valid(player):
-					player.refresh_vanity()
-				make_light_burst(Vector3(4, 0.7, 11), Color(0.92, 0.95, 0.85), 44)
-				if is_instance_valid(player):
-					player.glance_toward(Vector3(2, 1.0, 14))
-				EventBus.toast("You set the fair's trinkets on the bank. Your hands are empty, and lighter, for the water.")
-				AudioManager.play_sfx("vanity_lay_down")
-			else:
-				EventBus.toast("Your hands are already empty. You carry nothing the river can take.")
-		, null, Color(0.7, 0.8, 0.75), 0.5, 1.6, true)
+		_cb1, null, Color(0.7, 0.8, 0.75), 0.5, 1.6, true)
 
 	make_wayside_chapel(Vector3(-7, 0, 11), "river", {"faith": 8, "fear": -8}, "A last little chapel on the near bank. You commit the crossing to mercy.")
 
 	spawn_player(Vector3(0, 1, 14))
 
-	make_trigger(Vector3(0, 1.5, -22), Vector3(20, 4, 2), func(_b):
+	var _cb2 := func(_b):
 		GameState.set_flag("crossed_river", true)
 		QuestManager.update_quest_progress("cross_river")
 		EventBus.toast("Your feet find the far bank. Even the last river could not keep grace out.")
 		AudioManager.play_sfx("river_cross")
 		_advance_after_delay()
-	, false)
+	make_trigger(Vector3(0, 1.5, -22), Vector3(20, 4, 2), _cb2, false)
 
 
 func _process(delta: float) -> void:

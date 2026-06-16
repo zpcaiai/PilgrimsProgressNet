@@ -44,7 +44,7 @@ func _build_chapter() -> void:
 	spawn_player(Vector3(0, 1, 8))
 
 	# Leave through the gate — but only once Evangelist has set you on the way.
-	make_trigger(Vector3(0, 1.5, -21), Vector3(10, 4, 2), func(_b):
+	var _cb1 := func(_b):
 		if not GameState.has_flag("talked_to_evangelist"):
 			EventBus.toast("Do not flee blind. Speak with Evangelist and receive the way.")
 			return
@@ -52,4 +52,4 @@ func _build_chapter() -> void:
 		QuestManager.update_quest_progress("leave_city")
 		EventBus.toast("You leave the City of Destruction behind, carrying the burden into mercy's road.")
 		_advance_after_delay()
-	, false)
+	make_trigger(Vector3(0, 1.5, -21), Vector3(10, 4, 2), _cb1, false)

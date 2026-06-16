@@ -46,9 +46,9 @@ func _build_chapter() -> void:
 	_whisper(Vector3(0, 1.5, -26), "A whisper presses close: 'No one sees you here. No one keeps you.'")
 
 	# Lanterns of the Word — restore your light.
-	_lantern(Vector3(-2.5, 0, -6), lantern)
-	_lantern(Vector3(2.5, 0, -20), lantern)
-	_lantern(Vector3(-2.5, 0, -32), lantern)
+	_place_lantern(Vector3(-2.5, 0, -6), lantern)
+	_place_lantern(Vector3(2.5, 0, -20), lantern)
+	_place_lantern(Vector3(-2.5, 0, -32), lantern)
 
 	# Pools of deeper dark that snuff the lamp while you linger in them.
 	_shadow(Vector3(0, 1, -16))
@@ -62,12 +62,12 @@ func _build_chapter() -> void:
 	_vignette = DarkVignette.new()
 	add_child(_vignette)
 
-	make_trigger(Vector3(0, 1.5, -44), Vector3(8, 4, 2), func(_b):
+	var _cb1 := func(_b):
 		GameState.set_flag("crossed_shadow", true)
 		QuestManager.update_quest_progress("cross_shadow")
 		EventBus.toast("The path widens, and grey dawn proves the dark was not lord.")
 		_advance_after_delay()
-	, false)
+	make_trigger(Vector3(0, 1.5, -44), Vector3(8, 4, 2), _cb1, false)
 
 
 func _shadow(pos: Vector3) -> void:
@@ -118,17 +118,17 @@ func _spawn_fear_shade(pos: Vector3) -> void:
 
 
 func _whisper(pos: Vector3, text: String) -> void:
-	make_trigger(pos, Vector3(8, 4, 2), func(_b):
+	var _cb2 := func(_b):
 		SpiritualStateManager.apply_effects({"fear": 12})
 		EventBus.toast(text)
-	, true)
+	make_trigger(pos, Vector3(8, 4, 2), _cb2, true)
 
 
-func _lantern(pos: Vector3, lantern: PlayerLight) -> void:
+func _place_lantern(pos: Vector3, lantern: PlayerLight) -> void:
+	var _cb3 := func(_p):
+		lantern.add_boost(4.0)
+		SpiritualStateManager.apply_effects({"fear": -10, "faith": 5})
+		EventBus.toast("The Word steadies the lamp, and the next step appears.")
+		AudioManager.play_sfx("lantern_word")
 	make_interactable(pos, "Read the lantern of the Word",
-		func(_p):
-			lantern.add_boost(4.0)
-			SpiritualStateManager.apply_effects({"fear": -10, "faith": 5})
-			EventBus.toast("The Word steadies the lamp, and the next step appears.")
-			AudioManager.play_sfx("lantern_word")
-		, null, Color(1.0, 0.9, 0.6), 1.5, 1.3, true)
+		_cb3, null, Color(1.0, 0.9, 0.6), 1.5, 1.3, true)

@@ -44,12 +44,12 @@ func _build_chapter() -> void:
 
 	EventBus.dialogue_ended.connect(_on_dialogue_ended)
 
-	make_trigger(Vector3(0, 1.5, -32), Vector3(16, 4, 2), func(_b):
+	var _cb1 := func(_b):
 		if not GameState.has_flag("hopeful_joined"):
 			EventBus.toast("Do not leave alone. Find Hopeful in the crowd.")
 			return
 		_leave_fair()
-	, false)
+	make_trigger(Vector3(0, 1.5, -32), Vector3(16, 4, 2), _cb1, false)
 
 
 func _leave_fair() -> void:
@@ -87,9 +87,9 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 func _stall(pos: Vector3, ware: String, color: Color, buy_effects: Dictionary) -> void:
 	make_decor(Vector3(2.5, 2.5, 2.5), color, pos + Vector3(0, 1.25, 0), 0.6)
 	make_floating_label(ware, pos + Vector3(0, 3, 0), color)
+	var _cb2 := func(_p):
+		_active_ware = ware
+		_active_buy_effects = buy_effects
+		DialogueManager.start_dialogue("vanity_stall")
 	make_interactable(pos + Vector3(0, 0, 1.6), "Approach " + ware,
-		func(_p):
-			_active_ware = ware
-			_active_buy_effects = buy_effects
-			DialogueManager.start_dialogue("vanity_stall")
-		, null, color.darkened(0.2), 0.4, 1.6, false)
+		_cb2, null, color.darkened(0.2), 0.4, 1.6, false)

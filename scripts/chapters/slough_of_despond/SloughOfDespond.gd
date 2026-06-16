@@ -54,19 +54,19 @@ func _build_chapter() -> void:
 	spawn_player(Vector3(0, 1, 10))
 
 	# Pliable abandons you when you reach the mud's edge.
-	make_trigger(Vector3(0, 1.5, -12), Vector3(20, 4, 2), func(_b):
+	var _cb1 := func(_b):
 		if GameState.has_flag("pliable_left"):
 			return
 		DialogueManager.start_dialogue("pliable_leaves")
-	, true)
+	make_trigger(Vector3(0, 1.5, -12), Vector3(20, 4, 2), _cb1, true)
 
 	# Climbing out onto the far solid ground completes the chapter.
-	make_trigger(Vector3(0, 1.5, -50), Vector3(20, 4, 2), func(_b):
+	var _cb2 := func(_b):
 		GameState.set_flag("left_slough", true)
 		QuestManager.update_quest_progress("escape_slough")
 		EventBus.toast("You climb out onto solid ground, humbled but not abandoned.")
 		_advance_after_delay()
-	, false)
+	make_trigger(Vector3(0, 1.5, -50), Vector3(20, 4, 2), _cb2, false)
 
 
 func _add_mud(pos: Vector3, size: Vector3, deep: bool) -> void:

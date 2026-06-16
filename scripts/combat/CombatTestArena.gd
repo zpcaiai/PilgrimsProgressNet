@@ -33,13 +33,13 @@ func _build_chapter() -> void:
 	_spawn_enemy("despair_wraith", Vector3(0, 1, -10))
 
 	# A promise pickup to recharge.
+	var _cb1 := func(_p):
+		var c := get_tree().get_nodes_in_group("player_combat")
+		if c.size() > 0:
+			c[0].promise_charge = min(3, c[0].promise_charge + 1)
+		EventBus.toast("You take up a promise (charge +1).")
 	make_interactable(Vector3(-8, 0, 2), "Take up a promise",
-		func(_p):
-			var c := get_tree().get_nodes_in_group("player_combat")
-			if c.size() > 0:
-				c[0].promise_charge = min(3, c[0].promise_charge + 1)
-			EventBus.toast("You take up a promise (charge +1).")
-		, null, Color(0.9, 0.85, 0.5), 1.5, 1.2, false)
+		_cb1, null, Color(0.9, 0.85, 0.5), 1.5, 1.2, false)
 
 	# Summon the boss.
 	make_interactable(Vector3(8, 0, 2), "Summon Apollyon",

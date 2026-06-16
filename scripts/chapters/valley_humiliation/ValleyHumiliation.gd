@@ -34,11 +34,11 @@ func _build_chapter() -> void:
 	add_child(CombatHUD.new())
 
 	# Crossing into the valley summons Apollyon.
-	make_trigger(Vector3(0, 1.5, -6), Vector3(28, 4, 2), func(_b):
+	var _cb1 := func(_b):
 		if not GameState.has_flag("apollyon_met"):
 			GameState.set_flag("apollyon_met", true)
 			DialogueManager.start_dialogue("apollyon_encounter")
-	, true)
+	make_trigger(Vector3(0, 1.5, -6), Vector3(28, 4, 2), _cb1, true)
 
 	EventBus.dialogue_ended.connect(_on_dialogue_ended)
 

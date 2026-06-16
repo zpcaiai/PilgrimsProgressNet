@@ -30,9 +30,9 @@ func _build_chapter() -> void:
 
 	spawn_player(Vector3(0, 1, 8))
 
-	make_trigger(Vector3(0, 1.5, -40), Vector3(12, 4, 2), func(_b):
+	var _cb1 := func(_b):
 		GameState.set_flag("entered_slough", true)
 		QuestManager.update_quest_progress("cross_wilderness")
 		EventBus.toast("The ground softens, and the first deep discouragement opens underfoot.")
 		_advance_after_delay()
-	, false)
+	make_trigger(Vector3(0, 1.5, -40), Vector3(12, 4, 2), _cb1, false)

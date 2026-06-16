@@ -32,17 +32,17 @@ func _build_chapter() -> void:
 
 	# Left: Danger — a dark dead end that breeds deception.
 	make_block(Vector3(11, 4, 1), Color(0.3, 0.34, 0.4), Vector3(-12, 2, -26))
-	make_trigger(Vector3(-12, 1.5, -22), Vector3(10, 4, 2), func(_b):
+	var _cb1 := func(_b):
 		SpiritualStateManager.apply_effects({"deception": 10, "discernment": -4})
 		EventBus.toast("Danger hides its end in thorns and shadow. Turn back to the true path.")
-	, true)
+	make_trigger(Vector3(-12, 1.5, -22), Vector3(10, 4, 2), _cb1, true)
 
 	# Right: Destruction — wide, comfortable, ending in a sudden drop.
 	make_block(Vector3(11, 4, 1), Color(0.5, 0.4, 0.34), Vector3(12, 2, -26))
-	make_trigger(Vector3(12, 1.5, -22), Vector3(10, 4, 2), func(_b):
+	var _cb2 := func(_b):
 		SpiritualStateManager.apply_effects({"despair": 12, "weariness": 8})
 		EventBus.toast("Destruction stays wide until it breaks beneath you. Stagger back to truth.")
-	, true)
+	make_trigger(Vector3(12, 1.5, -22), Vector3(10, 4, 2), _cb2, true)
 
 	# Middle: the true, steep way — slow going, with a tempting rest arbor.
 	_add_steep_zone(Vector3(0, 1, -14), Vector3(10, 2, 22))
@@ -56,12 +56,12 @@ func _build_chapter() -> void:
 
 	spawn_player(Vector3(0, 1, 9))
 
-	make_trigger(Vector3(0, 1.5, -33), Vector3(10, 4, 2), func(_b):
+	var _cb3 := func(_b):
 		GameState.set_flag("reached_summit", true)
 		QuestManager.update_quest_progress("climb_hill")
 		EventBus.toast("You crest the summit, breathless and kept. Palace lights glow ahead.")
 		_advance_after_delay()
-	, false)
+	make_trigger(Vector3(0, 1.5, -33), Vector3(10, 4, 2), _cb3, false)
 
 
 # Make the three ways read at a glance: Danger looks ominous, Destruction looks

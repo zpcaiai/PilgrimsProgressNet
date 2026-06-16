@@ -24,7 +24,7 @@ var _mode_btns: Array = []
 var _avatar_rect: TextureRect
 var _avatar_dialog: FileDialog
 
-const TOKEN_NAMES := {
+var TOKEN_NAMES := {
 	"crown_of_life": LocaleManager.t("reward.crown", "生命冠冕"),
 	"palm_branch": LocaleManager.t("reward.palm", "棕榈枝"),
 	"pilgrims_staff": LocaleManager.t("reward.staff", "朝圣杖"),

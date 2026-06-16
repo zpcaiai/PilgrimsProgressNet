@@ -32,13 +32,13 @@ func _build_chapter() -> void:
 		GameState.set_flag("found_promise_key", true)
 		EventBus.toast("You feel the key called Promise near your heart; despair had made you forget it.")
 	else:
+		var _cb1 := func(_p):
+			SpiritualStateManager.has_promise_key = true
+			GameState.set_flag("found_promise_key", true)
+			QuestManager.update_quest_progress("escape_doubting_castle")
+			EventBus.toast("In your own breast pocket: Promise, waiting where despair told you not to look.")
 		make_interactable(Vector3(-2.8, 0, 2), "Search the cell",
-			func(_p):
-				SpiritualStateManager.has_promise_key = true
-				GameState.set_flag("found_promise_key", true)
-				QuestManager.update_quest_progress("escape_doubting_castle")
-				EventBus.toast("In your own breast pocket: Promise, waiting where despair told you not to look.")
-			, null, Color(0.85, 0.8, 0.5), 0.8, 1.2, true)
+			_cb1, null, Color(0.85, 0.8, 0.5), 0.8, 1.2, true)
 
 	# The locked door.
 	make_floating_label("Locked Door — Promise fits", Vector3(0, 4, -4), Color(0.8, 0.7, 0.6))

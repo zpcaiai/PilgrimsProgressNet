@@ -85,8 +85,8 @@ func _on_net_stats(latency_ms: int, quality: String) -> void:
 func _set_net(latency_ms: int, quality: String) -> void:
 	_panel.visible = true
 	_net_label.visible = true
-	var label := {"good": LocaleManager.t("net.good", "通畅"), "fair": LocaleManager.t("net.fair", "一般"), "poor": LocaleManager.t("net.unstable", "不稳")}.get(quality, quality)
-	var col := {"good": Color(0.6, 0.9, 0.7), "fair": Color(0.9, 0.85, 0.5),
+	var label: String = {"good": LocaleManager.t("net.good", "通畅"), "fair": LocaleManager.t("net.fair", "一般"), "poor": LocaleManager.t("net.unstable", "不稳")}.get(quality, quality)
+	var col: Color = {"good": Color(0.6, 0.9, 0.7), "fair": Color(0.9, 0.85, 0.5),
 		"poor": Color(0.9, 0.55, 0.55)}.get(quality, Color(0.7, 0.7, 0.8))
 	_net_label.add_theme_color_override("font_color", col)
 	if latency_ms >= 0:

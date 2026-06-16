@@ -90,8 +90,7 @@ func _build() -> void:
 func _can_use() -> bool:
 	if not NetConfig.enabled:
 		return false
-	var auth := get_node_or_null("/root/AuthService")
-	return auth != null and auth.is_online
+	return AuthService.is_online
 
 
 func _submit() -> void:

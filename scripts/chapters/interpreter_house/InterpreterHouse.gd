@@ -37,7 +37,7 @@ func _build_chapter() -> void:
 	make_distant_light(Vector3(0, 4, -30))
 	spawn_player(Vector3(0, 1, 8))
 
-	make_trigger(Vector3(0, 1.5, -24), Vector3(20, 4, 2), func(_b):
+	var _cb1 := func(_b):
 		if _lessons_seen < 2:
 			EventBus.toast("Do not hurry past mercy's instruction. Consider at least two of the rooms.")
 			return
@@ -45,7 +45,7 @@ func _build_chapter() -> void:
 		QuestManager.update_quest_progress("visit_interpreter")
 		EventBus.toast("You step out with clearer sight, and the hill waits ahead.")
 		_advance_after_delay()
-	, false)
+	make_trigger(Vector3(0, 1.5, -24), Vector3(20, 4, 2), _cb1, false)
 
 
 func _lesson(pos: Vector3, title: String, text: String, effects: Dictionary) -> void:
@@ -59,26 +59,26 @@ func _lesson(pos: Vector3, title: String, text: String, effects: Dictionary) -> 
 	symbol.position = pos + Vector3(0, 1.3, 0)
 	symbol.material_override = make_material(Color(0.3, 0.26, 0.2))
 	add_child(symbol)
+	var _cb2 := func(_p):
+		SpiritualStateManager.apply_effects(effects)
+		_lessons_seen += 1
+		GameState.set_flag("saw_interpreter_lesson", true)
+		QuestManager.update_quest_progress("visit_interpreter")
+		var lit := make_material(Color(1.0, 0.9, 0.6))
+		lit.emission_enabled = true
+		lit.emission = Color(1.0, 0.85, 0.55)
+		lit.emission_energy_multiplier = 2.5
+		symbol.material_override = lit
+		var lamp := OmniLight3D.new()
+		lamp.light_color = Color(1.0, 0.88, 0.6)
+		lamp.light_energy = 2.0
+		lamp.omni_range = 6.0
+		symbol.add_child(lamp)
+		if _lessons_seen >= 3:
+			SpiritualStateManager.apply_effects({"discernment": 5, "watchfulness": 5, "hope": 3})
+			GameState.set_flag("interpreter_full", true)
+			EventBus.toast("All three rooms considered. A quiet insight settles — you will know the lamp, the dust, and the patient way when you meet them on the road. " + text)
+		else:
+			EventBus.toast("(%d/2 considered)  %s" % [_lessons_seen, text])
 	make_interactable(pos, "Consider: " + title,
-		func(_p):
-			SpiritualStateManager.apply_effects(effects)
-			_lessons_seen += 1
-			GameState.set_flag("saw_interpreter_lesson", true)
-			QuestManager.update_quest_progress("visit_interpreter")
-			var lit := make_material(Color(1.0, 0.9, 0.6))
-			lit.emission_enabled = true
-			lit.emission = Color(1.0, 0.85, 0.55)
-			lit.emission_energy_multiplier = 2.5
-			symbol.material_override = lit
-			var lamp := OmniLight3D.new()
-			lamp.light_color = Color(1.0, 0.88, 0.6)
-			lamp.light_energy = 2.0
-			lamp.omni_range = 6.0
-			symbol.add_child(lamp)
-			if _lessons_seen >= 3:
-				SpiritualStateManager.apply_effects({"discernment": 5, "watchfulness": 5, "hope": 3})
-				GameState.set_flag("interpreter_full", true)
-				EventBus.toast("All three rooms considered. A quiet insight settles — you will know the lamp, the dust, and the patient way when you meet them on the road. " + text)
-			else:
-				EventBus.toast("(%d/2 considered)  %s" % [_lessons_seen, text])
-		, null, Color(0.7, 0.6, 0.4), 0.6, 1.4, true)
+		_cb2, null, Color(0.7, 0.6, 0.4), 0.6, 1.4, true)

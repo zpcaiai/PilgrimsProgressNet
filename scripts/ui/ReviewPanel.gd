@@ -6,10 +6,10 @@ extends CanvasLayer
 
 const FONT_TITLE := 22
 const FONT_BODY := 17
-const BOARD_NAMES := {
+var BOARD_NAMES := {
 	"fastest_run": LocaleManager.t("lb.board_fastest", "最快通关"), "fewest_falls": LocaleManager.t("lb.board_fewest", "最少倒下"), "devout_score": LocaleManager.t("lb.board_devout", "敬虔之心"),
 }
-const STATUS_NAMES := {
+var STATUS_NAMES := {
 	"pending": LocaleManager.t("review.st_pending", "待重算"), "approved": LocaleManager.t("review.st_approved", "已通过"), "rejected": LocaleManager.t("review.st_rejected", "已拒绝"), "appealed": LocaleManager.t("review.st_appealed", "申诉中"),
 }
 const STATUS_COLORS := {

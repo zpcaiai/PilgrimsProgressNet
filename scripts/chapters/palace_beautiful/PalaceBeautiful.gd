@@ -39,16 +39,16 @@ func _build_chapter() -> void:
 	# The library — records of pilgrims who walked before you.
 	make_decor(Vector3(3, 2, 0.6), Color(0.4, 0.3, 0.24), Vector3(-7, 1, -14))
 	make_floating_label("Library", Vector3(-7, 2.4, -14), Color(0.85, 0.82, 0.6))
+	var _cb1 := func(_p):
+		SpiritualStateManager.apply_effects({"discernment": 6, "faith": 4, "hope": 4})
+		EventBus.toast("Account after account says the same thing: grace kept them, and grace can keep you.")
 	make_interactable(Vector3(-7, 0, -12.6), "Read the records of pilgrims who endured",
-		func(_p):
-			SpiritualStateManager.apply_effects({"discernment": 6, "faith": 4, "hope": 4})
-			EventBus.toast("Account after account says the same thing: grace kept them, and grace can keep you.")
-		, null, Color(0.6, 0.5, 0.4), 0.3, 1.4, true)
+		_cb1, null, Color(0.6, 0.5, 0.4), 0.3, 1.4, true)
 
 	make_distant_label_to_valley()
 	spawn_player(Vector3(0, 1, 8))
 
-	make_trigger(Vector3(0, 1.5, -22), Vector3(16, 5, 2), func(_b):
+	var _cb2 := func(_b):
 		if not GameState.has_flag("took_armour"):
 			EventBus.toast("The valley will accuse you. Speak with Watchful and take up the armour first.")
 			return
@@ -56,7 +56,7 @@ func _build_chapter() -> void:
 		QuestManager.update_quest_progress("rest_palace")
 		EventBus.toast("Armed with faith and warned by love, you descend toward the valley.")
 		_advance_after_delay()
-	, false)
+	make_trigger(Vector3(0, 1.5, -22), Vector3(16, 5, 2), _cb2, false)
 
 
 func make_distant_label_to_valley() -> void:

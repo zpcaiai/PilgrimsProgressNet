@@ -8,7 +8,7 @@ extends CanvasLayer
 ## a no-op when networking is disabled — in that case this panel shows an
 ## "offline" notice instead of erroring.
 
-const BOARDS := [
+var BOARDS := [
 	{"id": "fastest_run", "title": LocaleManager.t("lb.board_fastest", "最快通关")},
 	{"id": "fewest_falls", "title": LocaleManager.t("lb.board_fewest", "最少倒下")},
 	{"id": "devout_score", "title": LocaleManager.t("lb.board_devout", "敬虔之心")},
