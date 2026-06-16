@@ -23,6 +23,10 @@ func _ready() -> void:
 	_build_chapter()
 	_apply_art_palette()
 	_attach_backdrop()
+	# Reshape pass: bespoke per-chapter lighting rig, atmosphere (fog/glow/
+	# tonemap), environmental set-dressing and the painterly post-process — all
+	# layered on top of the chapter's own gameplay geometry.
+	_apply_world_rebuild()
 	if player == null:
 		spawn_player(_spawn_position)
 	# Re-spawn a travelling companion if one has joined the pilgrim.
@@ -207,6 +211,8 @@ func make_material(color: Color, emission: float = 0.0) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
 	m.roughness = 0.95
+	# Subdue speculars so lit greybox reads as painted matte form, not plastic.
+	m.metallic_specular = 0.3
 	if emission > 0.0:
 		m.emission_enabled = true
 		m.emission = color
@@ -241,6 +247,16 @@ func make_ground(size: Vector2, color: Color, pos: Vector3 = Vector3.ZERO) -> St
 		gmat.albedo_color = Color(t.r / mx, t.g / mx, t.b / mx)
 		gmat.albedo_texture = gtex
 		gmat.uv1_scale = Vector3(maxf(1.0, size.x / 4.0), maxf(1.0, size.y / 4.0), 1.0)
+		# PBR companion maps (derived by tools/gen_pbr.py) give the ground real
+		# surface relief and varied roughness under the per-chapter lighting.
+		var gn := AssetLib.ground_map(ChapterManager.current_chapter_id, "normal")
+		if gn != null:
+			gmat.normal_enabled = true
+			gmat.normal_texture = gn
+			gmat.normal_scale = 1.0
+		var grm := AssetLib.ground_map(ChapterManager.current_chapter_id, "rough")
+		if grm != null:
+			gmat.roughness_texture = grm
 	mesh.material_override = gmat
 	body.add_child(mesh)
 
@@ -255,7 +271,7 @@ func make_ground(size: Vector2, color: Color, pos: Vector3 = Vector3.ZERO) -> St
 	return body
 
 
-func make_block(size: Vector3, color: Color, pos: Vector3, emission: float = 0.0) -> StaticBody3D:
+func make_block(size: Vector3, color: Color, pos: Vector3, emission: float = 0.0, surface: String = "") -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	body.position = pos
@@ -263,7 +279,7 @@ func make_block(size: Vector3, color: Color, pos: Vector3, emission: float = 0.0
 	var box := BoxMesh.new()
 	box.size = size
 	mesh.mesh = box
-	mesh.material_override = make_material(color, emission)
+	mesh.material_override = _surface_or_color(surface, color, emission)
 	body.add_child(mesh)
 	var col := CollisionShape3D.new()
 	var cshape := BoxShape3D.new()
@@ -274,7 +290,7 @@ func make_block(size: Vector3, color: Color, pos: Vector3, emission: float = 0.0
 	return body
 
 
-func make_ramp(size: Vector3, color: Color, pos: Vector3, angle_deg: float) -> StaticBody3D:
+func make_ramp(size: Vector3, color: Color, pos: Vector3, angle_deg: float, surface: String = "") -> StaticBody3D:
 	# A walkable slope (rotated about X). Keep angle below ~30 so the pilgrim
 	# can climb it with the default floor angle.
 	var body := StaticBody3D.new()
@@ -285,7 +301,7 @@ func make_ramp(size: Vector3, color: Color, pos: Vector3, angle_deg: float) -> S
 	var box := BoxMesh.new()
 	box.size = size
 	mesh.mesh = box
-	mesh.material_override = make_material(color)
+	mesh.material_override = _surface_or_color(surface, color)
 	body.add_child(mesh)
 	var col := CollisionShape3D.new()
 	var cshape := BoxShape3D.new()
@@ -296,14 +312,14 @@ func make_ramp(size: Vector3, color: Color, pos: Vector3, angle_deg: float) -> S
 	return body
 
 
-func make_decor(size: Vector3, color: Color, pos: Vector3, emission: float = 0.0) -> MeshInstance3D:
+func make_decor(size: Vector3, color: Color, pos: Vector3, emission: float = 0.0, surface: String = "") -> MeshInstance3D:
 	# Non-colliding visual prop.
 	var mesh := MeshInstance3D.new()
 	var box := BoxMesh.new()
 	box.size = size
 	mesh.mesh = box
 	mesh.position = pos
-	mesh.material_override = make_material(color, emission)
+	mesh.material_override = _surface_or_color(surface, color, emission)
 	add_child(mesh)
 	return mesh
 
@@ -590,3 +606,210 @@ func _check_chapel_meta() -> void:
 		GameState.set_flag("chapel_pilgrim", true)
 		EventBus.toast("You have not passed one prayer-place by. This quiet faithfulness will be remembered at the end.")
 		AudioManager.play_sfx("blessing")
+
+
+# ===========================================================================
+# World rebuild — painterly / PBR / per-chapter lighting reshape
+# ===========================================================================
+## Material helper: a named PBR surface (from MaterialKit) when `surface` is
+## given, else the flat painterly colour material. Keeps make_block/ramp/decor
+## backward compatible while letting dressing request real textured surfaces.
+func _surface_or_color(surface: String, color: Color, emission: float = 0.0) -> StandardMaterial3D:
+	if surface != "":
+		var opts: Dictionary = {}
+		if emission > 0.0:
+			opts["emission"] = emission
+		return MaterialKit.make(surface, color, opts)
+	return make_material(color, emission)
+
+
+## Apply the chapter's art profile after its gameplay geometry is built.
+func _apply_world_rebuild() -> void:
+	var prof := ChapterArtProfiles.for_chapter(ChapterManager.current_chapter_id)
+	_apply_environment(prof)
+	_apply_lighting(prof)
+	_apply_dressing(prof.get("dressing", []))
+	_attach_postfx(prof.get("post", {}))
+
+
+func _find_or_make_env() -> Environment:
+	for c in get_children():
+		if c is WorldEnvironment:
+			var e: Environment = (c as WorldEnvironment).environment
+			if e != null:
+				return e
+	var we := WorldEnvironment.new()
+	var env := Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0.06, 0.06, 0.09)
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	we.environment = env
+	add_child(we)
+	return env
+
+
+## Fog (depth + volumetric), glow, tonemap, colour adjustment and SSAO/SSIL,
+## tuned per chapter. The chapter painting stays the sky/ambient source; this
+## only adds atmosphere and grade on top. Volumetric/SSAO/SSIL apply on Forward+
+## and are harmlessly ignored on the gl_compatibility fallback.
+func _apply_environment(prof: Dictionary) -> void:
+	var env := _find_or_make_env()
+	if env == null:
+		return
+	var amb: Dictionary = prof.get("ambient", {})
+	env.ambient_light_energy = float(amb.get("energy", 0.6))
+	if env.ambient_light_source == Environment.AMBIENT_SOURCE_COLOR:
+		env.ambient_light_color = amb.get("color", Color(0.5, 0.5, 0.55))
+
+	var fog: Dictionary = prof.get("fog", {})
+	env.fog_enabled = bool(fog.get("enabled", false))
+	if env.fog_enabled:
+		env.fog_light_color = fog.get("color", Color(0.6, 0.6, 0.62))
+		env.fog_density = float(fog.get("density", 0.012))
+		env.fog_aerial_perspective = float(fog.get("aerial", 0.4))
+		env.fog_sky_affect = 0.3
+	if bool(fog.get("volumetric", false)):
+		env.volumetric_fog_enabled = true
+		env.volumetric_fog_density = float(fog.get("vol_density", 0.03))
+		env.volumetric_fog_albedo = fog.get("albedo", Color(0.7, 0.72, 0.75))
+		env.volumetric_fog_emission = fog.get("emission", Color(0, 0, 0))
+		env.volumetric_fog_emission_energy = float(fog.get("emission_energy", 0.0))
+		env.volumetric_fog_length = 96.0
+		env.volumetric_fog_gi_inject = 0.5
+
+	var glow: Dictionary = prof.get("glow", {})
+	env.glow_enabled = bool(glow.get("enabled", true))
+	if env.glow_enabled:
+		env.glow_intensity = float(glow.get("intensity", 0.8))
+		env.glow_strength = float(glow.get("strength", 1.0))
+		env.glow_bloom = float(glow.get("bloom", 0.1))
+		env.glow_hdr_threshold = float(glow.get("threshold", 0.9))
+		env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+
+	var tm: Dictionary = prof.get("tonemap", {})
+	env.tonemap_mode = _tonemap_enum(String(tm.get("mode", "aces")))
+	env.tonemap_exposure = float(tm.get("exposure", 1.0))
+	env.tonemap_white = float(tm.get("white", 1.0))
+
+	var adj: Dictionary = prof.get("adjust", {})
+	env.adjustment_enabled = true
+	env.adjustment_brightness = float(adj.get("brightness", 1.0))
+	env.adjustment_contrast = float(adj.get("contrast", 1.05))
+	env.adjustment_saturation = float(adj.get("saturation", 1.08))
+
+	env.ssao_enabled = bool(prof.get("ssao", true))
+	if env.ssao_enabled:
+		env.ssao_radius = 2.0
+		env.ssao_intensity = 1.5
+	env.ssil_enabled = bool(prof.get("ssil", false))
+
+
+func _tonemap_enum(mode: String) -> int:
+	match mode:
+		"filmic":
+			return Environment.TONE_MAPPER_FILMIC
+		"agx":
+			return Environment.TONE_MAPPER_AGX
+		"linear":
+			return Environment.TONE_MAPPER_LINEAR
+		_:
+			return Environment.TONE_MAPPER_ACES
+
+
+## Bespoke lighting rig: reconfigure the existing sun as a shadow-casting key
+## light from the profile, then add a soft shadowless fill from the opposite
+## side for painterly form modelling.
+func _apply_lighting(prof: Dictionary) -> void:
+	var sun_d: Dictionary = prof.get("sun", {})
+	var key: DirectionalLight3D = null
+	for c in get_children():
+		if c is DirectionalLight3D:
+			key = c as DirectionalLight3D
+			break
+	if key == null:
+		key = DirectionalLight3D.new()
+		add_child(key)
+	key.rotation_degrees = sun_d.get("angle", Vector3(-50, -40, 0))
+	var kc: Color = sun_d.get("color", Color(1, 1, 1))
+	if _pal_ok:
+		kc = kc.lerp(_pal_top, 0.15)
+	key.light_color = kc
+	key.light_energy = float(sun_d.get("energy", 1.1))
+	key.shadow_enabled = true
+	key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+	key.shadow_blur = 1.2
+	key.light_angular_distance = 1.0
+
+	var fill_d: Dictionary = prof.get("fill", {})
+	var fill := DirectionalLight3D.new()
+	fill.rotation_degrees = fill_d.get("angle", Vector3(-25, 150, 0))
+	fill.light_color = fill_d.get("color", Color(0.6, 0.7, 0.85))
+	fill.light_energy = float(fill_d.get("energy", 0.3))
+	fill.shadow_enabled = false
+	add_child(fill)
+
+
+func _apply_dressing(list: Array) -> void:
+	for item in list:
+		if item is Dictionary:
+			_dress_one(item)
+
+
+## Interpret one dressing entry. Every value is read with a safe default so a
+## partially-specified entry still works.
+func _dress_one(d: Dictionary) -> void:
+	var op := String(d.get("op", ""))
+	var tint: Color = d.get("tint", Color(1, 1, 1))
+	match op:
+		"scatter":
+			PropKit.scatter(self, String(d.get("kind", "rock")), d.get("center", Vector3.ZERO), d.get("area", Vector2(10, 10)), int(d.get("count", 6)), tint, int(d.get("seed", 1)))
+		"grass":
+			PropKit.grass_field(self, d.get("center", Vector3.ZERO), d.get("area", Vector2(40, 40)), int(d.get("count", 400)), tint, int(d.get("seed", 7)))
+		"reeds":
+			PropKit.reeds(self, d.get("center", Vector3.ZERO), d.get("area", Vector2(8, 16)), int(d.get("count", 40)), tint, int(d.get("seed", 11)))
+		"mist":
+			PropKit.mist(self, d.get("center", Vector3.ZERO), d.get("area", Vector2(30, 30)), float(d.get("height", 1.4)), d.get("color", Color(0.7, 0.72, 0.75)), int(d.get("seed", 4)))
+		"smoke":
+			PropKit.smoke(self, d.get("pos", Vector3.ZERO), float(d.get("scale", 1.0)), d.get("color", Color(0.12, 0.11, 0.12)))
+		"fire":
+			PropKit.fire(self, d.get("pos", Vector3.ZERO), float(d.get("scale", 1.0)), d.get("color", Color(1.0, 0.55, 0.2)))
+		"shaft":
+			PropKit.light_shaft(self, d.get("pos", Vector3.ZERO), float(d.get("length", 14)), float(d.get("radius", 3)), d.get("color", Color(1.0, 0.93, 0.7)))
+		"water":
+			PropKit.water_plane(self, d.get("center", Vector3.ZERO), d.get("size", Vector2(20, 20)), tint)
+		"ridge":
+			PropKit.ridge(self, d.get("center", Vector3.ZERO), float(d.get("length", 60)), float(d.get("height", 20)), tint, String(d.get("surface", "stone")), int(d.get("seed", 9)))
+		"cliff":
+			PropKit.cliff(self, d.get("pos", Vector3.ZERO), d.get("size", Vector3(6, 8, 10)), tint, String(d.get("surface", "stone")), int(d.get("seed", 3)))
+		"boulders":
+			PropKit.boulder_cluster(self, d.get("center", Vector3.ZERO), int(d.get("count", 5)), float(d.get("scale", 1.4)), tint, String(d.get("surface", "stone")), int(d.get("seed", 5)))
+		"arch":
+			PropKit.arch(self, d.get("pos", Vector3.ZERO), float(d.get("width", 3)), float(d.get("height", 4)), tint, String(d.get("surface", "stone")))
+		"wall":
+			PropKit.wall(self, d.get("pos", Vector3.ZERO), float(d.get("length", 6)), float(d.get("height", 3)), tint, String(d.get("surface", "stone")), int(d.get("axis", 0)))
+		"castle_wall":
+			PropKit.castle_wall(self, d.get("pos", Vector3.ZERO), float(d.get("length", 8)), float(d.get("height", 4)), tint, int(d.get("axis", 0)), int(d.get("seed", 2)))
+		"pillar":
+			PropKit.pillar(self, d.get("pos", Vector3.ZERO), float(d.get("height", 4)), tint, String(d.get("surface", "marble")))
+		"gate":
+			PropKit.gate(self, d.get("pos", Vector3.ZERO), tint, bool(d.get("open", true)))
+		"cross":
+			PropKit.cross(self, d.get("pos", Vector3.ZERO), float(d.get("height", 4)), tint, bool(d.get("glow", true)))
+		"tomb":
+			PropKit.tomb(self, d.get("pos", Vector3.ZERO), tint)
+		"banner":
+			PropKit.banner(self, d.get("pos", Vector3.ZERO), float(d.get("height", 4)), tint)
+		"stall":
+			PropKit.market_stall(self, d.get("pos", Vector3.ZERO), tint, d.get("cloth", Color(0.7, 0.2, 0.25)))
+		"lantern":
+			PropKit.lantern_post(self, d.get("pos", Vector3.ZERO), tint, d.get("color", Color(1.0, 0.85, 0.55)))
+		"tree":
+			PropKit.tree(self, d.get("pos", Vector3.ZERO), float(d.get("height", 4)), tint, int(d.get("seed", 0)))
+		"pine":
+			PropKit.pine(self, d.get("pos", Vector3.ZERO), float(d.get("height", 5)), tint, int(d.get("seed", 0)))
+		"bush":
+			PropKit.bush(self, d.get("pos", Vector3.ZERO), float(d.get("radius", 0.8)), tint, int(d.get("seed", 0)))
+
+
+func _attach_postfx(post: Dictionary) -> void:
+	PainterlyPostFX.attach(self, post)

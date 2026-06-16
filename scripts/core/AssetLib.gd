@@ -18,6 +18,7 @@ class_name AssetLib
 ##   res://assets/anim/<name>.png                    horizontal flipbook sheets
 
 const GROUND_DIR := "res://assets/textures/ground/"
+const PBR_DIR := "res://assets/textures/pbr/"
 const SCENE_DIR := "res://assets/scenes/"
 const CHAR_DIR := "res://assets/characters/"
 const PARTICLE_DIR := "res://assets/textures/particles/"
@@ -50,6 +51,20 @@ static func tex(path: String) -> Texture2D:
 
 static func ground(chapter_id: String) -> Texture2D:
 	return tex(GROUND_DIR + chapter_id + ".png")
+
+
+## Per-chapter ground PBR companion maps. Albedo is `<id>.png` (ground()); the
+## derived maps sit beside it as `<id>_n.png` (normal) and `<id>_r.png` (rough).
+## channel in {"normal","rough"}. Returns null if absent (flat fallback).
+static func ground_map(chapter_id: String, channel: String) -> Texture2D:
+	var suffix := "n" if channel == "normal" else "r"
+	return tex(GROUND_DIR + chapter_id + "_" + suffix + ".png")
+
+
+## Surface-library PBR map. assets/textures/pbr/<surface>_<channel>.png
+## channel in {"albedo","normal","rough","ao"}. Returns null if absent.
+static func pbr(surface: String, channel: String) -> Texture2D:
+	return tex(PBR_DIR + surface + "_" + channel + ".png")
 
 
 static func scene_art(chapter_id: String) -> Texture2D:

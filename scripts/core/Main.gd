@@ -6,6 +6,7 @@ extends Node3D
 const HUD_SCRIPT := preload("res://scripts/ui/HUD.gd")
 const DATA_VALIDATOR := preload("res://scripts/core/DataValidator.gd")
 const NET_UI := preload("res://scenes/ui/NetUI.tscn")
+const TOUCH_CONTROLS := preload("res://scripts/ui/TouchControls.gd")
 
 var _world_root: Node3D
 var _hud: CanvasLayer
@@ -16,6 +17,7 @@ var _route_visible: bool = false
 var _pause_layer: CanvasLayer
 var _pause_visible: bool = false
 var _in_game: bool = false
+var _touch: CanvasLayer
 
 
 func _ready() -> void:
@@ -35,6 +37,11 @@ func _ready() -> void:
 	# marker input M). Self-hide and no-op when networking is offline, so this
 	# is safe even with no backend running.
 	add_child(NET_UI.instantiate())
+
+	# On-screen touch keypad (WASD + Space/E + 1-4 + C/Tab/Esc). Only active on a
+	# touchscreen; self-hides outside gameplay. See scripts/ui/TouchControls.gd.
+	_touch = TOUCH_CONTROLS.new()
+	add_child(_touch)
 
 	_menu_layer = CanvasLayer.new()
 	_menu_layer.layer = 20
@@ -170,6 +177,8 @@ func _add_button(vb: VBoxContainer, text: String, cb: Callable) -> Button:
 # ---------------------------------------------------------------------------
 func _show_title() -> void:
 	_in_game = false
+	if _touch:
+		_touch.set_gameplay(false)
 	_hud.visible = false
 	_clear_menu()
 	var panel := _make_fullscreen_panel(Color(0.04, 0.04, 0.08, 1.0))
@@ -224,6 +233,8 @@ func start_new_game(mode: String = "standard") -> void:
 	_clear_menu()
 	_hud.visible = true
 	_in_game = true
+	if _touch:
+		_touch.set_gameplay(true)
 	EventBus.game_started.emit()
 	if mode == "child":
 		EventBus.toast(LocaleManager.t("toast.child_mode", "Children's Journey — a gentle road. Take your time."))
@@ -236,6 +247,8 @@ func continue_game() -> void:
 	_clear_menu()
 	_hud.visible = true
 	_in_game = true
+	if _touch:
+		_touch.set_gameplay(true)
 	var chapter := GameState.current_chapter_id
 	if chapter == "":
 		chapter = "city_of_destruction"
