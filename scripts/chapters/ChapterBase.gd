@@ -22,6 +22,11 @@ func _ready() -> void:
 	# Ease every chapter in from black so transitions between scenes of very
 	# different brightness never hard-cut.
 	_fade_in()
+	# Spawn the player (and its camera) FIRST, so a runtime error in any later
+	# build/dressing step can never leave the scene cameraless (black). The
+	# chapter's own spawn_player(...) call later just repositions this one.
+	if player == null:
+		spawn_player(_spawn_position)
 	# Oil-painting layers (palette harmonising + painting-as-sky) only run in the
 	# stylised look. Realistic mode uses a clean procedural (or photo) sky.
 	if not RenderConfig.is_realistic():
@@ -434,6 +439,11 @@ func make_floating_label(text: String, pos: Vector3, color: Color = Color.WHITE)
 # Player
 # ---------------------------------------------------------------------------
 func spawn_player(pos: Vector3) -> PlayerController:
+	# Idempotent: if a player already exists (e.g. pre-spawned in _ready), just
+	# move it to the requested position instead of creating a second one.
+	if is_instance_valid(player):
+		player.teleport(pos)
+		return player
 	player = PlayerController.new()
 	player.name = "Player"
 	add_child(player)

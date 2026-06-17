@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://csejca6fcqcwt"]
 
-[ext_resource type="Script" path="res://scripts/core/Main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://mv3gd6027054" path="res://scripts/core/Main.gd" id="1_main"]
 
-[node name="Main" type="Node3D"]
+[node name="Main" type="Node3D" unique_id=348105974]
 script = ExtResource("1_main")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1041071978]

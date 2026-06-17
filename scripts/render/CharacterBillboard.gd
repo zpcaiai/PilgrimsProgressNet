@@ -12,10 +12,9 @@ static func make(tex: Texture2D, height: float = 2.0) -> Sprite3D:
 	s.texture = tex
 	s.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
 	s.shaded = false
-	s.double_sided = true
-	s.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
-	s.alpha_scissor_threshold = 0.35
-	s.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	# Only the most fundamental, always-valid Sprite3D properties are set here
+	# (transparent defaults true, so the figure's alpha cuts out). Exotic
+	# properties were removed to avoid any runtime "invalid set index" risk.
 	var th := float(tex.get_height())
 	if th > 0.0:
 		s.pixel_size = height / th
