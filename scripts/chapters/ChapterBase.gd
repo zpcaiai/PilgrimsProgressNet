@@ -21,12 +21,13 @@ var _pal_ok: bool = false
 # --- TEMP DEBUG: build trace (remove after diagnosis) ---
 static var _trace: PackedStringArray = []
 func _dbg(msg: String) -> void:
+	if not OS.has_feature("editor"):
+		return  # temporary build-trace: editor runs only, never in exported builds
 	_trace.append(msg)
-	for path in ["res://_pp_trace.txt", "user://_pp_trace.txt"]:
-		var f := FileAccess.open(path, FileAccess.WRITE)
-		if f != null:
-			f.store_string("\n".join(_trace))
-			f.close()
+	var f := FileAccess.open("res://_pp_trace.txt", FileAccess.WRITE)
+	if f != null:
+		f.store_string("\n".join(_trace))
+		f.close()
 	print("[PPTRACE] ", msg)
 
 

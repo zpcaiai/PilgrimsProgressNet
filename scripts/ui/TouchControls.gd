@@ -126,10 +126,6 @@ func _refresh() -> void:
 
 
 # ---------------------------------------------------------------- visibility
-func _portrait() -> bool:
-	var s := _vsize()
-	return s.y > s.x
-
 func _btn_ids() -> Array:
 	# Which buttons are currently live, given game state.
 	if not _in_game:
@@ -286,13 +282,4 @@ func _draw_button(pad: Control, c: Vector2, r: float, label: String, on: bool) -
 	pad.draw_string(f, c + Vector2(-ts.x * 0.5, ts.y * 0.32), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.96, 0.95, 0.9, 0.95 if on else 0.8))
 
 
-func _draw_rotate_hint(pad: Control) -> void:
-	var s := _vsize()
-	pad.draw_rect(Rect2(Vector2.ZERO, s), Color(0.03, 0.03, 0.05, 0.9), true)
-	var f := ThemeDB.fallback_font
-	if get_tree().root.theme and get_tree().root.theme.default_font:
-		f = get_tree().root.theme.default_font
-	var fs: int = int(min(s.x, s.y) * 0.06)
-	var msg := "↻  请将手机横置游玩"
-	var ts := f.get_string_size(msg, HORIZONTAL_ALIGNMENT_CENTER, -1, fs)
-	pad.draw_string(f, Vector2(s.x * 0.5 - ts.x * 0.5, s.y * 0.5), msg, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.95, 0.93, 0.85))
+# (portrait rotate-hint removed — the game is playable in portrait)
