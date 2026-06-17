@@ -7,7 +7,7 @@ extends CanvasLayer
 ##   1-4  = dialogue choices · C = heart · Tab = map · Esc = pause
 ## Self-building, responsive (lays out from the viewport size), full multitouch
 ## (hold a direction + tap an action). Only active when a touchscreen is present.
-## Landscape-only: shows a "rotate" hint while the device is held portrait.
+## Playable in both portrait and landscape: the pad lays out from the viewport size.
 
 const MARGIN := 0.05      # all sizes are fractions of min(viewport w, h)
 const DPAD_R := 0.078
@@ -132,7 +132,7 @@ func _portrait() -> bool:
 
 func _btn_ids() -> Array:
 	# Which buttons are currently live, given game state.
-	if not _in_game or _portrait():
+	if not _in_game:
 		return []
 	var paused := get_tree().paused
 	var out: Array = []
@@ -263,9 +263,6 @@ func _send(keycode: int, pressed: bool) -> void:
 # ---------------------------------------------------------------- drawing
 func _draw_pad(pad: Control) -> void:
 	if not _enabled:
-		return
-	if _in_game and _portrait():
-		_draw_rotate_hint(pad)
 		return
 	var lay := _layout()
 	var held := _fingers.values()
