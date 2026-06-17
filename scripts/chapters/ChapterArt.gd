@@ -303,26 +303,19 @@ static func _lion(parent: Node3D, pos: Vector3, yaw: float, tint: Color) -> void
 ## rain, smoke columns.
 static func _city_of_destruction(parent: Node3D) -> void:
 	var rng := _rng(101)
-	var ash := MaterialKit.make("ash", Color(0.2, 0.17, 0.16))
-	var dark := MaterialKit.make("ash", Color(0.12, 0.11, 0.12))
-	# Near, detailed burning ruins (behind spawn, +Z).
-	for i in range(6):
-		var x := rng.randf_range(-17, 17)
-		var z := rng.randf_range(15, 23)
-		var h := rng.randf_range(7, 16)
-		var w := rng.randf_range(2.6, 4.4)
-		var t := _mi(_box(Vector3(w, h, w)), ash, Vector3(x, h * 0.5, z))
-		t.rotation_degrees = Vector3(rng.randf_range(-4, 4), rng.randf_range(0, 30), rng.randf_range(-4, 4))
-		parent.add_child(t)
-		parent.add_child(_mi(_box(Vector3(w * 0.5, h * 0.5, w * 0.5)), _emit(Color(1.0, 0.45, 0.15), 2.2), Vector3(x, h * 0.4, z)))
-		if rng.randf() < 0.7:
-			PropKit.fire(parent, Vector3(x, h, z), rng.randf_range(0.8, 1.6), Color(1.0, 0.5, 0.18))
-		PropKit.smoke(parent, Vector3(x, h + 1, z), rng.randf_range(1.6, 2.8), Color(0.1, 0.09, 0.09))
-		_accent(parent, Vector3(x, 1.5, z), Color(1.0, 0.4, 0.12), rng.randf_range(2.0, 4.0), 14.0)
-	# Far silhouette skyline.
-	for i in range(7):
-		_tower(parent, rng.randf_range(-22, 22), rng.randf_range(26, 36), rng.randf_range(2.5, 4.5), rng.randf_range(8, 20), dark, false)
-	_embers(parent, Vector3(0, 9, 22), Vector3(20, 8, 12), Color(1.0, 0.55, 0.2), 70)
+	# A real burning village behind the fleeing pilgrim (+Z): cottages ablaze,
+	# smoke columns and ember rain — naturalistic, not abstract towers.
+	for i in range(8):
+		var x := rng.randf_range(-19, 19)
+		var z := rng.randf_range(14, 32)
+		var s := rng.randf_range(3.5, 5.5)
+		PropKit.cottage(parent, Vector3(x, 0, z), Vector3(s, s * 0.65, s), Color(0.26, 0.2, 0.18), Color(0.18, 0.13, 0.1))
+		if i % 3 != 0:
+			PropKit.fire(parent, Vector3(x, s * 0.7, z), rng.randf_range(0.9, 1.7), Color(1.0, 0.5, 0.18))
+			_accent(parent, Vector3(x, 1.5, z), Color(1.0, 0.4, 0.12), rng.randf_range(2.0, 3.5), 14.0)
+		PropKit.smoke(parent, Vector3(x, s, z), rng.randf_range(1.6, 2.8), Color(0.1, 0.09, 0.09))
+	# Ember rain drifting over the burning town.
+	_embers(parent, Vector3(0, 8, 22), Vector3(20, 8, 14), Color(1.0, 0.55, 0.2), 70)
 	# Hope ahead.
 	_ray(parent, Vector3(0, 11, -32), 18, 4, Color(1.0, 0.95, 0.78), 0.9)
 	_glow_disc(parent, Vector3(0, 6, -34), 6.0, Color(1.0, 0.95, 0.78), 1.4)

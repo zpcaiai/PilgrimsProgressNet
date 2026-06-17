@@ -315,6 +315,35 @@ static func castle_wall(parent: Node3D, pos: Vector3, length: float = 8.0, heigh
 	return root
 
 
+## A small cottage / house: solid walls with a front door opening (facing +Z)
+## and a pitched gable roof + chimney. Walls collide; roof and chimney are decor.
+## Used for the City of Destruction village and the pilgrim's family home.
+static func cottage(parent: Node3D, pos: Vector3, size: Vector3 = Vector3(5, 3.2, 5), wall: Color = Color(0.62, 0.56, 0.48), roof: Color = Color(0.34, 0.24, 0.17)) -> Node3D:
+	var root := Node3D.new()
+	root.position = pos
+	var wmat := _mat("stone", wall, {"tint_blend": 0.55})
+	var w := size.x
+	var h := size.y
+	var d := size.z
+	var t := 0.3
+	_solid_box(root, Vector3(w, h, t), Vector3(0, h * 0.5, -d * 0.5), wmat)
+	_solid_box(root, Vector3(t, h, d), Vector3(-w * 0.5, h * 0.5, 0), wmat)
+	_solid_box(root, Vector3(t, h, d), Vector3(w * 0.5, h * 0.5, 0), wmat)
+	# Front wall with a central door opening (so the interior is visible).
+	var door_w := w * 0.4
+	var seg := (w - door_w) * 0.5
+	_solid_box(root, Vector3(seg, h, t), Vector3(-(door_w + seg) * 0.5, h * 0.5, d * 0.5), wmat)
+	_solid_box(root, Vector3(seg, h, t), Vector3((door_w + seg) * 0.5, h * 0.5, d * 0.5), wmat)
+	_solid_box(root, Vector3(door_w, h * 0.28, t), Vector3(0, h - h * 0.14, d * 0.5), wmat)
+	# Pitched gable roof + chimney.
+	var prism := PrismMesh.new()
+	prism.size = Vector3(w + 0.5, h * 0.7, d + 0.5)
+	root.add_child(_mesh_node(prism, _mat("wood", roof, {"tint_blend": 0.5}), Vector3(0, h + h * 0.35, 0)))
+	root.add_child(_mesh_node(_box(Vector3(0.5, 1.2, 0.5)), wmat, Vector3(w * 0.28, h + h * 0.55, -d * 0.2)))
+	parent.add_child(root)
+	return root
+
+
 ## A classical column: base + shaft + capital.
 static func pillar(parent: Node3D, pos: Vector3, height: float = 4.0, tint: Color = Color(1, 1, 1), surface: String = "marble") -> Node3D:
 	var root := Node3D.new()
