@@ -38,5 +38,6 @@
     "cross_shadow"
   ],
   "music": "res://assets/audio/music/valley_shadow_death.ogg",
-  "ambient": "res://assets/audio/ambient/valley_shadow_death.ogg"
+  "ambient": "res://assets/audio/ambient/valley_shadow_death.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/valley_shadow_death.glb"
 }

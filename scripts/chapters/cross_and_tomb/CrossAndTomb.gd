@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name CrossAndTomb
 ## Chapter 5. The climax. Climb the hill to the Cross. The burden loosens,
 ## falls, and rolls into the open tomb. Grace is given freely — not earned by
@@ -8,7 +8,7 @@ var _triggered: bool = false
 var _light: OmniLight3D
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.55, 0.7, 0.9),     # clear sunrise blue
 		Color(0.98, 0.85, 0.6),    # warm gold horizon

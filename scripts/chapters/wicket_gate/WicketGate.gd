@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name WicketGate
 ## Chapter 4. The narrow gate. Arrows of accusation chase you from behind, so
 ## press forward. Knock at the gate; Goodwill receives you and pulls you through.
@@ -6,7 +6,7 @@ class_name WicketGate
 var _arrows: ArrowEmitter = null
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.12, 0.12, 0.2),
 		Color(0.3, 0.25, 0.2),

@@ -1,10 +1,10 @@
-extends ChapterBase
+extends GlbChapter
 class_name DelectableMountains
 ## Chapter 13. A bright, restful height. The Shepherds give counsel and let you
 ## see the Celestial City through their glass. Rest, then go on.
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.5, 0.7, 0.95),
 		Color(0.95, 0.9, 0.7),

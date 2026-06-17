@@ -38,5 +38,6 @@
     "rest_palace"
   ],
   "music": "res://assets/audio/music/palace_beautiful.ogg",
-  "ambient": "res://assets/audio/ambient/palace_beautiful.ogg"
+  "ambient": "res://assets/audio/ambient/palace_beautiful.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/palace_beautiful.glb"
 }

@@ -34,5 +34,6 @@
     "cross_wilderness"
   ],
   "music": "res://assets/audio/music/wilderness_road.ogg",
-  "ambient": "res://assets/audio/ambient/wilderness_road.ogg"
+  "ambient": "res://assets/audio/ambient/wilderness_road.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/wilderness_road.glb"
 }

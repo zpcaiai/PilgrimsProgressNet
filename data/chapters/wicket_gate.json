@@ -36,5 +36,6 @@
     "enter_gate"
   ],
   "music": "res://assets/audio/music/wicket_gate.ogg",
-  "ambient": "res://assets/audio/ambient/wicket_gate.ogg"
+  "ambient": "res://assets/audio/ambient/wicket_gate.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/wicket_gate.glb"
 }

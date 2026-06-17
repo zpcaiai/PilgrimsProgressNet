@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name SloughOfDespond
 ## Chapter 3. The swamp of discouragement. Mud raises despair and slows you;
 ## promise stones and safe stones give relief; Pliable abandons you; Help can
@@ -11,7 +11,7 @@ const PROMISE_LINES := {
 }
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.3, 0.34, 0.32),
 		Color(0.38, 0.42, 0.38),

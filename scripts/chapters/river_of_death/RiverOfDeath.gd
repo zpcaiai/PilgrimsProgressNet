@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name RiverOfDeath
 ## Chapter 15. The last crossing. There is no bridge. The deeper your fear, the
 ## harder the water pulls; faith — and Hopeful's steadying voice — carry you
@@ -8,7 +8,7 @@ var _river_player: PlayerController = null
 var _tick: float = 0.0
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.18, 0.22, 0.32),
 		Color(0.6, 0.55, 0.55),

@@ -1,10 +1,10 @@
-extends ChapterBase
+extends GlbChapter
 class_name CityOfDestruction
 ## Chapter 1. The doomed city. Talk to Evangelist to learn the way, weather the
 ## family's plea and Obstinate's mockery, then leave through the eastern gate.
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.35, 0.12, 0.1),   # smoky red sky top
 		Color(0.5, 0.25, 0.15),   # dim orange horizon

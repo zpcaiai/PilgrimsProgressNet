@@ -135,12 +135,13 @@ func pray() -> void:
 	_prayer_flash()
 	# Push nearby enemies back and weaken them slightly.
 	for e in get_tree().get_nodes_in_group("enemy"):
-		if e is SymbolicEnemy and _player:
-			var away := (e.global_position - _player.global_position)
+		var foe := e as SymbolicEnemy
+		if foe != null and _player:
+			var away: Vector3 = foe.global_position - _player.global_position
 			away.y = 0
 			if away.length() < 6.0:
-				e.global_position += away.normalized() * 2.5
-				e.receive_counter("prayer", 6.0)
+				foe.global_position += away.normalized() * 2.5
+				foe.receive_counter("prayer", 6.0)
 	EventBus.toast("You pray, and light opens where fear had crowded close.")
 	emit_signal("stats_changed")
 

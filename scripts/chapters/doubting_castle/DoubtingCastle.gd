@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name DoubtingCastle
 ## Chapter 12. Captured by Giant Despair and shut in a cell. Despair presses on
 ## you while the Giant prowls. The key called Promise can open any door of this
@@ -8,7 +8,7 @@ var _aura: float = 0.0
 var _vignette: DarkVignette = null
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.05, 0.06, 0.09),
 		Color(0.12, 0.12, 0.16),

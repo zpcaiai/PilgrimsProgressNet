@@ -37,5 +37,6 @@
     "visit_interpreter"
   ],
   "music": "res://assets/audio/music/interpreter_house.ogg",
-  "ambient": "res://assets/audio/ambient/interpreter_house.ogg"
+  "ambient": "res://assets/audio/ambient/interpreter_house.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/interpreter_house.glb"
 }

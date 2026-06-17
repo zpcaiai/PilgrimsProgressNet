@@ -1,6 +1,9 @@
 {
-  "id": "full_pilgrimage_route",
-  "title": "Full Pilgrimage Route",
+  "id": "full_route",
+  "title": "Burden Fallen: Full Pilgrim Route",
+  "start_chapter": "city_of_destruction",
+  "end_chapter": "celestial_city",
+  "completion_flag": "journey_completed",
   "chapters": [
     "city_of_destruction",
     "wilderness_road",
@@ -19,6 +22,14 @@
     "river_of_death",
     "celestial_city"
   ],
-  "start_chapter": "city_of_destruction",
-  "end_chapter": "celestial_city"
+  "required_global_systems": [
+    "EventBus",
+    "GameState",
+    "ChapterManager",
+    "DialogueManager",
+    "SpiritualStateManager",
+    "QuestManager",
+    "SaveManager",
+    "DataValidator"
+  ]
 }

@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name ValleyShadowDeath
 ## Chapter 10. A pitch-dark, narrow path. Your lantern of faith lights only a
 ## small circle; fear shrinks it, faith and the lanterns of the Word restore it.
@@ -11,7 +11,7 @@ var _shadow_accum: float = 0.0
 var _vignette: DarkVignette = null
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.02, 0.02, 0.05),
 		Color(0.06, 0.05, 0.1),

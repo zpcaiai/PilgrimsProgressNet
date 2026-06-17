@@ -35,5 +35,6 @@
     "enter_celestial_city"
   ],
   "music": "res://assets/audio/music/celestial_city.ogg",
-  "ambient": "res://assets/audio/ambient/celestial_city.ogg"
+  "ambient": "res://assets/audio/ambient/celestial_city.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/celestial_city.glb"
 }

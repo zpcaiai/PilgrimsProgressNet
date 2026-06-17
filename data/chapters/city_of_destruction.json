@@ -38,5 +38,6 @@
     "leave_city"
   ],
   "music": "res://assets/audio/music/city_of_destruction.ogg",
-  "ambient": "res://assets/audio/ambient/city_of_destruction.ogg"
+  "ambient": "res://assets/audio/ambient/city_of_destruction.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/city_of_destruction.glb"
 }

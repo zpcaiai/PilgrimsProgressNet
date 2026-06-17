@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name HillDifficulty
 ## Chapter 7. From an open base, three corridors diverge. Danger and Destruction
 ## look easier but end badly; the narrow middle way is steep and slow but true.
@@ -8,7 +8,7 @@ var _arbor_player: PlayerController = null
 var _arbor_prompted: bool = false
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.45, 0.55, 0.7),
 		Color(0.8, 0.78, 0.6),

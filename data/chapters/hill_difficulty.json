@@ -35,5 +35,6 @@
     "climb_hill"
   ],
   "music": "res://assets/audio/music/hill_difficulty.ogg",
-  "ambient": "res://assets/audio/ambient/hill_difficulty.ogg"
+  "ambient": "res://assets/audio/ambient/hill_difficulty.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/hill_difficulty.glb"
 }

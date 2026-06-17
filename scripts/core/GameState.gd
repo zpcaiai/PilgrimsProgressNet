@@ -17,6 +17,14 @@ var companions: Dictionary = {}
 var completed_quests: Array[String] = []
 var visited_chapters: Array[String] = []
 
+# Per-chapter scratch meters (reset by chapters that use them): vanity_pressure,
+# sleepiness, river_depth_pressure. Drive temptation/drowsiness/depth feedback.
+var temporary_meters: Dictionary = {
+	"vanity_pressure": 0,
+	"sleepiness": 0,
+	"river_depth_pressure": 0,
+}
+
 
 func is_child_mode() -> bool:
 	return difficulty == "child"
@@ -34,6 +42,7 @@ func reset_for_new_game() -> void:
 	companions.clear()
 	completed_quests.clear()
 	visited_chapters.clear()
+	temporary_meters = {"vanity_pressure": 0, "sleepiness": 0, "river_depth_pressure": 0}
 
 
 # --- Flags ---
@@ -75,6 +84,19 @@ func has_companion(companion_id: String) -> bool:
 	return companions.has(companion_id)
 
 
+# --- Temporary meters ---
+func set_temporary_meter(key: String, value: int) -> void:
+	temporary_meters[key] = clampi(value, 0, 100)
+
+
+func modify_temporary_meter(key: String, delta: int) -> void:
+	set_temporary_meter(key, int(temporary_meters.get(key, 0)) + delta)
+
+
+func get_temporary_meter(key: String) -> int:
+	return int(temporary_meters.get(key, 0))
+
+
 # --- Progress ---
 func mark_chapter_visited(chapter_id: String) -> void:
 	if not visited_chapters.has(chapter_id):
@@ -98,6 +120,7 @@ func to_dict() -> Dictionary:
 		"companions": companions.duplicate(true),
 		"completed_quests": completed_quests.duplicate(),
 		"visited_chapters": visited_chapters.duplicate(),
+		"temporary_meters": temporary_meters.duplicate(true),
 	}
 
 
@@ -115,3 +138,6 @@ func from_dict(data: Dictionary) -> void:
 	visited_chapters.clear()
 	for c in data.get("visited_chapters", []):
 		visited_chapters.append(String(c))
+	temporary_meters = (data.get("temporary_meters", {
+		"vanity_pressure": 0, "sleepiness": 0, "river_depth_pressure": 0,
+	}) as Dictionary).duplicate(true)

@@ -38,5 +38,6 @@
     "cross_river"
   ],
   "music": "res://assets/audio/music/river_of_death.ogg",
-  "ambient": "res://assets/audio/ambient/river_of_death.ogg"
+  "ambient": "res://assets/audio/ambient/river_of_death.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/river_of_death.glb"
 }

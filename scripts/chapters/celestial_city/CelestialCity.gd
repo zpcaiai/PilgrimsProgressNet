@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name CelestialCity
 ## Chapter 16. Journey's end. A shining road climbs to the gate of the City.
 ## Walk up, and the pilgrimage is complete.
@@ -6,7 +6,7 @@ class_name CelestialCity
 var _done: bool = false
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.6, 0.78, 1.0),
 		Color(1.0, 0.95, 0.78),

@@ -39,5 +39,6 @@
     "visit_mountains"
   ],
   "music": "res://assets/audio/music/delectable_mountains.ogg",
-  "ambient": "res://assets/audio/ambient/delectable_mountains.ogg"
+  "ambient": "res://assets/audio/ambient/delectable_mountains.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/delectable_mountains.glb"
 }

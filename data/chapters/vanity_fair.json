@@ -37,5 +37,6 @@
     "pass_vanity_fair"
   ],
   "music": "res://assets/audio/music/vanity_fair.ogg",
-  "ambient": "res://assets/audio/ambient/vanity_fair.ogg"
+  "ambient": "res://assets/audio/ambient/vanity_fair.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/vanity_fair.glb"
 }

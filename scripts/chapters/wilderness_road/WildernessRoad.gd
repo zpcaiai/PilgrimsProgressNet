@@ -1,10 +1,10 @@
-extends ChapterBase
+extends GlbChapter
 class_name WildernessRoad
 ## Chapter 2. The narrow road out of the city. Obstinate gives one last push to
 ## turn back; Pliable walks ahead full of shallow excitement. Reach the swamp.
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.35, 0.4, 0.5),
 		Color(0.6, 0.55, 0.45),

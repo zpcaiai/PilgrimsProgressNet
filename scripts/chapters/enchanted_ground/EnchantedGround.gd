@@ -1,11 +1,11 @@
-extends ChapterBase
+extends GlbChapter
 class_name EnchantedGround
 ## Chapter 14. The air itself presses a heavy sleep on you. Lingering lets the
 ## drowse take you (and sets you back); keep moving, and let Hopeful's voice
 ## rouse you. Reach the far edge awake.
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.25, 0.2, 0.3),
 		Color(0.5, 0.4, 0.5),

@@ -1,10 +1,10 @@
-extends ChapterBase
+extends GlbChapter
 class_name PalaceBeautiful
 ## Chapter 8. A safe hub on the hilltop. Rest, speak with Watchful, and take up
 ## the armour of faith before descending into the valley.
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.25, 0.3, 0.5),
 		Color(0.9, 0.7, 0.45),

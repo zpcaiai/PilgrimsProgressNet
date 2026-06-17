@@ -32,5 +32,6 @@
     "valley_humiliation"
   ],
   "music": "res://assets/audio/music/valley_humiliation.ogg",
-  "ambient": "res://assets/audio/ambient/valley_humiliation.ogg"
+  "ambient": "res://assets/audio/ambient/valley_humiliation.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/valley_humiliation.glb"
 }

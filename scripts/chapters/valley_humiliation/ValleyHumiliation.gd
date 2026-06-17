@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name ValleyHumiliation
 ## Chapter 9 (finale of the vertical slice). Descend into the valley where
 ## Apollyon blocks the way. A short challenge, then the boss fight. Stand firm,
@@ -9,7 +9,7 @@ var _boss_controller: BossController = null
 var _fight_started: bool = false
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.18, 0.2, 0.16),
 		Color(0.4, 0.18, 0.16),

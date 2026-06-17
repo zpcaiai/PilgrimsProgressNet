@@ -12,7 +12,9 @@ const NUMERIC_STATES := [
 const POSITIVE_STATES := ["faith", "hope", "humility", "discernment", "perseverance", "watchfulness"]
 const NEGATIVE_STATES := ["despair", "shame", "fear", "pride", "deception", "weariness"]
 
-const BOOL_STATES := ["has_burden", "has_scroll", "has_seal", "has_promise_key", "has_new_garment"]
+const BOOL_STATES := ["has_burden", "has_scroll", "has_seal", "has_promise_key",
+	"has_new_garment", "has_armor", "has_sword", "has_shield", "has_shepherd_map",
+	"has_final_seal"]
 
 # --- Positive states ---
 var faith: int = 5
@@ -36,6 +38,12 @@ var has_scroll: bool = false
 var has_seal: bool = false
 var has_promise_key: bool = false
 var has_new_garment: bool = false
+# Vertical-slice / endgame equipment & tokens.
+var has_armor: bool = false
+var has_sword: bool = false
+var has_shield: bool = false
+var has_shepherd_map: bool = false
+var has_final_seal: bool = false
 
 var _collapsed: bool = false
 
@@ -58,6 +66,11 @@ func reset_for_new_game() -> void:
 	has_seal = false
 	has_promise_key = false
 	has_new_garment = false
+	has_armor = false
+	has_sword = false
+	has_shield = false
+	has_shepherd_map = false
+	has_final_seal = false
 	_collapsed = false
 
 
@@ -125,16 +138,55 @@ func _apply_items(items: Dictionary) -> void:
 func _apply_special(special: Dictionary) -> void:
 	if bool(special.get("remove_burden", false)):
 		remove_burden()
-	if bool(special.get("grant_scroll", false)):
-		has_scroll = true
-	if bool(special.get("grant_seal", false)):
-		has_seal = true
-	if bool(special.get("grant_new_garment", false)):
-		has_new_garment = true
-	if bool(special.get("grant_promise_key", false)):
-		has_promise_key = true
+	for token in ["scroll", "seal", "new_garment", "promise_key", "armor",
+			"sword", "shield", "shepherd_map", "final_seal"]:
+		if bool(special.get("grant_" + token, false)):
+			_grant(token)
 	if bool(special.get("cross_grace", false)):
 		apply_cross_grace()
+	if special.has("add_companion"):
+		var cid := String(special["add_companion"])
+		GameState.add_companion(cid)
+		GameState.set_flag("has_companion_" + cid, true)
+		if EventBus.has_signal("companion_joined"):
+			EventBus.emit_signal("companion_joined", cid)
+	if special.has("remove_companion"):
+		GameState.remove_companion(String(special["remove_companion"]))
+	if bool(special.get("activate_prayer_light", false)):
+		GameState.set_flag("used_prayer_light", true)
+	if bool(special.get("show_journey_review", false)):
+		GameState.set_flag("journey_review_requested", true)
+		EventBus.toast("The journey is remembered: the burden fell, help came, promises held, the river was crossed.")
+	if bool(special.get("show_credits", false)):
+		GameState.set_flag("show_credits", true)
+	if special.has("trigger_event"):
+		trigger_spiritual_event(String(special["trigger_event"]))
+
+
+## Set has_<token> on this manager AND mirror to a GameState flag so dialogue
+## flag-conditions and saves see it consistently.
+func _grant(token: String) -> void:
+	set("has_" + token, true)
+	GameState.set_flag("has_" + token, true)
+
+
+## Load and apply a data/spiritual_events/<id>.json (effects + flags + special).
+func trigger_spiritual_event(event_id: String) -> void:
+	var path := "res://data/spiritual_events/" + event_id + ".json"
+	if not FileAccess.file_exists(path):
+		return
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not (parsed is Dictionary):
+		return
+	var ev: Dictionary = parsed
+	if ev.has("effects"):
+		apply_effects(ev["effects"])
+	for k in (ev.get("flags", {}) as Dictionary).keys():
+		GameState.set_flag(String(k), ev["flags"][k])
+	if ev.has("special"):
+		_apply_special(ev["special"])
+	if EventBus.has_signal("spiritual_event_triggered"):
+		EventBus.emit_signal("spiritual_event_triggered", event_id)
 
 
 # --- Burden & Cross ---

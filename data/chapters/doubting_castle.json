@@ -39,5 +39,6 @@
     "escape_doubting_castle"
   ],
   "music": "res://assets/audio/music/doubting_castle.ogg",
-  "ambient": "res://assets/audio/ambient/doubting_castle.ogg"
+  "ambient": "res://assets/audio/ambient/doubting_castle.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/doubting_castle.glb"
 }

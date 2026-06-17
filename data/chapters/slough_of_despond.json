@@ -38,5 +38,6 @@
     "escape_slough"
   ],
   "music": "res://assets/audio/music/slough_of_despond.ogg",
-  "ambient": "res://assets/audio/ambient/slough_of_despond.ogg"
+  "ambient": "res://assets/audio/ambient/slough_of_despond.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/slough_of_despond.glb"
 }

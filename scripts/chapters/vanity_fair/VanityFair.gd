@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name VanityFair
 ## Chapter 11. A loud, glittering market that sells everything but peace. Each
 ## stall offers a real choice: BUY (pride/deception, a vanity token that weighs
@@ -10,7 +10,7 @@ var _active_ware: String = ""
 var _active_buy_effects: Dictionary = {}
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.3, 0.1, 0.3),
 		Color(0.9, 0.5, 0.2),

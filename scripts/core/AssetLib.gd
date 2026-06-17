@@ -71,13 +71,14 @@ static func pbr(surface: String, channel: String) -> Texture2D:
 
 
 static func scene_art(chapter_id: String) -> Texture2D:
-	# Children's-journey variant: prefer "<chapter>_child.png" in child mode,
-	# falling back to the standard chapter art when no child variant exists.
+	# A hand-placed .jpg wins over the generated .png/.webp (drop scene backdrops
+	# as assets/scenes/<chapter>.jpg). Children's-journey "<chapter>_child.*" is
+	# preferred in child mode, falling back to the standard art.
 	if _is_child_mode():
-		var child := tex(SCENE_DIR + chapter_id + "_child.png")
+		var child := _first_tex([SCENE_DIR + chapter_id + "_child.jpg", SCENE_DIR + chapter_id + "_child.png", SCENE_DIR + chapter_id + "_child.webp"])
 		if child != null:
 			return child
-	return tex(SCENE_DIR + chapter_id + ".png")
+	return _first_tex([SCENE_DIR + chapter_id + ".jpg", SCENE_DIR + chapter_id + ".png", SCENE_DIR + chapter_id + ".webp"])
 
 
 static func particle(particle_name: String) -> Texture2D:

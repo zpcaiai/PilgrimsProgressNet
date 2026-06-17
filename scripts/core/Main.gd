@@ -60,6 +60,15 @@ func _ready() -> void:
 
 	_show_title()
 
+	# TEMP DEBUG (editor only): auto-run city -> +3 chapters to capture the build
+	# trace for the empty-scene diagnosis. Remove after fixing.
+	if OS.has_feature("editor"):
+		await get_tree().create_timer(0.4).timeout
+		start_new_game("standard")
+		for _i in range(3):
+			await get_tree().create_timer(0.9).timeout
+			ChapterManager.go_to_next_chapter()
+
 
 # ---------------------------------------------------------------------------
 # Input map safety net (in case project.godot input section is unavailable)

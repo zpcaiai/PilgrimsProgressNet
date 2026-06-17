@@ -1,4 +1,4 @@
-extends ChapterBase
+extends GlbChapter
 class_name InterpreterHouse
 ## Chapter 6. A safe, candlelit hall of symbolic rooms. Each lesson sharpens an
 ## inner sense. Speak with the Interpreter, consider a room, then leave by the
@@ -7,7 +7,7 @@ class_name InterpreterHouse
 var _lessons_seen: int = 0
 
 
-func _build_chapter() -> void:
+func _build_procedural() -> void:
 	setup_environment(
 		Color(0.1, 0.09, 0.12),
 		Color(0.3, 0.22, 0.12),

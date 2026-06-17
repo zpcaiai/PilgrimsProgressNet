@@ -32,5 +32,6 @@
     "reach_the_cross"
   ],
   "music": "res://assets/audio/music/cross_and_tomb.ogg",
-  "ambient": "res://assets/audio/ambient/cross_and_tomb.ogg"
+  "ambient": "res://assets/audio/ambient/cross_and_tomb.ogg",
+  "imported_scene_path": "res://assets/imported_scenes/cross_and_tomb.glb"
 }
