@@ -12,10 +12,14 @@ func _build_chapter() -> void:
 	)
 	make_ground(Vector2(30, 50), Color(0.5, 0.46, 0.4))
 
-	# Palace walls and warm windows.
-	make_block(Vector3(1, 6, 36), Color(0.55, 0.5, 0.44), Vector3(-10, 3, -8))
-	make_block(Vector3(1, 6, 36), Color(0.55, 0.5, 0.44), Vector3(10, 3, -8))
-	make_block(Vector3(20, 6, 1), Color(0.5, 0.46, 0.4), Vector3(0, 3, -24))
+	# A stately palace: a windowed hall at the head of the court, flanked by
+	# marble colonnades, entered through a grand stone gatehouse.
+	PropKit.building(self, Vector3(0, 0, -27), Vector3(22, 9, 6), Color(0.74, 0.69, 0.62), Color(0.4, 0.3, 0.22))
+	for z in [-2, -9, -16]:
+		PropKit.pillar(self, Vector3(-10, 0, z), 6.0, Color(0.8, 0.76, 0.7), "marble")
+		PropKit.pillar(self, Vector3(10, 0, z), 6.0, Color(0.8, 0.76, 0.7), "marble")
+	PropKit.gatehouse(self, Vector3(0, 0, -23), Color(0.62, 0.56, 0.5))
+	# Warm window light from the hall.
 	for z in [0, -8, -16]:
 		var win := OmniLight3D.new()
 		win.position = Vector3(0, 4, z)

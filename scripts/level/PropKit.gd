@@ -344,6 +344,87 @@ static func cottage(parent: Node3D, pos: Vector3, size: Vector3 = Vector3(5, 3.2
 	return root
 
 
+## A believable multi-storey building: stone body, cornice, a grid of framed
+## windows on the front (+Z), and a pitched roof. Body collides.
+static func building(parent: Node3D, pos: Vector3, size: Vector3 = Vector3(8, 8, 8), wall: Color = Color(0.7, 0.66, 0.6), roof: Color = Color(0.4, 0.3, 0.22), windows: bool = true) -> Node3D:
+	var root := Node3D.new()
+	root.position = pos
+	var wmat := _mat("stone", wall, {"tint_blend": 0.5, "triplanar": true})
+	_solid_box(root, size, Vector3(0, size.y * 0.5, 0), wmat)
+	root.add_child(_mesh_node(_box(Vector3(size.x + 0.5, 0.5, size.z + 0.5)), wmat, Vector3(0, size.y, 0)))
+	if windows:
+		var glass := _mat("stone", Color(0.16, 0.14, 0.13), {"tint_blend": 0.85})
+		var frame := _mat("wood", Color(0.4, 0.3, 0.2), {"tint_blend": 0.3})
+		var cols := maxi(2, int(size.x / 3.0))
+		var rows := maxi(1, int((size.y - 1.0) / 3.0))
+		for r in range(rows):
+			for c in range(cols):
+				var wx := 0.0 if cols <= 1 else (float(c) / float(cols - 1) - 0.5) * (size.x - 2.2)
+				var wy := 1.8 + r * 3.0
+				if wy > size.y - 1.0:
+					continue
+				root.add_child(_mesh_node(_box(Vector3(1.3, 1.9, 0.12)), frame, Vector3(wx, wy, size.z * 0.5 + 0.02)))
+				root.add_child(_mesh_node(_box(Vector3(1.0, 1.6, 0.12)), glass, Vector3(wx, wy, size.z * 0.5 + 0.07)))
+	var prism := PrismMesh.new()
+	prism.size = Vector3(size.x + 0.6, size.y * 0.45, size.z + 0.6)
+	root.add_child(_mesh_node(prism, _mat("wood", roof, {"tint_blend": 0.5}), Vector3(0, size.y + 0.25 + size.y * 0.225, 0)))
+	parent.add_child(root)
+	return root
+
+
+## A run of rail fence between two points (posts + two horizontal rails).
+static func _fence_line(parent: Node3D, a: Vector3, b: Vector3, m: Material) -> void:
+	var dd := a.distance_to(b)
+	var n := maxi(1, int(dd / 1.4))
+	for i in range(n + 1):
+		parent.add_child(_mesh_node(_cyl(0.06, 0.08, 1.0, 5), m, a.lerp(b, float(i) / float(n)) + Vector3(0, 0.5, 0)))
+	var mid := (a + b) * 0.5
+	var horiz := absf(b.x - a.x) > absf(b.z - a.z)
+	for ry in [0.35, 0.72]:
+		var rs := Vector3(dd, 0.07, 0.07) if horiz else Vector3(0.07, 0.07, dd)
+		parent.add_child(_mesh_node(_box(rs), m, mid + Vector3(0, ry, 0)))
+
+
+## A rectangular fenced enclosure (sheepfold) with a gap on the front (+Z).
+static func pen(parent: Node3D, center: Vector3, size: Vector2, tint: Color = Color(0.46, 0.35, 0.24)) -> Node3D:
+	var root := Node3D.new()
+	root.position = center
+	var m := _mat("wood", tint, {"tint_blend": 0.4})
+	var hw := size.x * 0.5
+	var hd := size.y * 0.5
+	_fence_line(root, Vector3(-hw, 0, -hd), Vector3(hw, 0, -hd), m)
+	_fence_line(root, Vector3(-hw, 0, -hd), Vector3(-hw, 0, hd), m)
+	_fence_line(root, Vector3(hw, 0, -hd), Vector3(hw, 0, hd), m)
+	_fence_line(root, Vector3(-hw, 0, hd), Vector3(-1.2, 0, hd), m)
+	_fence_line(root, Vector3(1.2, 0, hd), Vector3(hw, 0, hd), m)
+	parent.add_child(root)
+	return root
+
+
+## A stone gatehouse: two crenellated towers with an arched opening and a
+## wooden door (ajar if open). The opening (~3.8m) is walkable.
+static func gatehouse(parent: Node3D, pos: Vector3, tint: Color = Color(0.52, 0.48, 0.43), open: bool = true) -> Node3D:
+	var root := Node3D.new()
+	root.position = pos
+	var stone := _mat("stone", tint, {"triplanar": true})
+	_solid_box(root, Vector3(2.2, 7, 2.4), Vector3(-3, 3.5, 0), stone)
+	_solid_box(root, Vector3(2.2, 7, 2.4), Vector3(3, 3.5, 0), stone)
+	for tx in [-3.0, 3.0]:
+		for mx in [-0.6, 0.0, 0.6]:
+			root.add_child(_mesh_node(_box(Vector3(0.5, 0.7, 0.5)), stone, Vector3(tx + mx, 7.4, 0)))
+	for i in range(5):
+		var t := float(i) / 4.0 - 0.5
+		var y := 5.2 + (0.5 - absf(t)) * 1.1
+		root.add_child(_mesh_node(_box(Vector3(1.3, 0.5, 2.4)), stone, Vector3(t * 4.0, y, 0)))
+	var door := _mesh_node(_box(Vector3(2.0, 4.4, 0.18)), _mat("wood", tint, {"tint_blend": 0.2}), Vector3(0, 2.2, 0))
+	if open:
+		door.rotation_degrees = Vector3(0, 30, 0)
+		door.position = Vector3(-0.7, 2.2, 0.5)
+	root.add_child(door)
+	parent.add_child(root)
+	return root
+
+
 ## A classical column: base + shaft + capital.
 static func pillar(parent: Node3D, pos: Vector3, height: float = 4.0, tint: Color = Color(1, 1, 1), surface: String = "marble") -> Node3D:
 	var root := Node3D.new()

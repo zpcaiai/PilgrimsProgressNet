@@ -263,6 +263,10 @@ func make_material(color: Color, emission: float = 0.0) -> StandardMaterial3D:
 	m.roughness = 0.95
 	# Subdue speculars so lit greybox reads as painted matte form, not plastic.
 	m.metallic_specular = 0.3
+	# Realistic mode: clamp strong "glowing object" emission to a subtle level so
+	# windows/candles still read as lit but nothing glows unnaturally.
+	if RenderConfig.is_realistic():
+		emission = minf(emission, 0.5)
 	if emission > 0.0:
 		m.emission_enabled = true
 		m.emission = color
@@ -578,6 +582,9 @@ func make_distant_light(pos: Vector3, color: Color = Color(1.0, 0.95, 0.7)) -> v
 	omni.light_energy = 4.0
 	omni.omni_range = 30.0
 	add_child(omni)
+	# Realistic mode: just the light, no floating glowing orb.
+	if RenderConfig.is_realistic():
+		return
 	var glow := MeshInstance3D.new()
 	var sphere := SphereMesh.new()
 	sphere.radius = 1.5

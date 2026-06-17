@@ -18,16 +18,14 @@ func _build_chapter() -> void:
 	make_block(Vector3(1, 4, 60), Color(0.2, 0.2, 0.24), Vector3(-6, 2, -10))
 	make_block(Vector3(1, 4, 60), Color(0.2, 0.2, 0.24), Vector3(6, 2, -10))
 
-	# The gate and its warm light.
-	make_block(Vector3(2, 6, 1.5), Color(0.45, 0.4, 0.35), Vector3(-2.5, 3, -22))
-	make_block(Vector3(2, 6, 1.5), Color(0.45, 0.4, 0.35), Vector3(2.5, 3, -22))
+	# The narrow gate — a real stone gatehouse, warm welcome spilling from beyond.
+	PropKit.gatehouse(self, Vector3(0, 0, -22), Color(0.42, 0.4, 0.42))
 	var gate_light := OmniLight3D.new()
 	gate_light.position = Vector3(0, 3, -24)
 	gate_light.light_color = Color(1.0, 0.92, 0.7)
 	gate_light.light_energy = 5.0
 	gate_light.omni_range = 18.0
 	add_child(gate_light)
-	make_decor(Vector3(4, 5, 0.3), Color(1.0, 0.95, 0.7), Vector3(0, 3, -23), 2.0)
 
 	make_npc("Goodwill", Vector3(0, 0, -26), Color(0.9, 0.85, 0.65), "", "")
 

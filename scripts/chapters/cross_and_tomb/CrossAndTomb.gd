@@ -24,9 +24,8 @@ func _build_chapter() -> void:
 	make_block(Vector3(0.6, 6, 0.6), Color(0.45, 0.35, 0.25), Vector3(0, 4.5, -18))
 	make_block(Vector3(3.2, 0.6, 0.6), Color(0.45, 0.35, 0.25), Vector3(0, 6.0, -18))
 
-	# The open tomb, to the side.
-	make_block(Vector3(3, 3, 3), Color(0.3, 0.3, 0.32), Vector3(7, 1.5, -18))
-	make_decor(Vector3(1.6, 1.8, 0.3), Color(0.05, 0.05, 0.05), Vector3(6.3, 1.2, -16.6))
+	# The open tomb, hewn from rock with its great stone rolled aside.
+	PropKit.tomb(self, Vector3(7, 0, -18), Color(0.42, 0.4, 0.38))
 
 	# Soft light at the Cross, brightened when the burden falls.
 	_light = OmniLight3D.new()

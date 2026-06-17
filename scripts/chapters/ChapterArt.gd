@@ -266,6 +266,15 @@ static func _figure(parent: Node3D, pos: Vector3, color: Color) -> void:
 	parent.add_child(_mi(_dome(0.16), MaterialKit.make("cloth", color.lightened(0.12), {"tint_blend": 0.7}), pos + Vector3(0, 1.32, 0)))
 
 
+## A simple wooden refectory table with legs and a bench.
+static func _table(parent: Node3D, pos: Vector3, mat: Material) -> void:
+	parent.add_child(_mi(_box(Vector3(3.0, 0.18, 1.1)), mat, pos + Vector3(0, 0.95, 0)))
+	for lx in [-1.3, 1.3]:
+		for lz in [-0.42, 0.42]:
+			parent.add_child(_mi(_box(Vector3(0.16, 0.95, 0.16)), mat, pos + Vector3(lx, 0.47, lz)))
+	parent.add_child(_mi(_box(Vector3(3.0, 0.14, 0.4)), mat, pos + Vector3(0, 0.5, 0.95)))
+
+
 ## A string of little colour flags between two points (festive bunting).
 static func _bunting(parent: Node3D, a: Vector3, b: Vector3, count: int) -> void:
 	var rng := _rng(int(a.x * 7.0 + b.z * 3.0) + 1)
@@ -381,9 +390,22 @@ static func _interpreter(parent: Node3D) -> void:
 		for s in [-1.0, 1.0]:
 			parent.add_child(_mi(_box(Vector3(0.3, 1.8, 1.4)), _emit(Color(1.0, 0.8, 0.45), 1.0), Vector3(s * 10.6, 3.0, z)))
 			PropKit.lantern_post(parent, Vector3(s * 9.4, 0, z), Color(0.32, 0.24, 0.18), Color(1.0, 0.78, 0.42), 1.4)
-	# Hearth.
-	parent.add_child(_mi(_box(Vector3(3, 2.4, 0.6)), MaterialKit.make("stone", Color(0.4, 0.36, 0.32)), Vector3(0, 1.2, -22)))
+	# Hearth + carved mantel.
+	var hearth_stone := MaterialKit.make("stone", Color(0.4, 0.36, 0.32))
+	parent.add_child(_mi(_box(Vector3(3, 2.4, 0.6)), hearth_stone, Vector3(0, 1.2, -22)))
+	parent.add_child(_mi(_box(Vector3(4.2, 0.4, 0.9)), hearth_stone, Vector3(0, 2.5, -22)))
 	PropKit.fire(parent, Vector3(0, 0.6, -21.6), 0.9, Color(1.0, 0.6, 0.25))
+	# Furniture: refectory tables against the walls + bookshelves (kept off the
+	# central walkway so the player passes freely between the lesson-rooms).
+	var wood := MaterialKit.make("wood", Color(0.3, 0.22, 0.16))
+	_table(parent, Vector3(-7.5, 0, -6), wood)
+	_table(parent, Vector3(7.5, 0, -14), wood)
+	var books := _rng(112)
+	for z in [-3.0, -12.0, -19.0]:
+		for s in [-1.0, 1.0]:
+			parent.add_child(_mi(_box(Vector3(0.5, 3.0, 2.6)), wood, Vector3(s * 10.3, 1.55, z)))
+			for k in range(5):
+				parent.add_child(_mi(_box(Vector3(0.4, 0.7, 0.32)), MaterialKit.make("cloth", Color.from_hsv(books.randf(), 0.45, 0.45), {"tint_blend": 0.8}), Vector3(s * 10.05, 0.6 + k * 0.55, z - 1.0 + books.randf_range(0.0, 2.0))))
 	_embers(parent, Vector3(0, 2.5, -10), Vector3(8, 2.5, 14), Color(1.0, 0.85, 0.55), 28, 0.15, "mote")
 
 
@@ -447,10 +469,12 @@ static func _valley_humiliation(parent: Node3D) -> void:
 	parent.add_child(_mi(_box(Vector3(3, 13, 3)), dark, Vector3(-5, 6.5, -34)))
 	parent.add_child(_mi(_box(Vector3(3, 13, 3)), dark, Vector3(5, 6.5, -34)))
 	parent.add_child(_mi(_box(Vector3(13, 3, 3)), dark, Vector3(0, 13, -34)))
-	parent.add_child(_mi(_box(Vector3(9, 8, 0.6)), _emit(Color(1.0, 0.4, 0.12), 1.8, true), Vector3(0, 5.5, -33.5)))
-	# Burning eyes.
-	for s in [-1.0, 1.0]:
-		parent.add_child(_mi(_dome(0.5), _emit(Color(1.0, 0.85, 0.2), 3.0), Vector3(s * 1.6, 9, -33.4)))
+	# The demonic glowing mouth + burning eyes are stylised; realistic mode keeps
+	# just the dark rock arch (a believable gorge mouth) lit by the real fire.
+	if not RenderConfig.is_realistic():
+		parent.add_child(_mi(_box(Vector3(9, 8, 0.6)), _emit(Color(1.0, 0.4, 0.12), 1.8, true), Vector3(0, 5.5, -33.5)))
+		for s in [-1.0, 1.0]:
+			parent.add_child(_mi(_dome(0.5), _emit(Color(1.0, 0.85, 0.2), 3.0), Vector3(s * 1.6, 9, -33.4)))
 	# Scorched spires lining the gorge.
 	for i in range(8):
 		var s := -1.0 if i % 2 == 0 else 1.0
@@ -495,6 +519,10 @@ static func _valley_shadow(parent: Node3D) -> void:
 static func _vanity_fair(parent: Node3D) -> void:
 	var rng := _rng(901)
 	var cloths := [Color(0.8, 0.2, 0.25), Color(0.2, 0.4, 0.75), Color(0.8, 0.7, 0.2), Color(0.5, 0.2, 0.6), Color(0.2, 0.6, 0.4)]
+	# Timber market-town buildings lining the street (off the central corridor).
+	for z in [-3.0, -13.0, -23.0]:
+		PropKit.building(parent, Vector3(-13, 0, z), Vector3(6, 6.5, 6), Color(0.6, 0.5, 0.42), Color(0.4, 0.28, 0.2))
+		PropKit.building(parent, Vector3(13, 0, z), Vector3(6, 7.0, 6), Color(0.58, 0.48, 0.4), Color(0.38, 0.26, 0.18))
 	var zi := 0
 	for z in [-4.0, -14.0, -24.0]:
 		PropKit.market_stall(parent, Vector3(-9, 0, z), Color(1, 1, 1), cloths[zi % cloths.size()])
@@ -562,6 +590,12 @@ static func _delectable(parent: Node3D) -> void:
 		parent.add_child(_mi(_box(Vector3(0.18, 0.4, 0.18)), MaterialKit.make("cloth", Color.from_hsv(rng.randf(), 0.7, 0.95), {"tint_blend": 0.8}), Vector3(rng.randf_range(-16, 16), 0.2, rng.randf_range(-22, 4))))
 	for i in range(4):
 		PropKit.sheep(parent, Vector3(rng.randf_range(-12, 12), 0, rng.randf_range(-18, -2)), rng.randi())
+	# A shepherd's hut and a fenced sheepfold with the flock.
+	PropKit.cottage(parent, Vector3(-13, 0, -8), Vector3(4.5, 3.0, 4.5), Color(0.56, 0.49, 0.41), Color(0.4, 0.3, 0.2))
+	PropKit.pen(parent, Vector3(13, 0, -9), Vector2(9, 9), Color(0.46, 0.35, 0.24))
+	for i in range(5):
+		PropKit.sheep(parent, Vector3(13 + rng.randf_range(-3, 3), 0, -9 + rng.randf_range(-3, 3)), rng.randi())
+
 	# The distant shining City.
 	for x in [-1.5, 0.0, 1.5]:
 		parent.add_child(_mi(_box(Vector3(1, 4, 1)), _emit(Color(1.0, 0.88, 0.55), 2.0, true), Vector3(x, 2.5, -54)))
@@ -624,6 +658,19 @@ static func _wilderness(parent: Node3D) -> void:
 ## of light, beams, an animated shimmer over the crossing.
 static func _river(parent: Node3D) -> void:
 	_water(parent, Vector3(0, 0.12, -7), Vector2(30, 26), Color(0.5, 0.62, 0.72), Color(0.12, 0.2, 0.3), 0.55)
+	# A weathered wooden jetty where the pilgrims step down into the water.
+	var plank := MaterialKit.make("wood", Color(0.34, 0.26, 0.18))
+	parent.add_child(_mi(_box(Vector3(3.0, 0.16, 8.0)), plank, Vector3(0, 0.14, 3.0)))
+	for px in [-1.3, 1.3]:
+		for pz in [6.0, 2.0, -1.0]:
+			parent.add_child(_mi(_cyl(0.1, 0.12, 1.4, 5), plank, Vector3(px, -0.3, pz)))
+	# Old pilings standing in the river, and stone steps rising to the far shore.
+	for pz in [-2.0, -7.0, -12.0]:
+		for px in [-6.0, 6.0]:
+			parent.add_child(_mi(_cyl(0.12, 0.16, 2.2, 5), plank, Vector3(px, 0.2, pz)))
+	var steps := MaterialKit.make("stone", Color(0.5, 0.47, 0.42))
+	for i in range(3):
+		parent.add_child(_mi(_box(Vector3(6.0 - i * 1.2, 0.4, 1.4)), steps, Vector3(0, 0.2 + i * 0.4, -25.0 - i * 1.4)))
 	# A shining gate-city on the far shore.
 	var goldmat := MaterialKit.make("gold", Color(1.0, 0.85, 0.45), {"emission": 0.6})
 	parent.add_child(_mi(_box(Vector3(4, 6, 2)), goldmat, Vector3(0, 3, -34)))
