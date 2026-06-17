@@ -196,6 +196,8 @@ func _show_title() -> void:
 	# Optional title-screen music (silently skipped if the file is absent).
 	AudioManager.play_music("res://assets/audio/music/title.ogg")
 	var vb := _make_centered_box(panel)
+	# Roomier vertical spacing between title-menu rows (e.g. between the journey buttons).
+	vb.add_theme_constant_override("separation", 30)
 	_add_title(vb, LocaleManager.t("menu.title", "PILGRIM'S ROAD"), 48, Color(0.95, 0.88, 0.6))
 	_add_title(vb, LocaleManager.t("menu.subtitle", "Burden Fallen"), 26, Color(0.7, 0.78, 0.9))
 	var spacer := Control.new()

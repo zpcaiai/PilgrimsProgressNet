@@ -60,6 +60,13 @@ func _build_chapter() -> void:
 func _build_family_house(pos: Vector3) -> void:
 	PropKit.cottage(self, pos, Vector3(5, 3.2, 5), Color(0.5, 0.42, 0.4), Color(0.32, 0.22, 0.16))
 
+	# Drawing near the family's home eases the heart a little (once): the warmth
+	# of what you are leaving behind steadies despair and weariness.
+	var family_solace := func(_b: Node) -> void:
+		SpiritualStateManager.apply_effects({"despair": -5, "weariness": -5})
+		EventBus.toast("Home's familiar warmth steadies you — despair and weariness ease a little.")
+	make_trigger(pos + Vector3(0, 1.0, 2.0), Vector3(7, 3, 7), family_solace)
+
 	# The family, seen inside the doorway. Falls back to the old greybox NPC if
 	# the figure art is missing, so the plea always works.
 	var fig := AssetLib.figure("Your Family")

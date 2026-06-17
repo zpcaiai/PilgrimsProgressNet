@@ -18,7 +18,20 @@ var _pal_bot: Color = Color(0.3, 0.3, 0.3)
 var _pal_ok: bool = false
 
 
+# --- TEMP DEBUG: build trace (remove after diagnosis) ---
+static var _trace: PackedStringArray = []
+func _dbg(msg: String) -> void:
+	_trace.append(msg)
+	for path in ["res://_pp_trace.txt", "user://_pp_trace.txt"]:
+		var f := FileAccess.open(path, FileAccess.WRITE)
+		if f != null:
+			f.store_string("\n".join(_trace))
+			f.close()
+	print("[PPTRACE] ", msg)
+
+
 func _ready() -> void:
+	_dbg("=== ready_start " + ChapterManager.current_chapter_id + " ===")
 	# Ease every chapter in from black so transitions between scenes of very
 	# different brightness never hard-cut.
 	_fade_in()
@@ -31,7 +44,9 @@ func _ready() -> void:
 	# stylised look. Realistic mode uses a clean procedural (or photo) sky.
 	if not RenderConfig.is_realistic():
 		_sample_palette()
+	_dbg("build_start")
 	_build_chapter()
+	_dbg("build_end")
 	if RenderConfig.is_realistic():
 		_attach_realistic_backdrop()
 	else:
@@ -40,7 +55,9 @@ func _ready() -> void:
 	# Reshape pass: bespoke per-chapter lighting rig, atmosphere (fog/glow/
 	# tonemap), environmental set-dressing and (stylised only) the painterly
 	# post-process — layered on top of the chapter's own gameplay geometry.
+	_dbg("rebuild_start")
 	_apply_world_rebuild()
+	_dbg("rebuild_end")
 	if player == null:
 		spawn_player(_spawn_position)
 	# Re-spawn a travelling companion if one has joined the pilgrim.
@@ -231,6 +248,7 @@ func _build_chapter() -> void:
 # ---------------------------------------------------------------------------
 func setup_environment(sky_top: Color, sky_horizon: Color, ambient_energy: float = 1.0,
 		fog_enabled: bool = false, fog_color: Color = Color(0.5, 0.5, 0.55), fog_density: float = 0.02) -> void:
+	_dbg("setup_environment")
 	var we := WorldEnvironment.new()
 	var env := Environment.new()
 	env.background_mode = Environment.BG_SKY
@@ -283,6 +301,7 @@ func make_material(color: Color, emission: float = 0.0) -> StandardMaterial3D:
 # Geometry helpers
 # ---------------------------------------------------------------------------
 func make_ground(size: Vector2, color: Color, pos: Vector3 = Vector3.ZERO) -> StaticBody3D:
+	_dbg("make_ground")
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	body.collision_mask = 0
@@ -331,6 +350,7 @@ func make_ground(size: Vector2, color: Color, pos: Vector3 = Vector3.ZERO) -> St
 
 
 func make_block(size: Vector3, color: Color, pos: Vector3, emission: float = 0.0, surface: String = "") -> StaticBody3D:
+	_dbg("make_block " + str(pos))
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	body.position = pos
@@ -372,6 +392,7 @@ func make_ramp(size: Vector3, color: Color, pos: Vector3, angle_deg: float, surf
 
 
 func make_decor(size: Vector3, color: Color, pos: Vector3, emission: float = 0.0, surface: String = "") -> MeshInstance3D:
+	_dbg("make_decor")
 	# Non-colliding visual prop.
 	var mesh := MeshInstance3D.new()
 	var box := BoxMesh.new()
@@ -423,6 +444,7 @@ func make_light_burst(pos: Vector3, color: Color = Color(1.0, 0.95, 0.7), amount
 
 
 func make_floating_label(text: String, pos: Vector3, color: Color = Color.WHITE) -> Label3D:
+	_dbg("make_floating_label " + text)
 	var label := Label3D.new()
 	label.text = text
 	label.position = pos
@@ -439,6 +461,7 @@ func make_floating_label(text: String, pos: Vector3, color: Color = Color.WHITE)
 # Player
 # ---------------------------------------------------------------------------
 func spawn_player(pos: Vector3) -> PlayerController:
+	_dbg("spawn_player " + str(pos))
 	# Idempotent: if a player already exists (e.g. pre-spawned in _ready), just
 	# move it to the requested position instead of creating a second one.
 	if is_instance_valid(player):
@@ -456,6 +479,7 @@ func spawn_player(pos: Vector3) -> PlayerController:
 # ---------------------------------------------------------------------------
 func make_npc(npc_name: String, pos: Vector3, color: Color, dialogue_id: String = "",
 		prompt: String = "", on_interact: Callable = Callable()) -> Interactable:
+	_dbg("make_npc " + npc_name)
 	var area := Interactable.new()
 	area.name = npc_name
 	area.position = pos
@@ -510,6 +534,7 @@ func make_npc(npc_name: String, pos: Vector3, color: Color, dialogue_id: String 
 func make_interactable(pos: Vector3, prompt: String, on_interact: Callable,
 		mesh: Mesh = null, color: Color = Color(0.8, 0.8, 0.9), emission: float = 0.0,
 		radius: float = 1.2, one_shot: bool = false) -> Interactable:
+	_dbg("make_interactable " + prompt)
 	var area := Interactable.new()
 	area.position = pos
 	area.prompt = prompt
@@ -538,6 +563,7 @@ func make_interactable(pos: Vector3, prompt: String, on_interact: Callable,
 # Triggers (detect the player body on layer 1)
 # ---------------------------------------------------------------------------
 func make_trigger(pos: Vector3, size: Vector3, on_enter: Callable, once: bool = true) -> Area3D:
+	_dbg("make_trigger")
 	var area := Area3D.new()
 	area.position = pos
 	area.collision_layer = 0
@@ -586,6 +612,7 @@ func _advance_after_delay() -> void:
 # Distant goal light (the Celestial direction) — a recurring motif.
 # ---------------------------------------------------------------------------
 func make_distant_light(pos: Vector3, color: Color = Color(1.0, 0.95, 0.7)) -> void:
+	_dbg("make_distant_light")
 	var omni := OmniLight3D.new()
 	omni.position = pos
 	omni.light_color = color
@@ -610,6 +637,7 @@ func make_distant_light(pos: Vector3, color: Color = Color(1.0, 0.95, 0.7)) -> v
 # blessing; kneeling inside gives a one-time grace and lights its candle.
 # ---------------------------------------------------------------------------
 func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Dictionary, kneel_text: String) -> void:
+	_dbg("make_wayside_chapel " + chapel_id)
 	var wall := Color(0.5, 0.48, 0.44)
 	make_block(Vector3(3.4, 3.0, 0.4), wall, pos + Vector3(0, 1.5, -1.6))
 	make_block(Vector3(0.4, 3.0, 3.2), wall, pos + Vector3(-1.5, 1.5, 0))
@@ -644,10 +672,13 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Diction
 	pause.position = pos + Vector3(0, 1, 1.5)
 	var pflag := "paused_chapel_" + chapel_id
 	pause.body_entered.connect(func(b):
-		if b is PlayerController and not GameState.has_flag(pflag):
-			GameState.set_flag(pflag, true)
-			SpiritualStateManager.apply_effects({"watchfulness": 2})
-			EventBus.toast("A small chapel stands off the road. You slow, and breathe.")
+		if b is PlayerController:
+			# Every visit to a cross-bearing chapel lifts faith and hope.
+			SpiritualStateManager.apply_effects({"faith": 3, "hope": 3})
+			if not GameState.has_flag(pflag):
+				GameState.set_flag(pflag, true)
+				SpiritualStateManager.apply_effects({"watchfulness": 2})
+				EventBus.toast("A small chapel stands off the road. You slow, and breathe.")
 	)
 	add_child(pause)
 
@@ -698,11 +729,16 @@ func _surface_or_color(surface: String, color: Color, emission: float = 0.0) -> 
 ## Apply the chapter's art profile after its gameplay geometry is built.
 func _apply_world_rebuild() -> void:
 	var prof := ChapterArtProfiles.for_chapter(ChapterManager.current_chapter_id)
+	_dbg("rb:env")
 	_apply_environment(prof)
+	_dbg("rb:light")
 	_apply_lighting(prof)
+	_dbg("rb:dress")
 	_apply_dressing(prof.get("dressing", []))
+	_dbg("rb:art")
 	# Bespoke per-chapter centrepiece (deep-polish layer) on top of the profile.
 	ChapterArt.build(self, ChapterManager.current_chapter_id)
+	_dbg("rb:postfx")
 	# The painterly oil filter is stylised-only (Children's Journey); realistic
 	# Devout mode skips it.
 	if not RenderConfig.is_realistic():

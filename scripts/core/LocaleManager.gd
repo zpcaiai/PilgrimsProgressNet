@@ -13,7 +13,7 @@ extends Node
 const SETTINGS := "user://locale.cfg"
 const TABLE := "res://assets/i18n/ui.json"
 
-var locale: String = "en"               # "zh" or "en"
+var locale: String = "zh"               # "zh" or "en" (defaults to Chinese)
 var _t: Dictionary = {}                  # key -> {"en": ..., "zh": ...}
 
 
@@ -40,7 +40,8 @@ func _load_saved() -> String:
 		var s := FileAccess.get_file_as_string(SETTINGS).strip_edges()
 		if s == "zh" or s == "en":
 			return s
-	return _detect()
+	# Default to Chinese on first open (no saved choice yet).
+	return "zh"
 
 
 func _apply_translation_server() -> void:

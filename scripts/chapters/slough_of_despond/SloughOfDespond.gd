@@ -34,6 +34,7 @@ func _build_chapter() -> void:
 	_add_promise(Vector3(0, 0, -26), "perseverance")
 
 	# Deceptive ground in the fog.
+	_dbg("false_ground")
 	var fg := FalseGround.new()
 	add_child(fg)
 	fg.setup(Vector3(4, 0.4, 4))
@@ -70,6 +71,7 @@ func _build_chapter() -> void:
 
 
 func _add_mud(pos: Vector3, size: Vector3, deep: bool) -> void:
+	_dbg("mud " + str(pos))
 	var m := MudZone.new()
 	add_child(m)
 	m.setup(size, deep)
@@ -77,6 +79,7 @@ func _add_mud(pos: Vector3, size: Vector3, deep: bool) -> void:
 
 
 func _add_safe_stone(pos: Vector3) -> void:
+	_dbg("safe_stone " + str(pos))
 	var s := SafeStone.new()
 	add_child(s)
 	s.setup(1.6)
@@ -84,6 +87,7 @@ func _add_safe_stone(pos: Vector3) -> void:
 
 
 func _add_promise(pos: Vector3, kind: String) -> void:
+	_dbg("promise " + kind)
 	var data: Dictionary = PROMISE_LINES[kind]
 	var p := PromiseStone.new()
 	add_child(p)
