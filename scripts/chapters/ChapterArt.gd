@@ -397,13 +397,13 @@ static func _interpreter(parent: Node3D) -> void:
 	PropKit.fire(parent, Vector3(0, 0.6, -21.6), 0.9, Color(1.0, 0.6, 0.25))
 	# Furniture: refectory tables against the walls + bookshelves (kept off the
 	# central walkway so the player passes freely between the lesson-rooms).
-	var wood := MaterialKit.make("wood", Color(0.3, 0.22, 0.16))
-	_table(parent, Vector3(-7.5, 0, -6), wood)
-	_table(parent, Vector3(7.5, 0, -14), wood)
+	var furniture_wood := MaterialKit.make("wood", Color(0.3, 0.22, 0.16))
+	_table(parent, Vector3(-7.5, 0, -6), furniture_wood)
+	_table(parent, Vector3(7.5, 0, -14), furniture_wood)
 	var books := _rng(112)
 	for z in [-3.0, -12.0, -19.0]:
 		for s in [-1.0, 1.0]:
-			parent.add_child(_mi(_box(Vector3(0.5, 3.0, 2.6)), wood, Vector3(s * 10.3, 1.55, z)))
+			parent.add_child(_mi(_box(Vector3(0.5, 3.0, 2.6)), furniture_wood, Vector3(s * 10.3, 1.55, z)))
 			for k in range(5):
 				parent.add_child(_mi(_box(Vector3(0.4, 0.7, 0.32)), MaterialKit.make("cloth", Color.from_hsv(books.randf(), 0.45, 0.45), {"tint_blend": 0.8}), Vector3(s * 10.05, 0.6 + k * 0.55, z - 1.0 + books.randf_range(0.0, 2.0))))
 	_embers(parent, Vector3(0, 2.5, -10), Vector3(8, 2.5, 14), Color(1.0, 0.85, 0.55), 28, 0.15, "mote")
@@ -663,11 +663,11 @@ static func _river(parent: Node3D) -> void:
 	parent.add_child(_mi(_box(Vector3(3.0, 0.16, 8.0)), plank, Vector3(0, 0.14, 3.0)))
 	for px in [-1.3, 1.3]:
 		for pz in [6.0, 2.0, -1.0]:
-			parent.add_child(_mi(_cyl(0.1, 0.12, 1.4, 5), plank, Vector3(px, -0.3, pz)))
+			parent.add_child(_mi(_cone(0.1, 0.12, 1.4, 5), plank, Vector3(px, -0.3, pz)))
 	# Old pilings standing in the river, and stone steps rising to the far shore.
 	for pz in [-2.0, -7.0, -12.0]:
 		for px in [-6.0, 6.0]:
-			parent.add_child(_mi(_cyl(0.12, 0.16, 2.2, 5), plank, Vector3(px, 0.2, pz)))
+			parent.add_child(_mi(_cone(0.12, 0.16, 2.2, 5), plank, Vector3(px, 0.2, pz)))
 	var steps := MaterialKit.make("stone", Color(0.5, 0.47, 0.42))
 	for i in range(3):
 		parent.add_child(_mi(_box(Vector3(6.0 - i * 1.2, 0.4, 1.4)), steps, Vector3(0, 0.2 + i * 0.4, -25.0 - i * 1.4)))
