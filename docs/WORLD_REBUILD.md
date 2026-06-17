@@ -8,6 +8,31 @@
 
 ---
 
+## 〇、画风随模式切换:儿童=油画,成人=写实 (RenderConfig)
+
+`scripts/render/RenderConfig.gd` 按**所选旅程模式**自动切换整套画风:
+
+```gdscript
+RenderConfig.is_realistic()   # 童趣版(Children's Journey)= false → 油画/绘本
+                              # 虔诚版(Devout / 成人)      = true  → 自然写实
+const FORCE := 0              # 0=按模式自动;1=强制写实;2=强制油画(测试用)
+```
+
+**童趣版 → 油画/绘本(stylised)**:油画 Kuwahara 全屏后处理、"画作当天空"的背景、
+调色板向画作靠拢、神光柱/光晕太阳/发光金城/火口光幕/发光梦花等奇幻特效全开;
+`PainterlyPostFX` 用暖色油画预设(明亮、温暖、适合孩子)。
+
+**虔诚版 → 自然写实**:关掉油画后处理与画作天空;干净程序化天空(或写实背景照片)、
+PBR 材质、自然布光/雾、辉光压到写实档、去自发光彩雾;奇幻特效跳过或大幅压暗,
+只留自然布景(树木、岩石、水、建筑、雾、羊群、集市…);天城变成阳光下的真实石城。
+
+**写实环境背景(仅虔诚版用)**:把写实风景图放进 `assets/scenes/realistic/<id>.{jpg,png,webp}`
+即被 `AssetLib.realistic_backdrop()` 当作该章天空/远景;没有就用程序化天空(优雅降级)。
+图可 AI(Z-Image/Firefly)生成或用真实照片。详见该目录 README。
+> 这批写实背景照片由定时任务 `generate-realistic-backdrops` 在 GPU 配额恢复后自动分批生成。
+
+---
+
 ## 一、改了什么(总览)
 
 | 层面 | 内容 | 文件 |
@@ -120,10 +145,11 @@ dressing[ {op:..., ...} ]                                   # 环境点缀清单
   没有立绘则返回 null(调用方回退灰模胶囊)。
 - 接入点:`ChapterBase.make_npc()`(NPC)、`PlayerController._build()`(主角,隐藏胶囊+头)、
   `Companion.setup()`(同伴)。
-- `tools/gen_figures.py`:从 `assets/characters/<stem>.png` 的近匀色画背景**抠图**
-  (边缘 flood-fill + 椭圆羽化)生成透明 `figures/<stem>.webp`。自动抠图是"够用的默认值"。
+- `tools/gen_figures.py`:用 **OpenCV GrabCut** 把人物从画背景中干净抠出(前/背景分割,
+  无需下载模型),生成透明 `figures/<stem>.webp`;没装 OpenCV 时回退到 flood-fill + 椭圆羽化。
+  需要 `pip install opencv-python` 以获得最佳质量。
 
-**想要完美效果**:把你自己的**透明** `pilgrim.webp` 等放进 `assets/characters/figures/`
+**覆盖/重生成**:把你自己的**透明** `pilgrim.webp` 等放进 `assets/characters/figures/`
 即可覆盖自动抠图(`.webp` 优先于 `.png`)。立绘是半身像,站立时呈"半身人像"感;
 要全身请放全身透明图。重生成:`python3 tools/gen_figures.py`。
 

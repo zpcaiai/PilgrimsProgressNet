@@ -116,9 +116,9 @@ static func _overrides(id: String) -> Dictionary:
 			}
 		"interpreter_house":
 			return {
-				"sun": {"angle": Vector3(-60, -40, 0), "color": Color(0.6, 0.55, 0.5), "energy": 0.25},
-				"fill": {"angle": Vector3(-20, 150, 0), "color": Color(0.4, 0.4, 0.5), "energy": 0.12},
-				"ambient": {"color": Color(0.3, 0.26, 0.22), "energy": 0.4},
+				"sun": {"angle": Vector3(-60, -40, 0), "color": Color(0.62, 0.56, 0.5), "energy": 0.35},
+				"fill": {"angle": Vector3(-20, 150, 0), "color": Color(0.4, 0.4, 0.5), "energy": 0.16},
+				"ambient": {"color": Color(0.32, 0.28, 0.24), "energy": 0.5},
 				"fog": {"enabled": false, "color": Color(0.2, 0.18, 0.16), "density": 0.0},
 				"glow": {"enabled": true, "intensity": 1.0, "strength": 1.1, "bloom": 0.2, "threshold": 0.8},
 				"tonemap": {"mode": "filmic", "exposure": 0.95, "white": 1.1},

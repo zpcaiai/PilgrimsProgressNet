@@ -73,19 +73,25 @@ func _build_visual() -> void:
 	col.shape = shape
 	col.position = Vector3(0, 0.9, 0)
 	add_child(col)
-	var mesh := MeshInstance3D.new()
-	var capsule := CapsuleMesh.new()
-	capsule.radius = 0.45
-	capsule.height = 1.7
-	mesh.mesh = capsule
-	mesh.position = Vector3(0, 0.9, 0)
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
-	mat.emission_enabled = true
-	mat.emission = color
-	mat.emission_energy_multiplier = 0.5
-	mesh.material_override = mat
-	add_child(mesh)
+	# Visual: a painted figure billboard when one exists for this foe (e.g.
+	# Apollyon, Giant Despair), else the emissive capsule greybox.
+	var fig := AssetLib.figure(display_name)
+	if fig != null:
+		add_child(CharacterBillboard.make(fig, 2.1))
+	else:
+		var mesh := MeshInstance3D.new()
+		var capsule := CapsuleMesh.new()
+		capsule.radius = 0.45
+		capsule.height = 1.7
+		mesh.mesh = capsule
+		mesh.position = Vector3(0, 0.9, 0)
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = color
+		mat.emission_enabled = true
+		mat.emission = color
+		mat.emission_energy_multiplier = 0.5
+		mesh.material_override = mat
+		add_child(mesh)
 	var label := Label3D.new()
 	label.text = display_name
 	label.position = Vector3(0, 2.3, 0)

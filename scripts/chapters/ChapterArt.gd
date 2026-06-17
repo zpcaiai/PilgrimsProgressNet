@@ -91,6 +91,10 @@ static func _dome(r: float) -> SphereMesh:
 
 
 static func _emit(color: Color, energy: float, unshaded: bool = false, alpha: float = 1.0) -> StandardMaterial3D:
+	# Realistic mode: keep only a fraction of the glow (fire/lava still read,
+	# but "magic" emissive cities/flowers/halos calm down).
+	if RenderConfig.is_realistic():
+		energy *= 0.35
 	var m := StandardMaterial3D.new()
 	m.albedo_color = Color(color.r, color.g, color.b, alpha)
 	m.emission_enabled = true
@@ -136,6 +140,10 @@ static func _spot(parent: Node3D, pos: Vector3, target: Vector3, color: Color, e
 
 ## An additive light shaft (animated godray shader, or emissive fallback).
 static func _ray(parent: Node3D, pos: Vector3, height: float, top_r: float, color: Color, intensity: float, tilt_x: float = 0.0, tilt_z: float = 0.0) -> void:
+	# God-ray shafts are a stylised device; realistic mode relies on real sky,
+	# sun and atmosphere instead.
+	if RenderConfig.is_realistic():
+		return
 	var mat: Material
 	var sh := load(GODRAY)
 	if sh is Shader:
@@ -156,6 +164,9 @@ static func _ray(parent: Node3D, pos: Vector3, height: float, top_r: float, colo
 
 ## A soft additive billboard disc — a sun, a halo, a glow.
 static func _glow_disc(parent: Node3D, pos: Vector3, radius: float, color: Color, energy: float) -> void:
+	# Soft glowing suns/halos are stylised; realistic mode omits them.
+	if RenderConfig.is_realistic():
+		return
 	var q := QuadMesh.new()
 	q.size = Vector2(radius * 2.0, radius * 2.0)
 	var m := _emit(color, energy, true, 0.9)
@@ -505,11 +516,12 @@ static func _vanity_fair(parent: Node3D) -> void:
 	for i in range(10):
 		var s := -1.0 if i % 2 == 0 else 1.0
 		_figure(parent, Vector3(s * rng.randf_range(6.5, 8.5), 0, rng.randf_range(-2, -28)), Color.from_hsv(rng.randf(), 0.5, 0.7))
-	# Gilded idol on a stage at the far end.
-	parent.add_child(_mi(_box(Vector3(6, 0.6, 4)), MaterialKit.make("wood", Color(0.4, 0.3, 0.2)), Vector3(0, 0.3, -30)))
-	parent.add_child(_mi(_box(Vector3(1.2, 4, 1.2)), MaterialKit.make("gold", Color(1.0, 0.85, 0.4), {"emission": 0.6}), Vector3(0, 2.6, -30)))
-	parent.add_child(_mi(_dome(0.9), MaterialKit.make("gold", Color(1.0, 0.85, 0.4), {"emission": 0.6}), Vector3(0, 5.0, -30)))
-	_accent(parent, Vector3(0, 4, -29), Color(1.0, 0.85, 0.4), 2.5, 18.0)
+	# Gilded idol on a stage, set BEHIND the chapter's exit (z=-32) so the pilgrim
+	# sees it ahead but advances before reaching it (no walk-through).
+	parent.add_child(_mi(_box(Vector3(6, 0.6, 4)), MaterialKit.make("wood", Color(0.4, 0.3, 0.2)), Vector3(0, 0.3, -38)))
+	parent.add_child(_mi(_box(Vector3(1.2, 4, 1.2)), MaterialKit.make("gold", Color(1.0, 0.85, 0.4), {"emission": 0.6}), Vector3(0, 2.6, -38)))
+	parent.add_child(_mi(_dome(0.9), MaterialKit.make("gold", Color(1.0, 0.85, 0.4), {"emission": 0.6}), Vector3(0, 5.0, -38)))
+	_accent(parent, Vector3(0, 4, -37), Color(1.0, 0.85, 0.4), 2.5, 18.0)
 
 
 ## Doubting Castle — the grim fortress looming over the cell: a towering keep,

@@ -19,13 +19,22 @@ var _pal_ok: bool = false
 
 
 func _ready() -> void:
-	_sample_palette()
+	# Ease every chapter in from black so transitions between scenes of very
+	# different brightness never hard-cut.
+	_fade_in()
+	# Oil-painting layers (palette harmonising + painting-as-sky) only run in the
+	# stylised look. Realistic mode uses a clean procedural (or photo) sky.
+	if not RenderConfig.is_realistic():
+		_sample_palette()
 	_build_chapter()
-	_apply_art_palette()
-	_attach_backdrop()
+	if RenderConfig.is_realistic():
+		_attach_realistic_backdrop()
+	else:
+		_apply_art_palette()
+		_attach_backdrop()
 	# Reshape pass: bespoke per-chapter lighting rig, atmosphere (fog/glow/
-	# tonemap), environmental set-dressing and the painterly post-process — all
-	# layered on top of the chapter's own gameplay geometry.
+	# tonemap), environmental set-dressing and (stylised only) the painterly
+	# post-process — layered on top of the chapter's own gameplay geometry.
 	_apply_world_rebuild()
 	if player == null:
 		spawn_player(_spawn_position)
@@ -70,6 +79,47 @@ func _attach_backdrop() -> void:
 			var sky := Sky.new()
 			var pano := PanoramaSkyMaterial.new()
 			pano.panorama = art
+			sky.sky_material = pano
+			env.background_mode = Environment.BG_SKY
+			env.sky = sky
+			env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+			return
+
+
+## A short fade-in from black on entering each chapter, so transitions between
+## scenes of very different brightness (e.g. the bright Cross into the dark
+## Interpreter's House, or the night Valley into bright Vanity Fair) ease through
+## black instead of cutting hard. Sits above all UI (layer 200).
+func _fade_in() -> void:
+	var cl := CanvasLayer.new()
+	cl.layer = 200
+	add_child(cl)
+	var rect := ColorRect.new()
+	rect.color = Color(0, 0, 0, 1)
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cl.add_child(rect)
+	var tw := create_tween()
+	tw.tween_interval(0.12)
+	tw.tween_property(rect, "color:a", 0.0, 0.7)
+	tw.tween_callback(cl.queue_free)
+
+
+## Realistic mode: if a realistic environment photo exists for this chapter, use
+## it as the sky/backdrop. Otherwise leave the clean procedural sky that
+## setup_environment created (already tuned to the chapter's natural sky colours).
+func _attach_realistic_backdrop() -> void:
+	var bg := AssetLib.realistic_backdrop(ChapterManager.current_chapter_id)
+	if bg == null:
+		return
+	for c in get_children():
+		if c is WorldEnvironment:
+			var env: Environment = (c as WorldEnvironment).environment
+			if env == null:
+				continue
+			var sky := Sky.new()
+			var pano := PanoramaSkyMaterial.new()
+			pano.panorama = bg
 			sky.sky_material = pano
 			env.background_mode = Environment.BG_SKY
 			env.sky = sky
@@ -636,7 +686,10 @@ func _apply_world_rebuild() -> void:
 	_apply_dressing(prof.get("dressing", []))
 	# Bespoke per-chapter centrepiece (deep-polish layer) on top of the profile.
 	ChapterArt.build(self, ChapterManager.current_chapter_id)
-	_attach_postfx(prof.get("post", {}))
+	# The painterly oil filter is stylised-only (Children's Journey); realistic
+	# Devout mode skips it.
+	if not RenderConfig.is_realistic():
+		_attach_postfx(prof.get("post", {}))
 
 
 func _find_or_make_env() -> Environment:
@@ -680,21 +733,36 @@ func _apply_environment(prof: Dictionary) -> void:
 		env.volumetric_fog_density = float(fog.get("vol_density", 0.03))
 		env.volumetric_fog_albedo = fog.get("albedo", Color(0.7, 0.72, 0.75))
 		env.volumetric_fog_emission = fog.get("emission", Color(0, 0, 0))
-		env.volumetric_fog_emission_energy = float(fog.get("emission_energy", 0.0))
+		# Realistic mode: no self-lit coloured fog (that "magic glow" look).
+		env.volumetric_fog_emission_energy = 0.0 if RenderConfig.is_realistic() else float(fog.get("emission_energy", 0.0))
 		env.volumetric_fog_length = 96.0
 		env.volumetric_fog_gi_inject = 0.5
 
 	var glow: Dictionary = prof.get("glow", {})
 	env.glow_enabled = bool(glow.get("enabled", true))
 	if env.glow_enabled:
-		env.glow_intensity = float(glow.get("intensity", 0.8))
+		var g_intensity := float(glow.get("intensity", 0.8))
+		var g_bloom := float(glow.get("bloom", 0.1))
+		var g_threshold := float(glow.get("threshold", 0.9))
+		# Realistic mode: only true highlights bloom, gently — no painterly halo.
+		if RenderConfig.is_realistic():
+			g_intensity = minf(g_intensity, 0.4)
+			g_bloom = minf(g_bloom, 0.06)
+			g_threshold = maxf(g_threshold, 1.0)
+		env.glow_intensity = g_intensity
 		env.glow_strength = float(glow.get("strength", 1.0))
-		env.glow_bloom = float(glow.get("bloom", 0.1))
-		env.glow_hdr_threshold = float(glow.get("threshold", 0.9))
+		env.glow_bloom = g_bloom
+		env.glow_hdr_threshold = g_threshold
 		env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
 
 	var tm: Dictionary = prof.get("tonemap", {})
-	env.tonemap_mode = _tonemap_enum(String(tm.get("mode", "aces")))
+	# Realistic mode uses one consistent tonemapper (ACES) across all scenes so
+	# the whole journey shares a coordinated colour response; the per-chapter
+	# filmic/agx choices are kept for the stylised oil look.
+	var tm_mode := String(tm.get("mode", "aces"))
+	if RenderConfig.is_realistic():
+		tm_mode = "aces"
+	env.tonemap_mode = _tonemap_enum(tm_mode)
 	env.tonemap_exposure = float(tm.get("exposure", 1.0))
 	env.tonemap_white = float(tm.get("white", 1.0))
 

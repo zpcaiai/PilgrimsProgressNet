@@ -20,6 +20,7 @@ class_name AssetLib
 const GROUND_DIR := "res://assets/textures/ground/"
 const PBR_DIR := "res://assets/textures/pbr/"
 const SCENE_DIR := "res://assets/scenes/"
+const REAL_SCENE_DIR := "res://assets/scenes/realistic/"
 const CHAR_DIR := "res://assets/characters/"
 const FIGURE_DIR := "res://assets/characters/figures/"
 const PARTICLE_DIR := "res://assets/textures/particles/"
@@ -36,6 +37,7 @@ const SPEAKER_MAP := {
 	"Apollyon": "apollyon",
 	"The Interpreter": "the_interpreter",
 	"The Shepherds": "the_shepherds",
+	"Shepherd": "the_shepherds",
 	"Watchful": "watchful",
 	"Obstinate": "obstinate",
 	"Pliable": "pliable",
@@ -80,6 +82,13 @@ static func scene_art(chapter_id: String) -> Texture2D:
 
 static func particle(particle_name: String) -> Texture2D:
 	return tex(PARTICLE_DIR + particle_name + ".png")
+
+
+## Realistic per-chapter environment photo used as the sky/backdrop in realistic
+## mode. assets/scenes/realistic/<id>.{jpg,png,webp}. Null if absent (then a
+## clean procedural sky is used). Drop landscape photos here to ground a chapter.
+static func realistic_backdrop(chapter_id: String) -> Texture2D:
+	return _first_tex([REAL_SCENE_DIR + chapter_id + ".jpg", REAL_SCENE_DIR + chapter_id + ".png", REAL_SCENE_DIR + chapter_id + ".webp"])
 
 
 static func ui(ui_name: String) -> Texture2D:

@@ -36,30 +36,22 @@ func _ready() -> void:
 	_apply_mode_defaults()
 
 
-## Base look per journey mode. Per-chapter profiles refine this via configure().
+## The Children's Journey oil-painting look. This post-process is now attached
+## ONLY in Children's mode (Devout mode renders realistically with no filter), so
+## the defaults are a warm, rich, kid-friendly oil wash. Per-chapter profiles
+## refine these via configure().
 func _apply_mode_defaults() -> void:
 	if _mat == null:
 		return
-	if GameState.is_child_mode():
-		_apply_param("strength", 0.72)
-		_apply_param("saturation", 1.18)
-		_apply_param("contrast", 0.98)
-		_apply_param("brightness", 1.06)
-		_apply_param("tint", Vector3(1.0, 0.97, 0.90))
-		_apply_param("tint_amount", 0.10)
-		_apply_param("vignette_amount", 0.14)
-		_apply_param("grain_amount", 0.015)
-		_apply_param("brush", 1.25)
-	else:
-		_apply_param("strength", 0.90)
-		_apply_param("saturation", 1.10)
-		_apply_param("contrast", 1.06)
-		_apply_param("brightness", 1.0)
-		_apply_param("tint", Vector3(1.0, 0.98, 0.94))
-		_apply_param("tint_amount", 0.06)
-		_apply_param("vignette_amount", 0.32)
-		_apply_param("grain_amount", 0.035)
-		_apply_param("brush", 1.0)
+	_apply_param("strength", 0.9)
+	_apply_param("saturation", 1.14)
+	_apply_param("contrast", 1.04)
+	_apply_param("brightness", 1.03)
+	_apply_param("tint", Vector3(1.0, 0.97, 0.9))
+	_apply_param("tint_amount", 0.1)
+	_apply_param("vignette_amount", 0.24)
+	_apply_param("grain_amount", 0.03)
+	_apply_param("brush", 1.2)
 
 
 ## Per-chapter overrides (e.g. {"tint": Vector3(...), "vignette_amount": 0.5}).

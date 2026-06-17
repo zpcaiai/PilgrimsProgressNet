@@ -23,16 +23,22 @@ static func build(parent: Node3D) -> void:
 	_city(parent, gold)
 	_front_wall(parent, gold)
 	_banners(parent)
-	_god_rays(parent)
-	_gate_curtain(parent)
 	_glory_lights(parent)
-	_motes(parent)
+	# Stylised glory effects (god-rays, gate-of-light curtain, rising motes) are
+	# skipped in realistic mode — a real sunlit stone city on a hill instead.
+	if not RenderConfig.is_realistic():
+		_god_rays(parent)
+		_gate_curtain(parent)
+		_motes(parent)
 
 
 # ---------------------------------------------------------------------------
 # Materials
 # ---------------------------------------------------------------------------
 static func _gold_mat() -> Material:
+	# Realistic mode: a real sunlit pale-stone city, not glowing gold.
+	if RenderConfig.is_realistic():
+		return MaterialKit.make("marble", Color(0.82, 0.78, 0.7))
 	var sh := load(GOLD_SHADER)
 	if sh is Shader:
 		var m := ShaderMaterial.new()
