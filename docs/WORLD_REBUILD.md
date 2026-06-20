@@ -3,6 +3,45 @@
 把 16 章的 3D 世界从「平面色块方盒 + 单一天光」整体重塑为**油画/绘本级**观感:
 **逐章建模(程序化道具)+ PBR 贴图 + 逐章布光 + 全屏 painterly 后处理**。
 
+---
+
+## ★ 高保真 GLB 升级(「3D Max」级,2026-06)
+
+导入场景 `assets/imported_scenes/*.glb` 已从**平面着色三角汤**升级为**渲染级几何 + PBR**,
+两条流水线共用 `tools/scene_gen/scene_defs.py`(同一份布局,逐物体一致):
+
+| 维度 | 旧 | 新 |
+|---|---|---|
+| 方块 | 6 面硬边「纸盒」 | **倒角(chamfer)方块**,每条棱都吃高光 |
+| 曲面 | 10 边硬边柱/锥 | **24 段解析法线平滑** 柱/锥/球/环面/**车削(lathe)** |
+| 地面 | 0.5m 平板 | **细分起伏地形**(振幅 ≤7cm,仍可行走、道具不悬空) |
+| 材质 | 全部 metallic0/rough0.95 哑光 | **按名字+颜色推断 PBR**:金/剑/盔/钟=金属高光,水=高光泽,石/木/草各异 |
+| 道具 | 色块 | 屋舍带屋顶/烟囱/暖光窗,柱子车削,人群有头,树有球冠,天城有光环 torus + 顶球 |
+
+绕序(winding)做了双保险:凸体按质心朝外定向,平滑索引网格按解析法线对齐,**绝不会被背面剔除而漏面**。
+所有 16 章共 **~4.6 万三角面 / 合计 ~2.0 MB**,配合 Godot 导入的 auto-LOD + shadow mesh,网页可跑。
+节点命名、Zone 的 AABB 碰撞范围、Marker 全部原样保留,`ImportedSceneBinder` 绑定不受影响。
+
+### 重新生成(两条流水线)
+```bash
+# A. 纯 Python(无需 Blender,网页用的就是它,CI 可跑):
+python3 tools/scene_gen/build_scenes.py     # 写 16 个 GLB
+python3 tools/scene_gen/verify_scenes.py    # 校验技术对象齐全 + GLB 合法
+
+# B. Blender(本机高保真/烘焙;产物轮廓与 A 一致):
+blender --background --python tools/blender/export_all_glb.py
+# 高模烘焙档(加细分曲面 + 倒角 + 程序化微凹凸,适合英雄渲染):
+PILGRIM_HIFI=1 blender --background --python tools/blender/export_all_glb.py
+```
+预览(非 Godot,纯 numpy 软渲染,仅用于快速肉眼检查):
+`python3 tools/glb_preview.py <scene.glb> <out.png>`;16 张样张见 `docs/world_rebuild_previews/`。
+
+> 关键文件:`tools/scene_gen/glb_lib.py`(几何 + PBR 推断 + GLB 写出)、
+> `tools/scene_gen/scene_defs.py`(16 章布局,逐章英雄道具升级)、
+> `tools/blender/blender_scene.py`(bpy 后端,Principled + 平滑 + 可选修改器)。
+
+---
+
 整套系统沿用项目原有的「程序化、素材可选、缺失即优雅降级」架构——没有任何外部
 3D 模型文件,所有几何都在代码里生成,任何贴图缺失都会自动回退,不会报错。
 
