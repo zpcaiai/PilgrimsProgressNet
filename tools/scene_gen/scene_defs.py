@@ -28,21 +28,21 @@ def _wall(s, name, size, pos, color=(0.46, 0.42, 0.38)):
 
 
 def _cottage(s, name, pos, size=(5, 3.2, 5), wall=(0.5, 0.43, 0.4),
-             roof=(0.33, 0.23, 0.17)):
+             roof=(0.33, 0.23, 0.17), lit=True):
     w, h, d = size
+    win = (0.96, 0.86, 0.56) if lit else (0.16, 0.17, 0.21)   # warm vs dead-cold
+    win_emis = (0.4, 0.34, 0.18) if lit else (0.0, 0.0, 0.0)
     s.composite(name, [
         {"kind": "box", "size": size, "color": wall, "pos": (0, h / 2, 0)},
         {"kind": "pyramid", "size": (w + 0.5, d + 0.5),
          "height": 1.7, "color": roof, "pos": (0, h + 0.85, 0)},
-        # plank door + two warm-lit windows on the +Z face
+        # plank door + two windows on the +Z face
         {"kind": "box", "size": (1.0, 1.9, 0.18), "color": (0.28, 0.2, 0.14),
          "pos": (0, 0.95, d / 2 + 0.03)},
-        {"kind": "box", "size": (0.8, 0.8, 0.14), "color": (0.96, 0.86, 0.56),
-         "pos": (-w / 2 + 0.95, h * 0.62, d / 2 + 0.03),
-         "emissive": (0.4, 0.34, 0.18)},
-        {"kind": "box", "size": (0.8, 0.8, 0.14), "color": (0.96, 0.86, 0.56),
-         "pos": (w / 2 - 0.95, h * 0.62, d / 2 + 0.03),
-         "emissive": (0.4, 0.34, 0.18)},
+        {"kind": "box", "size": (0.8, 0.8, 0.14), "color": win,
+         "pos": (-w / 2 + 0.95, h * 0.62, d / 2 + 0.03), "emissive": win_emis},
+        {"kind": "box", "size": (0.8, 0.8, 0.14), "color": win,
+         "pos": (w / 2 - 0.95, h * 0.62, d / 2 + 0.03), "emissive": win_emis},
         # brick chimney
         {"kind": "box", "size": (0.6, 1.7, 0.6), "color": (0.3, 0.25, 0.22),
          "pos": (w / 2 - 0.8, h + 1.25, -d / 4)},
@@ -69,20 +69,29 @@ def _sign(s, name, pos, color=(0.55, 0.45, 0.3)):
 # ===========================================================================
 def build_city_of_destruction():
     s = Scene("city_of_destruction")
-    gray = (0.28, 0.25, 0.22)
-    s.ground("ENV_City_Ground", (44, 74), gray)
-    _road(s, "ENV_City_Road_Main", 60, -2, 6, (0.22, 0.19, 0.17))
-    s.box("ENV_City_TownSquare", (14, 0.1, 14), (0.30, 0.27, 0.24), (0, 0.05, 12))
-    _road(s, "ENV_City_OuterRoad", 16, -27, 5, (0.20, 0.17, 0.15))
+    # Cold, oppressive palette — a doomed city under a leaden sky.
+    cold = (0.20, 0.22, 0.26)
+    s.ground("ENV_City_Ground", (44, 74), cold)
+    _road(s, "ENV_City_Road_Main", 60, -2, 6, (0.15, 0.17, 0.20))
+    s.box("ENV_City_TownSquare", (14, 0.1, 14), (0.22, 0.24, 0.27), (0, 0.05, 12))
+    _road(s, "ENV_City_OuterRoad", 16, -27, 5, (0.14, 0.16, 0.19))
 
+    cwall = (0.34, 0.37, 0.42)   # cold grey-blue masonry
+    croof = (0.23, 0.24, 0.28)
     _cottage(s, "PROP_PlayerHouse", (-7, 0, 6), (5, 3.2, 5),
-             (0.52, 0.44, 0.42), (0.34, 0.24, 0.18))
-    _cottage(s, "PROP_House_01", (9, 0, 8))
-    _cottage(s, "PROP_House_02", (10, 0, -2), (4.5, 3.0, 4.5))
-    _cottage(s, "PROP_House_03", (-10, 0, -4), (4.5, 3.2, 4.5))
-    _cottage(s, "PROP_House_04", (12, 0, 14), (4.2, 2.8, 4.2))
-    _cottage(s, "PROP_House_05", (-12, 0, 12), (4.2, 3.0, 4.2))
-    _cottage(s, "PROP_House_06", (11, 0, -10), (4.6, 3.1, 4.6))
+             (0.40, 0.41, 0.45), (0.28, 0.24, 0.24))
+    _cottage(s, "PROP_House_01", (9, 0, 8), wall=cwall, roof=croof)
+    _cottage(s, "PROP_House_02", (10, 0, -2), (4.5, 3.0, 4.5), cwall, croof)
+    _cottage(s, "PROP_House_03", (-10, 0, -4), (4.5, 3.2, 4.5), cwall, croof)
+    _cottage(s, "PROP_House_04", (12, 0, 14), (4.2, 2.8, 4.2), cwall, croof)
+    _cottage(s, "PROP_House_05", (-12, 0, 12), (4.2, 3.0, 4.2), cwall, croof)
+    _cottage(s, "PROP_House_06", (11, 0, -10), (4.6, 3.1, 4.6), cwall, croof)
+    # Denser, darker, abandoned housing pressing in on the streets.
+    _cottage(s, "PROP_House_07", (-13, 0, 2), (4.2, 3.4, 4.2), cwall, croof, lit=False)
+    _cottage(s, "PROP_House_08", (15, 0, 5), (4.0, 2.8, 4.0), cwall, croof, lit=False)
+    _cottage(s, "PROP_House_09", (-9, 0, 17), (4.0, 2.9, 4.0), cwall, croof, lit=False)
+    _cottage(s, "PROP_House_10", (6, 0, -7), (4.2, 3.0, 4.2), cwall, croof, lit=False)
+    _cottage(s, "PROP_House_11", (-15, 0, -8), (4.2, 3.2, 4.2), cwall, croof, lit=False)
 
     s.composite("PROP_Book", [
         {"kind": "box", "size": (0.6, 0.9, 0.6), "color": (0.3, 0.22, 0.16),
@@ -108,6 +117,27 @@ def build_city_of_destruction():
     ], pos=(6, 0, 2))
     s.box("PROP_Crate_01", (1.0, 1.0, 1.0), (0.42, 0.34, 0.24), (4.5, 0.5, 6))
     s.cylinder("PROP_Barrel_01", 0.6, 1.2, (0.36, 0.28, 0.2), (-4, 0.6, 7))
+
+    # Enclosing cold ramparts — the city hemmed in by its own walls.
+    rstone = (0.27, 0.29, 0.34)
+    _merl = [{"kind": "box", "size": (1.3, 1.3, 1.8), "color": rstone,
+              "pos": (mx, 9.4, 0)} for mx in range(-18, 19, 4)]
+    s.composite("ENV_CityWall_Back", [
+        {"kind": "box", "size": (40, 9, 1.8), "color": rstone, "pos": (0, 4.5, 0)},
+    ] + _merl, pos=(0, 0, -33))
+    s.box("ENV_CityWall_Left", (1.8, 8, 60), (0.25, 0.27, 0.32), (-21, 4, 0))
+    s.box("ENV_CityWall_Right", (1.8, 8, 60), (0.25, 0.27, 0.32), (21, 4, 0))
+
+    # Black smoke pouring up from the burning quarters (rooftop height -> harmless).
+    for i, (px, pz) in enumerate([(12, 22), (-11, 24), (4, -24)], start=1):
+        s.composite("PROP_SmokeStack_%02d" % i, [
+            {"kind": "cylinder", "radius": 1.1, "height": 3.2,
+             "color": (0.14, 0.14, 0.16), "pos": (0, 4.6, 0)},
+            {"kind": "cone", "radius": 1.7, "height": 4.2,
+             "color": (0.12, 0.12, 0.14), "pos": (0, 7.6, 0)},
+            {"kind": "sphere", "radius": 1.9, "color": (0.10, 0.10, 0.13),
+             "pos": (0.5, 10.6, 0)},
+        ], pos=(px, 0, pz))
 
     s.marker("NPC_Wife", (-3.0, 0, 5.0))
     s.marker("NPC_Children", (-3.8, 0, 5.6))
@@ -730,11 +760,12 @@ def build_valley_shadow_death():
 # ===========================================================================
 def build_vanity_fair():
     s = Scene("vanity_fair")
-    s.ground("ENV_VanityFair_Ground", (50, 70), (0.4, 0.3, 0.34))
-    _road(s, "ENV_VanityFair_MainStreet", 60, 0, 6, (0.5, 0.4, 0.45))
-    s.box("ENV_VanityFair_MarketSquare", (24, 0.1, 16), (0.5, 0.42, 0.5), (0, 0.06, 6))
-    s.box("ENV_VanityFair_TrialSquare", (16, 0.1, 14), (0.45, 0.4, 0.48), (0, 0.06, -14))
-    _road(s, "ENV_VanityFair_ExitRoad", 14, -28, 5, (0.4, 0.34, 0.38))
+    # Warm, gaudy fairground — saturated and inviting on the surface.
+    s.ground("ENV_VanityFair_Ground", (50, 70), (0.52, 0.34, 0.28))
+    _road(s, "ENV_VanityFair_MainStreet", 60, 0, 6, (0.62, 0.44, 0.32))
+    s.box("ENV_VanityFair_MarketSquare", (24, 0.1, 16), (0.64, 0.48, 0.34), (0, 0.06, 6))
+    s.box("ENV_VanityFair_TrialSquare", (16, 0.1, 14), (0.56, 0.42, 0.38), (0, 0.06, -14))
+    _road(s, "ENV_VanityFair_ExitRoad", 14, -28, 5, (0.5, 0.38, 0.32))
 
     s.composite("PROP_Stall_Applause", [
         {"kind": "box", "size": (3, 2.4, 3), "color": (0.8, 0.7, 0.2), "pos": (0, 1.2, 0)},
@@ -745,9 +776,24 @@ def build_vanity_fair():
     s.composite("PROP_Stall_Influence", [
         {"kind": "box", "size": (3, 2.4, 3), "color": (0.3, 0.7, 0.4), "pos": (0, 1.2, 0)},
         {"kind": "pyramid", "size": (3.6, 3.6), "height": 1.2, "color": (0.2, 0.6, 0.5), "pos": (0, 3.0, 0)}], pos=(0, 0, 12))
-    s.box("PROP_Banner_Red_01", (0.2, 4, 1.6), (0.8, 0.15, 0.2), (-11, 2.5, 2), emissive=(0.3, 0.05, 0.08))
-    s.box("PROP_Banner_Gold_01", (0.2, 4, 1.6), (0.85, 0.7, 0.2), (11, 2.5, 2), emissive=(0.3, 0.25, 0.06))
-    s.box("PROP_TrialPlatform", (8, 1.0, 6), (0.45, 0.4, 0.4), (0, 0.5, -14))
+    # More stalls crowding the fair (flanking, off the central path).
+    s.composite("PROP_Stall_Riches", [
+        {"kind": "box", "size": (3, 2.4, 3), "color": (0.92, 0.5, 0.16), "pos": (0, 1.2, 0)},
+        {"kind": "pyramid", "size": (3.6, 3.6), "height": 1.2, "color": (0.95, 0.78, 0.2), "pos": (0, 3.0, 0)},
+        {"kind": "sphere", "radius": 0.28, "color": (0.98, 0.85, 0.3), "pos": (0, 3.9, 0), "emissive": (0.5, 0.4, 0.1)}], pos=(-12, 0, 2))
+    s.composite("PROP_Stall_Pleasure", [
+        {"kind": "box", "size": (3, 2.4, 3), "color": (0.2, 0.66, 0.7), "pos": (0, 1.2, 0)},
+        {"kind": "pyramid", "size": (3.6, 3.6), "height": 1.2, "color": (0.85, 0.25, 0.5), "pos": (0, 3.0, 0)},
+        {"kind": "sphere", "radius": 0.28, "color": (0.95, 0.4, 0.6), "pos": (0, 3.9, 0), "emissive": (0.4, 0.12, 0.2)}], pos=(12, 0, 2))
+    s.composite("PROP_Stall_Honor", [
+        {"kind": "box", "size": (3, 2.4, 3), "color": (0.7, 0.2, 0.7), "pos": (0, 1.2, 0)},
+        {"kind": "pyramid", "size": (3.6, 3.6), "height": 1.2, "color": (0.95, 0.8, 0.25), "pos": (0, 3.0, 0)}], pos=(0, 0, 19))
+    s.box("PROP_Banner_Red_01", (0.2, 4.4, 1.7), (0.92, 0.14, 0.18), (-11, 2.7, 2), emissive=(0.45, 0.06, 0.08))
+    s.box("PROP_Banner_Gold_01", (0.2, 4.4, 1.7), (0.95, 0.78, 0.18), (11, 2.7, 2), emissive=(0.45, 0.36, 0.06))
+    s.box("PROP_Banner_Purple_01", (0.2, 4.0, 1.6), (0.6, 0.16, 0.78), (-4, 2.5, 12), emissive=(0.28, 0.06, 0.36))
+    s.box("PROP_Banner_Teal_01", (0.2, 4.0, 1.6), (0.12, 0.7, 0.74), (4, 2.5, 12), emissive=(0.05, 0.32, 0.34))
+    s.box("PROP_Banner_Crimson_01", (0.2, 3.6, 1.5), (0.86, 0.1, 0.32), (0, 2.3, 20), emissive=(0.4, 0.05, 0.14))
+    s.box("PROP_TrialPlatform", (8, 1.0, 6), (0.5, 0.42, 0.4), (0, 0.5, -14))
     # Crowd figures: a robed body (cylinder) topped with a head (sphere).
     _crowd = [part
               for x in (-1, 0, 1) for z in (0, 1)
@@ -758,6 +804,8 @@ def build_vanity_fair():
                    "pos": (x * 1.0, 1.68, z * 1.1)})]
     s.composite("PROP_CrowdCluster_01", _crowd, pos=(-6, 0, -10))
     s.composite("PROP_CrowdCluster_02", _crowd, pos=(6, 0, -10))
+    s.composite("PROP_CrowdCluster_03", _crowd, pos=(-10, 0, 5))
+    s.composite("PROP_CrowdCluster_04", _crowd, pos=(10, 0, 6))
     s.composite("PROP_BrokenPilgrimSign", [
         {"kind": "box", "size": (0.2, 1.4, 0.2), "color": (0.4, 0.34, 0.24), "pos": (0, 0.7, 0), "rot": (0, 0, 20)}], pos=(10, 0, 18))
 
@@ -1014,10 +1062,11 @@ def build_river_of_death():
 # ===========================================================================
 def build_celestial_city():
     s = Scene("celestial_city")
-    s.box("ENV_Celestial_FarBank", (40, 1.0, 14), (0.5, 0.5, 0.45), (0, 0.0, 20))
-    _road(s, "ENV_Celestial_ApproachRoad", 40, 0, 8, (0.85, 0.82, 0.7))
-    s.box("ENV_Celestial_GatePlatform", (16, 0.3, 12), (0.9, 0.88, 0.78), (0, 0.1, -16))
-    s.box("ENV_Celestial_CityInteriorHint", (30, 16, 3), (0.95, 0.93, 0.8), (0, 8, -26), emissive=(0.7, 0.68, 0.55))
+    # Warm, radiant approach — gold and cream, brighter the nearer the gate.
+    s.box("ENV_Celestial_FarBank", (40, 1.0, 14), (0.62, 0.56, 0.42), (0, 0.0, 20))
+    _road(s, "ENV_Celestial_ApproachRoad", 40, 0, 8, (0.96, 0.86, 0.58))
+    s.box("ENV_Celestial_GatePlatform", (16, 0.3, 12), (0.98, 0.89, 0.64), (0, 0.1, -16))
+    s.box("ENV_Celestial_CityInteriorHint", (30, 16, 3), (0.99, 0.90, 0.6), (0, 8, -26), emissive=(0.92, 0.74, 0.4))
 
     # Gilded lintel + a radiant halo ring and finials crowning the gate.
     s.composite("PROP_CelestialGate", [
@@ -1041,6 +1090,26 @@ def build_celestial_city():
             emissive=(0.5, 0.5, 0.4))
     s.lathe("PROP_CityLightPillar_02", _pillar, (0.9, 0.9, 0.8), (8, 0, -14),
             emissive=(0.5, 0.5, 0.4))
+
+    # Grand staircase climbing to the gate threshold.
+    _stair = [{"kind": "box", "size": (12 - k * 1.3, 0.18, 1.4),
+               "color": (0.96, 0.9, 0.7), "pos": (0, 0.09 + k * 0.18, -k * 1.0),
+               "emissive": (0.24, 0.21, 0.12)} for k in range(5)]
+    s.composite("PROP_CelestialStair", _stair, pos=(0, 0, -11))
+    # Warm city walls framing the gate.
+    s.box("ENV_Celestial_WallLeft", (1.8, 11, 16), (0.9, 0.84, 0.66),
+          (-12.5, 5.5, -22), emissive=(0.22, 0.2, 0.12))
+    s.box("ENV_Celestial_WallRight", (1.8, 11, 16), (0.9, 0.84, 0.66),
+          (12.5, 5.5, -22), emissive=(0.22, 0.2, 0.12))
+
+    # Soaring gilded spires of the City beyond the wall (out of reach).
+    def _spire(H):
+        return [(1.3, 0), (1.5, H * 0.06), (1.0, H * 0.12), (0.85, H * 0.66),
+                (1.15, H * 0.72), (0.45, H * 0.86), (0.0, H)]
+    for i, (sxp, hh) in enumerate([(-9, 17), (-3, 23), (3, 20), (9, 25)], start=1):
+        s.lathe("PROP_CelestialSpire_%02d" % i, _spire(hh), (0.96, 0.9, 0.64),
+                (sxp, 0, -29), emissive=(0.5, 0.42, 0.22))
+
     s.marker("PROP_JourneyReviewMarker", (0, 1.5, 0))
 
     s.marker("NPC_Hopeful", (1.6, 0, 6))
