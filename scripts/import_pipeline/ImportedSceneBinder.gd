@@ -373,8 +373,10 @@ static func _bind_exit(chapter: Node3D, node: Node) -> void:
 ## chapter exit, so the way out is unmistakable.
 static func _spawn_exit_portal(chapter: Node3D, pos: Vector3) -> void:
 	var portal := ExitPortal.new()
-	chapter.add_child(portal)
-	portal.global_position = pos
+	portal.position = pos
+	# Deferred: binding runs during the chapter's setup; a direct add_child can
+	# fail with "parent busy setting up children".
+	chapter.add_child.call_deferred(portal)
 
 
 static func _bind_hazard(chapter: Node3D, node: Node, nm: String) -> void:

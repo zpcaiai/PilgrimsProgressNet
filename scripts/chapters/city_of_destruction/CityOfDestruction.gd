@@ -67,10 +67,11 @@ func _build_procedural() -> void:
 		_advance_after_delay()
 	make_trigger(Vector3(0, 1.5, -21), Vector3(12, 4, 2), _cb1, false)
 	# Visible exit portal at the gate (procedural chapters skip the binder that
-	# normally spawns it, so add it here too).
+	# normally spawns it, so add it here too). Deferred add: this runs during the
+	# chapter's setup, and a direct add_child can fail with "parent busy".
 	var portal := ExitPortal.new()
-	add_child(portal)
 	portal.position = Vector3(0, 0, -21)
+	add_child.call_deferred(portal)
 
 
 ## The family home: a realistic timber-framed cottage with warm-lit windows and
