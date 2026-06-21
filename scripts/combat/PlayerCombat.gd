@@ -30,7 +30,7 @@ func _process(delta: float) -> void:
 	if _regen_block > 0.0:
 		_regen_block -= delta
 	else:
-		var regen := 4.0 + SpiritualStateManager.hope * 0.05 + SpiritualStateManager.faith * 0.05
+		var regen := 7.0 + SpiritualStateManager.hope * 0.06 + SpiritualStateManager.faith * 0.06
 		resolve = min(max_resolve, resolve + regen * delta)
 	emit_signal("stats_changed")
 
@@ -63,7 +63,7 @@ func take_hit(effects: Dictionary, _source_type: String) -> void:
 	if GameState.is_child_mode():
 		magnitude *= 0.5
 	resolve -= magnitude
-	_regen_block = 2.0
+	_regen_block = 1.2
 	if resolve <= 0.0:
 		resolve = 0.0
 		_stagger()
