@@ -523,6 +523,23 @@ def build_slough_of_despond():
         {"kind": "box", "size": (0.7, 0.9, 0.3), "color": (0.78, 0.78, 0.6),
          "pos": (0, 0.45, 0), "emissive": (0.45, 0.45, 0.3)}], pos=(0, 0, -26))
 
+    # --- 精装修: deeper, sodden mire dressing ---
+    for i, (rx, rz) in enumerate([(5, -4), (-6, -18), (7, -30), (-5, -40)], start=3):
+        s.composite("PROP_DeadReeds_%02d" % i, [
+            {"kind": "box", "size": (0.05, 1.2 + (k % 3) * 0.25, 0.05),
+             "color": (0.38, 0.4, 0.28), "pos": (k * 0.16 - 0.4, 0.65, 0)}
+            for k in range(6)], pos=(rx, 0, rz))
+    for i, (lx, lz, la) in enumerate([(-8, -10, 22), (8, -34, -16)], start=1):
+        s.composite("PROP_SunkLog_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.3, "height": 3.2, "color": (0.26, 0.22, 0.16),
+             "pos": (0, 0.18, 0), "rot": (0, la, 92)}], pos=(lx, 0, lz))
+    s.composite("PROP_BrokenWheelFoliage", [
+        {"kind": "torus", "ring_r": 0.7, "tube_r": 0.1, "color": (0.3, 0.25, 0.18),
+         "pos": (0, 0.5, 0), "rot": (0, 0, 78)}], pos=(-9, 0, 1))
+    for i, (mx, mz, mr) in enumerate([(3, -10, 0.5), (-4, -34, 0.45), (6, -22, 0.4)], start=1):
+        s.composite("PROP_MireFoliage_%02d" % i, [
+            {"kind": "sphere", "radius": mr, "color": (0.3, 0.34, 0.28), "pos": (0, mr * 0.35, 0)}], pos=(mx, 0, mz))
+
     s.marker("NPC_Pliable", (-2, 0, 2))
     s.marker("NPC_Help", (0, 0, -38))
 
@@ -579,6 +596,18 @@ def build_wicket_gate():
     ], pos=(0, 0, -8))
     s.box("PROP_GateDoor", (3.0, 4.2, 0.3), (0.62, 0.46, 0.26), (0, 2.1, -8),
           emissive=(0.5, 0.34, 0.12))
+    # --- 精装修: warm lanterns at the gate + rubble along the dark cliffs ---
+    for i, lx in enumerate((-3.4, 3.4), start=1):
+        s.composite("PROP_GateLight_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.08, "height": 3.0, "color": (0.3, 0.26, 0.2), "pos": (0, 1.5, 0)},
+            {"kind": "sphere", "radius": 0.34, "color": (1.0, 0.82, 0.45), "pos": (0, 3.1, 0), "emissive": (0.95, 0.7, 0.3)},
+        ], pos=(lx, 0, -7.5))
+    for i, (bx, bz, br) in enumerate([(7.2, 8, 1.0), (-7.2, -2, 0.9), (7.0, -12, 0.8),
+                                      (-7.0, 16, 0.7), (6.8, 0, 0.6)], start=1):
+        s.composite("PROP_CliffRubble_%02d" % i, [
+            {"kind": "sphere", "radius": br, "color": (0.2, 0.21, 0.26), "pos": (0, br * 0.5, 0)},
+            {"kind": "sphere", "radius": br * 0.6, "color": (0.22, 0.23, 0.28), "pos": (br * 0.7, br * 0.4, 0.3)},
+        ], pos=(bx, 0, bz))
 
     s.marker("NPC_Goodwill", (0, 0, -10.5))
     s.zone("TRIGGER_GateKnock", (3.4, 4, 1.6), (0, 2, -8),
@@ -955,6 +984,18 @@ def build_valley_shadow_death():
         {"kind": "cylinder", "radius": 0.12, "height": 2.4,
          "color": (0.2, 0.18, 0.16), "pos": (0, 1.0, 0), "rot": (0, 0, 40)}],
         pos=(-4, 0, -6))
+    # --- 精装修: more guiding lights + grim rubble in the dark valley ---
+    for i, gz in enumerate([16, 0, -12, -28], start=1):
+        s.composite("PROP_PathGlow_%02d" % i, [
+            {"kind": "sphere", "radius": 0.2, "color": (0.7, 0.78, 0.98),
+             "pos": (0, 0.3, 0), "emissive": (0.5, 0.58, 0.85)}], pos=(0, 0, gz))
+    for i, (jx, jz, jr) in enumerate([(5, 8, 0.7), (-5, -4, 0.6), (5.2, -22, 0.65), (-5, -36, 0.55)], start=1):
+        s.composite("PROP_JaggedRock_%02d" % i, [
+            {"kind": "cone", "radius": jr, "height": jr * 3.0, "color": (0.18, 0.18, 0.22),
+             "pos": (0, jr * 1.5, 0)}], pos=(jx, 0, jz))
+    s.composite("PROP_FallenPillarFoliage", [
+        {"kind": "cylinder", "radius": 0.4, "height": 4.0, "color": (0.22, 0.22, 0.26),
+         "pos": (0, 0.4, 0), "rot": (0, 10, 90)}], pos=(4.6, 0, -30))
 
     s.zone("TRIGGER_PrayerPrompt", (4, 4, 4), (0, 2, 20))
     s.zone("TRIGGER_FalseVoice_Left", (4, 4, 4), (-3, 2, 0))
@@ -1238,6 +1279,29 @@ def build_enchanted_ground():
     s.composite("PROP_DreamFlower_04", [
         {"kind": "cone", "radius": 0.4, "height": 0.9, "color": (0.55, 0.7, 0.5), "pos": (0, 0.45, 0)},
         {"kind": "sphere", "radius": 0.5, "color": (0.7, 0.95, 0.8), "pos": (0, 1.1, 0), "emissive": (0.35, 0.55, 0.42)}], pos=(7, 0, -18))
+    # --- 精装修: a lusher, dreamier (and more seductive) enchanted ground ---
+    for i, (fx, fz, fc) in enumerate([(-3, 22, (0.98, 0.62, 0.82)), (4, 12, (0.82, 0.72, 0.98)),
+                                      (-6, 2, (0.7, 0.95, 0.8)), (5, -28, (0.98, 0.8, 0.6)),
+                                      (-4, -32, (0.95, 0.7, 0.9))], start=5):
+        s.composite("PROP_DreamFlower_%02d" % i, [
+            {"kind": "cone", "radius": 0.4, "height": 0.9, "color": (0.55, 0.7, 0.5), "pos": (0, 0.45, 0)},
+            {"kind": "sphere", "radius": 0.48, "color": fc, "pos": (0, 1.1, 0),
+             "emissive": tuple(c * 0.6 for c in fc)}], pos=(fx, 0, fz))
+    for i, (mx, mz) in enumerate([(5, 18), (-5, 8), (6, -8), (-6, -22)], start=1):
+        s.composite("PROP_SoftMoundFoliage_%02d" % i, [
+            {"kind": "sphere", "radius": 0.9, "color": (0.5, 0.66, 0.42), "pos": (0, 0.4, 0)},
+            {"kind": "sphere", "radius": 0.6, "color": (0.54, 0.7, 0.46), "pos": (0.5, 0.5, 0.3)}], pos=(mx, 0, mz))
+    for i, (gx, gz) in enumerate([(2, 20), (-2, 6), (3, -10), (-3, -26), (1, 14)], start=1):
+        s.composite("PROP_FireflyGlow_%02d" % i, [
+            {"kind": "sphere", "radius": 0.12, "color": (1.0, 0.95, 0.6),
+             "pos": (0, 0, 0), "emissive": (0.95, 0.85, 0.45)}], pos=(gx, 1.4, gz))
+    s.composite("PROP_DreamArborFoliage", [
+        {"kind": "cylinder", "radius": 0.12, "height": 2.4, "color": (0.4, 0.34, 0.22), "pos": (-1.4, 1.2, 0)},
+        {"kind": "cylinder", "radius": 0.12, "height": 2.4, "color": (0.4, 0.34, 0.22), "pos": (1.4, 1.2, 0)},
+        {"kind": "box", "size": (3.4, 0.2, 1.4), "color": (0.4, 0.34, 0.22), "pos": (0, 2.4, 0)},
+        {"kind": "sphere", "radius": 1.3, "color": (0.45, 0.62, 0.4), "pos": (0, 2.9, 0)},
+        {"kind": "box", "size": (2.6, 0.25, 0.7), "color": (0.46, 0.4, 0.3), "pos": (0, 0.5, 0.2)},
+    ], pos=(-8, 0, -8))
     s.box("PROP_SoftGrassPatch_01", (4, 0.1, 4), (0.55, 0.7, 0.45), (-6, 0.1, -6))
     s.cylinder("PROP_AwakeStone_01", 0.5, 0.5, (0.7, 0.72, 0.8), (0, 0.25, 10), emissive=(0.35, 0.36, 0.42))
     s.cylinder("PROP_AwakeStone_02", 0.5, 0.5, (0.7, 0.72, 0.8), (0, 0.25, -16), emissive=(0.35, 0.36, 0.42))
@@ -1295,6 +1359,22 @@ def build_river_of_death():
         {"kind": "sphere", "radius": 1.2, "color": (1.0, 0.96, 0.8), "pos": (0, 3.5, 0), "emissive": (0.95, 0.9, 0.7)}], pos=(0, 0, -30))
     s.box("PROP_DistantCelestialGate", (12, 9, 2), (0.98, 0.93, 0.72), (0, 6, -44), emissive=(0.9, 0.82, 0.55))
     _chapel(s, "PROP_Chapel", (-14, 0, 16), rot=(0, 90, 0), wall=(0.8, 0.8, 0.76))
+    # --- 精装修: reedy near bank, stepping stones, driftwood, radiant far shore ---
+    for i, (rx, rz) in enumerate([(-12, 16), (10, 18), (-16, 14), (14, 15)], start=1):
+        s.composite("PROP_BankReeds_%02d" % i, [
+            {"kind": "box", "size": (0.05, 1.1 + (k % 3) * 0.2, 0.05), "color": (0.4, 0.46, 0.34),
+             "pos": (k * 0.16 - 0.4, 0.6, 0)} for k in range(6)], pos=(rx, 0, rz))
+    for i, (sx2, sz2, sr) in enumerate([(-3, 8, 0.6), (2, 0, 0.55), (-2, -8, 0.5), (3, -20, 0.6)], start=3):
+        s.composite("PROP_RiverStone_%02d" % i, [
+            {"kind": "sphere", "radius": sr, "color": (0.4, 0.42, 0.45), "pos": (0, sr * 0.4, 0)}], pos=(sx2, 0, sz2))
+    for i, (dx2, dz2, da) in enumerate([(-7, 6, 20), (7, -4, -25)], start=1):
+        s.composite("PROP_DriftwoodFoliage_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.18, "height": 2.6, "color": (0.32, 0.27, 0.2),
+             "pos": (0, 0.12, 0), "rot": (0, da, 90)}], pos=(dx2, 0, dz2))
+    for i, (gx, gz) in enumerate([(-4, -30), (4, -30), (0, -34)], start=1):
+        s.composite("PROP_FarShoreGlow_%02d" % i, [
+            {"kind": "sphere", "radius": 0.4, "color": (1.0, 0.93, 0.72),
+             "pos": (0, 0.5, 0), "emissive": (0.95, 0.85, 0.6)}], pos=(gx, 0, gz))
 
     s.marker("NPC_Hopeful", (1.5, 0, 14))
     s.marker("NPC_ShiningOne_01", (-2, 0, -30))
@@ -1405,7 +1485,7 @@ def build_celestial_city():
 
 
 # ---------------------------------------------------------------------------
-SCENES = {
+_BASE_SCENES = {
     "city_of_destruction": build_city_of_destruction,
     "wilderness_road": build_wilderness_road,
     "slough_of_despond": build_slough_of_despond,
@@ -1423,3 +1503,432 @@ SCENES = {
     "river_of_death": build_river_of_death,
     "celestial_city": build_celestial_city,
 }
+
+
+# ===========================================================================
+# Industrial-grade dressing pass
+# ---------------------------------------------------------------------------
+# Adds depth, density and framing to every chapter (City of Destruction and the
+# already-dense Wilderness Road are left as-is). Applied centrally by wrapping
+# the builders, so each builder above keeps ALL of its gameplay markers; the
+# dressing only ADDS decorative nodes (non-solid scatter via binder skip-tokens;
+# rocks/boulders stay solid). forward = -Z; spawn toward +Z.
+# ===========================================================================
+def _dress_slough(s):
+    """Bleak drowned fen ringing the mire: dead trees, sedge, mossy stones, moor."""
+    for i, (x, z, h) in enumerate([(-14, 6, 3.4), (13, -4, 3.8), (-16, -18, 3.0),
+                                   (15, -26, 2.8), (-13, -40, 2.9), (14, 12, 3.2),
+                                   (-10, -8, 2.6)], 1):
+        s.composite("PROP_Foliage_DeadTree_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.2, "height": h, "color": (0.2, 0.19, 0.16),
+             "pos": (0, h / 2, 0), "sides": 6},
+            {"kind": "cylinder", "radius": 0.07, "height": 1.5, "color": (0.2, 0.19, 0.16),
+             "pos": (0.5, h * 0.82, 0.1), "rot": (0, 0, 42), "sides": 4},
+            {"kind": "cylinder", "radius": 0.06, "height": 1.2, "color": (0.2, 0.19, 0.16),
+             "pos": (-0.4, h * 0.7, -0.1), "rot": (0, 0, -38), "sides": 4}], pos=(x, 0, z))
+    for i, (x, z) in enumerate([(-11, 2), (12, -12), (-13, -28), (12, -34), (10, 18),
+                                (-9, 16), (8, -44), (-8, -46), (11, 6), (-12, -6)], 1):
+        _reedclump(s, "PROP_Reeds_Fen_%02d" % i, (x, 0, z), (0.33, 0.4, 0.3), 1.8)
+    for i, (x, z, sz) in enumerate([(-12, 10, 1.3), (12, 4, 1.1), (-15, -14, 1.4),
+                                    (14, -22, 1.2), (-11, -36, 1.0), (13, -44, 1.2)], 1):
+        _rock(s, "PROP_Rock_Moss_%02d" % i, (x, 0, z), sz, (0.3, 0.34, 0.27))
+    for i, (x, z) in enumerate([(-9, 20), (9, 14), (-7, -48), (7, -50), (-6, 30), (6, 28)], 1):
+        _grass(s, "PROP_Grass_Sedge_%02d" % i, (x, 0, z), (0.35, 0.42, 0.3))
+    s.composite("PROP_SunkenCart", [
+        {"kind": "box", "size": (2.4, 0.8, 1.3), "color": (0.3, 0.25, 0.17),
+         "pos": (0, 0.25, 0), "rot": (10, 0, 7)},
+        {"kind": "cylinder", "radius": 0.6, "height": 0.18, "color": (0.24, 0.19, 0.13),
+         "pos": (1.0, 0.2, 0.7), "rot": (90, 0, 0), "sides": 10}], pos=(-9, 0, -12))
+    # Tussock mounds breaking up the open mire (non-solid grassy humps).
+    for i, (x, z) in enumerate([(-3, -2), (3, -8), (-5, -16), (4, -20), (-2, -26),
+                                (5, -30), (-4, 0), (2, -36), (-6, -22), (6, -14),
+                                (-3, -42), (3, 4)], 1):
+        s.composite("PROP_Grass_Tussock_%02d" % i, [
+            {"kind": "sphere", "radius": 0.7, "color": (0.25, 0.3, 0.22),
+             "pos": (0, 0.22, 0), "segs": 8, "rings": 4},
+            {"kind": "cone", "radius": 0.1, "height": 0.7, "color": (0.36, 0.42, 0.28),
+             "pos": (-0.2, 0.55, 0), "sides": 4},
+            {"kind": "cone", "radius": 0.1, "height": 0.8, "color": (0.36, 0.42, 0.28),
+             "pos": (0.15, 0.6, 0.1), "sides": 4},
+            {"kind": "cone", "radius": 0.09, "height": 0.6, "color": (0.33, 0.4, 0.26),
+             "pos": (0.05, 0.5, -0.2), "sides": 4}], pos=(x, 0, z))
+    # A dense reed fringe hugging the safe stone path so the way reads clearly.
+    for i, z in enumerate(range(8, -40, -8), 1):
+        _reedclump(s, "PROP_Reeds_PathL_%02d" % i, (-2.6, 0, z), (0.32, 0.4, 0.3), 1.5)
+        _reedclump(s, "PROP_Reeds_PathR_%02d" % i, (2.6, 0, z), (0.32, 0.4, 0.3), 1.5)
+    # The drowned moor closing the horizon (near + tall so it reads, not zooms out).
+    _ridge(s, "PROP_Ridge_Moor", (0, 0, -56),
+           [(-20, 22, 9), (-2, 26, 12), (20, 22, 10)], (0.18, 0.22, 0.24))
+
+
+def _dress_wicket(s):
+    """A rocky ravine climbing to the gate, lit by lanterns, the City glowing beyond."""
+    for i, (x, z) in enumerate([(6.4, 14), (-6.4, 8), (6.6, -2), (-6.6, 2),
+                                (6.2, 18), (-6.2, -4)], 1):
+        _rock(s, "PROP_Rock_Ravine_%02d" % i, (x, 0, z), 1.5, (0.2, 0.21, 0.27))
+    for i, (x, z) in enumerate([(2.6, 12), (-2.6, 6), (2.6, 0), (-2.6, -4)], 1):
+        _lantern(s, "PROP_Lantern_Path_%02d" % i, (x, 0, z), (1.0, 0.82, 0.45))
+    for i, (x, z) in enumerate([(3.4, 16), (-3.4, 10), (3.2, 4), (-3.2, -2)], 1):
+        _bush(s, "PROP_Bush_Ravine_%02d" % i, (x, 0, z), 0.6, (0.24, 0.3, 0.22))
+    # The radiant City of God glimpsed through the open gate (beyond, -Z).
+    s.composite("PROP_Distant_CityBeyond", [
+        {"kind": "box", "size": (3, 9, 2), "color": (0.98, 0.93, 0.74), "pos": (px, hy, 0),
+         "emissive": (0.85, 0.78, 0.5)}
+        for (px, hy) in [(-4, 4.5), (-1, 6.5), (2, 5.5), (5, 7.5), (0, 3.5)]], pos=(0, 0, -22))
+    # Dark brooding hills rising above the ravine walls.
+    _ridge(s, "PROP_Ridge_Above_L", (-12, 0, 4), [(0, 18, 12), (8, 14, 9)], (0.12, 0.13, 0.18))
+    _ridge(s, "PROP_Ridge_Above_R", (12, 0, 4), [(0, 18, 12), (-8, 14, 9)], (0.12, 0.13, 0.18))
+    s.marker("LIGHT_GateCityGlow", (0, 5, -16))
+
+
+def _dress_cross(s):
+    """The hill of grace greening with new life: meadow trees, blossom, far hills."""
+    for i, (x, z, h) in enumerate([(-15, 6, 5.0), (16, 2, 5.5), (-17, -10, 4.6),
+                                   (17, -14, 5.0), (-14, 18, 4.4), (15, 20, 4.8)], 1):
+        _tree(s, "PROP_Foliage_Oak_%02d" % i, (x, 0, z), h,
+              (0.3, 0.5, 0.26), (0.4, 0.3, 0.18))
+    for i, (x, z, c) in enumerate([(-4, 4, (0.95, 0.8, 0.4)), (4, 2, (0.95, 0.55, 0.6)),
+                                   (-3, -6, (0.85, 0.7, 0.95)), (3, -8, (0.98, 0.85, 0.5)),
+                                   (-5, 10, (0.95, 0.6, 0.55)), (5, 12, (0.9, 0.82, 0.45))], 1):
+        _flower(s, "PROP_Flower_Hill_%02d" % i, (x, 0, z), c, (c[0]*0.4, c[1]*0.4, c[2]*0.4))
+    for i, (x, z) in enumerate([(-7, 0), (7, -4), (-6, 8), (6, 6), (-8, -12), (8, -10)], 1):
+        _bush(s, "PROP_Bush_Bloom_%02d" % i, (x, 0, z), 0.7, (0.34, 0.5, 0.28))
+    for i, (x, z) in enumerate([(-2.6, 6), (2.6, 4), (-2.6, 0), (2.6, -2)], 1):
+        _grass(s, "PROP_Grass_Path_%02d" % i, (x, 0, z), (0.42, 0.56, 0.32))
+    _ridge(s, "PROP_Ridge_GreenHills", (0, 0, -44),
+           [(-20, 22, 7), (-2, 26, 9), (20, 24, 8)], (0.36, 0.46, 0.34))
+
+
+def _dress_interpreter(s):
+    """Furnish the instructive house: runner rug, sconces, shelves, beams, hearth."""
+    # Long runner rug down the central hall.
+    s.box("PROP_Decor_HallRug", (3.0, 0.06, 22), (0.5, 0.18, 0.16), (0, 0.12, -6),
+          emissive=(0.12, 0.04, 0.04))
+    # Wall sconces (warm) along the main hall.
+    for i, (x, z) in enumerate([(-6.2, 6), (6.2, 6), (-6.2, -6), (6.2, -6)], 1):
+        _lantern(s, "PROP_Lantern_Sconce_%02d" % i, (x, 0, z), (1.0, 0.84, 0.5))
+    # Bookshelves & cabinets against the south wall.
+    for i, x in enumerate([-9, -4.5, 4.5, 9], 1):
+        s.composite("PROP_Decor_Bookshelf_%02d" % i, [
+            {"kind": "box", "size": (2.6, 3.0, 0.7), "color": (0.32, 0.22, 0.15),
+             "pos": (0, 1.5, 0)},
+            {"kind": "box", "size": (2.3, 0.5, 0.6), "color": (0.6, 0.5, 0.34),
+             "pos": (0, 1.0, 0.06), "emissive": (0.12, 0.1, 0.05)},
+            {"kind": "box", "size": (2.3, 0.5, 0.6), "color": (0.55, 0.46, 0.3),
+             "pos": (0, 2.0, 0.06), "emissive": (0.1, 0.08, 0.04)}], pos=(x, 0, 12.6))
+    # Ceiling beams spanning the hall.
+    for i, z in enumerate([6, 0, -6, -12], 1):
+        s.box("PROP_Decor_Beam_%02d" % i, (12, 0.4, 0.4), (0.26, 0.19, 0.13), (0, 3.9, z))
+    # A warm hearth on the east edge of the hall.
+    s.composite("PROP_Decor_Hearth", [
+        {"kind": "box", "size": (3.0, 2.4, 1.0), "color": (0.4, 0.36, 0.32), "pos": (0, 1.2, 0)},
+        {"kind": "box", "size": (1.6, 1.3, 0.5), "color": (0.1, 0.08, 0.08), "pos": (0, 0.8, 0.4)},
+        {"kind": "cone", "radius": 0.6, "height": 1.2, "color": (1.0, 0.55, 0.2),
+         "pos": (0, 0.9, 0.45), "emissive": (0.95, 0.45, 0.12), "sides": 8}], pos=(8.5, 0, 11))
+    s.marker("LIGHT_HearthGlowWarm", (8.5, 1.4, 10))
+    # Potted greenery softening the hall corners.
+    for i, (x, z) in enumerate([(-5, 9), (5, 9), (-5, -16), (5, -16)], 1):
+        _bush(s, "PROP_Bush_Pot_%02d" % i, (x, 0, z), 0.55, (0.26, 0.42, 0.26))
+
+
+def _dress_hill(s):
+    """A real rocky hillside: pines and boulders on the climb, peaks behind."""
+    for i, (x, z, h) in enumerate([(-9, -2, 6.5), (9, -6, 7.0), (-11, -16, 6.0),
+                                   (11, -20, 6.8), (-7, -24, 5.6), (8, -26, 6.2)], 1):
+        _pine(s, "PROP_Foliage_Pine_%02d" % i, (x, 0, z), h, (0.16, 0.3, 0.22))
+    for i, (x, z, sz) in enumerate([(-6, -10, 1.6), (6, -14, 1.8), (-4, -20, 1.3),
+                                    (5, -22, 1.5), (-8, -6, 1.4), (7, -2, 1.5)], 1):
+        _rock(s, "PROP_Rock_Slope_%02d" % i, (x, 0, z), sz, (0.5, 0.46, 0.4))
+    # The Danger path (left) grim and cold; Destruction path (right) broken rubble.
+    for i, (x, z) in enumerate([(-15, -2), (-17, -10), (-14, -16)], 1):
+        s.composite("PROP_Foliage_DeadTree_Danger_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.16, "height": 3.2, "color": (0.2, 0.22, 0.26),
+             "pos": (0, 1.6, 0), "sides": 6}], pos=(x, 0, z))
+    for i, (x, z, sz) in enumerate([(15, -4, 1.4), (17, -12, 1.7), (14, -18, 1.3)], 1):
+        _rock(s, "PROP_Rock_Rubble_%02d" % i, (x, 0, z), sz, (0.44, 0.36, 0.3))
+    for i, (x, z) in enumerate([(-3, 8), (3, 6), (4, 2), (-4, 4)], 1):
+        _flower(s, "PROP_Flower_Verge_%02d" % i, (x, 0, z), (0.9, 0.82, 0.4))
+    # A grand mountain range crowning the summit horizon.
+    _ridge(s, "PROP_Ridge_Peaks", (0, 0, -52),
+           [(-24, 22, 13), (-6, 26, 17), (12, 24, 14), (28, 20, 11)], (0.34, 0.36, 0.46))
+
+
+def _dress_palace(s):
+    """A formal palace garden: cypress avenue, hedges, fountain, braziers, beds."""
+    for i, (x, z) in enumerate([(-6, 18), (6, 18), (-6, 12), (6, 12), (-6, 6), (6, 6)], 1):
+        _pine(s, "PROP_Foliage_Cypress_%02d" % i, (x, 0, z), 5.5, (0.2, 0.36, 0.26))
+    for i, (x, z) in enumerate([(-4, 20), (4, 20), (-4, 9), (4, 9)], 1):
+        _lantern(s, "PROP_Lantern_Court_%02d" % i, (x, 0, z), (1.0, 0.84, 0.5))
+    # Clipped hedges lining the gate court.
+    for i, (x, z) in enumerate([(-7.5, 15), (7.5, 15)], 1):
+        s.box("PROP_Hedge_Court_%02d" % i, (1.2, 1.3, 9), (0.22, 0.36, 0.24), (x, 0.65, 15))
+    # A central fountain in the gate court.
+    s.composite("PROP_Decor_Fountain", [
+        {"kind": "cylinder", "radius": 2.0, "height": 0.6, "color": (0.7, 0.68, 0.6), "pos": (0, 0.3, 0), "sides": 16},
+        {"kind": "cylinder", "radius": 1.6, "height": 0.5, "color": (0.5, 0.62, 0.7),
+         "pos": (0, 0.55, 0), "sides": 16, "emissive": (0.1, 0.16, 0.2)},
+        {"kind": "cylinder", "radius": 0.3, "height": 1.6, "color": (0.72, 0.7, 0.62), "pos": (0, 1.1, 0), "sides": 10},
+        {"kind": "sphere", "radius": 0.5, "color": (0.6, 0.7, 0.78), "pos": (0, 2.0, 0), "emissive": (0.18, 0.24, 0.28), "segs": 10, "rings": 6}], pos=(0, 0, 18))
+    # Flower beds flanking the hall.
+    for i, (x, z, c) in enumerate([(-9, 2, (0.92, 0.5, 0.55)), (9, 2, (0.95, 0.8, 0.4)),
+                                   (-9, -6, (0.7, 0.55, 0.95)), (9, -6, (0.95, 0.6, 0.45))], 1):
+        _flower(s, "PROP_Flower_Bed_%02d" % i, (x, 0, z), c, (c[0]*0.4, c[1]*0.4, c[2]*0.4))
+    # Festive pennant poles on the approach.
+    for i, (x, z, c) in enumerate([(-8, 24, (0.8, 0.18, 0.2)), (8, 24, (0.9, 0.78, 0.2))], 1):
+        s.composite("PROP_Banner_Approach_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.1, "height": 6, "color": (0.4, 0.38, 0.34), "pos": (0, 3, 0), "sides": 6},
+            {"kind": "box", "size": (0.12, 2.0, 1.4), "color": c, "pos": (0, 4.8, 0.7),
+             "emissive": (c[0]*0.4, c[1]*0.4, c[2]*0.4)}], pos=(x, 0, z))
+    _ridge(s, "PROP_Ridge_Distant", (0, 0, -30), [(-22, 20, 8), (4, 24, 10), (24, 18, 7)], (0.4, 0.43, 0.52))
+
+
+def _dress_humiliation(s):
+    """A scorched battlefield ringed with black rock teeth, embers and ruin."""
+    import math as _m
+    for i in range(1, 11):
+        ang = _m.radians(i * 36)
+        x = round(_m.cos(ang) * 16, 1)
+        z = round(-6 + _m.sin(ang) * 15, 1)
+        h = 3.0 + (i % 4)
+        s.composite("PROP_Rock_Tooth_%02d" % i, [
+            {"kind": "cone", "radius": 1.0 + (i % 3) * 0.3, "height": h,
+             "color": (0.16, 0.15, 0.17), "pos": (0, h / 2, 0), "sides": 6}], pos=(x, 0, z))
+    for i, (x, z) in enumerate([(-10, -2), (10, -8), (-6, -16), (7, -14), (-12, -10),
+                                (12, -2), (0, -22), (-4, 2)], 1):
+        s.composite("PROP_Ember_Field_%02d" % i, [
+            {"kind": "sphere", "radius": 0.35, "color": (1.0, 0.35, 0.12),
+             "pos": (0, 0.25, 0), "emissive": (0.95, 0.28, 0.06), "segs": 8, "rings": 5}], pos=(x, 0, z))
+    for i, (x, z, r) in enumerate([(-9, 4, 60), (9, 6, -50), (-7, -20, 80), (6, -18, 30)], 1):
+        s.composite("PROP_Decor_BrokenWeapon_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.06, "height": 2.6, "color": (0.4, 0.34, 0.26),
+             "pos": (0, 1.0, 0), "rot": (0, 0, r), "sides": 5},
+            {"kind": "box", "size": (0.5, 0.5, 0.08), "color": (0.5, 0.5, 0.54),
+             "pos": (0, 2.0, 0), "rot": (0, 0, r), "metallic": 0.8, "roughness": 0.5}], pos=(x, 0, z))
+    for i, (x, z) in enumerate([(-13, 8, ), (13, 10), (-11, -22), (11, -24)], 1):
+        s.composite("PROP_Foliage_Charred_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.18, "height": 3.0, "color": (0.12, 0.11, 0.1),
+             "pos": (0, 1.5, 0), "sides": 6}], pos=(x, 0, z))
+    _ridge(s, "PROP_Ridge_Brood", (0, 0, -44),
+           [(-20, 22, 10), (0, 26, 13), (20, 22, 11)], (0.16, 0.14, 0.16))
+
+
+def _dress_shadow(s):
+    """A deeper, jagged chasm: rock teeth on the walls, snags, guiding wisps."""
+    for i, (x, z, h) in enumerate([(5.2, 20, 4), (-5.2, 12, 5), (5.2, 2, 4.5),
+                                   (-5.2, -8, 5), (5.2, -18, 4), (-5.2, -28, 4.5),
+                                   (5.0, -34, 3.6)], 1):
+        s.composite("PROP_Rock_Tooth_%02d" % i, [
+            {"kind": "cone", "radius": 0.8, "height": h, "color": (0.06, 0.06, 0.1),
+             "pos": (0, h / 2, 0), "sides": 6}], pos=(x, 0, z))
+    for i, (x, z) in enumerate([(3.4, 16), (-3.4, 6), (3.2, -4), (-3.2, -14),
+                                (3.0, -24), (-3.0, -32)], 1):
+        s.composite("PROP_Foliage_Snag_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.12, "height": 2.4, "color": (0.1, 0.1, 0.12),
+             "pos": (0, 1.1, 0), "rot": (0, 0, 18 if x > 0 else -18), "sides": 5}], pos=(x, 0, z))
+    # Faint guiding wisps just off the path (cool emissive).
+    for i, z in enumerate([18, 4, -10, -22, -34], 1):
+        s.composite("PROP_Flower_Wisp_%02d" % i, [
+            {"kind": "sphere", "radius": 0.22, "color": (0.5, 0.62, 0.85),
+             "pos": (0, 0.4, 0), "emissive": (0.4, 0.52, 0.8), "segs": 8, "rings": 5}],
+            pos=(1.6 if i % 2 else -1.6, 0, z))
+    # Taller broken ridgelines above the chasm walls.
+    _ridge(s, "PROP_Ridge_ChasmL", (-9, 0, 0), [(0, 10, 14), (0, 8, 10)], (0.05, 0.05, 0.08))
+    _ridge(s, "PROP_Ridge_ChasmR", (9, 0, 0), [(0, 10, 14), (0, 8, 10)], (0.05, 0.05, 0.08))
+
+
+def _dress_vanity(s):
+    """A teeming fairground: extra booths, bunting, lanterns, wares, more crowd."""
+    palette = [(0.9, 0.2, 0.3), (0.95, 0.78, 0.2), (0.3, 0.7, 0.5), (0.6, 0.3, 0.75),
+               (0.2, 0.66, 0.74), (0.92, 0.5, 0.16)]
+    for i, (x, z) in enumerate([(-15, 12), (15, 12), (-17, 4), (17, 4),
+                                (-15, -4), (15, -4), (-13, 18), (13, 18)], 1):
+        c = palette[i % len(palette)]
+        s.composite("PROP_Decor_Booth_%02d" % i, [
+            {"kind": "box", "size": (2.6, 2.2, 2.6), "color": _shade(c, 0.8), "pos": (0, 1.1, 0)},
+            {"kind": "pyramid", "size": (3.2, 3.2), "height": 1.0, "color": c, "pos": (0, 2.7, 0)}], pos=(x, 0, z))
+    # Bunting garlands strung on poles along the street.
+    for i, z in enumerate([16, 8, 0, -8], 1):
+        flags = []
+        for k in range(-3, 4):
+            flags.append({"kind": "box", "size": (0.5, 0.5, 0.08),
+                          "color": palette[(k + i) % len(palette)],
+                          "pos": (k * 0.9, 4.4 - abs(k) * 0.12, 0),
+                          "emissive": (0.12, 0.1, 0.04)})
+        s.composite("PROP_Banner_Bunting_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.08, "height": 5.0, "color": (0.4, 0.36, 0.3), "pos": (-3.4, 2.5, 0), "sides": 6},
+            {"kind": "cylinder", "radius": 0.08, "height": 5.0, "color": (0.4, 0.36, 0.3), "pos": (3.4, 2.5, 0), "sides": 6}] + flags, pos=(0, 0, z))
+    for i, (x, z) in enumerate([(-3.5, 14), (3.5, 14), (-3.5, 2), (3.5, 2)], 1):
+        _lantern(s, "PROP_Lantern_Fair_%02d" % i, (x, 0, z), (1.0, 0.78, 0.4))
+    for i, (x, z) in enumerate([(-10, 9), (10, 9), (-12, -1), (12, -1)], 1):
+        s.composite("PROP_Decor_Wares_%02d" % i, [
+            {"kind": "box", "size": (1.0, 1.0, 1.0), "color": (0.5, 0.36, 0.24), "pos": (0, 0.5, 0)},
+            {"kind": "box", "size": (0.8, 0.8, 0.8), "color": (0.56, 0.4, 0.26), "pos": (0.3, 1.3, 0.1), "rot": (0, 20, 0)},
+            {"kind": "sphere", "radius": 0.4, "color": palette[i % len(palette)], "pos": (-0.3, 1.2, 0.2), "segs": 8, "rings": 5}], pos=(x, 0, z))
+    _crowd2 = [part for x in (-1, 0, 1) for z in (0, 1)
+               for part in (
+                   {"kind": "cylinder", "radius": 0.32, "height": 1.5,
+                    "color": (0.4, 0.34, 0.42), "pos": (x * 0.95, 0.75, z * 1.05), "sides": 7},
+                   {"kind": "sphere", "radius": 0.25, "color": (0.72, 0.6, 0.52),
+                    "pos": (x * 0.95, 1.66, z * 1.05), "segs": 7, "rings": 4})]
+    for i, (x, z) in enumerate([(-13, 6), (13, 6), (-8, 16), (8, 16)], 1):
+        s.composite("PROP_Crowd_Extra_%02d" % i, _crowd2, pos=(x, 0, z))
+
+
+def _dress_doubting(s):
+    """A grim castle ground: dead garden, gravestones, ravens; lush By-Path meadow."""
+    for i, (x, z) in enumerate([(-9, -2), (9, -6), (-11, -14), (10, -16), (-7, -20),
+                                (8, 0)], 1):
+        s.composite("PROP_Foliage_DeadOak_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.26, "height": 3.6, "color": (0.16, 0.14, 0.12),
+             "pos": (0, 1.8, 0), "sides": 6},
+            {"kind": "cylinder", "radius": 0.1, "height": 1.8, "color": (0.16, 0.14, 0.12),
+             "pos": (0.7, 3.0, 0), "rot": (0, 0, 50), "sides": 4},
+            {"kind": "cylinder", "radius": 0.1, "height": 1.6, "color": (0.16, 0.14, 0.12),
+             "pos": (-0.6, 2.7, 0.1), "rot": (0, 0, -46), "sides": 4}], pos=(x, 0, z))
+    for i, (x, z) in enumerate([(-6, -4), (6, -10), (-8, -16), (7, -18)], 1):
+        s.composite("PROP_Rock_Grave_%02d" % i, [
+            {"kind": "box", "size": (0.7, 1.1, 0.2), "color": (0.3, 0.3, 0.33),
+             "pos": (0, 0.55, 0), "rot": (4, 0, i * 3 - 6)}], pos=(x, 0, z))
+    for i, (x, z) in enumerate([(-3, -8), (3, -12), (-2, 1)], 1):
+        s.composite("PROP_Crow_Yard_%02d" % i, [
+            {"kind": "sphere", "radius": 0.16, "color": (0.05, 0.05, 0.07), "pos": (0, 0, 0), "segs": 7, "rings": 4},
+            {"kind": "cone", "radius": 0.1, "height": 0.3, "color": (0.05, 0.05, 0.07), "pos": (0, 0.1, 0.18), "sides": 5}], pos=(x, 1.1, z))
+    # The By-Path meadow (behind spawn) deceptively soft and green.
+    for i, (x, z) in enumerate([(-9, 22), (9, 24), (-12, 18), (12, 20)], 1):
+        _bush(s, "PROP_Bush_Bypath_%02d" % i, (x, 0, z), 0.8, (0.32, 0.46, 0.28))
+    for i, (x, z) in enumerate([(-5, 26), (5, 28), (-3, 22)], 1):
+        _flower(s, "PROP_Flower_Bypath_%02d" % i, (x, 0, z), (0.9, 0.85, 0.4))
+    _ridge(s, "PROP_Ridge_Storm", (0, 0, -34), [(-20, 22, 11), (2, 26, 14), (22, 20, 10)], (0.14, 0.14, 0.18))
+
+
+def _dress_delectable(s):
+    """Abundant high pasture: groves, flocks, wildflowers, dry-stone walls, peaks."""
+    for i, (x, z, h) in enumerate([(-18, -4, 5.2), (-15, -10, 4.6), (16, -2, 5.4),
+                                   (18, -12, 4.8), (-20, 6, 5.0), (20, 8, 5.2),
+                                   (14, 14, 4.4)], 1):
+        _tree(s, "PROP_Foliage_Pasture_%02d" % i, (x, 0, z), h, (0.22, 0.48, 0.27), (0.36, 0.26, 0.16))
+    for i, (x, z) in enumerate([(-4, 14), (-1, 16), (-6, 13), (3, 18), (6, 15),
+                                (1, 12), (-8, -6), (8, -8), (4, -4)], 1):
+        s.composite("PROP_Sheep_Flock_%02d" % i, [
+            {"kind": "sphere", "radius": 0.46, "color": (0.92, 0.92, 0.88), "pos": (0, 0.6, 0), "segs": 8, "rings": 5},
+            {"kind": "sphere", "radius": 0.2, "color": (0.3, 0.28, 0.28), "pos": (0, 0.72, 0.46), "segs": 7, "rings": 4}], pos=(x, 0, z))
+    for i, (x, z, c) in enumerate([(-3, 4, (0.95, 0.85, 0.4)), (3, 6, (0.9, 0.5, 0.7)),
+                                   (-5, 0, (0.7, 0.6, 0.95)), (5, -2, (0.95, 0.6, 0.4)),
+                                   (-2, 8, (0.95, 0.8, 0.45)), (4, 2, (0.85, 0.5, 0.75))], 1):
+        _flower(s, "PROP_Flower_Pasture_%02d" % i, (x, 0, z), c)
+    # A dry-stone boundary wall stepping across the pasture.
+    for i, (x, z) in enumerate([(-13, 2), (-10, 2), (-7, 2)], 1):
+        s.box("PROP_Rock_Wall_%02d" % i, (3.0, 1.0, 0.7), (0.6, 0.58, 0.5), (x, 0.5, z))
+    _ridge(s, "PROP_Ridge_SnowPeaks", (0, 0, -46),
+           [(-24, 24, 15), (-4, 28, 19), (16, 26, 16), (32, 20, 12)], (0.62, 0.66, 0.74))
+
+
+def _dress_enchanted(s):
+    """A drowsy enchanted wood: glowing blooms, drooping willows, fireflies, mist."""
+    for i, (x, z) in enumerate([(-8, 20), (8, 14), (-10, 4), (9, -2), (-7, -12),
+                                (8, -22), (-9, -30), (7, 24)], 1):
+        # Drooping willow: low wide canopy.
+        h = 4.6
+        s.composite("PROP_Foliage_Willow_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.22, "height": h * 0.6, "color": (0.36, 0.3, 0.2), "pos": (0, h * 0.3, 0), "sides": 6},
+            {"kind": "sphere", "radius": 2.0, "color": (0.4, 0.56, 0.36), "pos": (0, h * 0.7, 0), "segs": 10, "rings": 6},
+            {"kind": "sphere", "radius": 1.3, "color": (0.46, 0.62, 0.4), "pos": (1.2, h * 0.55, 0.4), "segs": 9, "rings": 5}], pos=(x, 0, z))
+    blooms = [(0.98, 0.6, 0.82), (0.82, 0.72, 0.98), (0.7, 0.95, 0.8), (0.98, 0.82, 0.6)]
+    for i, (x, z) in enumerate([(-4, 22), (4, 18), (-5, 10), (5, 6), (-3, -2), (4, -8),
+                                (-4, -16), (5, -24), (-3, -32), (3, 26)], 1):
+        c = blooms[i % len(blooms)]
+        _flower(s, "PROP_Flower_Dream_%02d" % i, (x, 0, z), c, (c[0]*0.55, c[1]*0.5, c[2]*0.6))
+    # Luminous mushroom rings and fireflies.
+    for i, (x, z) in enumerate([(-6, 16), (6, 2), (-7, -18), (6, -28)], 1):
+        s.composite("PROP_Flower_Mushroom_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.12, "height": 0.5, "color": (0.85, 0.85, 0.78), "pos": (0, 0.25, 0), "sides": 6},
+            {"kind": "sphere", "radius": 0.34, "color": (0.7, 0.9, 0.7), "pos": (0, 0.6, 0), "emissive": (0.4, 0.6, 0.45), "segs": 8, "rings": 5}], pos=(x, 0, z))
+    for i in range(1, 9):
+        x = round(((i * 3) % 11) - 5, 1)
+        z = round(28 - i * 7, 1)
+        s.composite("PROP_Flower_Firefly_%02d" % i, [
+            {"kind": "sphere", "radius": 0.1, "color": (0.95, 0.95, 0.6),
+             "pos": (0, 0, 0), "emissive": (0.9, 0.88, 0.4), "segs": 6, "rings": 4}], pos=(x, 1.6, z))
+    _ridge(s, "PROP_Ridge_DreamWood", (0, 0, -48), [(-20, 22, 8), (2, 24, 10), (20, 20, 8)], (0.38, 0.42, 0.34))
+
+
+def _dress_river(s):
+    """Reedy near shore, lilypads, and the radiant far City shore with spires."""
+    for i, (x, z) in enumerate([(-12, 16), (12, 14), (-16, 20), (16, 18), (-10, 12)], 1):
+        _reedclump(s, "PROP_Reeds_Shore_%02d" % i, (x, 0, z), (0.34, 0.44, 0.32), 1.9)
+    for i, (x, z) in enumerate([(-14, 18), (14, 20)], 1):
+        s.composite("PROP_Foliage_Willow_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.22, "height": 2.6, "color": (0.34, 0.28, 0.2), "pos": (0, 1.3, 0), "sides": 6},
+            {"kind": "sphere", "radius": 1.8, "color": (0.36, 0.5, 0.34), "pos": (0, 3.0, 0), "segs": 10, "rings": 6}], pos=(x, 0, z))
+    # Lilypads drifting on the dark water (non-solid).
+    for i, (x, z) in enumerate([(-5, 2), (5, -4), (-3, -10), (4, 6), (-6, -16), (6, -12)], 1):
+        s.composite("PROP_Flower_Lily_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.5, "height": 0.06, "color": (0.2, 0.4, 0.3), "pos": (0, 0.05, 0), "sides": 8},
+            {"kind": "sphere", "radius": 0.16, "color": (0.95, 0.92, 0.8), "pos": (0.1, 0.16, 0), "emissive": (0.4, 0.38, 0.3), "segs": 7, "rings": 4}], pos=(x, 0.02, z))
+    # The far celestial shore: a row of glowing spires beyond the far bank.
+    for i, (x, h) in enumerate([(-12, 9), (-6, 13), (0, 11), (6, 15), (12, 10)], 1):
+        s.composite("PROP_Distant_Spire_%02d" % i, [
+            {"kind": "cone", "radius": 1.0, "height": h, "color": (0.98, 0.92, 0.72),
+             "pos": (0, h / 2, 0), "emissive": (0.8, 0.72, 0.46), "sides": 8}], pos=(x, 0, -42))
+    for i, (x, z) in enumerate([(-4, -30), (4, -30)], 1):
+        _lantern(s, "PROP_Lantern_FarBank_%02d" % i, (x, 0, z), (1.0, 0.92, 0.66))
+
+
+def _dress_celestial(s):
+    """A radiant golden approach: pillared avenue, blossom, statues, more spires."""
+    for i, (x, z) in enumerate([(-5, 12), (5, 12), (-5, 4), (5, 4), (-5, -4), (5, -4)], 1):
+        s.composite("PROP_Decor_Pillar_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.5, "height": 5.5, "color": (0.95, 0.9, 0.74),
+             "pos": (0, 2.75, 0), "emissive": (0.4, 0.36, 0.24), "sides": 12},
+            {"kind": "sphere", "radius": 0.55, "color": (1.0, 0.95, 0.7), "pos": (0, 5.7, 0),
+             "emissive": (0.85, 0.78, 0.5), "segs": 10, "rings": 6}], pos=(x, 0, z))
+    for i, (x, z) in enumerate([(-7, 14), (7, 14), (-7, 0), (7, 0)], 1):
+        _tree(s, "PROP_Foliage_Blossom_%02d" % i, (x, 0, z), 4.2, (0.95, 0.8, 0.86), (0.5, 0.4, 0.3))
+    # Gilded welcoming statues flanking the stair.
+    for i, x in enumerate([-6, 6], 1):
+        s.composite("PROP_Decor_Statue_%02d" % i, [
+            {"kind": "box", "size": (1.4, 0.8, 1.4), "color": (0.9, 0.84, 0.66), "pos": (0, 0.4, 0)},
+            {"kind": "cylinder", "radius": 0.4, "height": 2.4, "color": (0.96, 0.9, 0.66),
+             "pos": (0, 1.9, 0), "emissive": (0.5, 0.44, 0.28), "sides": 10},
+            {"kind": "sphere", "radius": 0.4, "color": (0.98, 0.92, 0.7), "pos": (0, 3.3, 0),
+             "emissive": (0.6, 0.54, 0.34), "segs": 9, "rings": 5}], pos=(x, 0, -8))
+    # Doves rising before the gate.
+    for i in range(1, 6):
+        s.composite("PROP_Crow_Dove_%02d" % i, [
+            {"kind": "sphere", "radius": 0.13, "color": (0.98, 0.96, 0.92),
+             "pos": (0, 0, 0), "emissive": (0.4, 0.4, 0.38), "segs": 7, "rings": 4}],
+            pos=(round((i - 3) * 1.6, 1), 3.4 + (i % 2) * 0.6, -10))
+    # Extra spires of the City rising beyond the wall.
+    for i, (x, h) in enumerate([(-13, 14), (13, 16), (-7, 19), (7, 21)], 1):
+        s.composite("PROP_Distant_Spire_%02d" % i, [
+            {"kind": "cone", "radius": 1.1, "height": h, "color": (0.97, 0.9, 0.66),
+             "pos": (0, h / 2, 0), "emissive": (0.7, 0.62, 0.38), "sides": 8}], pos=(x, 0, -34))
+
+
+_DRESSERS = {
+    "slough_of_despond": _dress_slough,
+    "wicket_gate": _dress_wicket,
+    "cross_and_tomb": _dress_cross,
+    "interpreter_house": _dress_interpreter,
+    "hill_difficulty": _dress_hill,
+    "palace_beautiful": _dress_palace,
+    "valley_humiliation": _dress_humiliation,
+    "valley_shadow_death": _dress_shadow,
+    "vanity_fair": _dress_vanity,
+    "doubting_castle": _dress_doubting,
+    "delectable_mountains": _dress_delectable,
+    "enchanted_ground": _dress_enchanted,
+    "river_of_death": _dress_river,
+    "celestial_city": _dress_celestial,
+}
+
+
+def _build_dressed(cid):
+    s = _BASE_SCENES[cid]()
+    dresser = _DRESSERS.get(cid)
+    if dresser is not None:
+        dresser(s)
+    return s
+
+
+SCENES = {cid: (lambda cid=cid: _build_dressed(cid)) for cid in _BASE_SCENES}

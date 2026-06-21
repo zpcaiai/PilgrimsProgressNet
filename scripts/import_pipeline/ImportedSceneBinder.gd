@@ -372,38 +372,9 @@ static func _bind_exit(chapter: Node3D, node: Node) -> void:
 ## A visible "portal": a soft glowing light-beam + ground ring + lamp marking the
 ## chapter exit, so the way out is unmistakable.
 static func _spawn_exit_portal(chapter: Node3D, pos: Vector3) -> void:
-	var mat := StandardMaterial3D.new()
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.albedo_color = Color(0.62, 0.85, 1.0, 0.55)
-	mat.emission_enabled = true
-	mat.emission = Color(0.55, 0.8, 1.0)
-	mat.emission_energy_multiplier = 4.0
-	var beam := MeshInstance3D.new()
-	var cyl := CylinderMesh.new()
-	cyl.top_radius = 0.16
-	cyl.bottom_radius = 0.16
-	cyl.height = 6.0
-	beam.mesh = cyl
-	beam.material_override = mat
-	beam.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	chapter.add_child(beam)
-	beam.global_position = pos + Vector3(0, 3.0, 0)
-	var ring := MeshInstance3D.new()
-	var tor := TorusMesh.new()
-	tor.inner_radius = 0.9
-	tor.outer_radius = 1.2
-	ring.mesh = tor
-	ring.material_override = mat
-	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	chapter.add_child(ring)
-	ring.global_position = pos + Vector3(0, 0.12, 0)
-	var lamp := OmniLight3D.new()
-	lamp.light_color = Color(0.6, 0.8, 1.0)
-	lamp.light_energy = 2.0
-	lamp.omni_range = 8.0
-	chapter.add_child(lamp)
-	lamp.global_position = pos + Vector3(0, 2.0, 0)
+	var portal := ExitPortal.new()
+	chapter.add_child(portal)
+	portal.global_position = pos
 
 
 static func _bind_hazard(chapter: Node3D, node: Node, nm: String) -> void:
