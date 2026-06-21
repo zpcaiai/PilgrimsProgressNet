@@ -640,6 +640,22 @@ def build_cross_and_tomb():
     s.box("ENV_Cross_Hilltop", (22, 1.0, 16), (0.42, 0.48, 0.36), (0, 0.5, -22))
     s.box("ENV_Cross_TombSlope", (10, 0.1, 7), (0.4, 0.42, 0.34), (-7, 1.05, -18))
     _chapel(s, "PROP_Chapel", (13, 0, 6), rot=(0, -90, 0))
+    # --- 精装修: life returning to the hill of grace (flowers, light, doves) ---
+    for i, (fx, fz, fc) in enumerate([(-3, -16, (0.95, 0.85, 0.4)), (3, -14, (0.9, 0.5, 0.6)),
+                                      (-5, -22, (0.86, 0.86, 0.95)), (5, -20, (0.95, 0.8, 0.45)),
+                                      (-2, -10, (0.9, 0.6, 0.82))], start=1):
+        s.composite("PROP_HillFlower_%02d" % i, [
+            {"kind": "cone", "radius": 0.12, "height": 0.5, "color": (0.4, 0.55, 0.32), "pos": (0, 0.25, 0)},
+            {"kind": "sphere", "radius": 0.22, "color": fc, "pos": (0, 0.62, 0),
+             "emissive": tuple(c * 0.4 for c in fc)}], pos=(fx, 1.0, fz))
+    for i, (gx, gz) in enumerate([(-2, -18), (2, -16), (0, -24)], start=1):
+        s.composite("PROP_DawnGlow_%02d" % i, [
+            {"kind": "sphere", "radius": 0.16, "color": (1.0, 0.95, 0.7),
+             "pos": (0, 0, 0), "emissive": (0.95, 0.85, 0.5)}], pos=(gx, 2.3, gz))
+    for i, (dx2, dz2) in enumerate([(-6.4, -18), (0.6, -16.6)], start=1):
+        s.composite("PROP_DoveFoliage_%02d" % i, [
+            {"kind": "sphere", "radius": 0.18, "color": (0.95, 0.95, 0.92), "pos": (0, 0, 0)},
+            {"kind": "sphere", "radius": 0.1, "color": (0.95, 0.95, 0.92), "pos": (0, 0.12, 0.14)}], pos=(dx2, 2.6, dz2))
 
     s.composite("PROP_Cross", [
         {"kind": "box", "size": (0.5, 5.0, 0.5), "color": (0.45, 0.34, 0.22),
@@ -711,6 +727,22 @@ def build_interpreter_house():
     s.sphere("PROP_HallLight_01", 0.42, (1.0, 0.92, 0.7), (-4, 3.3, -2), emissive=(0.95, 0.82, 0.5))
     s.sphere("PROP_HallLight_02", 0.42, (1.0, 0.92, 0.7), (4, 3.3, -3), emissive=(0.95, 0.82, 0.5))
     _chapel(s, "PROP_Chapel", (-12, 0, 13), rot=(0, 0, 0), wall=(0.8, 0.74, 0.66))
+    # --- 精装修: a warmly furnished house of instruction ---
+    for i, (lx, lz) in enumerate([(-6, 6), (6, 6), (-6, -6), (6, -6)], start=3):
+        s.composite("PROP_HallLight_%02d" % i, [
+            {"kind": "sphere", "radius": 0.22, "color": (1.0, 0.86, 0.55),
+             "pos": (0, 0, 0), "emissive": (0.9, 0.72, 0.4)}], pos=(lx, 2.8, lz))
+    s.composite("PROP_Bookshelf", [
+        {"kind": "box", "size": (3.0, 2.6, 0.6), "color": (0.34, 0.24, 0.16), "pos": (0, 1.3, 0)},
+        {"kind": "box", "size": (2.7, 0.12, 0.5), "color": (0.72, 0.62, 0.42), "pos": (0, 0.8, 0.06)},
+        {"kind": "box", "size": (2.7, 0.12, 0.5), "color": (0.72, 0.62, 0.42), "pos": (0, 1.5, 0.06)},
+        {"kind": "box", "size": (2.7, 0.12, 0.5), "color": (0.72, 0.62, 0.42), "pos": (0, 2.2, 0.06)},
+    ], pos=(-5.5, 0, 5.5), rot=(0, 90, 0))
+    s.composite("PROP_HallBench", [
+        {"kind": "box", "size": (3.0, 0.3, 0.8), "color": (0.4, 0.3, 0.2), "pos": (0, 0.5, 0)},
+        {"kind": "box", "size": (3.0, 0.8, 0.18), "color": (0.4, 0.3, 0.2), "pos": (0, 0.9, -0.32)}], pos=(5.5, 0, 8))
+    s.composite("PROP_FloorRugFoliage", [
+        {"kind": "box", "size": (6, 0.04, 4), "color": (0.5, 0.2, 0.18), "pos": (0, 0.02, 0)}], pos=(0, 0, 0))
     s.cylinder("PROP_DustRoom_Broom", 0.1, 1.8, wood, (-13, 0.9, 1), rot=(0, 0, 18))
     s.cylinder("PROP_DustRoom_WaterBowl", 0.5, 0.3, (0.4, 0.5, 0.6),
                (-15, 0.2, -1), emissive=(0.1, 0.14, 0.18))
@@ -784,6 +816,20 @@ def build_hill_difficulty():
          "pos": (0, 1.0, -0.4)},
     ], pos=(6, 0, 0))
     _chapel(s, "PROP_Chapel", (11, 0, 9), rot=(0, -90, 0))
+    # --- 精装修: scree, pines and a wayside spring on the climb ---
+    for i, (bx, bz, br) in enumerate([(-4.5, -4, 0.7), (4.5, -10, 0.6), (-4, -18, 0.8), (4.5, -24, 0.65)], start=1):
+        s.composite("PROP_Scree_%02d" % i, [
+            {"kind": "sphere", "radius": br, "color": (0.5, 0.46, 0.4), "pos": (0, br * 0.5, 0)},
+            {"kind": "sphere", "radius": br * 0.6, "color": (0.52, 0.48, 0.42), "pos": (br * 0.6, br * 0.4, 0.2)}], pos=(bx, 0, bz))
+    for i, (px, pz, ph) in enumerate([(-9, -2, 4.5), (9, -16, 5.0), (-11, -22, 4.0)], start=1):
+        s.composite("PROP_Pine_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.22, "height": ph * 0.4, "color": (0.32, 0.24, 0.16), "pos": (0, ph * 0.2, 0)},
+            {"kind": "cone", "radius": 1.2, "height": ph * 0.5, "color": (0.2, 0.4, 0.26), "pos": (0, ph * 0.55, 0)},
+            {"kind": "cone", "radius": 0.9, "height": ph * 0.42, "color": (0.22, 0.43, 0.28), "pos": (0, ph * 0.8, 0)}], pos=(px, 0, pz))
+    s.composite("PROP_WaysideSpring", [
+        {"kind": "cylinder", "radius": 0.9, "height": 0.5, "color": (0.45, 0.44, 0.4), "pos": (0, 0.25, 0)},
+        {"kind": "cylinder", "radius": 0.7, "height": 0.2, "color": (0.32, 0.5, 0.6), "pos": (0, 0.5, 0),
+         "emissive": (0.1, 0.2, 0.26), "metallic": 0.1, "roughness": 0.08}], pos=(8.6, 0, 1))
     s.composite("PROP_SummitMarker", [
         {"kind": "cone", "radius": 0.6, "height": 2.4, "color": (0.9, 0.8, 0.4),
          "pos": (0, 1.2, 0), "emissive": (0.6, 0.55, 0.25)},
@@ -876,6 +922,21 @@ def build_palace_beautiful():
     s.box("PROP_GateBanner_Left", (0.16, 2.2, 1.2), (0.72, 0.2, 0.26), (-4, 8.3, 22), emissive=(0.32, 0.06, 0.08))
     s.box("PROP_GateBanner_Right", (0.16, 2.2, 1.2), (0.72, 0.2, 0.26), (4, 8.3, 22), emissive=(0.32, 0.06, 0.08))
     _chapel(s, "PROP_Chapel", (-11, 0, 15), rot=(0, 0, 0), wall=(0.86, 0.82, 0.76))
+    # --- 精装修: a richer noble hall (columns, banners, hearth, urns) ---
+    _hcol = [(0.5, 0), (0.6, 0.3), (0.42, 0.6), (0.4, 4.6), (0.56, 5.0), (0.66, 5.4)]
+    for i, (cx, cz) in enumerate([(-7, 6), (7, 6), (-7, -6), (7, -6)], start=1):
+        s.lathe("PROP_HallColumn_%02d" % i, _hcol, stone, (cx, 0, cz))
+    for i, (bx, bz, bc) in enumerate([(-8.6, 2, (0.72, 0.18, 0.2)), (8.6, 2, (0.2, 0.3, 0.72)),
+                                      (-8.6, -8, (0.62, 0.5, 0.16))], start=1):
+        s.box("PROP_HallBanner_%02d" % i, (0.16, 3.0, 1.4), bc, (bx, 3.0, bz),
+              emissive=tuple(c * 0.25 for c in bc))
+    s.composite("PROP_HearthFire", [
+        {"kind": "cone", "radius": 0.5, "height": 1.2, "color": (1.0, 0.5, 0.2),
+         "pos": (0, 0.6, 0), "emissive": (0.95, 0.45, 0.12)}], pos=(-15, 0, -6))
+    for i, ux in enumerate((-5, 5), start=1):
+        s.lathe("PROP_GardenUrn_%02d" % i,
+                [(0.3, 0), (0.5, 0.4), (0.6, 0.8), (0.4, 1.2), (0.5, 1.5), (0.3, 1.7)],
+                (0.6, 0.55, 0.45), (ux, 0, 18))
 
     s.marker("NPC_Watchman", (0, 0, 20))
     s.marker("NPC_Discretion", (-2, 0, 14))
@@ -926,6 +987,20 @@ def build_valley_humiliation():
     s.sphere("PROP_EmberGlow_01", 0.5, (1.0, 0.3, 0.12), (-8, 0.6, -12), emissive=(0.95, 0.25, 0.05))
     s.sphere("PROP_EmberGlow_02", 0.42, (1.0, 0.35, 0.14), (8, 0.5, -12), emissive=(0.9, 0.28, 0.06))
     _chapel(s, "PROP_Chapel", (13, 0, 18), rot=(0, -90, 0))
+    # --- 精装修: more battlefield wreckage ---
+    for i, (sx2, sz2, sa) in enumerate([(-8, 2, 60), (9, -6, -50), (-9, -10, 40), (8, 4, 75)], start=2):
+        s.cylinder("PROP_BrokenSpear_%02d" % i, 0.07, 2.4, (0.4, 0.34, 0.26), (sx2, 0.4, sz2), rot=(0, 0, sa))
+    for i, (dx2, dz2) in enumerate([(-6, -4), (7, -10), (-3, -14)], start=1):
+        s.composite("PROP_BrokenShield_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.6, "height": 0.12, "color": (0.4, 0.36, 0.3),
+             "pos": (0, 0.06, 0), "rot": (90, 0, 20)}], pos=(dx2, 0, dz2))
+    for i, (ex, ez) in enumerate([(-10, -10), (10, -8), (0, -14)], start=3):
+        s.composite("PROP_EmberGlow_%02d" % i, [
+            {"kind": "sphere", "radius": 0.32, "color": (1.0, 0.32, 0.12),
+             "pos": (0, 0.4, 0), "emissive": (0.95, 0.25, 0.05)}], pos=(ex, 0, ez))
+    s.composite("PROP_FallenBannerFoliage", [
+        {"kind": "cylinder", "radius": 0.1, "height": 3.5, "color": (0.3, 0.24, 0.18), "pos": (0, 0.2, 0), "rot": (0, 0, 80)},
+        {"kind": "box", "size": (0.12, 1.6, 1.0), "color": (0.5, 0.12, 0.12), "pos": (1.3, 0.3, 0), "rot": (0, 0, 80)}], pos=(-9, 0, 3))
     s.marker("PROP_ArmorLightMarker", (0, 1.2, 14))
 
     s.marker("NPC_Apollyon", (0, 0, -16))
@@ -1153,6 +1228,21 @@ def build_doubting_castle():
     s.lathe("PROP_CastleTower_Right", _tower, stone, (11, 0, -8))
     # A chapel out in the By-Path meadow — mercy within reach of the dungeon.
     _chapel(s, "PROP_Chapel", (-12, 0, 20), rot=(0, 90, 0))
+    # --- 精装修: a grimmer castle ground (graves, dead trees, puddles, chains) ---
+    for i, (gx, gz) in enumerate([(7, 18), (11, 22), (5, 25)], start=1):
+        s.composite("PROP_GraveCairn_%02d" % i, [
+            {"kind": "box", "size": (0.7, 1.0, 0.2), "color": (0.3, 0.31, 0.34), "pos": (0, 0.5, 0)},
+            {"kind": "sphere", "radius": 0.34, "color": (0.32, 0.33, 0.36), "pos": (0, 1.0, 0)}], pos=(gx, 0, gz))
+    for i, (dx2, dz2, dh) in enumerate([(-10, 14, 3.5), (12, 16, 3.0)], start=1):
+        s.composite("PROP_DeadTreeFoliage_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.24, "height": dh, "color": (0.22, 0.18, 0.16), "pos": (0, dh * 0.5, 0)},
+            {"kind": "box", "size": (1.8, 0.16, 0.16), "color": (0.22, 0.18, 0.16), "pos": (0.4, dh * 0.8, 0), "rot": (0, 0, 28)}], pos=(dx2, 0, dz2))
+    for i, (px, pz, pr) in enumerate([(0, 6, 1.6), (-3, -2, 1.2), (3, -12, 1.4)], start=1):
+        s.composite("PROP_PuddleFoliage_%02d" % i, [
+            {"kind": "box", "size": (pr, 0.03, pr * 0.8), "color": (0.1, 0.11, 0.16),
+             "pos": (0, 0.02, 0), "metallic": 0.1, "roughness": 0.08}], pos=(px, 0, pz))
+    s.composite("PROP_CellChains_02", [
+        {"kind": "cylinder", "radius": 0.05, "height": 1.4, "color": (0.2, 0.2, 0.22), "pos": (0, 0.7, 0)}], pos=(3, 0, -10))
 
     s.marker("NPC_Hopeful", (1.5, 0, -9))
     s.marker("NPC_GiantDespair", (0, 0, 1))

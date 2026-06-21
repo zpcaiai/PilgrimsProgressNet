@@ -1049,10 +1049,15 @@ class Scene:
             P, N, I = cylinder_mesh(p["radius"], p["height"], p.get("sides", 24))
             return self.glb.mesh_indexed(P, N, I, mat)
         if kind == "cone":
-            P, N, I = cone_mesh(p["radius"], p["height"], p.get("sides", 24))
+            _cs = p.get("sides", 24 if p["radius"] >= 0.3 else 10)
+            P, N, I = cone_mesh(p["radius"], p["height"], _cs)
             return self.glb.mesh_indexed(P, N, I, mat)
         if kind == "sphere":
-            P, N, I = sphere_mesh(p["radius"], p.get("segs", 22), p.get("rings", 12))
+            # small decorative spheres get a cheaper tessellation (size budget)
+            _r = p["radius"]
+            _sg = p.get("segs", 22 if _r >= 0.35 else 10)
+            _rg = p.get("rings", 12 if _r >= 0.35 else 6)
+            P, N, I = sphere_mesh(_r, _sg, _rg)
             return self.glb.mesh_indexed(P, N, I, mat)
         if kind == "torus":
             P, N, I = torus_mesh(p["ring_r"], p["tube_r"], p.get("segs", 26),
