@@ -28,12 +28,18 @@ def _wall(s, name, size, pos, color=(0.46, 0.42, 0.38)):
 
 
 def _cottage(s, name, pos, size=(5, 3.2, 5), wall=(0.5, 0.43, 0.4),
-             roof=(0.33, 0.23, 0.17), lit=True):
+             roof=(0.33, 0.23, 0.17), lit=True, brick=True):
     w, h, d = size
     win = (0.96, 0.86, 0.56) if lit else (0.16, 0.17, 0.21)   # warm vs dead-cold
     win_emis = (0.4, 0.34, 0.18) if lit else (0.0, 0.0, 0.0)
+    # Brick masonry walls (textured) — every house in the city is brick.
+    wall_part = {"kind": "box", "size": size,
+                 "color": (0.84, 0.76, 0.72) if brick else wall, "pos": (0, h / 2, 0)}
+    if brick:
+        wall_part["tex"] = "brick"
+        wall_part["tile"] = 1.3
     s.composite(name, [
-        {"kind": "box", "size": size, "color": wall, "pos": (0, h / 2, 0)},
+        wall_part,
         {"kind": "pyramid", "size": (w + 0.5, d + 0.5),
          "height": 1.7, "color": roof, "pos": (0, h + 0.85, 0)},
         # plank door + two windows on the +Z face
@@ -62,6 +68,42 @@ def _sign(s, name, pos, color=(0.55, 0.45, 0.3)):
         {"kind": "sphere", "radius": 0.16, "color": (0.28, 0.22, 0.16),
          "pos": (0, 2.06, 0)},
     ], pos=pos)
+
+
+def _chapel(s, name, pos, rot=(0, 0, 0), wall=(0.84, 0.8, 0.74),
+            roof=(0.5, 0.28, 0.24), brick=False):
+    """A small wayside chapel: nave + pitched roof + steeple crowned with a
+    cross, a glowing rose window and warm-lit side windows. Bound to a
+    'Worship' interactable by ImportedSceneBinder (PROP_Chapel)."""
+    nave = {"kind": "box", "size": (5, 4, 7), "color": wall, "pos": (0, 2, 0)}
+    tower = {"kind": "box", "size": (2.2, 7.5, 2.2), "color": wall, "pos": (0, 3.75, 4.3)}
+    if brick:
+        nave["tex"] = "brick"; nave["tile"] = 1.4
+        tower["tex"] = "brick"; tower["tile"] = 1.3
+    s.composite(name, [
+        nave,
+        {"kind": "box", "size": (5.4, 0.5, 7.4), "color": roof, "pos": (0, 4.05, 0)},
+        {"kind": "pyramid", "size": (5.7, 7.7), "height": 2.2, "color": roof, "pos": (0, 5.2, 0)},
+        tower,
+        {"kind": "cone", "radius": 1.5, "height": 3.0, "color": roof, "pos": (0, 9.0, 4.3)},
+        # cross atop the steeple
+        {"kind": "box", "size": (0.18, 1.5, 0.18), "color": (0.96, 0.9, 0.6),
+         "pos": (0, 11.0, 4.3), "emissive": (0.55, 0.5, 0.25)},
+        {"kind": "box", "size": (0.8, 0.18, 0.18), "color": (0.96, 0.9, 0.6),
+         "pos": (0, 11.05, 4.3), "emissive": (0.55, 0.5, 0.25)},
+        # arched door
+        {"kind": "box", "size": (1.3, 2.3, 0.25), "color": (0.3, 0.22, 0.16), "pos": (0, 1.15, 5.55)},
+        # glowing rose window
+        {"kind": "torus", "ring_r": 0.62, "tube_r": 0.12, "color": (0.72, 0.62, 0.42),
+         "pos": (0, 3.0, 5.5), "rot": (90, 0, 0)},
+        {"kind": "sphere", "radius": 0.5, "color": (1.0, 0.9, 0.6),
+         "pos": (0, 3.0, 5.45), "emissive": (0.78, 0.64, 0.32)},
+        # warm lit side windows
+        {"kind": "box", "size": (0.2, 1.6, 1.1), "color": (1.0, 0.88, 0.6),
+         "pos": (2.55, 2.2, -0.5), "emissive": (0.55, 0.45, 0.22)},
+        {"kind": "box", "size": (0.2, 1.6, 1.1), "color": (1.0, 0.88, 0.6),
+         "pos": (-2.55, 2.2, -0.5), "emissive": (0.55, 0.45, 0.22)},
+    ], pos=pos, rot=rot)
 
 
 # ===========================================================================
@@ -139,6 +181,10 @@ def build_city_of_destruction():
              "pos": (0.5, 10.6, 0)},
         ], pos=(px, 0, pz))
 
+    # The last chapel still standing in the doomed city.
+    _chapel(s, "PROP_Chapel", (-16, 0, -15), rot=(0, 90, 0),
+            wall=(0.5, 0.46, 0.46), roof=(0.3, 0.24, 0.26), brick=True)
+
     s.marker("NPC_Wife", (-3.0, 0, 5.0))
     s.marker("NPC_Children", (-3.8, 0, 5.6))
     s.marker("NPC_Evangelist", (0, 0, -4))
@@ -198,7 +244,9 @@ def build_wilderness_road():
     # The little light ahead -- the goal you fix your eyes on.
     s.composite("PROP_DistantLightMarker", [
         {"kind": "cone", "radius": 1.3, "height": 2.6, "color": (1.0, 0.93, 0.7),
-         "pos": (0, 5, 0), "emissive": (0.9, 0.82, 0.55)},
+         "pos": (0, 5, 0), "emissive": (0.95, 0.86, 0.6)},
+        {"kind": "sphere", "radius": 1.6, "color": (1.0, 0.95, 0.78),
+         "pos": (0, 7.4, 0), "emissive": (0.95, 0.88, 0.62)},
     ], pos=(0, 0, -46))
 
     # A leaning signpost: the way is marked even out here.
@@ -215,10 +263,13 @@ def build_wilderness_road():
         {"kind": "box", "size": (0.9, 0.5, 0.7), "color": (0.48, 0.45, 0.40), "pos": (0.2, 1.1, 0.1)},
     ], pos=(3.6, 0, 8))
 
+    # A wayside chapel beside the road through the waste.
+    _chapel(s, "PROP_Chapel", (-9, 0, 4), rot=(0, 90, 0))
+
     # Rocks, dead trees, broken fence, dry brush -- the parched in-between land.
     s.composite("PROP_RockCluster_01", [
         {"kind": "box", "size": (1.6, 1.2, 1.4), "color": (0.5, 0.47, 0.42), "pos": (0, 0.6, 0)},
-        {"kind": "box", "size": (1.0, 0.8, 1.0), "color": (0.45, 0.42, 0.38), "pos": (1.0, 0.4, 0.4)},
+        {"kind": "sphere", "radius": 0.82, "color": (0.52, 0.49, 0.44), "pos": (1.0, 0.55, 0.4)},
     ], pos=(8, 0, 2))
     s.composite("PROP_RockCluster_02", [
         {"kind": "box", "size": (1.4, 1.0, 1.2), "color": (0.5, 0.47, 0.42), "pos": (0, 0.5, 0)},
@@ -292,8 +343,9 @@ def build_wilderness_road():
 # ===========================================================================
 def build_slough_of_despond():
     s = Scene("slough_of_despond")
-    s.ground("ENV_Slough_Ground", (40, 96), (0.22, 0.26, 0.22))
-    s.box("ENV_Slough_MudBasin", (26, 0.3, 50), (0.2, 0.24, 0.2), (0, -0.1, -18))
+    # Murkier, colder mire — heavier and more hopeless underfoot.
+    s.ground("ENV_Slough_Ground", (40, 96), (0.18, 0.22, 0.21))
+    s.box("ENV_Slough_MudBasin", (26, 0.3, 50), (0.15, 0.19, 0.17), (0, -0.1, -18))
     s.box("ENV_Slough_SafeStonePath", (3, 0.2, 60), (0.5, 0.5, 0.55),
           (0, 0.08, -10))
     s.box("ENV_Slough_ExitSlope", (10, 0.12, 10), (0.34, 0.36, 0.3), (0, 0.05, -48))
@@ -370,14 +422,17 @@ def build_wicket_gate():
     s.box("ENV_Wicket_GatePlatform", (10, 0.3, 10), (0.32, 0.3, 0.3),
           (0, 0.1, -9))
 
-    s.box("PROP_StonePost_Left", (1.4, 5, 1.4), (0.45, 0.43, 0.4), (-2.4, 2.5, -8))
-    s.box("PROP_StonePost_Right", (1.4, 5, 1.4), (0.45, 0.43, 0.4), (2.4, 2.5, -8))
+    for _nm, _x in (("PROP_StonePost_Left", -2.4), ("PROP_StonePost_Right", 2.4)):
+        s.composite(_nm, [
+            {"kind": "box", "size": (1.4, 5, 1.4), "color": (0.46, 0.45, 0.43), "pos": (0, 2.5, 0)},
+            {"kind": "sphere", "radius": 0.86, "color": (0.5, 0.49, 0.46), "pos": (0, 5.2, 0)},
+        ], pos=(_x, 0, -8))
     s.composite("PROP_WicketGate", [
         {"kind": "box", "size": (5.6, 1.0, 1.0), "color": (0.4, 0.34, 0.26),
          "pos": (0, 5.2, 0)},
     ], pos=(0, 0, -8))
-    s.box("PROP_GateDoor", (3.0, 4.2, 0.3), (0.5, 0.38, 0.24), (0, 2.1, -8),
-          emissive=(0.18, 0.12, 0.05))
+    s.box("PROP_GateDoor", (3.0, 4.2, 0.3), (0.62, 0.46, 0.26), (0, 2.1, -8),
+          emissive=(0.5, 0.34, 0.12))
 
     s.marker("NPC_Goodwill", (0, 0, -10.5))
     s.zone("TRIGGER_GateKnock", (3.4, 4, 1.6), (0, 2, -8),
@@ -403,7 +458,8 @@ def build_wicket_gate():
 # ===========================================================================
 def build_cross_and_tomb():
     s = Scene("cross_and_tomb")
-    s.ground("ENV_Cross_Ground", (44, 60), (0.4, 0.46, 0.34))
+    # Warm dawn breaking over the hill of grace.
+    s.ground("ENV_Cross_Ground", (44, 60), (0.52, 0.5, 0.36))
     # Flat ground -> gentle flush ramp -> low hilltop, all continuously walkable.
     s.ramp("ENV_Cross_HillPath", 8, 12, 1.0, (0.5, 0.46, 0.34), (0, 0, -2))
     s.box("ENV_Cross_Hilltop", (22, 1.0, 16), (0.42, 0.48, 0.36), (0, 0.5, -22))
@@ -416,13 +472,12 @@ def build_cross_and_tomb():
          "pos": (0, 3.6, 0)},
     ], pos=(0, 1.0, -20))
     s.composite("PROP_Tomb", [
-        {"kind": "box", "size": (4, 3, 4), "color": (0.5, 0.5, 0.52),
+        {"kind": "box", "size": (4, 3, 4), "color": (0.52, 0.52, 0.54),
          "pos": (0, 1.5, 0)},
-        {"kind": "cylinder", "radius": 1.2, "height": 0.5, "color": (0.4, 0.4, 0.42),
-         "pos": (1.6, 0.6, 1.6), "rot": (90, 0, 0)},
+        {"kind": "sphere", "radius": 1.3, "color": (0.42, 0.42, 0.44),
+         "pos": (2.3, 1.0, 1.8)},
     ], pos=(-7, 1.0, -18))
-    s.box("PROP_RollingBurden", (1.2, 1.1, 1.2), (0.3, 0.26, 0.22),
-          (0, 1.6, -18.5))
+    s.sphere("PROP_RollingBurden", 0.72, (0.3, 0.26, 0.22), (0, 1.7, -18.5))
     s.marker("PROP_NewGarmentMarker", (0, 1.6, -17))
     s.marker("PROP_ScrollMarker", (0.8, 1.6, -17))
     s.marker("PROP_SealMarker", (-0.8, 1.6, -17))
@@ -474,6 +529,9 @@ def build_interpreter_house():
     _wall(s, "ENV_InterpreterHouse_WallS", (40, 4, 0.4), (0, 2, 14), wall)
 
     s.marker("NPC_Interpreter", (0, 0, -3))
+    # Warm hanging lamps pooling light through the instructive hall.
+    s.sphere("PROP_HallLight_01", 0.42, (1.0, 0.92, 0.7), (-4, 3.3, -2), emissive=(0.95, 0.82, 0.5))
+    s.sphere("PROP_HallLight_02", 0.42, (1.0, 0.92, 0.7), (4, 3.3, -3), emissive=(0.95, 0.82, 0.5))
     s.cylinder("PROP_DustRoom_Broom", 0.1, 1.8, wood, (-13, 0.9, 1), rot=(0, 0, 18))
     s.cylinder("PROP_DustRoom_WaterBowl", 0.5, 0.3, (0.4, 0.5, 0.6),
                (-15, 0.2, -1), emissive=(0.1, 0.14, 0.18))
@@ -546,10 +604,18 @@ def build_hill_difficulty():
         {"kind": "box", "size": (2.4, 0.9, 0.2), "color": (0.4, 0.32, 0.2),
          "pos": (0, 1.0, -0.4)},
     ], pos=(6, 0, 0))
-    s.cone("PROP_SummitMarker", 0.6, 2.4, (0.9, 0.8, 0.4), (0, 3.2, -29),
-           emissive=(0.6, 0.55, 0.25))
+    _chapel(s, "PROP_Chapel", (11, 0, 9), rot=(0, -90, 0))
+    s.composite("PROP_SummitMarker", [
+        {"kind": "cone", "radius": 0.6, "height": 2.4, "color": (0.9, 0.8, 0.4),
+         "pos": (0, 1.2, 0), "emissive": (0.6, 0.55, 0.25)},
+        {"kind": "sphere", "radius": 0.7, "color": (1.0, 0.92, 0.6),
+         "pos": (0, 2.9, 0), "emissive": (0.92, 0.8, 0.45)},
+    ], pos=(0, 2.0, -29))
     s.box("PROP_DistantPalaceSilhouette", (16, 9, 2), (0.3, 0.3, 0.4),
           (0, 12, -46))
+    # Boulders strewn beside the climb.
+    s.sphere("PROP_HillBoulder_01", 1.1, (0.5, 0.46, 0.4), (-5, 0.6, -8))
+    s.sphere("PROP_HillBoulder_02", 0.9, (0.48, 0.45, 0.39), (5, 0.5, -18))
 
     s.marker("NPC_Timorous", (-11, 0, 2))
     s.marker("NPC_Mistrust", (11, 0, 2))
@@ -626,6 +692,11 @@ def build_palace_beautiful():
     s.box("PROP_Shield", (1.2, 1.4, 0.2), (0.6, 0.6, 0.68), (16.4, 1.3, -3),
           emissive=(0.15, 0.16, 0.2))
     s.box("PROP_ValleyView", (12, 7, 1.5), (0.2, 0.2, 0.28), (0, 4, -19.5))
+    # Warm hearth glow in the rest room + festive pennants on the gate.
+    s.sphere("PROP_HearthGlow", 0.6, (1.0, 0.6, 0.3), (-15, 0.8, -5), emissive=(0.95, 0.45, 0.15))
+    s.box("PROP_GateBanner_Left", (0.16, 2.2, 1.2), (0.72, 0.2, 0.26), (-4, 8.3, 22), emissive=(0.32, 0.06, 0.08))
+    s.box("PROP_GateBanner_Right", (0.16, 2.2, 1.2), (0.72, 0.2, 0.26), (4, 8.3, 22), emissive=(0.32, 0.06, 0.08))
+    _chapel(s, "PROP_Chapel", (-11, 0, 15), rot=(0, 0, 0), wall=(0.86, 0.82, 0.76))
 
     s.marker("NPC_Watchman", (0, 0, 20))
     s.marker("NPC_Discretion", (-2, 0, 14))
@@ -657,20 +728,24 @@ def build_palace_beautiful():
 # ===========================================================================
 def build_valley_humiliation():
     s = Scene("valley_humiliation")
-    s.ground("ENV_Humiliation_ValleyFloor", (54, 70), (0.34, 0.36, 0.3))
-    s.box("ENV_Humiliation_DescentPath", (8, 0.12, 18), (0.4, 0.4, 0.34), (0, 0.06, 22))
-    s.box("ENV_Humiliation_BossArena", (34, 0.1, 34), (0.32, 0.3, 0.28),
+    # Darker, scorched battlefield — oppressive and close.
+    s.ground("ENV_Humiliation_ValleyFloor", (54, 70), (0.30, 0.27, 0.26))
+    s.box("ENV_Humiliation_DescentPath", (8, 0.12, 18), (0.34, 0.32, 0.3), (0, 0.06, 22))
+    s.box("ENV_Humiliation_BossArena", (34, 0.1, 34), (0.26, 0.22, 0.22),
           (0, 0.06, -6))
     s.box("ENV_Humiliation_ExitPath", (8, 0.12, 14), (0.36, 0.36, 0.32), (0, 0.06, -30))
 
     s.composite("PROP_BattleStone_01", [
-        {"kind": "box", "size": (2.2, 1.6, 2.0), "color": (0.46, 0.44, 0.4),
-         "pos": (0, 0.8, 0)}], pos=(-12, 0, -4))
+        {"kind": "box", "size": (2.2, 1.6, 2.0), "color": (0.4, 0.38, 0.36), "pos": (0, 0.8, 0)},
+        {"kind": "sphere", "radius": 1.1, "color": (0.42, 0.4, 0.38), "pos": (0.6, 1.2, 0.5)}], pos=(-12, 0, -4))
     s.composite("PROP_BattleStone_02", [
-        {"kind": "box", "size": (2.4, 1.8, 2.2), "color": (0.46, 0.44, 0.4),
-         "pos": (0, 0.9, 0)}], pos=(12, 0, -10))
+        {"kind": "box", "size": (2.4, 1.8, 2.2), "color": (0.4, 0.38, 0.36), "pos": (0, 0.9, 0)},
+        {"kind": "sphere", "radius": 1.25, "color": (0.43, 0.41, 0.39), "pos": (-0.6, 1.4, -0.4)}], pos=(12, 0, -10))
     s.cylinder("PROP_BrokenSpear_01", 0.08, 2.6, (0.4, 0.34, 0.26),
                (-6, 0.5, 2), rot=(0, 0, 70))
+    # Brimstone embers smouldering on the field.
+    s.sphere("PROP_EmberGlow_01", 0.5, (1.0, 0.3, 0.12), (-8, 0.6, -12), emissive=(0.95, 0.25, 0.05))
+    s.sphere("PROP_EmberGlow_02", 0.42, (1.0, 0.35, 0.14), (8, 0.5, -12), emissive=(0.9, 0.28, 0.06))
     s.marker("PROP_ArmorLightMarker", (0, 1.2, 14))
 
     s.marker("NPC_Apollyon", (0, 0, -16))
@@ -717,10 +792,12 @@ def build_valley_shadow_death():
         s.composite("PROP_FaintPathMarker_%02d" % i, [
             {"kind": "cylinder", "radius": 0.3, "height": 0.5,
              "color": (0.6, 0.62, 0.7), "pos": (0, 0.25, 0),
-             "emissive": (0.3, 0.32, 0.4)}], pos=(0, 0, z))
+             "emissive": (0.3, 0.32, 0.4)},
+            {"kind": "sphere", "radius": 0.28, "color": (0.72, 0.78, 0.98),
+             "pos": (0, 0.72, 0), "emissive": (0.52, 0.58, 0.85)}], pos=(0, 0, z))
     s.composite("PROP_BrokenSkullRock_01", [
-        {"kind": "box", "size": (1.2, 1.0, 1.2), "color": (0.3, 0.3, 0.32),
-         "pos": (0, 0.5, 0)}], pos=(4, 0, 12))
+        {"kind": "box", "size": (1.2, 1.0, 1.2), "color": (0.3, 0.3, 0.32), "pos": (0, 0.5, 0)},
+        {"kind": "sphere", "radius": 0.55, "color": (0.62, 0.6, 0.58), "pos": (0.2, 1.05, 0.1)}], pos=(4, 0, 12))
     s.composite("PROP_DeadBranch_01", [
         {"kind": "cylinder", "radius": 0.12, "height": 2.4,
          "color": (0.2, 0.18, 0.16), "pos": (0, 1.0, 0), "rot": (0, 0, 40)}],
@@ -808,6 +885,8 @@ def build_vanity_fair():
     s.composite("PROP_CrowdCluster_04", _crowd, pos=(10, 0, 6))
     s.composite("PROP_BrokenPilgrimSign", [
         {"kind": "box", "size": (0.2, 1.4, 0.2), "color": (0.4, 0.34, 0.24), "pos": (0, 0.7, 0), "rot": (0, 0, 20)}], pos=(10, 0, 18))
+    # A quiet chapel at the edge of the clamouring fair.
+    _chapel(s, "PROP_Chapel", (-16, 0, -4), rot=(0, 90, 0), wall=(0.8, 0.78, 0.74))
 
     s.marker("NPC_Faithful", (-2, 0, -10))
     s.marker("NPC_Hopeful", (2, 0, -10))
@@ -863,7 +942,8 @@ def build_doubting_castle():
         {"kind": "cylinder", "radius": 0.06, "height": 1.6, "color": (0.2, 0.2, 0.22), "pos": (0, 0.8, 0)}], pos=(-3, 0, -10))
     s.box("PROP_ScrollMemory", (0.5, 0.12, 0.4), (0.85, 0.8, 0.7), (2, 0.4, -10), emissive=(0.25, 0.22, 0.16))
     s.composite("PROP_PromiseKey", [
-        {"kind": "box", "size": (0.16, 0.6, 0.16), "color": (0.95, 0.85, 0.4), "pos": (0, 0.3, 0), "emissive": (0.7, 0.6, 0.2)}], pos=(0, 0.5, -10))
+        {"kind": "box", "size": (0.16, 0.6, 0.16), "color": (0.98, 0.86, 0.42), "pos": (0, 0.3, 0), "emissive": (0.85, 0.72, 0.28)},
+        {"kind": "torus", "ring_r": 0.17, "tube_r": 0.06, "color": (0.98, 0.86, 0.42), "pos": (0, 0.66, 0), "rot": (90, 0, 0), "emissive": (0.85, 0.72, 0.28)}], pos=(0, 0.5, -10))
     _merlons = [{"kind": "box", "size": (0.9, 0.9, 1.7), "color": stone,
                  "pos": (dx, 9.3, 0)} for dx in (-3.5, -1.75, 0, 1.75, 3.5)]
     s.composite("PROP_CastleGate", [
@@ -872,6 +952,11 @@ def build_doubting_castle():
         {"kind": "box", "size": (8.4, 1.4, 1.6), "color": stone, "pos": (0, 8.4, 0)},
     ] + _merlons, pos=(0, 0, 4))
     s.marker("PROP_StormCloudMarker", (0, 12, 14))
+    # Heavy corner towers giving the castle its brooding mass.
+    _tower = [(1.6, 0), (1.8, 0.5), (1.5, 1.0), (1.4, 9.0), (1.7, 9.5),
+              (1.9, 10.2), (1.3, 11.0), (0.0, 12.6)]
+    s.lathe("PROP_CastleTower_Left", _tower, stone, (-11, 0, -8))
+    s.lathe("PROP_CastleTower_Right", _tower, stone, (11, 0, -8))
 
     s.marker("NPC_Hopeful", (1.5, 0, -9))
     s.marker("NPC_GiantDespair", (0, 0, 1))
@@ -922,9 +1007,10 @@ def build_delectable_mountains():
         {"kind": "cylinder", "radius": 0.5, "height": 1.2, "color": (0.6, 0.55, 0.5), "pos": (0, 0.6, 0)}], pos=(-9, 0, -10))
     s.composite("PROP_Viewpoint_ShortcutGrave", [
         {"kind": "cylinder", "radius": 0.5, "height": 1.2, "color": (0.55, 0.5, 0.5), "pos": (0, 0.6, 0)}], pos=(9, 0, -10))
-    s.box("PROP_DistantCelestialCity", (18, 8, 2), (0.85, 0.85, 0.7), (0, 10, -40), emissive=(0.5, 0.5, 0.4))
+    s.box("PROP_DistantCelestialCity", (18, 8, 2), (0.93, 0.91, 0.72), (0, 10, -40), emissive=(0.74, 0.68, 0.46))
     s.composite("PROP_PastureStone_01", [
         {"kind": "box", "size": (1.4, 1.0, 1.2), "color": (0.5, 0.5, 0.46), "pos": (0, 0.5, 0)}], pos=(8, 0, 6))
+    _chapel(s, "PROP_Chapel", (12, 0, 8), rot=(0, -90, 0), wall=(0.86, 0.84, 0.78))
     s.composite("PROP_PastureTree_01", [
         {"kind": "cylinder", "radius": 0.28, "height": 2.4,
          "color": (0.34, 0.24, 0.16), "pos": (0, 1.2, 0)},
@@ -935,6 +1021,16 @@ def build_delectable_mountains():
         {"kind": "sphere", "radius": 1.0, "color": (0.19, 0.43, 0.24),
          "pos": (-0.8, 3.5, -0.3)},
     ], pos=(-14, 0, -2))
+    # A fuller grove + a small flock grazing the delectable pasture.
+    for _i, (_x, _z, _r) in enumerate([(-16, -5, 1.45), (-11, -7, 1.2)], start=2):
+        s.composite("PROP_PastureTree_%02d" % _i, [
+            {"kind": "cylinder", "radius": 0.26, "height": 2.2, "color": (0.34, 0.24, 0.16), "pos": (0, 1.1, 0)},
+            {"kind": "sphere", "radius": _r, "color": (0.21, 0.46, 0.26), "pos": (0, 2.9, 0)},
+            {"kind": "sphere", "radius": _r * 0.72, "color": (0.24, 0.5, 0.29), "pos": (0.6, 3.4, 0.3)}], pos=(_x, 0, _z))
+    for _i, (_x, _z) in enumerate([(-6, 12), (-4, 14), (-8, 13)], start=1):
+        s.composite("PROP_Sheep_%02d" % _i, [
+            {"kind": "sphere", "radius": 0.5, "color": (0.9, 0.9, 0.86), "pos": (0, 0.6, 0)},
+            {"kind": "sphere", "radius": 0.22, "color": (0.32, 0.3, 0.3), "pos": (0, 0.74, 0.48)}], pos=(_x, 0, _z))
 
     s.marker("NPC_Shepherd_Knowledge", (-9, 0, 4))
     s.marker("NPC_Shepherd_Experience", (-11, 0, 6))
@@ -974,8 +1070,19 @@ def build_enchanted_ground():
     s.box("ENV_Enchanted_SoftField", (40, 0.08, 60), (0.62, 0.66, 0.46), (0, 0.04, -4))
     s.box("ENV_Enchanted_ExitSlope", (8, 0.12, 12), (0.55, 0.6, 0.42), (0, 0.05, -42))
 
-    s.cone("PROP_DreamFlower_01", 0.5, 1.0, (0.95, 0.6, 0.8), (-5, 0.5, 18), emissive=(0.4, 0.25, 0.35))
-    s.cone("PROP_DreamFlower_02", 0.5, 1.0, (0.8, 0.7, 0.95), (5, 0.5, 6), emissive=(0.35, 0.3, 0.45))
+    # Luminous dream-blooms — beautiful, and dangerously soporific.
+    s.composite("PROP_DreamFlower_01", [
+        {"kind": "cone", "radius": 0.45, "height": 1.0, "color": (0.55, 0.7, 0.5), "pos": (0, 0.5, 0)},
+        {"kind": "sphere", "radius": 0.55, "color": (0.98, 0.62, 0.82), "pos": (0, 1.25, 0), "emissive": (0.6, 0.3, 0.45)}], pos=(-5, 0, 18))
+    s.composite("PROP_DreamFlower_02", [
+        {"kind": "cone", "radius": 0.45, "height": 1.0, "color": (0.55, 0.7, 0.5), "pos": (0, 0.5, 0)},
+        {"kind": "sphere", "radius": 0.55, "color": (0.82, 0.72, 0.98), "pos": (0, 1.25, 0), "emissive": (0.5, 0.42, 0.62)}], pos=(5, 0, 6))
+    s.composite("PROP_DreamFlower_03", [
+        {"kind": "cone", "radius": 0.4, "height": 0.9, "color": (0.55, 0.7, 0.5), "pos": (0, 0.45, 0)},
+        {"kind": "sphere", "radius": 0.5, "color": (0.98, 0.8, 0.6), "pos": (0, 1.1, 0), "emissive": (0.6, 0.45, 0.25)}], pos=(-7, 0, -2))
+    s.composite("PROP_DreamFlower_04", [
+        {"kind": "cone", "radius": 0.4, "height": 0.9, "color": (0.55, 0.7, 0.5), "pos": (0, 0.45, 0)},
+        {"kind": "sphere", "radius": 0.5, "color": (0.7, 0.95, 0.8), "pos": (0, 1.1, 0), "emissive": (0.35, 0.55, 0.42)}], pos=(7, 0, -18))
     s.box("PROP_SoftGrassPatch_01", (4, 0.1, 4), (0.55, 0.7, 0.45), (-6, 0.1, -6))
     s.cylinder("PROP_AwakeStone_01", 0.5, 0.5, (0.7, 0.72, 0.8), (0, 0.25, 10), emissive=(0.35, 0.36, 0.42))
     s.cylinder("PROP_AwakeStone_02", 0.5, 0.5, (0.7, 0.72, 0.8), (0, 0.25, -16), emissive=(0.35, 0.36, 0.42))
@@ -983,6 +1090,7 @@ def build_enchanted_ground():
     s.box("PROP_TestimonyMarker_Cross", (0.4, 1.4, 0.4), (0.8, 0.7, 0.4), (-3, 0.7, 0))
     s.box("PROP_TestimonyMarker_Slough", (0.4, 1.4, 0.4), (0.6, 0.6, 0.4), (3, 0.7, -10))
     s.box("PROP_TestimonyMarker_Castle", (0.4, 1.4, 0.4), (0.5, 0.5, 0.55), (-3, 0.7, -22))
+    _chapel(s, "PROP_Chapel", (-11, 0, 8), rot=(0, 90, 0), wall=(0.82, 0.82, 0.72))
 
     s.marker("NPC_Hopeful", (1.5, 0, 16))
     s.marker("NPC_Ignorance_Optional", (4, 0, -24))
@@ -1027,8 +1135,11 @@ def build_river_of_death():
         {"kind": "box", "size": (1.4, 0.6, 1.4), "color": (0.4, 0.42, 0.44), "pos": (0, 0.3, 0)}], pos=(-3, 0, 4))
     s.composite("PROP_RiverStone_02", [
         {"kind": "box", "size": (1.4, 0.6, 1.4), "color": (0.4, 0.42, 0.44), "pos": (0, 0.3, 0)}], pos=(3, 0, -14))
-    s.cone("PROP_FarBankLight", 1.0, 3.0, (1.0, 0.95, 0.75), (0, 1.5, -30), emissive=(0.9, 0.85, 0.6))
-    s.box("PROP_DistantCelestialGate", (12, 9, 2), (0.95, 0.9, 0.75), (0, 6, -44), emissive=(0.7, 0.66, 0.5))
+    s.composite("PROP_FarBankLight", [
+        {"kind": "cone", "radius": 1.0, "height": 3.0, "color": (1.0, 0.95, 0.75), "pos": (0, 1.5, 0), "emissive": (0.95, 0.88, 0.65)},
+        {"kind": "sphere", "radius": 1.2, "color": (1.0, 0.96, 0.8), "pos": (0, 3.5, 0), "emissive": (0.95, 0.9, 0.7)}], pos=(0, 0, -30))
+    s.box("PROP_DistantCelestialGate", (12, 9, 2), (0.98, 0.93, 0.72), (0, 6, -44), emissive=(0.9, 0.82, 0.55))
+    _chapel(s, "PROP_Chapel", (-14, 0, 16), rot=(0, 90, 0), wall=(0.8, 0.8, 0.76))
 
     s.marker("NPC_Hopeful", (1.5, 0, 14))
     s.marker("NPC_ShiningOne_01", (-2, 0, -30))

@@ -35,7 +35,35 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import struct
+
+# PBR texture library shipped with the project (albedo, normal) keyed by name.
+_TEX_DIR = os.path.normpath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "..",
+    "assets", "textures", "pbr"))
+_TEX = {
+    "brick": ("brick_albedo.png", "brick_normal.png"),
+    "rooftile": ("rooftile_albedo.png", "rooftile_normal.png"),
+    "stone": ("stone_albedo.png", "stone_normal.png"),
+    "wood": ("wood_albedo.png", "wood_normal.png"),
+    "cobble": ("cobble_albedo.png", "cobble_normal.png"),
+}
+
+
+def tex_paths(name):
+    """(albedo_path, normal_path|None) for a named PBR texture, or (None, None)
+    if the files are missing (graceful degrade -> solid colour)."""
+    pair = _TEX.get(name)
+    if not pair:
+        return None, None
+    alb = os.path.join(_TEX_DIR, pair[0])
+    nrm = os.path.join(_TEX_DIR, pair[1]) if pair[1] else None
+    if not os.path.exists(alb):
+        return None, None
+    if nrm and not os.path.exists(nrm):
+        nrm = None
+    return alb, nrm
 
 # glTF component / target constants
 _FLOAT = 5126
@@ -244,6 +272,36 @@ def box_tris_bevel(sx, sy, sz, bevel=None):
         tris.append((cv(ca, 0), cv(ca, 1), cv(ca, 2)))
 
     return _orient_outward(tris)
+
+
+def box_uv(sx, sy, sz, tile=1.4):
+    """Plain (sharp) box with per-face planar UVs tiled by world size -- for
+    textured surfaces (brick walls etc.). Returns (positions, normals, uvs,
+    indices); winding aligned to the outward normals."""
+    hx, hy, hz = sx / 2.0, sy / 2.0, sz / 2.0
+    # origin corner, u-axis, v-axis, outward normal, u-extent, v-extent
+    faces = [
+        ((hx, -hy, -hz), (0, 0, 1), (0, 1, 0), (1, 0, 0), sz, sy),    # +X
+        ((-hx, -hy, hz), (0, 0, -1), (0, 1, 0), (-1, 0, 0), sz, sy),  # -X
+        ((-hx, hy, -hz), (1, 0, 0), (0, 0, 1), (0, 1, 0), sx, sz),    # +Y
+        ((-hx, -hy, hz), (1, 0, 0), (0, 0, -1), (0, -1, 0), sx, sz),  # -Y
+        ((hx, -hy, hz), (-1, 0, 0), (0, 1, 0), (0, 0, 1), sx, sy),    # +Z
+        ((-hx, -hy, -hz), (1, 0, 0), (0, 1, 0), (0, 0, -1), sx, sy),  # -Z
+    ]
+    P, N, UV, I = [], [], [], []
+    for origin, uax, vax, nrm, wu, wv in faces:
+        c0 = origin
+        c1 = _add(origin, _scale(uax, wu))
+        c2 = _add(c1, _scale(vax, wv))
+        c3 = _add(origin, _scale(vax, wv))
+        base = len(P)
+        for c in (c0, c1, c2, c3):
+            P.append(c)
+            N.append(nrm)
+        for uu, vv in ((0, 0), (wu / tile, 0), (wu / tile, wv / tile), (0, wv / tile)):
+            UV.append((uu, vv))
+        I.extend([base, base + 1, base + 2, base, base + 2, base + 3])
+    return P, N, UV, _align_winding(P, N, I)
 
 
 def plane_tris(sx, sz):
@@ -625,21 +683,25 @@ class GLB:
         self.materials = []
         self.accessors = []
         self.buffer_views = []
+        self.images = []
+        self.textures = []
+        self.samplers = []
         self.bin = bytearray()
         self._mat_cache = {}
+        self._tex_cache = {}
 
     def _align(self):
         while len(self.bin) % 4 != 0:
             self.bin.append(0)
 
-    def _add_view(self, data: bytes, target: int) -> int:
+    def _add_view(self, data: bytes, target=None) -> int:
         self._align()
         offset = len(self.bin)
         self.bin.extend(data)
-        self.buffer_views.append({
-            "buffer": 0, "byteOffset": offset,
-            "byteLength": len(data), "target": target,
-        })
+        bv = {"buffer": 0, "byteOffset": offset, "byteLength": len(data)}
+        if target is not None:
+            bv["target"] = target
+        self.buffer_views.append(bv)
         return len(self.buffer_views) - 1
 
     def _acc_vec3(self, pts) -> int:
@@ -669,23 +731,58 @@ class GLB:
         })
         return len(self.accessors) - 1
 
+    def _acc_vec2(self, uvs) -> int:
+        data = bytearray()
+        for (u, v) in uvs:
+            data.extend(struct.pack("<2f", u, v))
+        view = self._add_view(bytes(data), _ARRAY_BUFFER)
+        self.accessors.append({
+            "bufferView": view, "componentType": _FLOAT,
+            "count": len(uvs), "type": "VEC2",
+        })
+        return len(self.accessors) - 1
+
+    # -- textures (embedded PNG) --
+    def texture(self, png_path) -> int:
+        """Embed a PNG into the GLB and return its texture index (cached)."""
+        if png_path in self._tex_cache:
+            return self._tex_cache[png_path]
+        with open(png_path, "rb") as f:
+            data = f.read()
+        view = self._add_view(data)  # image data: no buffer target
+        img_idx = len(self.images)
+        self.images.append({"bufferView": view, "mimeType": "image/png"})
+        if not self.samplers:
+            self.samplers.append({"wrapS": 10497, "wrapT": 10497,
+                                  "magFilter": 9729, "minFilter": 9987})
+        tex_idx = len(self.textures)
+        self.textures.append({"source": img_idx, "sampler": 0})
+        self._tex_cache[png_path] = tex_idx
+        return tex_idx
+
     # -- materials --
     def material(self, rgba, emissive=(0.0, 0.0, 0.0), blend=False,
-                 double_sided=False, metallic=0.0, roughness=0.95) -> int:
+                 double_sided=False, metallic=0.0, roughness=0.95,
+                 base_tex=None, normal_tex=None) -> int:
         key = (tuple(round(c, 4) for c in rgba),
                tuple(round(c, 4) for c in emissive), blend, double_sided,
-               round(metallic, 3), round(roughness, 3))
+               round(metallic, 3), round(roughness, 3), base_tex, normal_tex)
         if key in self._mat_cache:
             return self._mat_cache[key]
+        pbr = {
+            "baseColorFactor": [rgba[0], rgba[1], rgba[2],
+                                rgba[3] if len(rgba) > 3 else 1.0],
+            "metallicFactor": metallic,
+            "roughnessFactor": roughness,
+        }
+        if base_tex is not None:
+            pbr["baseColorTexture"] = {"index": base_tex}
         mat = {
-            "pbrMetallicRoughness": {
-                "baseColorFactor": [rgba[0], rgba[1], rgba[2],
-                                    rgba[3] if len(rgba) > 3 else 1.0],
-                "metallicFactor": metallic,
-                "roughnessFactor": roughness,
-            },
+            "pbrMetallicRoughness": pbr,
             "emissiveFactor": [emissive[0], emissive[1], emissive[2]],
         }
+        if normal_tex is not None:
+            mat["normalTexture"] = {"index": normal_tex}
         if blend:
             mat["alphaMode"] = "BLEND"
         if double_sided:
@@ -711,13 +808,19 @@ class GLB:
         """Smooth indexed mesh (shared verts, supplied normals)."""
         return self._emit(positions, normals, indices, material_idx)
 
-    def _emit(self, positions, normals, indices, material_idx) -> int:
-        pos_acc = self._acc_vec3(positions)
-        nrm_acc = self._acc_vec3(normals)
+    def mesh_uv(self, positions, normals, uvs, indices, material_idx) -> int:
+        """Indexed mesh carrying texture coordinates (TEXCOORD_0)."""
+        return self._emit(positions, normals, indices, material_idx, uvs=uvs)
+
+    def _emit(self, positions, normals, indices, material_idx, uvs=None) -> int:
+        attrs = {"POSITION": self._acc_vec3(positions),
+                 "NORMAL": self._acc_vec3(normals)}
+        if uvs is not None:
+            attrs["TEXCOORD_0"] = self._acc_vec2(uvs)
         idx_acc = self._acc_indices(indices)
         self.meshes.append({
             "primitives": [{
-                "attributes": {"POSITION": pos_acc, "NORMAL": nrm_acc},
+                "attributes": attrs,
                 "indices": idx_acc,
                 "material": material_idx,
             }]
@@ -759,6 +862,10 @@ class GLB:
             "bufferViews": self.buffer_views,
             "buffers": [{"byteLength": len(self.bin)}],
         }
+        if self.images:
+            gltf["images"] = self.images
+            gltf["textures"] = self.textures
+            gltf["samplers"] = self.samplers
         json_bytes = json.dumps(gltf, separators=(",", ":")).encode("utf-8")
         while len(json_bytes) % 4 != 0:
             json_bytes += b" "
@@ -798,25 +905,38 @@ class Scene:
 
     # --- material helper ---
     def _mat(self, name, color, emissive=None, metallic=None, roughness=None,
-             blend=False, double_sided=False):
+             blend=False, double_sided=False, tex=None):
         m, r = infer_pbr(name, color)
         if metallic is not None:
             m = metallic
         if roughness is not None:
             r = roughness
+        base_tex = normal_tex = None
+        if tex:
+            alb, nrm = tex_paths(tex)
+            if alb:
+                base_tex = self.glb.texture(alb)
+                if nrm:
+                    normal_tex = self.glb.texture(nrm)
         return self.glb.material(color, emissive or (0, 0, 0), blend=blend,
                                  double_sided=double_sided, metallic=m,
-                                 roughness=r)
+                                 roughness=r, base_tex=base_tex,
+                                 normal_tex=normal_tex)
 
     # --- visible primitives ---
     def box(self, name, size, color, pos=(0, 0, 0), rot=(0, 0, 0),
-            emissive=None, metallic=None, roughness=None, bevel=True):
-        mat = self._mat(name, color, emissive, metallic, roughness)
-        if bevel and min(size) >= self.BEVEL_MIN_DIM:
-            tris = box_tris_bevel(*size)
+            emissive=None, metallic=None, roughness=None, bevel=True,
+            tex=None, tile=1.4):
+        mat = self._mat(name, color, emissive, metallic, roughness, tex=tex)
+        if tex:
+            P, N, UV, I = box_uv(*size, tile=tile)
+            mesh = self.glb.mesh_uv(P, N, UV, I, mat)
         else:
-            tris = box_tris(*size)
-        mesh = self.glb.mesh(tris, mat)
+            if bevel and min(size) >= self.BEVEL_MIN_DIM:
+                tris = box_tris_bevel(*size)
+            else:
+                tris = box_tris(*size)
+            mesh = self.glb.mesh(tris, mat)
         return self.glb.node(name, translation=pos, rotation_deg=rot, mesh_idx=mesh)
 
     def ground(self, name, size, color, pos=(0, 0, 0), flat=False):
@@ -885,10 +1005,14 @@ class Scene:
         kind = p.get("kind", "box")
         col = p["color"]
         emis = p.get("emissive")
+        tex = p.get("tex")
         mat = self._mat(parent_name, col, emis, p.get("metallic"),
-                        p.get("roughness"))
+                        p.get("roughness"), tex=tex)
         if kind == "box":
             size = p["size"]
+            if tex:
+                P, N, UV, I = box_uv(*size, tile=p.get("tile", 1.4))
+                return self.glb.mesh_uv(P, N, UV, I, mat)
             if min(size) >= self.BEVEL_MIN_DIM and p.get("bevel", True):
                 return self.glb.mesh(box_tris_bevel(*size), mat)
             return self.glb.mesh(box_tris(*size), mat)
