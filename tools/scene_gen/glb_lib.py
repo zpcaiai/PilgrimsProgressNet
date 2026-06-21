@@ -304,6 +304,31 @@ def box_uv(sx, sy, sz, tile=1.4):
     return P, N, UV, _align_winding(P, N, I)
 
 
+def pyramid_uv(sx, sz, height, tile=1.2):
+    """Pyramid with UVs on its 4 slopes (+ base) so a roof-tile texture tiles
+    across the pitched faces. Returns (positions, normals, uvs, indices)."""
+    hx, hz = sx / 2.0, sz / 2.0
+    apex = (0.0, height / 2.0, 0.0)
+    by = -height / 2.0
+    b = [(-hx, by, -hz), (hx, by, -hz), (hx, by, hz), (-hx, by, hz)]
+    P, N, UV, I = [], [], [], []
+    for (p0, p1) in [(b[0], b[1]), (b[1], b[2]), (b[2], b[3]), (b[3], b[0])]:
+        nrm = _face_normal(p0, p1, apex)
+        edge = math.dist(p0, p1)
+        mid = ((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2, (p0[2] + p1[2]) / 2)
+        slant = math.dist(apex, mid)
+        base = len(P)
+        P.append(p0); N.append(nrm); UV.append((0.0, 0.0))
+        P.append(p1); N.append(nrm); UV.append((edge / tile, 0.0))
+        P.append(apex); N.append(nrm); UV.append((edge / tile / 2.0, slant / tile))
+        I.extend([base, base + 1, base + 2])
+    base = len(P)
+    for c, uv in zip(b, [(0, 0), (sx / tile, 0), (sx / tile, sz / tile), (0, sz / tile)]):
+        P.append(c); N.append((0, -1, 0)); UV.append(uv)
+    I.extend([base, base + 1, base + 2, base, base + 2, base + 3])
+    return P, N, UV, _align_winding(P, N, I)
+
+
 def plane_tris(sx, sz):
     hx, hz = sx / 2.0, sz / 2.0
     a = (-hx, 0.0, -hz)
@@ -990,9 +1015,13 @@ class Scene:
         return self.glb.node(name, translation=pos, rotation_deg=rot, mesh_idx=mesh)
 
     def pyramid(self, name, size, height, color, pos=(0, 0, 0), rot=(0, 0, 0),
-                metallic=None, roughness=None, emissive=None):
-        mat = self._mat(name, color, emissive, metallic, roughness)
-        mesh = self.glb.mesh(_orient_outward(pyramid_tris(size[0], size[1], height)), mat)
+                metallic=None, roughness=None, emissive=None, tex=None, tile=1.2):
+        mat = self._mat(name, color, emissive, metallic, roughness, tex=tex)
+        if tex:
+            P, N, UV, I = pyramid_uv(size[0], size[1], height, tile=tile)
+            mesh = self.glb.mesh_uv(P, N, UV, I, mat)
+        else:
+            mesh = self.glb.mesh(_orient_outward(pyramid_tris(size[0], size[1], height)), mat)
         return self.glb.node(name, translation=pos, rotation_deg=rot, mesh_idx=mesh)
 
     def ramp(self, name, width, run, height, color, pos=(0, 0, 0), rot=(0, 0, 0)):
@@ -1033,6 +1062,10 @@ class Scene:
             P, N, I = lathe_mesh(p["profile"], p.get("segs", 22))
             return self.glb.mesh_indexed(P, N, I, mat)
         if kind == "pyramid":
+            if tex:
+                P, N, UV, I = pyramid_uv(p["size"][0], p["size"][1], p["height"],
+                                         tile=p.get("tile", 1.2))
+                return self.glb.mesh_uv(P, N, UV, I, mat)
             return self.glb.mesh(_orient_outward(
                 pyramid_tris(p["size"][0], p["size"][1], p["height"])), mat)
         if kind == "plane":

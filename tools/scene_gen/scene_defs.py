@@ -40,8 +40,9 @@ def _cottage(s, name, pos, size=(5, 3.2, 5), wall=(0.5, 0.43, 0.4),
         wall_part["tile"] = 1.3
     s.composite(name, [
         wall_part,
-        {"kind": "pyramid", "size": (w + 0.5, d + 0.5),
-         "height": 1.7, "color": roof, "pos": (0, h + 0.85, 0)},
+        {"kind": "pyramid", "size": (w + 0.5, d + 0.5), "height": 1.7,
+         "color": (0.82, 0.6, 0.5), "pos": (0, h + 0.85, 0),
+         "tex": "rooftile", "tile": 0.9},
         # plank door + two windows on the +Z face
         {"kind": "box", "size": (1.0, 1.9, 0.18), "color": (0.28, 0.2, 0.14),
          "pos": (0, 0.95, d / 2 + 0.03)},
@@ -71,7 +72,7 @@ def _sign(s, name, pos, color=(0.55, 0.45, 0.3)):
 
 
 def _chapel(s, name, pos, rot=(0, 0, 0), wall=(0.84, 0.8, 0.74),
-            roof=(0.5, 0.28, 0.24), brick=False):
+            roof=(0.5, 0.28, 0.24), brick=True):
     """A small wayside chapel: nave + pitched roof + steeple crowned with a
     cross, a glowing rose window and warm-lit side windows. Bound to a
     'Worship' interactable by ImportedSceneBinder (PROP_Chapel)."""
@@ -82,8 +83,10 @@ def _chapel(s, name, pos, rot=(0, 0, 0), wall=(0.84, 0.8, 0.74),
         tower["tex"] = "brick"; tower["tile"] = 1.3
     s.composite(name, [
         nave,
-        {"kind": "box", "size": (5.4, 0.5, 7.4), "color": roof, "pos": (0, 4.05, 0)},
-        {"kind": "pyramid", "size": (5.7, 7.7), "height": 2.2, "color": roof, "pos": (0, 5.2, 0)},
+        {"kind": "box", "size": (5.4, 0.5, 7.4), "color": (0.78, 0.5, 0.42),
+         "pos": (0, 4.05, 0), "tex": "rooftile", "tile": 1.0},
+        {"kind": "pyramid", "size": (5.7, 7.7), "height": 2.2, "color": (0.78, 0.5, 0.42),
+         "pos": (0, 5.2, 0), "tex": "rooftile", "tile": 1.0},
         tower,
         {"kind": "cone", "radius": 1.5, "height": 3.0, "color": roof, "pos": (0, 9.0, 4.3)},
         # cross atop the steeple
@@ -464,6 +467,7 @@ def build_cross_and_tomb():
     s.ramp("ENV_Cross_HillPath", 8, 12, 1.0, (0.5, 0.46, 0.34), (0, 0, -2))
     s.box("ENV_Cross_Hilltop", (22, 1.0, 16), (0.42, 0.48, 0.36), (0, 0.5, -22))
     s.box("ENV_Cross_TombSlope", (10, 0.1, 7), (0.4, 0.42, 0.34), (-7, 1.05, -18))
+    _chapel(s, "PROP_Chapel", (13, 0, 6), rot=(0, -90, 0))
 
     s.composite("PROP_Cross", [
         {"kind": "box", "size": (0.5, 5.0, 0.5), "color": (0.45, 0.34, 0.22),
@@ -746,6 +750,7 @@ def build_valley_humiliation():
     # Brimstone embers smouldering on the field.
     s.sphere("PROP_EmberGlow_01", 0.5, (1.0, 0.3, 0.12), (-8, 0.6, -12), emissive=(0.95, 0.25, 0.05))
     s.sphere("PROP_EmberGlow_02", 0.42, (1.0, 0.35, 0.14), (8, 0.5, -12), emissive=(0.9, 0.28, 0.06))
+    _chapel(s, "PROP_Chapel", (13, 0, 18), rot=(0, -90, 0))
     s.marker("PROP_ArmorLightMarker", (0, 1.2, 14))
 
     s.marker("NPC_Apollyon", (0, 0, -16))
@@ -957,6 +962,8 @@ def build_doubting_castle():
               (1.9, 10.2), (1.3, 11.0), (0.0, 12.6)]
     s.lathe("PROP_CastleTower_Left", _tower, stone, (-11, 0, -8))
     s.lathe("PROP_CastleTower_Right", _tower, stone, (11, 0, -8))
+    # A chapel out in the By-Path meadow — mercy within reach of the dungeon.
+    _chapel(s, "PROP_Chapel", (-12, 0, 20), rot=(0, 90, 0))
 
     s.marker("NPC_Hopeful", (1.5, 0, -9))
     s.marker("NPC_GiantDespair", (0, 0, 1))
