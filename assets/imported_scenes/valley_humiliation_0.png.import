@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://doycfy2qdwtic"
-path="res://.godot/imported/valley_humiliation_0.png-152a01f35b5e74e59c65f0ed28d13ef8.ctex"
+path.s3tc="res://.godot/imported/valley_humiliation_0.png-152a01f35b5e74e59c65f0ed28d13ef8.s3tc.ctex"
+path.etc2="res://.godot/imported/valley_humiliation_0.png-152a01f35b5e74e59c65f0ed28d13ef8.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "2b6ea7b0ab3338da940e73982de78354"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/imported_scenes/valley_humiliation_0.png"
-dest_files=["res://.godot/imported/valley_humiliation_0.png-152a01f35b5e74e59c65f0ed28d13ef8.ctex"]
+dest_files=["res://.godot/imported/valley_humiliation_0.png-152a01f35b5e74e59c65f0ed28d13ef8.s3tc.ctex", "res://.godot/imported/valley_humiliation_0.png-152a01f35b5e74e59c65f0ed28d13ef8.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +42,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

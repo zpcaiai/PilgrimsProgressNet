@@ -109,6 +109,110 @@ def _chapel(s, name, pos, rot=(0, 0, 0), wall=(0.84, 0.8, 0.74),
     ], pos=pos, rot=rot)
 
 
+# ---------------------------------------------------------------------------
+# Industrial-grade landscape dressing helpers (reusable across every chapter).
+#
+# Decorative names embed ImportedSceneBinder skip-tokens (Foliage / Bush / Grass
+# / Reeds / Flower / Ridge / Cairn / Hedge) so scatter never walls the pilgrim
+# in; rocks/boulders ("Rock"/"Boulder") stay solid so the pilgrim walks around
+# them. All decor is deliberately low-poly (few segments) for a web-safe budget.
+# ---------------------------------------------------------------------------
+def _shade(c, f):
+    return (min(1.0, c[0] * f), min(1.0, c[1] * f), min(1.0, c[2] * f))
+
+
+def _tree(s, name, pos, h=4.5, leaf=(0.24, 0.42, 0.24), trunk=(0.33, 0.24, 0.15)):
+    """Round broadleaf tree. Name should contain 'Foliage' (kept non-solid)."""
+    cr = h * 0.34
+    s.composite(name, [
+        {"kind": "cylinder", "radius": max(0.16, h * 0.045), "height": h * 0.62,
+         "color": trunk, "pos": (0, h * 0.31, 0), "sides": 6},
+        {"kind": "sphere", "radius": cr, "color": leaf, "pos": (0, h * 0.74, 0),
+         "segs": 10, "rings": 6},
+        {"kind": "sphere", "radius": cr * 0.74, "color": _shade(leaf, 1.1),
+         "pos": (cr * 0.62, h * 0.94, cr * 0.2), "segs": 9, "rings": 5},
+        {"kind": "sphere", "radius": cr * 0.66, "color": _shade(leaf, 0.9),
+         "pos": (-cr * 0.55, h * 0.86, -cr * 0.3), "segs": 9, "rings": 5},
+    ], pos=pos)
+
+
+def _pine(s, name, pos, h=6.0, leaf=(0.17, 0.33, 0.23), trunk=(0.28, 0.21, 0.14)):
+    """Conifer of stacked cones. Name should contain 'Foliage' (non-solid)."""
+    s.composite(name, [
+        {"kind": "cylinder", "radius": 0.16, "height": h * 0.3, "color": trunk,
+         "pos": (0, h * 0.15, 0), "sides": 6},
+        {"kind": "cone", "radius": h * 0.26, "height": h * 0.42, "color": leaf,
+         "pos": (0, h * 0.42, 0), "sides": 8},
+        {"kind": "cone", "radius": h * 0.2, "height": h * 0.34, "color": _shade(leaf, 1.1),
+         "pos": (0, h * 0.64, 0), "sides": 8},
+        {"kind": "cone", "radius": h * 0.13, "height": h * 0.28, "color": _shade(leaf, 1.2),
+         "pos": (0, h * 0.84, 0), "sides": 7},
+    ], pos=pos)
+
+
+def _bush(s, name, pos, r=0.8, col=(0.3, 0.42, 0.26)):
+    """Shrub. Name should contain 'Bush' (non-solid)."""
+    s.composite(name, [
+        {"kind": "sphere", "radius": r, "color": col, "pos": (0, r * 0.7, 0),
+         "segs": 9, "rings": 5},
+        {"kind": "sphere", "radius": r * 0.72, "color": _shade(col, 1.12),
+         "pos": (r * 0.55, r * 0.92, r * 0.2), "segs": 8, "rings": 5},
+    ], pos=pos)
+
+
+def _rock(s, name, pos, sz=1.2, col=(0.5, 0.47, 0.42)):
+    """Solid rock/boulder cluster (name contains 'Rock'/'Boulder' -> solid)."""
+    s.composite(name, [
+        {"kind": "sphere", "radius": sz * 0.6, "color": col, "pos": (0, sz * 0.4, 0),
+         "segs": 8, "rings": 5},
+        {"kind": "box", "size": (sz, sz * 0.7, sz * 0.9), "color": _shade(col, 0.92),
+         "pos": (sz * 0.4, sz * 0.34, -sz * 0.2)},
+    ], pos=pos)
+
+
+def _grass(s, name, pos, col=(0.5, 0.55, 0.32)):
+    """Grass tuft fan. Name should contain 'Grass'/'Tuft' (non-solid)."""
+    s.composite(name, [
+        {"kind": "cone", "radius": 0.12, "height": 0.6, "color": col,
+         "pos": (dx * 0.16, 0.3, dz * 0.16), "sides": 5}
+        for dx, dz in ((-1, 0), (0, 0), (1, 0), (0, 1), (0, -1))], pos=pos)
+
+
+def _reedclump(s, name, pos, col=(0.4, 0.45, 0.32), h=1.6):
+    """Reed/cattail clump. Name should contain 'Reeds' (non-solid)."""
+    s.composite(name, [
+        {"kind": "cylinder", "radius": 0.05, "height": h + (i % 3) * 0.2, "color": col,
+         "pos": (((i % 5) - 2) * 0.18, (h + (i % 3) * 0.2) / 2, ((i // 5) - 1) * 0.2),
+         "sides": 4}
+        for i in range(10)], pos=pos)
+
+
+def _flower(s, name, pos, petal=(0.9, 0.6, 0.7), emis=None):
+    """Single bloom. Name should contain 'Flower' (non-solid)."""
+    s.composite(name, [
+        {"kind": "cylinder", "radius": 0.04, "height": 0.5, "color": (0.4, 0.5, 0.3),
+         "pos": (0, 0.25, 0), "sides": 4},
+        {"kind": "sphere", "radius": 0.16, "color": petal, "pos": (0, 0.56, 0),
+         "segs": 8, "rings": 5, "emissive": emis}], pos=pos)
+
+
+def _ridge(s, name, pos, peaks, col=(0.32, 0.33, 0.4)):
+    """Distant mountain/ridge silhouette: a row of wide pyramids. Non-solid
+    (name should contain 'Ridge'). `peaks` = list of (x, width, height)."""
+    s.composite(name, [
+        {"kind": "pyramid", "size": (w, w), "height": hgt, "color": col, "pos": (px, 0, 0)}
+        for (px, w, hgt) in peaks], pos=pos)
+
+
+def _lantern(s, name, pos, col=(1.0, 0.86, 0.5)):
+    """Lamp post (solid pole + glowing head)."""
+    s.composite(name, [
+        {"kind": "cylinder", "radius": 0.1, "height": 2.6, "color": (0.26, 0.24, 0.2),
+         "pos": (0, 1.3, 0), "sides": 6},
+        {"kind": "box", "size": (0.42, 0.5, 0.42), "color": col, "pos": (0, 2.75, 0),
+         "emissive": (col[0] * 0.65, col[1] * 0.5, col[2] * 0.28)}], pos=pos)
+
+
 # ===========================================================================
 # CHAPTER 1 - City of Destruction
 # ===========================================================================
@@ -312,6 +416,45 @@ def build_wilderness_road():
     s.composite("PROP_DryBrush_02", [
         {"kind": "box", "size": (0.5, 0.4, 0.5), "color": (0.46, 0.44, 0.28), "pos": (0, 0.2, 0)},
     ], pos=(4.5, 0, -8))
+
+    # --- 精装修: richer wilderness dressing (decor; non-blocking) ---
+    for i, (bx, bz, br) in enumerate([(10, 6, 1.2), (-11, -4, 1.0), (9, -18, 0.9),
+                                      (-7, 9, 0.8), (8, 24, 1.1)], start=1):
+        s.sphere("PROP_Boulder_%02d" % i, br, (0.5, 0.47, 0.42), (bx, br * 0.55, bz))
+    # Dry grass tufts scattered along the verges.
+    for i, (gx, gz) in enumerate([(3.2, 4), (-3.4, -2), (5, -14), (-5, 16),
+                                  (2.6, -26), (-4, 28), (4, 12), (-2.8, -34)], start=1):
+        s.composite("PROP_GrassTuft_%02d" % i, [
+            {"kind": "cone", "radius": 0.16, "height": 0.7, "color": (0.56, 0.52, 0.32),
+             "pos": (dx * 0.16, 0.33, dz * 0.16)}
+            for dx, dz in ((-1, 0), (0, 0), (1, 0), (0, 1), (0, -1))], pos=(gx, 0, gz))
+    # A wooden waymark cross + stone cairns marking the narrow way.
+    s.composite("PROP_Waymark", [
+        {"kind": "cylinder", "radius": 0.12, "height": 2.6, "color": (0.36, 0.28, 0.2), "pos": (0, 1.3, 0)},
+        {"kind": "box", "size": (1.1, 0.18, 0.18), "color": (0.36, 0.28, 0.2), "pos": (0, 2.1, 0)},
+    ], pos=(3.6, 0, -2))
+    for i, (cx, cz) in enumerate([(-2.8, 18), (2.6, -30)], start=1):
+        s.composite("PROP_Cairn_%02d" % i, [
+            {"kind": "sphere", "radius": 0.42, "color": (0.5, 0.47, 0.42), "pos": (0, 0.36, 0)},
+            {"kind": "sphere", "radius": 0.3, "color": (0.52, 0.49, 0.44), "pos": (0.05, 0.86, 0)},
+            {"kind": "sphere", "radius": 0.2, "color": (0.5, 0.47, 0.42), "pos": (-0.03, 1.22, 0)},
+        ], pos=(cx, 0, cz))
+    # Hardier green shrubs as the gate-light nears (hope returning to the land).
+    for i, (sx2, sz2) in enumerate([(-6, -36), (6, -40), (-3, -44)], start=1):
+        s.composite("PROP_GreenBush_%02d" % i, [
+            {"kind": "sphere", "radius": 0.72, "color": (0.32, 0.46, 0.28), "pos": (0, 0.5, 0)},
+            {"kind": "sphere", "radius": 0.5, "color": (0.35, 0.5, 0.3), "pos": (0.4, 0.7, 0.2)},
+        ], pos=(sx2, 0, sz2))
+    # Two crows on the broken fence (small, non-solid).
+    for i, (kx, kz) in enumerate([(5.3, 30), (4.7, 29.5)], start=1):
+        s.composite("PROP_Crow_%02d" % i, [
+            {"kind": "sphere", "radius": 0.16, "color": (0.08, 0.08, 0.1), "pos": (0, 0, 0)},
+            {"kind": "sphere", "radius": 0.1, "color": (0.08, 0.08, 0.1), "pos": (0, 0.12, 0.12)},
+        ], pos=(kx, 1.05, kz))
+    # A low ridge line on the far horizon (backdrop).
+    s.composite("PROP_DistantRidge", [
+        {"kind": "pyramid", "size": (24, 9), "height": 7, "color": (0.3, 0.31, 0.38), "pos": (rx, 3.5, 0)}
+        for rx in (-22, -6, 12, 28)], pos=(0, 0, -58))
 
     # --- NPCs & story beats (travel order: spawn +Z -> exit -Z) ---
     # 1. Obstinate catches up and makes his last argument, then turns back.
@@ -529,13 +672,16 @@ def build_interpreter_house():
     s.box("ENV_InterpreterHouse_ExitHall", (6, 0.1, 12), (0.34, 0.3, 0.24),
           (0, 0.06, -18))
     # enclosing walls (visual)
-    _wall(s, "ENV_InterpreterHouse_WallN", (40, 4, 0.4), (0, 2, -22), wall)
+    # North wall with a central doorway (the chapter exit) so the way out is open.
+    _wall(s, "ENV_InterpreterHouse_WallN_L", (17, 4, 0.4), (-11.5, 2, -22), wall)
+    _wall(s, "ENV_InterpreterHouse_WallN_R", (17, 4, 0.4), (11.5, 2, -22), wall)
     _wall(s, "ENV_InterpreterHouse_WallS", (40, 4, 0.4), (0, 2, 14), wall)
 
     s.marker("NPC_Interpreter", (0, 0, -3))
     # Warm hanging lamps pooling light through the instructive hall.
     s.sphere("PROP_HallLight_01", 0.42, (1.0, 0.92, 0.7), (-4, 3.3, -2), emissive=(0.95, 0.82, 0.5))
     s.sphere("PROP_HallLight_02", 0.42, (1.0, 0.92, 0.7), (4, 3.3, -3), emissive=(0.95, 0.82, 0.5))
+    _chapel(s, "PROP_Chapel", (-12, 0, 13), rot=(0, 0, 0), wall=(0.8, 0.74, 0.66))
     s.cylinder("PROP_DustRoom_Broom", 0.1, 1.8, wood, (-13, 0.9, 1), rot=(0, 0, 18))
     s.cylinder("PROP_DustRoom_WaterBowl", 0.5, 0.3, (0.4, 0.5, 0.6),
                (-15, 0.2, -1), emissive=(0.1, 0.14, 0.18))
@@ -564,7 +710,7 @@ def build_interpreter_house():
     s.zone("TRIGGER_FireRoomStart", (4, 3, 4), (14, 1.5, 3))
     s.zone("TRIGGER_CageRoomStart", (4, 3, 4), (-14, 1.5, -11))
     s.zone("TRIGGER_NarrowRoomStart", (4, 3, 4), (14, 1.5, -10))
-    s.zone("TRIGGER_Exit_HillDifficulty", (5, 4, 2), (0, 1.5, -23))
+    s.zone("TRIGGER_Exit_HillDifficulty", (6, 4, 3), (0, 1.5, -20))
     s.zone("COL_DustCloudZone", (6, 3, 6), (-14, 1.5, 0), color=(0.5, 0.45, 0.4, 0.4))
     s.zone("COL_CageFearZone", (6, 3, 6), (-14, 1.5, -14), color=(0.3, 0.34, 0.4, 0.4))
     s.zone("COL_FalseDoor_Left", (1, 3, 2), (12.5, 1.5, -14), color=(0.5, 0.3, 0.3, 0.35))
@@ -792,6 +938,8 @@ def build_valley_shadow_death():
     s.box("ENV_ShadowValley_RightWall", (3, 10, 90), (0.08, 0.08, 0.12),
           (-7, 5, 0))
     s.box("ENV_ShadowValley_ExitSlope", (8, 0.12, 12), (0.3, 0.3, 0.34), (0, 0.05, -44))
+    # A prayer chapel against the valley wall at the entrance — light before the dark.
+    _chapel(s, "PROP_Chapel", (-3.5, 0, 25), rot=(0, 0, 0))
 
     for i, z in enumerate((24, 8, -8, -24), start=1):
         s.composite("PROP_FaintPathMarker_%02d" % i, [
@@ -1228,6 +1376,7 @@ def build_celestial_city():
         s.lathe("PROP_CelestialSpire_%02d" % i, _spire(hh), (0.96, 0.9, 0.64),
                 (sxp, 0, -29), emissive=(0.5, 0.42, 0.22))
 
+    _chapel(s, "PROP_Chapel", (-10, 0, 8), rot=(0, 90, 0), wall=(0.92, 0.88, 0.74))
     s.marker("PROP_JourneyReviewMarker", (0, 1.5, 0))
 
     s.marker("NPC_Hopeful", (1.6, 0, 6))
