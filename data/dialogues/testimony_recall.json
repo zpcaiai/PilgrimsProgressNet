@@ -3,56 +3,43 @@
   "nodes": {
     "start": {
       "speaker": "Hopeful",
-      "text": "What do you remember most clearly?",
+      "speaker_zh": "盼望",
+      "text": "This sweet air pulls at my eyes. Keep me awake — tell me, what do you remember most clearly?",
+      "text_zh": "这甘甜的空气直拽我的眼皮。帮我醒着——告诉我，你记得最清楚的是什么？",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "found_promise_key" },
+          "text": "We came out of the giant's castle alive — that should keep anyone awake. But this ground is sly. Talk to me: what do you remember most clearly?",
+          "text_zh": "我们竟从巨人的城堡里活着出来——这本该叫人怎么也睡不着。可这片地阴得很。和我说说话：你记得最清楚的是什么？"
+        }
+      ],
       "choices": [
         {
           "id": "cross",
-          "text": "Tell Hopeful about the burden falling.",
-          "effects": {
-            "faith": 8,
-            "hope": 8,
-            "watchfulness": 5
-          },
-          "flags": {
-            "shared_testimony_with_hopeful": true,
-            "resisted_sleep": true
-          },
+          "text": "Tell Hopeful how the burden fell at the Cross.",
+          "text_zh": "对盼望讲：重担如何在十字架前滚落。",
+          "effects": { "faith": 8, "hope": 8, "watchfulness": 5 },
+          "flags": { "shared_testimony_with_hopeful": true, "resisted_sleep": true },
           "next": "end"
         },
         {
           "id": "slough",
-          "text": "Tell Hopeful about the Slough.",
-          "effects": {
-            "humility": 8,
-            "hope": 5,
-            "despair": -5
-          },
-          "flags": {
-            "shared_testimony_with_hopeful": true,
-            "resisted_sleep": true
-          },
+          "text": "Tell Hopeful about the Slough, and learning to be helped.",
+          "text_zh": "对盼望讲泥潭，讲我如何学会了被人扶起。",
+          "effects": { "humility": 8, "hope": 5, "despair": -5 },
+          "flags": { "shared_testimony_with_hopeful": true, "resisted_sleep": true },
           "next": "end"
         },
         {
           "id": "castle",
-          "text": "Tell Hopeful about Doubting Castle.",
-          "effects": {
-            "hope": 10,
-            "faith": 5,
-            "shame": -5
-          },
-          "flags": {
-            "shared_testimony_with_hopeful": true,
-            "resisted_sleep": true
-          },
+          "text": "Tell Hopeful how the Promise unlocked Doubting Castle.",
+          "text_zh": "对盼望讲：应许如何打开了怀疑城堡。",
+          "effects": { "hope": 10, "faith": 5, "shame": -5 },
+          "flags": { "shared_testimony_with_hopeful": true, "resisted_sleep": true },
           "next": "end"
         }
       ]
     },
-    "end": {
-      "speaker": "",
-      "text": "",
-      "end": true
-    }
+    "end": { "speaker": "", "text": "", "end": true }
   }
 }
