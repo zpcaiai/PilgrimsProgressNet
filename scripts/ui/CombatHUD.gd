@@ -99,13 +99,14 @@ func _process(delta: float) -> void:
 	_resolve_bar.value = _combat.resolve
 	var pct: float = float(_combat.resolve) / maxr
 
-	# Colour-code the bar: healthy green -> caution amber -> danger red.
+	# Colour-code the bar. Default green->amber->red; colour-blind-safe uses the
+	# Okabe-Ito blue->orange->vermillion ramp (distinguishable for most CVD).
 	if pct > 0.5:
-		_fill.bg_color = Color(0.45, 0.8, 0.45)
+		_fill.bg_color = Color(0.0, 0.45, 0.7) if Settings.colorblind else Color(0.45, 0.8, 0.45)
 	elif pct > LOW_PCT:
-		_fill.bg_color = Color(0.95, 0.75, 0.3)
+		_fill.bg_color = Color(0.9, 0.6, 0.0) if Settings.colorblind else Color(0.95, 0.75, 0.3)
 	else:
-		_fill.bg_color = Color(0.95, 0.3, 0.28)
+		_fill.bg_color = Color(0.84, 0.37, 0.0) if Settings.colorblind else Color(0.95, 0.3, 0.28)
 
 	var enemies := get_tree().get_nodes_in_group("enemy").size()
 	var cd: float = _combat.prayer_cooldown

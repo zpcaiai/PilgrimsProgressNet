@@ -23,6 +23,7 @@ var _touch: CanvasLayer
 func _ready() -> void:
 	_ensure_input_actions()
 	_load_video_settings()
+	_apply_ui_scale()
 
 	_world_root = Node3D.new()
 	_world_root.name = "World"
@@ -57,6 +58,7 @@ func _ready() -> void:
 
 	EventBus.demo_completed.connect(_on_demo_completed)
 	EventBus.spiritual_collapse.connect(_on_collapse)
+	EventBus.settings_changed.connect(_apply_ui_scale)
 
 	_show_title()
 
@@ -241,6 +243,7 @@ func start_new_game(mode: String = "standard") -> void:
 	if mode == "child":
 		EventBus.toast(LocaleManager.t("toast.child_mode", "Children's Journey — a gentle road. Take your time."))
 	ChapterManager.start_chapter("city_of_destruction")
+	_show_controls_hint()
 
 
 func continue_game() -> void:
@@ -255,6 +258,46 @@ func continue_game() -> void:
 	if chapter == "":
 		chapter = "city_of_destruction"
 	ChapterManager.start_chapter(chapter)
+	_show_controls_hint()
+
+
+## First-run only: a dismissible control / onboarding overlay.
+func _show_controls_hint() -> void:
+	if Settings.seen_controls:
+		return
+	Settings.mark_controls_seen()
+	var cl := CanvasLayer.new()
+	cl.layer = 30
+	add_child(cl)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	cl.add_child(center)
+	var panel := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.06, 0.07, 0.12, 0.96)
+	sb.set_corner_radius_all(12)
+	sb.set_content_margin_all(24)
+	sb.border_color = Color(0.85, 0.74, 0.4, 0.6)
+	sb.set_border_width_all(2)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 10)
+	panel.add_child(vb)
+	_add_title(vb, "操作指引 · Controls", 28, Color(0.95, 0.9, 0.6))
+	for s in [
+			"WASD / 方向键   移动 Move",
+			"空格 Space 跳 Jump      E 互动 Interact",
+			"1–4   对话选择 Dialogue choices",
+			"战斗 Combat:  J 攻击  K 闪避  L 站稳  U 应许  P 祷告",
+			"Tab 路线图 Map      Esc 暂停 / 设置 Pause & Settings",
+			"每章出口有发光传送门;答对该章经文方可通行。",
+			]:
+		var l := Label.new()
+		l.text = s
+		l.add_theme_font_size_override("font_size", 18)
+		vb.add_child(l)
+	_add_button(vb, "知道了 Got it", func(): cl.queue_free())
 
 
 # ---------------------------------------------------------------------------
@@ -362,6 +405,25 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	inv.button_pressed = bool(_get_input_setting("invert_look_y", false))
 	inv.toggled.connect(func(on): _set_input_setting("invert_look_y", on))
 	vb.add_child(inv)
+	_add_range_slider(vb, "Touch Button Size", "touch_button_scale", 0.6, 1.4, 0.05, 1.0, true)
+	_add_range_slider(vb, "UI Scale", "ui_scale", 0.8, 1.6, 0.05, _ui_scale_default(), true)
+
+	var spacerA := Control.new()
+	spacerA.custom_minimum_size = Vector2(0, 12)
+	vb.add_child(spacerA)
+	_add_title(vb, "Accessibility · 无障碍", 20, Color(0.75, 0.8, 0.92))
+	var rm := CheckButton.new()
+	rm.text = "减少震动 Reduce Motion (shake / hit-stop)"
+	rm.add_theme_font_size_override("font_size", 18)
+	rm.button_pressed = Settings.reduce_motion
+	rm.toggled.connect(func(on): Settings.set_reduce_motion(on))
+	vb.add_child(rm)
+	var cbf := CheckButton.new()
+	cbf.text = "色盲友好配色 Colour-blind safe"
+	cbf.add_theme_font_size_override("font_size", 18)
+	cbf.button_pressed = Settings.colorblind
+	cbf.toggled.connect(func(on): Settings.set_colorblind(on))
+	vb.add_child(cbf)
 
 	var spacer2 := Control.new()
 	spacer2.custom_minimum_size = Vector2(0, 12)
@@ -429,6 +491,21 @@ func _set_input_setting(key: String, value) -> void:
 	cf.save("user://settings.cfg")
 	if EventBus.has_signal("settings_changed"):
 		EventBus.settings_changed.emit()
+
+
+func _ui_scale_default() -> float:
+	# Phones/tablets start a bit larger so menu text & HUD numbers are readable.
+	return 1.15 if DisplayServer.is_touchscreen_available() else 1.0
+
+
+func _apply_ui_scale() -> void:
+	# Global GUI scale for menus + HUD (Window.content_scale_factor). The touch
+	# keypad re-derives its size from the viewport each frame, so it stays put;
+	# fine-tune the keypad separately via "Touch Button Size".
+	var w := get_window()
+	if w == null:
+		return
+	w.content_scale_factor = clampf(float(_get_input_setting("ui_scale", _ui_scale_default())), 0.7, 2.0)
 
 
 func _add_range_slider(vb: VBoxContainer, label_text: String, key: String,

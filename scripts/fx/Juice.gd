@@ -23,6 +23,8 @@ func _ready() -> void:
 
 
 func shake(amount: float = 0.5) -> void:
+	if Settings.reduce_motion:
+		return
 	_trauma = clampf(_trauma + amount, 0.0, 1.0)
 
 
@@ -42,7 +44,7 @@ func _process(delta: float) -> void:
 
 
 func hitstop(duration: float = 0.08, scale: float = 0.05) -> void:
-	if _hitstop_active:
+	if _hitstop_active or Settings.reduce_motion:
 		return
 	_hitstop_active = true
 	Engine.time_scale = scale
