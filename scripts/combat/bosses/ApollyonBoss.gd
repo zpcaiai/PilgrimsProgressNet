@@ -62,6 +62,8 @@ func _update_phase() -> void:
 		phase_changed.emit(current_phase)
 		var names := ["", "Intimidation", "Accusation", "Desperate Assault"]
 		EventBus.toast("Apollyon presses harder — Phase %d: %s" % [current_phase, names[min(current_phase, 3)]])
+		Juice.shake(0.5)
+		Juice.flash(Color(0.6, 0.12, 0.12, 0.22), 0.35)
 
 
 func on_defeated() -> void:
@@ -70,5 +72,8 @@ func on_defeated() -> void:
 	GameState.set_flag("defeated_apollyon", true)
 	GameState.set_flag("stood_against_accuser", true)
 	EventBus.toast("Apollyon is overcome. You stood because mercy held you.")
+	Juice.shake(1.0)
+	Juice.hitstop(0.15)
+	Juice.flash(Color(1.0, 0.95, 0.7, 0.4), 0.8)
 	boss_defeated.emit()
 	queue_free()

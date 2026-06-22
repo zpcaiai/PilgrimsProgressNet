@@ -42,6 +42,7 @@ RealtimeService="*res://scripts/net/RealtimeService.gd"
 AnalyticsService="*res://scripts/net/AnalyticsService.gd"
 LocaleManager="*res://scripts/core/LocaleManager.gd"
 ThemeManager="*res://scripts/ui/ThemeManager.gd"
+Juice="*res://scripts/fx/Juice.gd"
 
 [debug]
 
