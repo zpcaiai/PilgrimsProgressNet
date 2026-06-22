@@ -7,3 +7,6 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# large macOS installers — never commit
+*.dmg
