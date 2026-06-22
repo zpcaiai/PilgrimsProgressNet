@@ -1,0 +1,15 @@
+{
+  "id": "receive_burden",
+  "title": "The Burden Appears",
+  "trigger": "read_book",
+  "effects": {
+    "despair": 10,
+    "fear": 5,
+    "humility": 5
+  },
+  "special": {},
+  "flags": {
+    "read_book": true,
+    "received_burden": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "cross_grace",
+  "title": "The Burden Falls",
+  "trigger": "approach_cross",
+  "effects": {
+    "faith": 30,
+    "hope": 30,
+    "humility": 10,
+    "despair": -100,
+    "shame": -100,
+    "fear": -80
+  },
+  "special": {
+    "remove_burden": true,
+    "grant_scroll": true,
+    "grant_seal": true,
+    "grant_new_garment": true
+  },
+  "flags": {
+    "burden_removed": true,
+    "cross_grace_received": true,
+    "mvp_completed": true
+  }
+}

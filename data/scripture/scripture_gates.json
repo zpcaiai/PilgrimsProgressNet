@@ -1,0 +1,147 @@
+{
+  "_comment": "Per-chapter Scripture Gate. To pass a chapter the pilgrim must answer its key verse correctly; a wrong choice lets them choose again. answer = index of the correct option. Bilingual (zh primary, en in parentheses on each option).",
+  "city_of_destruction": {
+    "ref": "希伯来书 11:7 · Hebrews 11:7",
+    "prompt": "传道者催你逃离将倾之城。挪亚因着什么预备了方舟,使全家得救?",
+    "prompt_en": "Evangelist urges you to flee the doomed city. By what did Noah build the ark and save his household?",
+    "options": ["因着信 (By faith)", "因着运气 (By luck)", "因着财富 (By wealth)", "因着聪明 (By cleverness)"],
+    "answer": 0,
+    "correct": "「挪亚因着信……预备了一只方舟,使他全家得救。」(来 11:7)",
+    "wrong": "再想想——救恩的根基不是别的,正是信。"
+  },
+  "wilderness_road": {
+    "ref": "希伯来书 12:1-2 · Hebrews 12:1-2",
+    "prompt": "旧城的声音仍在耳边。你当怎样奔那摆在前头的路程?",
+    "prompt_en": "The old city's voices still follow. How should you run the race set before you?",
+    "options": ["存心忍耐,仰望耶稣 (With perseverance, eyes on Jesus)", "凭自己的血气 (In my own strength)", "回头再看一眼 (By looking back)", "走最易走的路 (By the easiest road)"],
+    "answer": 0,
+    "correct": "「存心忍耐,奔那摆在我们前头的路程,仰望为我们信心创始成终的耶稣。」(来 12:1-2)",
+    "wrong": "不是靠血气、也不是回望——当存心忍耐,定睛仰望。"
+  },
+  "slough_of_despond": {
+    "ref": "诗篇 40:2 · Psalm 40:2",
+    "prompt": "你陷在绝望的泥沼里。谁把你从祸坑、淤泥中拉上来,使你脚步稳当?",
+    "prompt_en": "You sink in the mire of despair. Who lifts you from the miry pit and sets your feet firm?",
+    "options": ["耶和华 (The LORD)", "我的决心 (My own willpower)", "同伴易迁 (Pliable)", "运气 (Chance)"],
+    "answer": 0,
+    "correct": "「他从祸坑里、从淤泥中把我拉上来,使我的脚立在磐石上。」(诗 40:2)",
+    "wrong": "不是决心或运气——是耶和华把人从淤泥中拉起。"
+  },
+  "wicket_gate": {
+    "ref": "马太福音 7:7 · Matthew 7:7",
+    "prompt": "窄门在前,指控如箭飞来。主应许:叩门的会怎样?",
+    "prompt_en": "The narrow gate is before you, accusations fly. What did the Lord promise the one who knocks?",
+    "options": ["就给他开门 (It shall be opened)", "须先够资格 (Must first be worthy)", "门永远关闭 (The door stays shut)", "要付上代价 (Must pay a price)"],
+    "answer": 0,
+    "correct": "「叩门,就给你们开门。因为凡叩门的,就给他开门。」(太 7:7-8)",
+    "wrong": "窄门不凭资格或代价——只管叩,门就开。"
+  },
+  "cross_and_tomb": {
+    "ref": "彼得前书 2:24 · 1 Peter 2:24",
+    "prompt": "在十字架前,你背上的重担滚落。这重担被谁担当了?",
+    "prompt_en": "At the cross your burden rolls away. Who bore that burden?",
+    "options": ["主在木头上亲身担当 (Christ bore it on the tree)", "被你自己挣脱 (I shook it off myself)", "被同伴分担 (A companion shared it)", "只是掉进了坟墓 (It just fell in the tomb)"],
+    "answer": 0,
+    "correct": "「他被挂在木头上,亲身担当了我们的罪。」(彼前 2:24)",
+    "wrong": "重担不是你挣脱的——是主在十字架上亲身担当。"
+  },
+  "interpreter_house": {
+    "ref": "诗篇 119:105 · Psalm 119:105",
+    "prompt": "解经者用灯火照亮一间间屋子。什么是你脚前的灯、路上的光?",
+    "prompt_en": "The Interpreter lights each room. What is a lamp to your feet and a light to your path?",
+    "options": ["神的话语 (Your word)", "我的感觉 (My feelings)", "世人的智慧 (The world's wisdom)", "前路的运气 (Fortune ahead)"],
+    "answer": 0,
+    "correct": "「你的话是我脚前的灯,是我路上的光。」(诗 119:105)",
+    "wrong": "照亮道路的不是感觉或世智——是神的话。"
+  },
+  "hill_difficulty": {
+    "ref": "以赛亚书 40:31 · Isaiah 40:31",
+    "prompt": "陡坡难行,力气将尽。等候耶和华的人会怎样?",
+    "prompt_en": "The climb is steep and strength fails. What happens to those who wait on the LORD?",
+    "options": ["如鹰展翅上腾,从新得力 (Renew strength, mount up like eagles)", "终必跌倒 (Will surely fall)", "原地不动 (Stay where they are)", "靠咖啡硬撑 (Push on by sheer grit)"],
+    "answer": 0,
+    "correct": "「但那等候耶和华的必从新得力,他们必如鹰展翅上腾。」(赛 40:31)",
+    "wrong": "不是靠硬撑——等候耶和华的,必从新得力。"
+  },
+  "palace_beautiful": {
+    "ref": "以弗所书 6:11 · Ephesians 6:11",
+    "prompt": "在华美宫你领受军装,前路有恶者埋伏。你当穿戴什么以站立得住?",
+    "prompt_en": "At the Palace you receive armor. What must you put on to stand?",
+    "options": ["神所赐的全副军装 (The whole armor of God)", "自己的功劳 (My own merit)", "厚重的铠甲 (Thick steel plate)", "隐身的斗篷 (A cloak of hiding)"],
+    "answer": 0,
+    "correct": "「要穿戴神所赐的全副军装,就能抵挡魔鬼的诡计。」(弗 6:11)",
+    "wrong": "护你的不是功劳或钢甲——是神所赐的全副军装。"
+  },
+  "valley_humiliation": {
+    "ref": "雅各书 4:7 · James 4:7",
+    "prompt": "亚玻伦以恐吓与控告压你。圣经说,务要怎样行,魔鬼就必离开?",
+    "prompt_en": "Apollyon presses with threats and accusation. What does Scripture say to do, that the devil will flee?",
+    "options": ["顺服神,抵挡魔鬼 (Submit to God, resist the devil)", "与他讲和 (Make peace with him)", "转身逃跑 (Turn and run)", "独自硬拼 (Fight him alone by might)"],
+    "answer": 0,
+    "correct": "「故此,你们要顺服神。务要抵挡魔鬼,魔鬼就必离开你们逃跑了。」(雅 4:7)",
+    "wrong": "不是讲和、逃跑或硬拼——顺服神、抵挡他,他必逃跑。"
+  },
+  "valley_shadow_death": {
+    "ref": "诗篇 23:4 · Psalm 23:4",
+    "prompt": "你行过死荫的幽谷,黑暗与低语环绕。你为何可以不怕遭害?",
+    "prompt_en": "You walk the valley of the shadow of death. Why need you fear no evil?",
+    "options": ["因为你与我同在 (For You are with me)", "因为我够勇敢 (For I am brave enough)", "因为谷很短 (For the valley is short)", "因为我看得见路 (For I can see the path)"],
+    "answer": 0,
+    "correct": "「我虽然行过死荫的幽谷,也不怕遭害,因为你与我同在。」(诗 23:4)",
+    "wrong": "壮胆的理由不是勇气或视野——乃因祂与你同在。"
+  },
+  "vanity_fair": {
+    "ref": "约翰一书 2:15 · 1 John 2:15",
+    "prompt": "集市以名利享乐相诱。圣经如何劝你待这世界与其上的情欲?",
+    "prompt_en": "The fair tempts with fame and pleasure. How does Scripture say to treat the world and its desires?",
+    "options": ["不要爱世界 (Do not love the world)", "尽情享用 (Enjoy it fully)", "买一点无妨 (A little won't hurt)", "随众而行 (Follow the crowd)"],
+    "answer": 0,
+    "correct": "「不要爱世界和世界上的事……这都是从世界来的。」(约一 2:15-16)",
+    "wrong": "随众与纵情都是网罗——不要爱世界。"
+  },
+  "doubting_castle": {
+    "ref": "希伯来书 10:23 · Hebrews 10:23",
+    "prompt": "巨人绝望把你囚在牢中。你手中『应许之钥』的力量从何而来?",
+    "prompt_en": "Giant Despair locks you in the cell. Why can the 'key of Promise' be trusted?",
+    "options": ["那应许我们的是信实的 (He who promised is faithful)", "因为牢门本就松 (The door was loose anyway)", "因为我力气大 (Because I am strong)", "因为巨人睡着了 (Because the giant slept)"],
+    "answer": 0,
+    "correct": "「也要坚守我们所承认的指望,不至摇动,因为那应许我们的是信实的。」(来 10:23)",
+    "wrong": "钥匙的能力不在牢门或你的力气——在那信实的应许者。"
+  },
+  "delectable_mountains": {
+    "ref": "诗篇 23:1 · Psalm 23:1",
+    "prompt": "牧人们在喜山接待你,指给你看远方的圣城。谁是你的牧者?",
+    "prompt_en": "The shepherds welcome you and show the distant City. Who is your shepherd?",
+    "options": ["耶和华 (The LORD)", "我自己 (Myself)", "这些牧人 (These shepherds)", "前方的城 (The City ahead)"],
+    "answer": 0,
+    "correct": "「耶和华是我的牧者,我必不至缺乏。」(诗 23:1)",
+    "wrong": "牧养你的不是人或城——耶和华才是你的牧者。"
+  },
+  "enchanted_ground": {
+    "ref": "帖撒罗尼迦前书 5:6 · 1 Thessalonians 5:6",
+    "prompt": "魔境的空气催人沉睡。圣经劝我们不要睡觉,却要怎样?",
+    "prompt_en": "The Enchanted air lulls you to sleep. Scripture says: not to sleep, but to do what?",
+    "options": ["要警醒谨守 (Watch and be sober)", "稍稍歇一会 (Rest a little while)", "躺下做美梦 (Lie down and dream)", "走慢一点 (Just slow down)"],
+    "answer": 0,
+    "correct": "「所以我们不要睡觉,像别人一样,总要警醒谨守。」(帖前 5:6)",
+    "wrong": "此地最危险的是沉睡——总要警醒谨守。"
+  },
+  "river_of_death": {
+    "ref": "以赛亚书 43:2 · Isaiah 43:2",
+    "prompt": "死河横在面前,水深可惧。你从水中经过时,有谁的应许?",
+    "prompt_en": "The river of death lies before you. Whose promise holds as you pass through the waters?",
+    "options": ["你从水中经过,我必与你同在 (I will be with you)", "水会自动分开 (The waters will part on their own)", "你必不沾湿 (You won't get wet)", "你要自己游过 (You must swim it alone)"],
+    "answer": 0,
+    "correct": "「你从水中经过,我必与你同在;你趟过江河,水必不漫过你。」(赛 43:2)",
+    "wrong": "凭据不是水自分或你的泳技——是祂与你同在的应许。"
+  },
+  "celestial_city": {
+    "ref": "启示录 21:4 · Revelation 21:4",
+    "prompt": "天城的门为你而开。城里,神要为祂的子民成就什么?",
+    "prompt_en": "The Celestial City opens to you. What will God do for His people there?",
+    "options": ["擦去一切眼泪,不再有死亡悲哀 (Wipe away every tear; no more death or sorrow)", "赐下金银财宝 (Give gold and riches)", "让人永远沉睡 (Let them sleep forever)", "论功行赏 (Reward each by his merit)"],
+    "answer": 0,
+    "correct": "「神要擦去他们一切的眼泪,不再有死亡,也不再有悲哀、哭号、疼痛。」(启 21:4)",
+    "wrong": "天城的福不是财宝或功赏——是神亲手擦去一切眼泪。"
+  }
+}

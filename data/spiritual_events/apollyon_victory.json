@@ -1,0 +1,17 @@
+{
+  "id": "apollyon_victory",
+  "title": "Apollyon Defeated",
+  "trigger": "boss_defeated_apollyon",
+  "effects": {
+    "faith": 15,
+    "perseverance": 15,
+    "hope": 10,
+    "fear": -30,
+    "shame": -30,
+    "despair": -10
+  },
+  "flags": {
+    "defeated_apollyon": true,
+    "stood_against_accuser": true
+  }
+}

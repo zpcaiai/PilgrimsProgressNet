@@ -1,0 +1,12 @@
+{
+  "id": "arbor_sleep_zone",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "sleep_zone",
+  "sleepiness_delta": 5,
+  "effects_per_tick": {
+    "weariness": -2,
+    "watchfulness": -3,
+    "deception": 1
+  }
+}

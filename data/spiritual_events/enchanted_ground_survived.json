@@ -1,0 +1,14 @@
+{
+  "id": "enchanted_ground_survived",
+  "title": "Stayed Awake",
+  "trigger": "enchanted_ground_exit",
+  "effects": {
+    "watchfulness": 20,
+    "perseverance": 10,
+    "hope": 10,
+    "weariness": -10
+  },
+  "flags": {
+    "survived_enchanted_ground": true
+  }
+}

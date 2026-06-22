@@ -1,0 +1,10 @@
+{
+  "id": "false_ground",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "false_ground",
+  "effects_on_enter": {
+    "despair": 8,
+    "fear": 5
+  }
+}

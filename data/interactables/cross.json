@@ -1,0 +1,13 @@
+{
+  "id": "cross",
+  "display_name": "Cross",
+  "type": "story_event",
+  "interaction_prompt": "Approach",
+  "required_flags": [
+    "passed_wicket_gate"
+  ],
+  "trigger_spiritual_event": "cross_grace",
+  "set_flags_on_interact": {
+    "approached_cross": true
+  }
+}

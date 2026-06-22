@@ -1,0 +1,58 @@
+{
+  "id": "hopeful_keep_awake",
+  "nodes": {
+    "start": {
+      "speaker": "Hopeful",
+      "text": "This place feels safe. That makes me uneasy.",
+      "choices": [
+        {
+          "id": "speak",
+          "text": "Speak with me. Let us keep one another awake.",
+          "effects": {
+            "hope": 8,
+            "watchfulness": 8,
+            "weariness": -3
+          },
+          "next": "testimony"
+        },
+        {
+          "id": "sit",
+          "text": "Sit down for a moment.",
+          "effects": {
+            "weariness": -5,
+            "watchfulness": -10,
+            "deception": 5
+          },
+          "next": "warning"
+        },
+        {
+          "id": "walk",
+          "text": "Keep walking.",
+          "effects": {
+            "perseverance": 8,
+            "weariness": 5
+          },
+          "flags": {
+            "resisted_sleep": true
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "testimony": {
+      "speaker": "Hopeful",
+      "text": "Tell me again where your burden fell.",
+      "next": "end"
+    },
+    "warning": {
+      "speaker": "Hopeful",
+      "text": "A moment can become a chain in this place.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

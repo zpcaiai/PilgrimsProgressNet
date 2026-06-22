@@ -1,0 +1,10 @@
+{
+  "id": "arrow_pressure_zone",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "projectile_pressure",
+  "effects_per_tick": {
+    "fear": 5,
+    "shame": 3
+  }
+}

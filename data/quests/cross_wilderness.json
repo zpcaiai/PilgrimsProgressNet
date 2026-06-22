@@ -1,9 +1,11 @@
 {
   "id": "cross_wilderness",
   "title": "Press On Down the Wilderness Road",
-  "description": "The city still argues through familiar voices. Answer without pride, and keep the light ahead.",
+  "description": "The city still argues through familiar voices. Answer Obstinate without pride, steady Pliable without flattery, and keep the little light ahead until the ground begins to fail.",
   "steps": [
-    { "id": "reach_slough", "description": "Walk past the last voices calling you home.", "required_flag": "entered_slough" }
+    { "id": "answer_obstinate", "description": "Answer Obstinate, and let the burning city go.", "required_flag": "obstinate_left" },
+    { "id": "steady_pliable", "description": "Tell Pliable the truth about the road ahead.", "required_flag": "spoke_with_pliable" },
+    { "id": "fix_eyes", "description": "At the brink of the lowland, fix your eyes on the light.", "required_flag": "fixed_eyes_on_light" }
   ],
-  "rewards": { "perseverance": 5 }
+  "rewards": { "perseverance": 5, "faith": 3 }
 }

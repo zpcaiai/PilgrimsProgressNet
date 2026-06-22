@@ -14,13 +14,20 @@ var control_locked: bool = false
 var terrain_multiplier: float = 1.0  # set by hazards (mud, etc.)
 var _mesh_root: Node3D
 var _body_mesh: MeshInstance3D
-var _burden_mesh: MeshInstance3D
+var _burden_root: Node3D
+var _is_greybox: bool = false
+var _fig: Node3D
 var _vanity_root: Node3D
 var _camera: Camera3D
 var _interactor: Area3D
 var _current_target: Interactable = null
 var _breath_timer: float = 0.0
 var _glancing: bool = false
+# Footstep / landing dust
+var _dust: CPUParticles3D
+var _land_puff: CPUParticles3D
+var _was_on_floor: bool = true
+var _fall_speed: float = 0.0
 
 # Camera orbit (right-mouse drag / right stick) + look settings
 @export var mouse_sensitivity: float = 0.25
@@ -83,9 +90,10 @@ func _build() -> void:
 	_mesh_root.name = "MeshRoot"
 	add_child(_mesh_root)
 
-	# Painted pilgrim figure (billboard) when available; else greybox capsule.
-	var pilgrim_fig := AssetLib.figure("Pilgrim")
-
+	# The pilgrim is now a real in-engine 3D body that walks on two legs. `self`
+	# is the mover whose horizontal motion drives the walk cycle (the legs swing
+	# in alternation via HumanoidAnimator). The greybox capsule is kept but
+	# permanently hidden as a last-ditch fallback only.
 	_body_mesh = MeshInstance3D.new()
 	var capsule := CapsuleMesh.new()
 	capsule.radius = 0.4
@@ -93,33 +101,25 @@ func _build() -> void:
 	_body_mesh.mesh = capsule
 	_body_mesh.position = Vector3(0, 0.9, 0)
 	_body_mesh.material_override = _make_material(Color(0.78, 0.68, 0.5))
-	_body_mesh.visible = pilgrim_fig == null
+	_body_mesh.visible = false
 	_mesh_root.add_child(_body_mesh)
 
-	var head := MeshInstance3D.new()
-	var sphere := SphereMesh.new()
-	sphere.radius = 0.28
-	sphere.height = 0.56
-	head.mesh = sphere
-	head.position = Vector3(0, 1.85, 0)
-	head.material_override = _make_material(Color(0.9, 0.78, 0.62))
-	head.visible = pilgrim_fig == null
-	_mesh_root.add_child(head)
+	_fig = HumanoidFigure.make("Pilgrim", 2.0, self)
+	_mesh_root.add_child(_fig)
 
-	if pilgrim_fig != null:
-		_mesh_root.add_child(CharacterBillboard.make(pilgrim_fig, 2.0))
-
-	# Burden on the back
-	_burden_mesh = MeshInstance3D.new()
-	var box := BoxMesh.new()
-	box.size = Vector3(0.7, 0.7, 0.5)
-	_burden_mesh.mesh = box
-	_burden_mesh.position = Vector3(0, 1.1, 0.5)
-	_burden_mesh.material_override = _make_material(Color(0.25, 0.2, 0.18))
-	_mesh_root.add_child(_burden_mesh)
+	# Burden: a real backpack on his back that he visibly drops at the Cross.
+	# The 3D body faces +Z (the travel direction), so the pack is flipped to sit
+	# behind him (-Z), and shown only while the burden is still carried.
+	_is_greybox = false
+	_burden_root = _build_backpack()
+	_burden_root.rotation.y = PI
+	_burden_root.visible = SpiritualStateManager.has_burden
+	_mesh_root.add_child(_burden_root)
 
 	# Vanity trinkets bought at the fair hang on the back as visible weight.
+	# Flipped with the pack so they sit behind the body (which faces +Z).
 	_vanity_root = Node3D.new()
+	_vanity_root.rotation.y = PI
 	_mesh_root.add_child(_vanity_root)
 	refresh_vanity()
 
@@ -148,6 +148,8 @@ func _build() -> void:
 	_interactor.add_child(icol)
 	add_child(_interactor)
 
+	_build_dust()
+
 
 ## Rebuild the hanging trinkets to match how much vanity you bought.
 func refresh_vanity() -> void:
@@ -175,6 +177,87 @@ func _make_material(color: Color) -> StandardMaterial3D:
 	m.albedo_color = color
 	m.roughness = 0.9
 	return m
+
+
+func _dust_mesh() -> QuadMesh:
+	var q := QuadMesh.new()
+	q.size = Vector2(0.4, 0.4)
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	m.billboard_keep_scale = true
+	m.vertex_color_use_as_albedo = true
+	m.albedo_texture = CharacterBillboard.soft_disc()
+	q.material = m
+	return q
+
+
+## Little dust kicked up underfoot while walking, plus a puff when landing.
+func _build_dust() -> void:
+	_dust = CPUParticles3D.new()
+	_dust.name = "FootDust"
+	_dust.position = Vector3(0, 0.06, 0)
+	_dust.emitting = false
+	_dust.amount = 14
+	_dust.lifetime = 0.7
+	_dust.local_coords = false
+	_dust.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	_dust.emission_sphere_radius = 0.18
+	_dust.direction = Vector3(0, 1, 0)
+	_dust.spread = 35.0
+	_dust.gravity = Vector3(0, 0.4, 0)
+	_dust.initial_velocity_min = 0.2
+	_dust.initial_velocity_max = 0.7
+	_dust.scale_amount_min = 0.4
+	_dust.scale_amount_max = 0.9
+	_dust.color = Color(0.62, 0.55, 0.45, 0.5)
+	_dust.mesh = _dust_mesh()
+	add_child(_dust)
+
+	_land_puff = CPUParticles3D.new()
+	_land_puff.name = "LandPuff"
+	_land_puff.position = Vector3(0, 0.06, 0)
+	_land_puff.emitting = false
+	_land_puff.one_shot = true
+	_land_puff.amount = 18
+	_land_puff.lifetime = 0.6
+	_land_puff.explosiveness = 0.9
+	_land_puff.local_coords = false
+	_land_puff.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	_land_puff.emission_sphere_radius = 0.22
+	_land_puff.direction = Vector3(0, 1, 0)
+	_land_puff.spread = 70.0
+	_land_puff.gravity = Vector3(0, 0.2, 0)
+	_land_puff.initial_velocity_min = 0.6
+	_land_puff.initial_velocity_max = 1.4
+	_land_puff.scale_amount_min = 0.5
+	_land_puff.scale_amount_max = 1.0
+	_land_puff.color = Color(0.62, 0.55, 0.45, 0.6)
+	_land_puff.mesh = _dust_mesh()
+	add_child(_land_puff)
+
+
+func _update_dust() -> void:
+	var on_floor := is_on_floor()
+	var hspeed := Vector2(velocity.x, velocity.z).length()
+	if is_instance_valid(_dust):
+		_dust.emitting = on_floor and hspeed > 1.2 and not control_locked
+	if not on_floor:
+		_fall_speed = -velocity.y
+	if on_floor and not _was_on_floor and _fall_speed > 3.0 and is_instance_valid(_land_puff):
+		_land_puff.restart()
+	if on_floor:
+		_fall_speed = 0.0
+	_was_on_floor = on_floor
+
+
+## The pilgrim is a full 3D body now: the mesh-root yaw (set in _physics_process)
+## turns him to face the travel direction, so his legs stride forward and the
+## back of his head shows when he walks away. The old front/back billboard swap
+## is no longer needed.
+func _update_facing() -> void:
+	pass
 
 
 func _load_input_settings() -> void:
@@ -217,8 +300,50 @@ func _on_burden_removed() -> void:
 
 
 func _update_burden_visual() -> void:
-	if is_instance_valid(_burden_mesh):
-		_burden_mesh.visible = SpiritualStateManager.has_burden
+	if is_instance_valid(_burden_root):
+		_burden_root.visible = _is_greybox and SpiritualStateManager.has_burden
+
+
+## A pilgrim's backpack (rounded sack + flap + bedroll + shoulder straps) for the
+## greybox fallback. The painted figure already has its own pack.
+func _build_backpack() -> Node3D:
+	var root := Node3D.new()
+	var sack := MeshInstance3D.new()
+	var s := SphereMesh.new()
+	s.radius = 0.42
+	s.height = 0.9
+	sack.mesh = s
+	sack.scale = Vector3(1.0, 1.1, 0.8)
+	sack.position = Vector3(0, 1.05, 0.42)
+	sack.material_override = _make_material(Color(0.42, 0.30, 0.18))
+	root.add_child(sack)
+	var flap := MeshInstance3D.new()
+	var fb := BoxMesh.new()
+	fb.size = Vector3(0.72, 0.26, 0.6)
+	flap.mesh = fb
+	flap.position = Vector3(0, 1.46, 0.42)
+	flap.material_override = _make_material(Color(0.34, 0.24, 0.14))
+	root.add_child(flap)
+	var roll := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 0.16
+	cyl.bottom_radius = 0.16
+	cyl.height = 0.82
+	roll.mesh = cyl
+	roll.rotation_degrees = Vector3(0, 0, 90)
+	roll.position = Vector3(0, 1.62, 0.42)
+	roll.material_override = _make_material(Color(0.55, 0.45, 0.30))
+	root.add_child(roll)
+	for sx in [-0.18, 0.18]:
+		var off := float(sx)
+		var strap := MeshInstance3D.new()
+		var sb := BoxMesh.new()
+		sb.size = Vector3(0.08, 0.95, 0.06)
+		strap.mesh = sb
+		strap.position = Vector3(off, 1.12, -0.2)
+		strap.material_override = _make_material(Color(0.3, 0.2, 0.12))
+		root.add_child(strap)
+	return root
 
 
 func _physics_process(delta: float) -> void:
@@ -252,6 +377,8 @@ func _physics_process(delta: float) -> void:
 		_mesh_root.rotation.y = lerp_angle(_mesh_root.rotation.y, target_yaw, rotation_speed * delta)
 
 	move_and_slide()
+	_update_dust()
+	_update_facing()
 	_update_interaction()
 	_update_breath(delta, input_dir.length() > 0.1)
 

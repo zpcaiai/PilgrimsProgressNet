@@ -1,0 +1,11 @@
+{
+  "id": "sleep_zone_enchanted_ground",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "sleep_zone",
+  "sleepiness_delta": 5,
+  "effects_per_tick": {
+    "watchfulness": -2,
+    "deception": 1
+  }
+}

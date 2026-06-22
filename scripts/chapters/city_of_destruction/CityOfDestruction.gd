@@ -56,15 +56,8 @@ func _build_procedural() -> void:
 
 	spawn_player(Vector3(0, 1, 8))
 
-	# Leave through the gate — but only once Evangelist has set you on the way.
-	var _cb1 := func(_b):
-		if not GameState.has_flag("talked_to_evangelist"):
-			EventBus.toast("先与传道者交谈，领受当行的路。 (Speak with Evangelist first — he sets you on the way.)")
-			return
-		GameState.set_flag("left_city", true)
-		QuestManager.update_quest_progress("leave_city")
-		EventBus.toast("You leave the City of Destruction behind, carrying the burden into mercy's road.")
-		_advance_after_delay()
+	# Leave through the gate — gated by Evangelist's call AND the Scripture Gate.
+	var _cb1 := func(_b): _try_leave_city()
 	make_trigger(Vector3(0, 1.5, -21), Vector3(12, 4, 2), _cb1, false)
 	# Visible exit portal at the gate (procedural chapters skip the binder that
 	# normally spawns it, so add it here too). Deferred add: this runs during the
@@ -72,6 +65,27 @@ func _build_procedural() -> void:
 	var portal := ExitPortal.new()
 	portal.position = Vector3(0, 0, -21)
 	add_child.call_deferred(portal)
+
+
+## Leaving the City requires Evangelist's word, then a correct Scripture answer.
+func _try_leave_city() -> void:
+	if not GameState.has_flag("talked_to_evangelist"):
+		EventBus.toast("先与传道者交谈，领受当行的路。 (Speak with Evangelist first — he sets you on the way.)")
+		return
+	if GameState.has_flag("scripture_city_of_destruction") or not ScriptureGate.has_question("city_of_destruction"):
+		_city_leave()
+		return
+	var on_pass := func() -> void:
+		GameState.set_flag("scripture_city_of_destruction", true)
+		_city_leave()
+	ScriptureGate.open(self, "city_of_destruction", on_pass)
+
+
+func _city_leave() -> void:
+	GameState.set_flag("left_city", true)
+	QuestManager.update_quest_progress("leave_city")
+	EventBus.toast("You leave the City of Destruction behind, carrying the burden into mercy's road.")
+	_advance_after_delay()
 
 
 ## The family home: a realistic timber-framed cottage with warm-lit windows and

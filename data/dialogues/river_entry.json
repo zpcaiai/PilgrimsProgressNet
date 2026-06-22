@@ -1,0 +1,45 @@
+{
+  "id": "river_entry",
+  "nodes": {
+    "start": {
+      "speaker": "Pilgrim",
+      "text": "The city is near, but the river is between.",
+      "choices": [
+        {
+          "id": "step",
+          "text": "Step into the river.",
+          "effects": {
+            "fear": 10,
+            "faith": 5
+          },
+          "flags": {
+            "entered_river_of_death": true
+          },
+          "next": "hopeful"
+        },
+        {
+          "id": "ask",
+          "text": "Ask Hopeful to go with you.",
+          "effects": {
+            "humility": 5,
+            "hope": 8
+          },
+          "flags": {
+            "entered_river_of_death": true
+          },
+          "next": "hopeful"
+        }
+      ]
+    },
+    "hopeful": {
+      "speaker": "Hopeful",
+      "text": "Be of good courage. I feel the bottom.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

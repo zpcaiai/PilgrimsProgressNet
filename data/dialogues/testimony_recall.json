@@ -1,0 +1,58 @@
+{
+  "id": "testimony_recall",
+  "nodes": {
+    "start": {
+      "speaker": "Hopeful",
+      "text": "What do you remember most clearly?",
+      "choices": [
+        {
+          "id": "cross",
+          "text": "Tell Hopeful about the burden falling.",
+          "effects": {
+            "faith": 8,
+            "hope": 8,
+            "watchfulness": 5
+          },
+          "flags": {
+            "shared_testimony_with_hopeful": true,
+            "resisted_sleep": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "slough",
+          "text": "Tell Hopeful about the Slough.",
+          "effects": {
+            "humility": 8,
+            "hope": 5,
+            "despair": -5
+          },
+          "flags": {
+            "shared_testimony_with_hopeful": true,
+            "resisted_sleep": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "castle",
+          "text": "Tell Hopeful about Doubting Castle.",
+          "effects": {
+            "hope": 10,
+            "faith": 5,
+            "shame": -5
+          },
+          "flags": {
+            "shared_testimony_with_hopeful": true,
+            "resisted_sleep": true
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "promise_key",
+  "display_name": "Promise Key",
+  "type": "story_event",
+  "interaction_prompt": "Remember",
+  "trigger_spiritual_event": "promise_key_escape",
+  "set_flags_on_interact": {
+    "found_promise_key": true
+  }
+}

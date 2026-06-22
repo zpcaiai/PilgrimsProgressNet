@@ -1,0 +1,68 @@
+{
+  "id": "wilderness_city_voices",
+  "nodes": {
+    "start": {
+      "speaker": "A Voice on the Wind",
+      "speaker_zh": "风中的声音",
+      "text": "Pilgrim... the fields you knew are still green. Your chair is still warm by the fire. Why wear out your one life chasing a rumour of light?",
+      "text_zh": "朝圣者啊……你熟悉的田野依旧青翠，炉火旁你的椅子还是暖的。何苦耗尽你这一生，去追一个关于光的传闻？",
+      "choices": [
+        {
+          "id": "forward",
+          "text": "What I left was good — but it was not life. I have set my face to the road.",
+          "text_zh": "我所离开的是美好的——但那不是生命。我已定意面向这条路。",
+          "effects": { "faith": 5, "perseverance": 5, "fear": -3 },
+          "flags": { "resisted_city_voices": true },
+          "next": "silenced"
+        },
+        {
+          "id": "grieve",
+          "text": "I do miss it. God help me, I miss it — but missing is not the same as turning back.",
+          "text_zh": "我的确想念它。神帮助我，我想念它——但想念，并不等于回头。",
+          "effects": { "despair": 3, "perseverance": 3 },
+          "flags": { "resisted_city_voices": true },
+          "next": "ache"
+        },
+        {
+          "id": "linger",
+          "text": "Surely one look back can do no harm...",
+          "text_zh": "回头看一眼，总归不会有什么害处吧……",
+          "effects": { "fear": 4, "deception": 3, "hope": -2 },
+          "next": "tempted"
+        }
+      ]
+    },
+    "silenced": {
+      "speaker": "",
+      "text": "You do not answer it again. The wind thins, and the voice with it, until there is only the sound of your own steady steps.",
+      "text_zh": "你不再回应它。风渐渐稀薄，那声音也随之消散，最后只剩下你自己沉稳的脚步声。",
+      "choices": [
+        { "id": "go", "text": "(Walk on.)", "text_zh": "（继续前行。）", "next": "end" }
+      ]
+    },
+    "ache": {
+      "speaker": "",
+      "text": "The ache is real, and you let it be real. You carry it forward instead of turning back for it — and that, too, is faith.",
+      "text_zh": "那酸楚是真实的，你也任它真实。你带着它向前，而不为它回头——这，也是信心。",
+      "choices": [
+        { "id": "go", "text": "(Walk on, heavy but whole.)", "text_zh": "（继续走，沉重，却完整。）", "next": "end" }
+      ]
+    },
+    "tempted": {
+      "speaker": "",
+      "text": "You glance over your shoulder. The far glow of the city tugs at you — and you force yourself to face forward again before your feet can follow your eyes.",
+      "text_zh": "你回头望了一眼。那城远远的火光揪着你——你强迫自己重新面向前方，免得脚跟着眼睛走了。",
+      "choices": [
+        {
+          "id": "recover",
+          "text": "Forward. Always forward.",
+          "text_zh": "向前。一直向前。",
+          "effects": { "perseverance": 4, "fear": -2 },
+          "flags": { "resisted_city_voices": true },
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

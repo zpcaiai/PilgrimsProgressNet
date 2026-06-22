@@ -1,0 +1,9 @@
+{
+  "id": "scroll",
+  "display_name": "Scroll",
+  "type": "story_item",
+  "description": "Assurance received at the Cross.",
+  "visible_on_player": false,
+  "effects": {},
+  "special": {}
+}

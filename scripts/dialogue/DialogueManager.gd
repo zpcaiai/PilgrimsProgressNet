@@ -157,6 +157,11 @@ func _emit_current_node() -> void:
 	# Auto-apply node-level on_enter effects (optional).
 	if node.has("on_enter"):
 		SpiritualStateManager.apply_effects(node["on_enter"])
+	# Node-level flags: reaching a node reliably sets story flags even if the
+	# player leaves before picking a flag-bearing choice (prevents soft-locks).
+	if node.has("set_flags"):
+		for fk in (node["set_flags"] as Dictionary).keys():
+			GameState.set_flag(String(fk), node["set_flags"][fk])
 	node = _resolve_text_variant(node)
 	node = _localize_node(node)
 	EventBus.dialogue_node_changed.emit(node)

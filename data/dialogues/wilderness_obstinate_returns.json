@@ -1,0 +1,42 @@
+{
+  "id": "wilderness_obstinate_returns",
+  "nodes": {
+    "start": {
+      "speaker": "Obstinate",
+      "text": "Last chance. The city still has a bed for you.",
+      "choices": [
+        {
+          "id": "forward",
+          "text": "Forward is frightening, but backward is death.",
+          "effects": {
+            "faith": 5,
+            "perseverance": 5,
+            "fear": -3
+          },
+          "flags": {
+            "obstinate_left": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "miss",
+          "text": "I miss the city already.",
+          "effects": {
+            "despair": 5,
+            "fear": 5,
+            "hope": -3
+          },
+          "flags": {
+            "obstinate_left": true
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

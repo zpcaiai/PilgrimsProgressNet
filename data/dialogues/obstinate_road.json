@@ -3,72 +3,81 @@
   "nodes": {
     "start": {
       "speaker": "Obstinate",
-      "text": "Still walking? Look behind you: the city is near enough to return, and ahead there is nothing but mud, hunger, and sermons from strangers.",
+      "text": "So you really left. I came all this way to fetch you back. Look — the city is still in sight. One turn, and you sleep in your own bed tonight.",
+      "text_zh": "你当真走了。我大老远追来，就是要把你带回去。瞧——城还在眼前。回个头，今晚你就能睡回自己的床。",
       "choices": [
         {
           "id": "forward",
-          "text": "I will not return to a familiar ruin.",
-          "effects": {
-            "faith": 5,
-            "perseverance": 5,
-            "fear": -3
-          },
-          "flags": {
-            "obstinate_left": true
-          },
-          "next": "gives_up",
-          "text_zh": "我不会回到一座熟悉的废墟里去。"
+          "text": "I will not go back to a house that is burning.",
+          "text_zh": "我不会回到一座正在焚烧的屋子里去。",
+          "effects": { "faith": 5, "perseverance": 5, "fear": -3 },
+          "next": "gives_up"
+        },
+        {
+          "id": "book",
+          "text": "I follow what is written in the book. Will you not read it?",
+          "text_zh": "我跟随书上所写的。你不愿读一读吗？",
+          "next": "mock_book"
         },
         {
           "id": "doubt",
-          "text": "What if the light is only distance and wishful thinking?",
-          "effects": {
-            "fear": 5,
-            "despair": 5
-          },
-          "next": "press_doubt",
-          "text_zh": "万一那光只是距离和一厢情愿呢？"
+          "text": "And if the light ahead is only distance and wishful thinking?",
+          "text_zh": "万一前方那光只是距离和一厢情愿呢？",
+          "effects": { "fear": 4, "despair": 3 },
+          "next": "press_doubt"
         }
-      ],
-      "text_zh": "还在走？回头看看：那城近得还能折返，前头却只有泥泞、饥饿，和陌生人的说教。"
+      ]
+    },
+    "mock_book": {
+      "speaker": "Obstinate",
+      "text": "Your book! A bundle of another man's dreams. I left such fancies behind when I learned to live in the world as it actually is.",
+      "text_zh": "你那本书！不过是别人的一堆梦呓。当我学会照着世界本来的样子去活，就把这些幻想都丢下了。",
+      "choices": [
+        {
+          "id": "trust",
+          "text": "Then we are each content — I with my book, you with your world. I walk on.",
+          "text_zh": "那我们各得其所——我守着我的书，你守着你的世界。我继续走。",
+          "effects": { "faith": 6, "discernment": 4 },
+          "next": "gives_up"
+        },
+        {
+          "id": "waver",
+          "text": "Perhaps... perhaps you have lived more wisely than I.",
+          "text_zh": "也许……也许你活得比我更明智。",
+          "effects": { "deception": 3, "fear": 3 },
+          "next": "press_doubt"
+        }
+      ]
     },
     "press_doubt": {
       "speaker": "Obstinate",
-      "text": "Exactly. Nothing. Come home while you can still laugh at this tomorrow.",
+      "text": "Wishful thinking — exactly. There is nothing out here but mud and strangers' sermons. Come home while you can still laugh about it tomorrow.",
+      "text_zh": "一厢情愿——正是。这外头除了泥泞和陌生人的说教，什么都没有。趁你明天还笑得出来，回家吧。",
       "choices": [
         {
           "id": "still_go",
           "text": "No. Even trembling, I would rather seek the light than make peace with the fire.",
-          "effects": {
-            "faith": 6,
-            "hope": 4
-          },
-          "flags": {
-            "obstinate_left": true
-          },
-          "next": "gives_up",
-          "text_zh": "不。哪怕颤抖，我也宁愿寻那光，也不愿与那火言和。"
+          "text_zh": "不。哪怕颤抖，我也宁愿寻那光，也不愿与那火言和。",
+          "effects": { "faith": 6, "hope": 4, "fear": -2 },
+          "next": "gives_up"
         }
-      ],
-      "text_zh": "正是。什么都没有。趁你明天还笑得出来，回家吧。"
+      ]
     },
     "gives_up": {
       "speaker": "Obstinate",
-      "text": "Then keep your burden and your little light. I am done following sorrow.",
+      "text": "Then keep your burden and your little light. I am done chasing a fool toward his sorrow.",
+      "text_zh": "那就留着你的重担和你那点微光吧。我不再追着一个傻子奔他的愁苦了。",
+      "set_flags": { "obstinate_left": true },
       "choices": [
         {
           "id": "ok",
-          "text": "Walk on alone.",
-          "next": "end",
-          "text_zh": "独自前行。"
+          "text": "(Watch him turn back toward the city, and walk on alone.)",
+          "text_zh": "（看着他转身回城，独自前行。）",
+          "effects": { "perseverance": 3 },
+          "next": "end"
         }
-      ],
-      "text_zh": "那就留着你的重担和你那点微光吧。我不奉陪愁苦了。"
+      ]
     },
-    "end": {
-      "speaker": "",
-      "text": "",
-      "end": true
-    }
+    "end": { "speaker": "", "text": "", "end": true }
   }
 }

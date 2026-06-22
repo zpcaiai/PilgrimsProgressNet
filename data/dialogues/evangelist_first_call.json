@@ -120,6 +120,7 @@
     },
     "point_light": {
       "speaker": "Evangelist",
+      "set_flags": { "talked_to_evangelist": true },
       "text": "Look there, beyond the eastern gate. Do you see the small light? Fix your eyes on it. Walk to the Wicket Gate. Knock, and do not argue with mercy before it opens.",
       "choices": [
         {

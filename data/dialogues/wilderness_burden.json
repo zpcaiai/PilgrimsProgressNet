@@ -1,0 +1,54 @@
+{
+  "id": "wilderness_burden",
+  "nodes": {
+    "start": {
+      "speaker": "",
+      "text": "The bundle on your back pulls heavier where the road climbs. A worn stone sits beside the path, smoothed by others who stopped here before you.",
+      "text_zh": "路一爬高，背上的包袱就坠得更沉。路旁有一块磨损的石头，被一个个曾在此停留的人磨得光滑。",
+      "choices": [
+        {
+          "id": "pray",
+          "text": "Lean on the stone and pray for strength to carry it to the place of deliverance.",
+          "text_zh": "靠着石头，祈求力量，好把它一直背到得释放的地方。",
+          "effects": { "perseverance": 6, "hope": 4, "weariness": -5 },
+          "flags": { "steadied_burden": true },
+          "next": "prayed"
+        },
+        {
+          "id": "press",
+          "text": "No time to sit — press on, and try to outwalk the ache.",
+          "text_zh": "没工夫坐下——继续走，想把这酸痛甩在身后。",
+          "effects": { "weariness": 4, "perseverance": 2 },
+          "next": "pressed"
+        }
+      ]
+    },
+    "prayed": {
+      "speaker": "",
+      "text": "You cannot be rid of it yet — that release waits at a Cross you have not yet seen. But you can carry it faithfully. You rise a little steadier, and the weight feels strangely shared.",
+      "text_zh": "你还不能卸下它——那释放，要等到你尚未见过的一座十字架前。但你能忠心地背着它。你起身时稳了几分，那重担竟仿佛有人同担。",
+      "choices": [
+        {
+          "id": "go",
+          "text": "(Settle the bundle, and walk on.)",
+          "text_zh": "（把包袱挪正，继续前行。）",
+          "next": "end"
+        }
+      ]
+    },
+    "pressed": {
+      "speaker": "",
+      "text": "You push past the stone without stopping. The weight stays, and so does the ache — but at least the road behind you grows longer.",
+      "text_zh": "你不停步，越过那石头。重担还在，酸痛也还在——但至少，身后的路在加长。",
+      "choices": [
+        {
+          "id": "go2",
+          "text": "(Walk on, breathing hard.)",
+          "text_zh": "（喘着气，继续走。）",
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

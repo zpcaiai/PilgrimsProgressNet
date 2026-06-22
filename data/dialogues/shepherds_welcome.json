@@ -1,0 +1,52 @@
+{
+  "id": "shepherds_welcome",
+  "nodes": {
+    "start": {
+      "speaker": "Shepherd Knowledge",
+      "text": "Vision is mercy when the road has narrowed your sight.",
+      "choices": [
+        {
+          "id": "look",
+          "text": "Look long toward the city.",
+          "effects": {
+            "hope": 15,
+            "faith": 5
+          },
+          "flags": {
+            "met_shepherds": true,
+            "saw_celestial_city_from_mountains": true
+          },
+          "next": "warning"
+        },
+        {
+          "id": "ask",
+          "text": "Ask Hopeful what he sees.",
+          "effects": {
+            "hope": 10,
+            "humility": 5
+          },
+          "flags": {
+            "met_shepherds": true,
+            "saw_celestial_city_from_mountains": true
+          },
+          "next": "hopeful"
+        }
+      ]
+    },
+    "hopeful": {
+      "speaker": "Hopeful",
+      "text": "After the castle, even green hills feel unbelievable.",
+      "next": "warning"
+    },
+    "warning": {
+      "speaker": "Shepherd Watchful",
+      "text": "The next ground is not violent. That is why it is dangerous.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

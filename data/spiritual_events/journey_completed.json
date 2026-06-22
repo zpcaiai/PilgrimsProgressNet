@@ -1,0 +1,22 @@
+{
+  "id": "journey_completed",
+  "title": "Journey Completed",
+  "trigger": "enter_celestial_city",
+  "effects": {
+    "faith": 100,
+    "hope": 100,
+    "fear": -100,
+    "despair": -100,
+    "shame": -100,
+    "weariness": -100
+  },
+  "special": {
+    "grant_final_seal": true,
+    "show_journey_review": true,
+    "show_credits": true
+  },
+  "flags": {
+    "entered_celestial_city": true,
+    "journey_completed": true
+  }
+}

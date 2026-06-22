@@ -1,0 +1,11 @@
+{
+  "id": "vanity_applause_zone",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "temptation_zone",
+  "vanity_pressure_delta": 5,
+  "effects_per_tick": {
+    "pride": 2,
+    "deception": 1
+  }
+}

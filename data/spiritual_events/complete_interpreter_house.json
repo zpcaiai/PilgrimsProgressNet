@@ -1,0 +1,21 @@
+{
+  "id": "complete_interpreter_house",
+  "title": "Rooms Understood",
+  "trigger": "all_interpreter_rooms_complete",
+  "conditions": {
+    "required_flags": [
+      "saw_dust_room",
+      "saw_fire_wall",
+      "saw_cage_vision",
+      "saw_narrow_room"
+    ]
+  },
+  "effects": {
+    "discernment": 15,
+    "watchfulness": 10,
+    "humility": 5
+  },
+  "flags": {
+    "completed_interpreter_house": true
+  }
+}

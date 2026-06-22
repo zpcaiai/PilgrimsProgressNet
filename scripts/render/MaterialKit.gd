@@ -25,6 +25,8 @@ const SURFACES := {
 	"sand": {"color": Color(0.71, 0.62, 0.44), "rough": 0.96, "uv_scale": 0.7, "triplanar": true},
 	"wood": {"color": Color(0.45, 0.31, 0.19), "rough": 0.78, "uv_scale": 0.6},
 	"bark": {"color": Color(0.31, 0.23, 0.17), "rough": 0.93, "uv_scale": 0.8, "triplanar": true},
+	"brick": {"color": Color(0.95, 0.90, 0.88), "rough": 0.9, "uv_scale": 0.7, "triplanar": true},
+	"rooftile": {"color": Color(0.96, 0.92, 0.90), "rough": 0.86, "uv_scale": 1.0, "triplanar": true},
 	"ash": {"color": Color(0.22, 0.21, 0.22), "rough": 0.95, "uv_scale": 0.6, "triplanar": true},
 	"cloth": {"color": Color(0.5, 0.3, 0.3), "rough": 0.95, "uv_scale": 0.7},
 	"foliage": {"color": Color(0.3, 0.5, 0.25), "rough": 0.9, "foliage": true, "uv_scale": 1.0},

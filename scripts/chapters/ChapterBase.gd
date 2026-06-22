@@ -485,28 +485,10 @@ func make_npc(npc_name: String, pos: Vector3, color: Color, dialogue_id: String 
 	area.name = npc_name
 	area.position = pos
 	area.prompt = prompt if prompt != "" else "Talk to " + npc_name
-	# Visual: a billboard of the character's painted figure when available, else
-	# the procedural capsule + head greybox.
-	var fig := AssetLib.figure(npc_name)
-	if fig != null:
-		area.add_child(CharacterBillboard.make(fig, 2.0))
-	else:
-		var mesh := MeshInstance3D.new()
-		var capsule := CapsuleMesh.new()
-		capsule.radius = 0.4
-		capsule.height = 1.6
-		mesh.mesh = capsule
-		mesh.position = Vector3(0, 0.9, 0)
-		mesh.material_override = make_material(color)
-		area.add_child(mesh)
-		var head := MeshInstance3D.new()
-		var sphere := SphereMesh.new()
-		sphere.radius = 0.28
-		sphere.height = 0.56
-		head.mesh = sphere
-		head.position = Vector3(0, 1.85, 0)
-		head.material_override = make_material(color.lightened(0.2))
-		area.add_child(head)
+	# Visual: a real in-engine 3D body, tinted by the character's palette (with
+	# `color` as the fallback garment tint for un-tabled folk). Standing NPCs
+	# idle in place (no mover).
+	area.add_child(HumanoidFigure.make(npc_name, 2.0, null, true, color))
 	# Floating name
 	var label := Label3D.new()
 	label.text = npc_name
@@ -527,7 +509,14 @@ func make_npc(npc_name: String, pos: Vector3, color: Color, dialogue_id: String 
 	if on_interact.is_valid():
 		area.interact_callback = on_interact
 	elif dialogue_id != "":
-		area.interact_callback = func(_p): DialogueManager.start_dialogue(dialogue_id)
+		area.interact_callback = func(_p):
+			# Face-on-talk: pilgrim turns to the NPC, the NPC gives a small nod.
+			if _p != null and is_instance_valid(_p) and _p.has_method("glance_toward"):
+				_p.call("glance_toward", area.global_position)
+			var anim := HumanoidAnimator.find_in(area)
+			if anim != null:
+				anim.nudge(0.07)
+			DialogueManager.start_dialogue(dialogue_id)
 	add_child(area)
 	return area
 

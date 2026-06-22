@@ -1,0 +1,15 @@
+{
+  "id": "survive_shadow_valley",
+  "title": "Survived the Dark Valley",
+  "trigger": "shadow_valley_exit",
+  "effects": {
+    "watchfulness": 15,
+    "faith": 10,
+    "fear": -20,
+    "perseverance": 10
+  },
+  "flags": {
+    "survived_shadow_valley": true,
+    "completed_vertical_slice": true
+  }
+}

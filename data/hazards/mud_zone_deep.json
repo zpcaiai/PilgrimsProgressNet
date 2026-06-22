@@ -1,0 +1,15 @@
+{
+  "id": "mud_zone_deep",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "mud",
+  "movement_multiplier": 0.45,
+  "effects_per_tick": {
+    "despair": 2,
+    "fear": 1,
+    "hope": -1
+  },
+  "collapse_threshold": {
+    "despair": 100
+  }
+}

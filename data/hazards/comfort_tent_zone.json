@@ -1,0 +1,11 @@
+{
+  "id": "comfort_tent_zone",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "temptation_zone",
+  "effects_per_tick": {
+    "weariness": -2,
+    "watchfulness": -2,
+    "deception": 1
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "pliable_in_wilderness",
+  "nodes": {
+    "start": {
+      "speaker": "Pliable",
+      "text": "Tell me again of the city ahead. Is it bright?",
+      "choices": [
+        {
+          "id": "hard",
+          "text": "The promise is great, but the road may be hard.",
+          "effects": {
+            "discernment": 3,
+            "humility": 3
+          },
+          "next": "reward"
+        },
+        {
+          "id": "reward",
+          "text": "Think only of the reward.",
+          "effects": {
+            "hope": 3,
+            "deception": 3
+          },
+          "next": "reward"
+        }
+      ]
+    },
+    "reward": {
+      "speaker": "Pliable",
+      "text": "Then I will think of the reward. That is easier than the road.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "palace_rest",
+  "title": "Rested at Palace Beautiful",
+  "trigger": "rest_at_palace",
+  "effects": {
+    "weariness": -30,
+    "fear": -10,
+    "despair": -10,
+    "hope": 10
+  },
+  "flags": {
+    "rested_at_palace": true
+  }
+}

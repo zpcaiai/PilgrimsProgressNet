@@ -9,6 +9,8 @@ var companion_name: String = "Hopeful"
 var _player: Node3D = null
 var _timer: float = 0.0
 var _offset: Vector3 = Vector3(1.6, 0, 2.2)
+var _fig: Node3D
+var _prev_pos: Vector3 = Vector3.ZERO
 
 const LINES := [
 	"Hopeful: \"Be of good cheer. The City stands, though clouds hide it.\"",
@@ -21,21 +23,10 @@ const LINES := [
 func setup(display_name: String = "Hopeful", color: Color = Color(0.6, 0.8, 0.7)) -> void:
 	companion_name = display_name
 	add_to_group("companion")
-	# Painted figure billboard when available; else the greybox capsule.
-	var fig := AssetLib.figure(display_name)
-	if fig != null:
-		add_child(CharacterBillboard.make(fig, 1.9))
-	else:
-		var mesh := MeshInstance3D.new()
-		var capsule := CapsuleMesh.new()
-		capsule.radius = 0.38
-		capsule.height = 1.5
-		mesh.mesh = capsule
-		mesh.position = Vector3(0, 0.85, 0)
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = color
-		mesh.material_override = mat
-		add_child(mesh)
+	# A real in-engine 3D body that walks on two legs beside you. `self` is the
+	# mover whose motion drives the walk cycle (HumanoidAnimator).
+	_fig = HumanoidFigure.make(display_name, 1.9, self, true, color)
+	add_child(_fig)
 	var label := Label3D.new()
 	label.text = companion_name
 	label.position = Vector3(0, 2.1, 0)
@@ -50,6 +41,7 @@ func _ready() -> void:
 	if players.size() > 0:
 		_player = players[0]
 		global_position = _player.global_position + _offset
+	_prev_pos = global_position
 
 
 func _process(delta: float) -> void:
@@ -57,6 +49,8 @@ func _process(delta: float) -> void:
 		return
 	var target := _player.global_position + _offset
 	global_position = global_position.lerp(target, clampf(delta * 3.0, 0.0, 1.0))
+	_face_travel(global_position - _prev_pos, delta)
+	_prev_pos = global_position
 
 	_timer += delta
 	if _timer >= 7.0:
@@ -64,3 +58,14 @@ func _process(delta: float) -> void:
 		if SpiritualStateManager.despair > 55 or SpiritualStateManager.fear > 55 or SpiritualStateManager.weariness > 60:
 			SpiritualStateManager.apply_effects({"despair": -6, "fear": -4, "hope": 4})
 			EventBus.toast(LINES[randi() % LINES.size()])
+
+
+## Turn the 3D body to face its travel direction, so it strides forward and
+## shows its back (and the back of its head) when walking away from the camera.
+func _face_travel(moved: Vector3, delta: float) -> void:
+	if not is_instance_valid(_fig):
+		return
+	if Vector2(moved.x, moved.z).length() < 0.002:
+		return
+	var target_yaw := atan2(moved.x, moved.z)
+	_fig.rotation.y = lerp_angle(_fig.rotation.y, target_yaw, clampf(delta * 10.0, 0.0, 1.0))

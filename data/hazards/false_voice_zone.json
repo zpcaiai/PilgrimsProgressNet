@@ -1,0 +1,10 @@
+{
+  "id": "false_voice_zone",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "fear_zone",
+  "effects_per_tick": {
+    "deception": 2,
+    "fear": 2
+  }
+}

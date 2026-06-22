@@ -1,0 +1,10 @@
+{
+  "id": "despair_flame_zone",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "despair_zone",
+  "effects_per_tick": {
+    "despair": 3,
+    "fear": 2
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "shadow_fear_zone",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "fear_zone",
+  "effects_per_tick": {
+    "fear": 2,
+    "hope": -1
+  }
+}

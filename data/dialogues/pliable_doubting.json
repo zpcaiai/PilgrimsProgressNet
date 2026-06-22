@@ -3,50 +3,83 @@
   "nodes": {
     "start": {
       "speaker": "Pliable",
-      "text": "Tell me again about the crowns, the music, and the golden city. I do hope the road stays open and bright like this.",
+      "text": "Well, he's gone back — more fool him! Now, tell me again about the place we're bound for. The crowns, the music, the golden streets. Is it all really ours just for the walking?",
+      "text_zh": "好啦，他回去了——真是个傻瓜！来，再跟我讲讲我们要去的那地方吧。那些冠冕、那音乐、那金色的街道。只要走到了，就真的都归我们吗？",
       "choices": [
         {
           "id": "honest",
-          "text": "The reward is real, but the road is not a tale told to flatter us.",
-          "effects": {
-            "discernment": 4,
-            "humility": 3
-          },
-          "flags": {
-            "pliable_warned": true
-          },
-          "next": "uneasy",
-          "text_zh": "那赏赐是真的，但这路不是一则讨好我们的故事。"
+          "text": "The reward is real and endless — but the way to it is hard, and no tale told to flatter us.",
+          "text_zh": "那赏赐是真实而无尽的——但通往它的路很难，绝不是一则讨好我们的故事。",
+          "effects": { "discernment": 4, "humility": 3 },
+          "flags": { "pliable_warned": true },
+          "next": "uneasy"
+        },
+        {
+          "id": "glory",
+          "text": "There is a kingdom that does not fade, and a life that never ends. The book promises it.",
+          "text_zh": "那里有不衰残的国度，有永不止息的生命。书上是这样应许的。",
+          "effects": { "hope": 3 },
+          "next": "glory"
         },
         {
           "id": "flatter",
-          "text": "Stay close, and we will face the road as it comes.",
-          "effects": {
-            "hope": 3
-          },
-          "next": "uneasy",
-          "text_zh": "靠紧些，这路来什么，我们就一同面对。"
+          "text": "Stay close to me, and you'll see it for yourself.",
+          "text_zh": "紧跟着我，你就会亲眼看见。",
+          "effects": { "hope": 2 },
+          "next": "eager"
         }
-      ],
-      "text_zh": "再跟我说说那些冠冕、那音乐、那金色的城吧。我真盼这路能一直这样敞亮。"
+      ]
+    },
+    "glory": {
+      "speaker": "Pliable",
+      "text": "Oh, this is excellent! My heart could burst. Come, let us mend our pace — I can hardly wait to be there!",
+      "text_zh": "哦，这太美妙了！我的心都要炸开了。来，我们加快脚步吧——我都等不及要到那儿了！",
+      "choices": [
+        {
+          "id": "but_hard",
+          "text": "Gladly — but steady your feet. The nearest ground is not the easiest.",
+          "text_zh": "好极了——但站稳你的脚。最近的这段路，并不是最好走的。",
+          "effects": { "discernment": 3, "watchfulness": 2 },
+          "flags": { "pliable_warned": true },
+          "next": "uneasy"
+        },
+        {
+          "id": "run",
+          "text": "Then run, friend — let joy carry us both!",
+          "text_zh": "那就跑吧，朋友——让喜乐带着我们俩！",
+          "effects": { "hope": 3 },
+          "next": "eager"
+        }
+      ]
     },
     "uneasy": {
       "speaker": "Pliable",
-      "text": "Not a tale? Hard? Well... let us hurry through the unpleasant parts, then.",
+      "text": "Hard? You did not say hard. Well... then let us hurry through the unpleasant parts, and think only of the good that comes after.",
+      "text_zh": "难？你可没说过难。好吧……那我们就快些穿过那些不愉快的部分，单想着随后而来的好处。",
+      "set_flags": { "spoke_with_pliable": true },
       "choices": [
         {
           "id": "ok",
-          "text": "Keep walking toward the swamp.",
-          "next": "end",
-          "text_zh": "继续朝泥沼走去。"
+          "text": "Keep your eyes open as well as your hopes, and walk on.",
+          "text_zh": "盼望要睁着眼，脚步也要睁着眼——继续走吧。",
+          "next": "end"
         }
-      ],
-      "text_zh": "不是故事？很难？好吧……那我们就快些穿过那些不愉快的部分。"
+      ]
     },
-    "end": {
-      "speaker": "",
-      "text": "",
-      "end": true
-    }
+    "eager": {
+      "speaker": "Pliable",
+      "text": "I think only of the end! Whatever lies between, surely it cannot be much. Lead on — quickly, quickly!",
+      "text_zh": "我只想着那结局！无论中间有什么，总不至于太难。带路吧——快些，快些！",
+      "set_flags": { "spoke_with_pliable": true, "pliable_shallow": true },
+      "choices": [
+        {
+          "id": "ok2",
+          "text": "(He skips ahead, eyes on the horizon, watching nothing underfoot.)",
+          "text_zh": "（他蹦跳着抢到前头，眼盯着天边，却全不看脚下。）",
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
   }
 }

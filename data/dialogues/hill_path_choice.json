@@ -1,0 +1,71 @@
+{
+  "id": "hill_path_choice",
+  "nodes": {
+    "start": {
+      "speaker": "",
+      "text": "Three roads meet at the hill: one steep, one easy, one wide.",
+      "choices": [
+        {
+          "id": "difficulty",
+          "text": "Take the Difficulty path.",
+          "effects": {
+            "perseverance": 10,
+            "faith": 5,
+            "weariness": 5
+          },
+          "flags": {
+            "chose_difficulty_path": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "danger",
+          "text": "Take the flatter path marked Danger.",
+          "effects": {
+            "deception": 10,
+            "discernment": -5
+          },
+          "flags": {
+            "entered_false_path_danger": true
+          },
+          "next": "false_path"
+        },
+        {
+          "id": "destruction",
+          "text": "Take the wide path marked Destruction.",
+          "effects": {
+            "pride": 5,
+            "deception": 10
+          },
+          "flags": {
+            "entered_false_path_destruction": true
+          },
+          "next": "false_path"
+        }
+      ]
+    },
+    "false_path": {
+      "speaker": "",
+      "text": "The easy road bends away from the light.",
+      "choices": [
+        {
+          "id": "return",
+          "text": "Return to the hard path.",
+          "effects": {
+            "humility": 5,
+            "deception": -5
+          },
+          "flags": {
+            "chose_difficulty_path": true
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

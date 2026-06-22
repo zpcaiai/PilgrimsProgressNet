@@ -1,0 +1,55 @@
+{
+  "id": "receive_armor",
+  "nodes": {
+    "start": {
+      "speaker": "Watchman",
+      "text": "The valley below is not empty. Take what is given.",
+      "choices": [
+        {
+          "id": "thanks",
+          "text": "Receive the armor with thanks.",
+          "effects": {
+            "humility": 5,
+            "faith": 5
+          },
+          "flags": {
+            "received_armor": true
+          },
+          "special": {
+            "grant_armor": true,
+            "grant_sword": true,
+            "grant_shield": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "ask",
+          "text": "Ask why armor is needed.",
+          "effects": {
+            "discernment": 5,
+            "watchfulness": 5
+          },
+          "flags": {
+            "received_armor": true
+          },
+          "special": {
+            "grant_armor": true,
+            "grant_sword": true,
+            "grant_shield": true
+          },
+          "next": "answer"
+        }
+      ]
+    },
+    "answer": {
+      "speaker": "Watchman",
+      "text": "Because some enemies speak before they strike.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

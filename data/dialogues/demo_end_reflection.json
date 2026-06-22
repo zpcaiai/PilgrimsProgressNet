@@ -1,0 +1,24 @@
+{
+  "id": "demo_end_reflection",
+  "nodes": {
+    "start": {
+      "speaker": "",
+      "text": "Your burden has fallen. The road continues beyond the hill.",
+      "choices": [
+        {
+          "id": "go",
+          "text": "Walk on.",
+          "effects": {
+            "hope": 5
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

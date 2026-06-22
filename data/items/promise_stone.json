@@ -1,0 +1,9 @@
+{
+  "id": "promise_stone",
+  "display_name": "Promise Stone",
+  "type": "consumable_interactable",
+  "description": "A stone bearing a line of hope; single use.",
+  "visible_on_player": false,
+  "effects": {},
+  "special": {}
+}

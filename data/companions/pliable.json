@@ -1,0 +1,13 @@
+{
+  "id": "pliable",
+  "display_name": "Pliable",
+  "type": "companion",
+  "join_flag": "pliable_joined",
+  "leave_flag": "pliable_left",
+  "special_state": "walked_with_pliable",
+  "core_effects": {},
+  "abilities": [
+    "shallow_enthusiasm"
+  ],
+  "interventions": []
+}

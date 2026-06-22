@@ -1,0 +1,18 @@
+{
+  "id": "promise_key_escape",
+  "title": "Escaped by Promise",
+  "trigger": "use_promise_key",
+  "effects": {
+    "faith": 10,
+    "hope": 15,
+    "despair": -30,
+    "shame": -20
+  },
+  "special": {
+    "grant_promise_key": true
+  },
+  "flags": {
+    "found_promise_key": true,
+    "escaped_doubting_castle": true
+  }
+}

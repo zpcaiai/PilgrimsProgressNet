@@ -1,0 +1,9 @@
+{
+  "id": "armor",
+  "display_name": "Armor",
+  "type": "equipment",
+  "description": "Preparation for accusation, fear, and conflict.",
+  "visible_on_player": true,
+  "effects": {},
+  "special": {}
+}

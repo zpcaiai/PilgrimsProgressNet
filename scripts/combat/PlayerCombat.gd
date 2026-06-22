@@ -64,6 +64,9 @@ func take_hit(effects: Dictionary, _source_type: String) -> void:
 		magnitude *= 0.5
 	resolve -= magnitude
 	_regen_block = 1.2
+	if magnitude > 0.0:
+		Juice.shake(clampf(magnitude * 0.03, 0.12, 0.6))
+		Juice.flash(Color(0.92, 0.18, 0.18, clampf(magnitude * 0.010, 0.05, 0.26)), 0.28)
 	if resolve <= 0.0:
 		resolve = 0.0
 		_stagger()
@@ -75,6 +78,9 @@ func _stagger() -> void:
 	# Despair surges; if it reaches 100 the collapse/repentance flow fires.
 	SpiritualStateManager.modify_state("despair", 20)
 	resolve = max_resolve * 0.4
+	Juice.shake(0.9)
+	Juice.hitstop(0.12)
+	Juice.flash(Color(0.55, 0.1, 0.5, 0.35), 0.5)
 
 
 # --- Actions ---
@@ -94,6 +100,7 @@ func light_attack() -> void:
 	var e := _nearest_enemy(3.0)
 	if e:
 		e.receive_counter("light_attack", 12.0)
+		Juice.shake(0.18)
 		EventBus.toast("You strike at the shadow, but truth must finish the work.")
 
 
@@ -117,6 +124,9 @@ func use_promise() -> void:
 	var e := _nearest_enemy(8.0)
 	if e:
 		e.receive_counter("promise", 30.0)
+		Juice.shake(0.45)
+		Juice.hitstop(0.07)
+		Juice.flash(Color(1.0, 0.95, 0.72, 0.18), 0.3)
 		match e.enemy_type:
 			"shame": SpiritualStateManager.apply_effects({"shame": -20, "faith": 5})
 			"despair": SpiritualStateManager.apply_effects({"despair": -25, "hope": 5})
@@ -133,6 +143,8 @@ func pray() -> void:
 	prayer_cooldown = PRAYER_CD
 	SpiritualStateManager.apply_effects({"fear": -10, "despair": -10, "hope": 5})
 	_prayer_flash()
+	Juice.shake(0.22)
+	Juice.flash(Color(1.0, 0.96, 0.72, 0.16), 0.35)
 	# Push nearby enemies back and weaken them slightly.
 	for e in get_tree().get_nodes_in_group("enemy"):
 		var foe := e as SymbolicEnemy

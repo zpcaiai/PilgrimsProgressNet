@@ -1,0 +1,13 @@
+{
+  "id": "faithful_witness_event",
+  "title": "Faithful's Witness",
+  "trigger": "vanity_trial",
+  "effects": {
+    "faith": 10,
+    "perseverance": 8
+  },
+  "flags": {
+    "faithful_witnessed": true,
+    "faithful_lost": true
+  }
+}

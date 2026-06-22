@@ -1,0 +1,68 @@
+{
+  "id": "apollyon_intro",
+  "nodes": {
+    "start": {
+      "speaker": "Apollyon",
+      "text": "You fled the city, but you did not cease to be mine.",
+      "choices": [
+        {
+          "id": "cross",
+          "text": "I was burdened, but the burden fell.",
+          "effects": {
+            "faith": 8,
+            "shame": -5
+          },
+          "flags": {
+            "apollyon_encountered": true
+          },
+          "next": "threat"
+        },
+        {
+          "id": "fear",
+          "text": "I am afraid of you.",
+          "effects": {
+            "fear": 8,
+            "humility": 3
+          },
+          "flags": {
+            "apollyon_encountered": true
+          },
+          "next": "threat"
+        },
+        {
+          "id": "pride",
+          "text": "I can defeat you easily.",
+          "effects": {
+            "pride": 10,
+            "watchfulness": -5
+          },
+          "flags": {
+            "apollyon_encountered": true
+          },
+          "next": "mock"
+        }
+      ]
+    },
+    "threat": {
+      "speaker": "Apollyon",
+      "text": "Then stand, if you can remember what you claim.",
+      "special": {
+        "start_boss": "apollyon"
+      },
+      "next": "end"
+    },
+    "mock": {
+      "speaker": "Apollyon",
+      "text": "Pride is a loose strap on borrowed armor.",
+      "special": {
+        "start_boss": "apollyon"
+      },
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

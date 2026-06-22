@@ -1,0 +1,11 @@
+{
+  "id": "despair_cell_zone",
+  "tick_interval": 5.0,
+  "nonlethal": true,
+  "type": "despair_zone",
+  "effects_per_tick": {
+    "despair": 2,
+    "shame": 1,
+    "hope": -1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "seal",
+  "display_name": "Seal",
+  "type": "story_item",
+  "description": "A mark of belonging set on the forehead.",
+  "visible_on_player": false,
+  "effects": {},
+  "special": {}
+}

@@ -2,15 +2,12 @@ extends Node3D
 class_name ExitPortal
 ## A vivid, animated chapter-exit portal so the way onward is unmistakable:
 ## a slowly spinning ground ring, a soft vertical light-beam, rising motes
-## (CPUParticles3D -- web/gl_compatibility safe), a gently pulsing glow, and a
-## floating bilingual "Proceed" label. Purely cosmetic; the actual transition is
-## handled by the ChapterExitTrigger placed at the same spot.
-
-const FONT_PATH := "res://assets/fonts/NotoSansCJKsc-Subset.otf"
+## (CPUParticles3D -- web/gl_compatibility safe), and a gently pulsing glow.
+## Purely cosmetic; the actual transition is handled by the ChapterExitTrigger
+## placed at the same spot.
 
 var _ring: MeshInstance3D
 var _lamp: OmniLight3D
-var _label: Label3D
 var _t := 0.0
 
 
@@ -93,22 +90,6 @@ func _ready() -> void:
 	add_child(_lamp)
 	_lamp.position = Vector3(0, 2.0, 0)
 
-	# Floating bilingual label.
-	_label = Label3D.new()
-	_label.text = "前往下一章 ▶ Proceed"
-	_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	_label.modulate = Color(0.9, 0.96, 1.0)
-	_label.outline_modulate = Color(0.0, 0.05, 0.12, 0.85)
-	_label.outline_size = 10
-	_label.font_size = 56
-	_label.pixel_size = 0.011
-	_label.no_depth_test = true
-	_label.fixed_size = false
-	if ResourceLoader.exists(FONT_PATH):
-		_label.font = load(FONT_PATH)
-	add_child(_label)
-	_label.position = Vector3(0, 3.4, 0)
-
 
 func _process(delta: float) -> void:
 	_t += delta
@@ -116,5 +97,3 @@ func _process(delta: float) -> void:
 		_ring.rotate_y(delta * 1.1)
 	if is_instance_valid(_lamp):
 		_lamp.light_energy = 2.1 + sin(_t * 3.0) * 0.9
-	if is_instance_valid(_label):
-		_label.position.y = 3.4 + sin(_t * 1.6) * 0.12

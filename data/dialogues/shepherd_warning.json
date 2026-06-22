@@ -1,0 +1,53 @@
+{
+  "id": "shepherd_warning",
+  "nodes": {
+    "start": {
+      "speaker": "Shepherd Watchful",
+      "text": "Sleep will not attack you. It will invite you.",
+      "choices": [
+        {
+          "id": "serious",
+          "text": "Receive the warning seriously.",
+          "effects": {
+            "watchfulness": 10,
+            "discernment": 5
+          },
+          "flags": {
+            "received_shepherd_warning": true,
+            "has_shepherd_map": true
+          },
+          "special": {
+            "grant_shepherd_map": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "proud",
+          "text": "We have survived worse.",
+          "effects": {
+            "pride": 8,
+            "watchfulness": -5
+          },
+          "flags": {
+            "received_shepherd_warning": true,
+            "has_shepherd_map": true
+          },
+          "special": {
+            "grant_shepherd_map": true
+          },
+          "next": "gentle"
+        }
+      ]
+    },
+    "gentle": {
+      "speaker": "Shepherd Experience",
+      "text": "Past victories cannot keep watch for you.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

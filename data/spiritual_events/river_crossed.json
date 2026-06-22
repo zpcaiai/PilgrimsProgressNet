@@ -1,0 +1,16 @@
+{
+  "id": "river_crossed",
+  "title": "The River Crossed",
+  "trigger": "river_exit",
+  "effects": {
+    "faith": 20,
+    "hope": 20,
+    "fear": -100,
+    "despair": -100,
+    "shame": -100,
+    "weariness": -100
+  },
+  "flags": {
+    "crossed_river": true
+  }
+}

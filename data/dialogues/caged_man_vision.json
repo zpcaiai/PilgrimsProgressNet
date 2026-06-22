@@ -1,0 +1,51 @@
+{
+  "id": "caged_man_vision",
+  "nodes": {
+    "start": {
+      "speaker": "",
+      "text": "A figure sits behind iron bars. The room grows colder as you look.",
+      "choices": [
+        {
+          "id": "look_away",
+          "text": "Look away quickly.",
+          "effects": {
+            "fear": 5
+          },
+          "next": "end"
+        },
+        {
+          "id": "listen",
+          "text": "Stay and listen.",
+          "effects": {
+            "discernment": 8,
+            "watchfulness": 5,
+            "fear": 3
+          },
+          "flags": {
+            "saw_cage_vision": true
+          },
+          "next": "warning"
+        },
+        {
+          "id": "never",
+          "text": "This could never happen to me.",
+          "effects": {
+            "pride": 10,
+            "deception": 5
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "warning": {
+      "speaker": "Caged Figure",
+      "text": "Small doors become locked rooms when ignored long enough.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

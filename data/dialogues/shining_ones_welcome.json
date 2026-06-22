@@ -1,0 +1,50 @@
+{
+  "id": "shining_ones_welcome",
+  "nodes": {
+    "start": {
+      "speaker": "Shining One",
+      "text": "The river is behind you.",
+      "choices": [
+        {
+          "id": "hopeful",
+          "text": "Look to Hopeful.",
+          "effects": {
+            "hope": 5,
+            "humility": 5
+          },
+          "flags": {
+            "welcomed_by_shining_ones": true
+          },
+          "next": "hopeful"
+        },
+        {
+          "id": "gate",
+          "text": "Look toward the gate.",
+          "effects": {
+            "faith": 5,
+            "hope": 5
+          },
+          "flags": {
+            "welcomed_by_shining_ones": true
+          },
+          "next": "gate"
+        }
+      ]
+    },
+    "hopeful": {
+      "speaker": "Hopeful",
+      "text": "We have crossed.",
+      "next": "gate"
+    },
+    "gate": {
+      "speaker": "Shining One",
+      "text": "What was promised is now before you.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

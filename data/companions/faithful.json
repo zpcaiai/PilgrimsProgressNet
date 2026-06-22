@@ -1,0 +1,13 @@
+{
+  "id": "faithful",
+  "display_name": "Faithful",
+  "type": "companion",
+  "join_flag": "faithful_witnessed",
+  "leave_flag": "faithful_lost",
+  "special_state": "remembered_faithful",
+  "core_effects": {},
+  "abilities": [
+    "witness_at_vanity"
+  ],
+  "interventions": []
+}

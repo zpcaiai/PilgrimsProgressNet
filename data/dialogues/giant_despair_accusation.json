@@ -1,0 +1,35 @@
+{
+  "id": "giant_despair_accusation",
+  "nodes": {
+    "start": {
+      "speaker": "Giant Despair",
+      "text": "You have failed too often to call this a journey.",
+      "choices": [
+        {
+          "id": "believe",
+          "text": "Believe the accusation.",
+          "effects": {
+            "despair": 15,
+            "shame": 10
+          },
+          "next": "end"
+        },
+        {
+          "id": "gate",
+          "text": "I cannot see the road, but I remember the gate.",
+          "effects": {
+            "faith": 5,
+            "hope": 5,
+            "shame": -5
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "shield",
+  "display_name": "Shield",
+  "type": "equipment",
+  "description": "Faith that quenches the fiery darts.",
+  "visible_on_player": true,
+  "effects": {},
+  "special": {}
+}

@@ -1,0 +1,34 @@
+{
+  "id": "children_fear",
+  "nodes": {
+    "start": {
+      "speaker": "Your Children",
+      "text": "Must you go where we cannot follow?",
+      "choices": [
+        {
+          "id": "love",
+          "text": "I go so that you might one day follow.",
+          "effects": {
+            "humility": 5,
+            "hope": 3
+          },
+          "next": "end"
+        },
+        {
+          "id": "grief",
+          "text": "I cannot stay, though it breaks me.",
+          "effects": {
+            "despair": 4,
+            "perseverance": 3
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

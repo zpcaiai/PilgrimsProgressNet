@@ -1,0 +1,9 @@
+{
+  "id": "final_seal",
+  "display_name": "Final Seal",
+  "type": "story_state",
+  "description": "The token of arrival at the Celestial City.",
+  "visible_on_player": false,
+  "effects": {},
+  "special": {}
+}

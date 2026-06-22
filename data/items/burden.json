@@ -1,0 +1,9 @@
+{
+  "id": "burden",
+  "display_name": "Burden",
+  "type": "story_state",
+  "description": "The weight of conviction carried until the Cross.",
+  "visible_on_player": true,
+  "effects": {},
+  "special": {}
+}

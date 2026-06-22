@@ -1,0 +1,15 @@
+{
+  "id": "accepted_help",
+  "title": "Lifted from the Mire",
+  "trigger": "accept_help",
+  "effects": {
+    "humility": 10,
+    "hope": 10,
+    "despair": -20
+  },
+  "special": {},
+  "flags": {
+    "accepted_help": true,
+    "rescued_from_slough": true
+  }
+}

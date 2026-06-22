@@ -1,0 +1,13 @@
+{
+  "id": "wicket_gate",
+  "display_name": "Wicket Gate",
+  "type": "gate",
+  "dialogue_id": "wicket_gate_knock",
+  "interaction_prompt": "Knock",
+  "required_flags": [
+    "left_slough"
+  ],
+  "set_flags_on_interact": {
+    "reached_wicket_gate": true
+  }
+}

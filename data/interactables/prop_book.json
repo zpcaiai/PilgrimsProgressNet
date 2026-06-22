@@ -1,0 +1,10 @@
+{
+  "id": "prop_book",
+  "display_name": "Warning Book",
+  "type": "story_event",
+  "interaction_prompt": "Read",
+  "trigger_spiritual_event": "receive_burden",
+  "set_flags_on_interact": {
+    "read_book": true
+  }
+}

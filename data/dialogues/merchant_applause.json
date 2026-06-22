@@ -1,0 +1,60 @@
+{
+  "id": "merchant_applause",
+  "nodes": {
+    "start": {
+      "speaker": "Merchant of Applause",
+      "text": "Pilgrim, you would be more useful if people liked you.",
+      "choices": [
+        {
+          "id": "accept",
+          "text": "Accept a small badge of reputation.",
+          "effects": {
+            "pride": 8,
+            "deception": 6,
+            "humility": -4
+          },
+          "flags": {
+            "compromised_at_vanity": true
+          },
+          "next": "cost"
+        },
+        {
+          "id": "refuse",
+          "text": "Refuse the badge.",
+          "effects": {
+            "humility": 5,
+            "discernment": 5,
+            "pride": -3
+          },
+          "flags": {
+            "rejected_vanity_goods": true
+          },
+          "next": "mock"
+        },
+        {
+          "id": "ask",
+          "text": "Ask what the badge costs.",
+          "effects": {
+            "discernment": 8
+          },
+          "next": "cost"
+        }
+      ]
+    },
+    "cost": {
+      "speaker": "Merchant of Applause",
+      "text": "Only a little silence when the crowd prefers it.",
+      "next": "end"
+    },
+    "mock": {
+      "speaker": "Merchant of Applause",
+      "text": "Then remain strange, if you insist.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

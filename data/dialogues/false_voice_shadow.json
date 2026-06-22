@@ -1,0 +1,65 @@
+{
+  "id": "false_voice_shadow",
+  "nodes": {
+    "start": {
+      "speaker": "False Voice",
+      "text": "This way is safer.",
+      "choices": [
+        {
+          "id": "ignore",
+          "text": "Ignore the voice and stay on the path.",
+          "effects": {
+            "watchfulness": 5,
+            "discernment": 5
+          },
+          "flags": {
+            "heard_false_voice": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "follow",
+          "text": "Step toward the voice.",
+          "effects": {
+            "deception": 8,
+            "fear": 8
+          },
+          "flags": {
+            "heard_false_voice": true
+          },
+          "next": "return"
+        },
+        {
+          "id": "pray",
+          "text": "Stop and pray.",
+          "effects": {
+            "hope": 5,
+            "fear": -8
+          },
+          "flags": {
+            "used_prayer_light": true,
+            "heard_false_voice": true
+          },
+          "special": {
+            "activate_prayer_light": true
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "return": {
+      "speaker": "",
+      "text": "The voice fades. The path is behind you, not beside you.",
+      "effects": {
+        "humility": 5,
+        "deception": -5
+      },
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "sword",
+  "display_name": "Sword",
+  "type": "equipment",
+  "description": "The Word, answered against the accuser.",
+  "visible_on_player": true,
+  "effects": {},
+  "special": {}
+}

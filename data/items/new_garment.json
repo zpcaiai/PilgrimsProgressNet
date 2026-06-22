@@ -1,0 +1,9 @@
+{
+  "id": "new_garment",
+  "display_name": "New Garment",
+  "type": "equipment",
+  "description": "Clean raiment given in place of rags.",
+  "visible_on_player": true,
+  "effects": {},
+  "special": {}
+}

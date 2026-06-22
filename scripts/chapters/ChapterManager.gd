@@ -124,6 +124,14 @@ func start_chapter(chapter_id: String) -> void:
 	GameState.mark_chapter_visited(chapter_id)
 	GameState.set_flag(String(data.get("id", chapter_id)) + "_started", true)
 	apply_chapter_entry_effects(chapter_id)
+	# Clean up stragglers: complete the quests of every EARLIER chapter in the
+	# route, so the objective tracker always reflects the current chapter instead
+	# of an old, partly-finished one (e.g. leave_city lingering into later chapters
+	# when the player left without reading the book or facing Obstinate).
+	var idx := get_chapter_index(chapter_id)
+	for i in range(maxi(0, idx)):
+		for pq in load_chapter_data(route[i]).get("quests", []):
+			QuestManager.complete_quest(String(pq))
 	# Start the chapter's quests.
 	for q in data.get("quests", []):
 		QuestManager.start_quest(String(q))

@@ -22,6 +22,7 @@ var gravity: float = 18.0
 var _cooldown: float = 0.0
 var _player: Node3D = null
 var _bar: Sprite3D = null
+var _fig: Node3D = null
 
 
 func load_from_data(id: String) -> void:
@@ -73,25 +74,11 @@ func _build_visual() -> void:
 	col.shape = shape
 	col.position = Vector3(0, 0.9, 0)
 	add_child(col)
-	# Visual: a painted figure billboard when one exists for this foe (e.g.
-	# Apollyon, Giant Despair), else the emissive capsule greybox.
-	var fig := AssetLib.figure(display_name)
-	if fig != null:
-		add_child(CharacterBillboard.make(fig, 2.1))
-	else:
-		var mesh := MeshInstance3D.new()
-		var capsule := CapsuleMesh.new()
-		capsule.radius = 0.45
-		capsule.height = 1.7
-		mesh.mesh = capsule
-		mesh.position = Vector3(0, 0.9, 0)
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = color
-		mat.emission_enabled = true
-		mat.emission = color
-		mat.emission_energy_multiplier = 0.5
-		mesh.material_override = mat
-		add_child(mesh)
+	# Visual: a real in-engine 3D body with the menacing emissive foe look (tinted
+	# by `color`, or the character palette for named foes like Apollyon). `self`
+	# is the mover, so it strides toward the pilgrim on two legs.
+	_fig = HumanoidFigure.make(display_name, 2.1, self, true, color, true)
+	add_child(_fig)
 	var label := Label3D.new()
 	label.text = display_name
 	label.position = Vector3(0, 2.3, 0)
@@ -110,6 +97,10 @@ func _physics_process(delta: float) -> void:
 	var to_player := _player.global_position - global_position
 	to_player.y = 0
 	var dist := to_player.length()
+	# Turn the 3D body to face the pilgrim so it strides toward him head-on.
+	if is_instance_valid(_fig) and dist > 0.05:
+		var yaw := atan2(to_player.x, to_player.z)
+		_fig.rotation.y = lerp_angle(_fig.rotation.y, yaw, clampf(delta * 8.0, 0.0, 1.0))
 	if dist > attack_range:
 		var dir := to_player.normalized()
 		velocity.x = dir.x * move_speed

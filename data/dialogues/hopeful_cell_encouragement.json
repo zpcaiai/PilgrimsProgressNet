@@ -1,0 +1,55 @@
+{
+  "id": "hopeful_cell_encouragement",
+  "nodes": {
+    "start": {
+      "speaker": "Hopeful",
+      "text": "We have been foolish, but not forsaken.",
+      "choices": [
+        {
+          "id": "afraid",
+          "text": "Tell Hopeful you are afraid.",
+          "effects": {
+            "humility": 8,
+            "hope": 5,
+            "despair": -5
+          },
+          "flags": {
+            "hopeful_encouraged_in_castle": true
+          },
+          "next": "remember"
+        },
+        {
+          "id": "search",
+          "text": "Search your scroll and memory.",
+          "effects": {
+            "faith": 5,
+            "hope": 8
+          },
+          "flags": {
+            "hopeful_encouraged_in_castle": true,
+            "found_promise_key": true
+          },
+          "special": {
+            "grant_promise_key": true
+          },
+          "next": "key"
+        }
+      ]
+    },
+    "remember": {
+      "speaker": "Hopeful",
+      "text": "Search what you carry. We have forgotten something.",
+      "next": "end"
+    },
+    "key": {
+      "speaker": "Hopeful",
+      "text": "Despair locks doors that Promise can open.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "id": "armor_stand",
+  "display_name": "Armor Stand",
+  "type": "equipment",
+  "interaction_prompt": "Take up the armor",
+  "item_id": "armor"
+}

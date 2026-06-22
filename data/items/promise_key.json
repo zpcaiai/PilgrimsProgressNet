@@ -1,0 +1,9 @@
+{
+  "id": "promise_key",
+  "display_name": "Promise Key",
+  "type": "key_item",
+  "description": "A remembered promise that opens despair's prison.",
+  "visible_on_player": false,
+  "effects": {},
+  "special": {}
+}

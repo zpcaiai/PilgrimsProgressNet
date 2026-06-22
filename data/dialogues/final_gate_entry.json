@@ -1,0 +1,38 @@
+{
+  "id": "final_gate_entry",
+  "nodes": {
+    "start": {
+      "speaker": "Gatekeeper",
+      "text": "Enter with joy.",
+      "choices": [
+        {
+          "id": "enter",
+          "text": "Enter with Hopeful.",
+          "flags": {
+            "entered_celestial_city": true,
+            "journey_completed": true
+          },
+          "special": {
+            "show_journey_review": true,
+            "show_credits": true,
+            "grant_final_seal": true
+          },
+          "next": "final"
+        }
+      ]
+    },
+    "final": {
+      "speaker": "",
+      "text": "The burden was gone. The road was finished. The welcome remained.",
+      "flags": {
+        "journey_review_completed": true
+      },
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

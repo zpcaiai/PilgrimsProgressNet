@@ -1,0 +1,55 @@
+{
+  "id": "hopeful",
+  "display_name": "Hopeful",
+  "type": "companion",
+  "join_flag": "hopeful_joined",
+  "leave_flag": "",
+  "special_state": "has_companion_hopeful",
+  "core_effects": {
+    "hope": 5
+  },
+  "abilities": [
+    "encourage_in_despair",
+    "testimony_dialogue",
+    "wake_player_in_enchanted_ground",
+    "support_river_crossing"
+  ],
+  "interventions": [
+    {
+      "id": "doubting_castle_despair",
+      "trigger": {
+        "chapter": "doubting_castle",
+        "despair_min": 70
+      },
+      "dialogue_id": "hopeful_cell_encouragement",
+      "effects": {
+        "hope": 10,
+        "despair": -10
+      }
+    },
+    {
+      "id": "enchanted_ground_sleep",
+      "trigger": {
+        "chapter": "enchanted_ground",
+        "sleepiness_min": 80
+      },
+      "dialogue_id": "hopeful_keep_awake",
+      "effects": {
+        "watchfulness": 10,
+        "hope": 5
+      }
+    },
+    {
+      "id": "river_fear",
+      "trigger": {
+        "chapter": "river_of_death",
+        "fear_min": 70
+      },
+      "dialogue_id": "river_memory_recall",
+      "effects": {
+        "hope": 10,
+        "fear": -10
+      }
+    }
+  ]
+}

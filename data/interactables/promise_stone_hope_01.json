@@ -1,0 +1,14 @@
+{
+  "id": "promise_stone_hope_01",
+  "display_name": "Promise Stone",
+  "type": "promise_stone",
+  "interaction_prompt": "Remember",
+  "effects": {
+    "hope": 8,
+    "despair": -12
+  },
+  "single_use": true,
+  "set_flags_on_interact": {
+    "used_promise_stone_hope_01": true
+  }
+}

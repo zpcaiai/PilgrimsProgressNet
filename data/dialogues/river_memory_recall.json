@@ -1,0 +1,57 @@
+{
+  "id": "river_memory_recall",
+  "nodes": {
+    "start": {
+      "speaker": "Hopeful",
+      "text": "Remember what has carried you before.",
+      "choices": [
+        {
+          "id": "cross",
+          "text": "Remember the Cross.",
+          "effects": {
+            "faith": 15,
+            "shame": -10,
+            "fear": -10
+          },
+          "flags": {
+            "river_memory_recalled": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "key",
+          "text": "Remember the Promise Key.",
+          "conditions": {
+            "flag_required": "found_promise_key"
+          },
+          "effects": {
+            "hope": 15,
+            "despair": -15
+          },
+          "flags": {
+            "river_memory_recalled": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "hopeful",
+          "text": "Listen to Hopeful.",
+          "effects": {
+            "hope": 10,
+            "humility": 5,
+            "fear": -8
+          },
+          "flags": {
+            "river_memory_recalled": true
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

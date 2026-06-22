@@ -1,0 +1,7 @@
+{
+  "id": "shepherd_map",
+  "display_name": "Shepherd Map",
+  "type": "equipment",
+  "interaction_prompt": "Receive the map",
+  "item_id": "shepherd_map"
+}

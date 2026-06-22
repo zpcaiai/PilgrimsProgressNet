@@ -1,0 +1,10 @@
+{
+  "id": "shame_field_zone",
+  "tick_interval": 2.0,
+  "nonlethal": true,
+  "type": "shame_zone",
+  "effects_per_tick": {
+    "shame": 3,
+    "hope": -1
+  }
+}

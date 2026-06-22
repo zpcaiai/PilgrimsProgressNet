@@ -1,0 +1,43 @@
+{
+  "id": "wilderness_resolve",
+  "nodes": {
+    "start": {
+      "speaker": "",
+      "text": "Ahead, the ground sinks into a grey, sodden lowland, and for a moment the little light beyond it seems impossibly far. This is the place where many travellers turn back.",
+      "text_zh": "前方，地势沉入一片灰蒙蒙、湿漉漉的低地，那低地之外的微光，霎时显得远得不可企及。许多旅人，正是在这里掉头回去的。",
+      "choices": [
+        {
+          "id": "fix_eyes",
+          "text": "Fix your eyes on the light, and go down into the low place.",
+          "text_zh": "定睛望那光，走下那低地去。",
+          "effects": { "faith": 4, "hope": 4, "perseverance": 4, "fear": -3 },
+          "flags": { "fixed_eyes_on_light": true },
+          "next": "end"
+        },
+        {
+          "id": "hesitate",
+          "text": "Slow at the edge, and let the doubt speak.",
+          "text_zh": "在边缘放慢脚步，任那疑虑发声。",
+          "effects": { "fear": 3 },
+          "next": "steady"
+        }
+      ]
+    },
+    "steady": {
+      "speaker": "",
+      "text": "But the light does not move. Whatever waits in the hollow, it still shines beyond it. You breathe once, and take the first step down.",
+      "text_zh": "但那光没有移动。无论那洼地里有什么，它依旧在那之外照着。你深吸一口气，迈下第一步。",
+      "set_flags": { "fixed_eyes_on_light": true },
+      "choices": [
+        {
+          "id": "descend",
+          "text": "(Step down toward the lowland.)",
+          "text_zh": "（向着低地迈步走下。）",
+          "effects": { "perseverance": 3, "hope": 2 },
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

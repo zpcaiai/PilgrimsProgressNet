@@ -1,0 +1,46 @@
+{
+  "id": "shadow_valley_entry",
+  "nodes": {
+    "start": {
+      "speaker": "Pilgrim",
+      "text": "I cannot see far. I can still take one step.",
+      "choices": [
+        {
+          "id": "pray",
+          "text": "Pray for light.",
+          "effects": {
+            "fear": -10,
+            "hope": 5,
+            "watchfulness": 5
+          },
+          "flags": {
+            "used_prayer_light": true
+          },
+          "special": {
+            "activate_prayer_light": true
+          },
+          "next": "echo"
+        },
+        {
+          "id": "rush",
+          "text": "Rush forward blindly.",
+          "effects": {
+            "fear": 5,
+            "weariness": 5
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "echo": {
+      "speaker": "Prayer Echo",
+      "text": "One step is enough for this moment.",
+      "next": "end"
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

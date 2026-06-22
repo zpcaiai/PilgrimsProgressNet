@@ -1,22 +1,45 @@
 extends RefCounted
 class_name CharacterBillboard
-## Builds an upright billboard Sprite3D of a character's painted figure, so the
-## cast stand in the 3D world as real painted people instead of greybox
-## capsules. Y-axis billboard (always faces the camera but stays vertical),
-## unshaded so the art reads true under the painterly post-process, with an
-## alpha-scissor cutout so transparent figure art (assets/characters/figures/)
-## reads cleanly. Feet sit on the ground (y = 0).
+## Shared ground-shadow + soft-disc helpers for the in-engine 3D character
+## bodies (HumanoidFigure / HumanoidAnimator) and the player's footstep dust.
+## The cast are now real 3D people rather than flat painted billboards, but
+## these small primitives remain useful and live here for any caller that needs
+## a soft grounded shadow or a round alpha disc.
 
-static func make(tex: Texture2D, height: float = 2.0) -> Sprite3D:
-	var s := Sprite3D.new()
-	s.texture = tex
-	s.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
-	s.shaded = false
-	# Only the most fundamental, always-valid Sprite3D properties are set here
-	# (transparent defaults true, so the figure's alpha cuts out). Exotic
-	# properties were removed to avoid any runtime "invalid set index" risk.
-	var th := float(tex.get_height())
-	if th > 0.0:
-		s.pixel_size = height / th
-	s.position = Vector3(0, height * 0.5, 0)
-	return s
+
+static var _disc: Texture2D = null
+
+## Soft round white alpha disc (cached). Reused for ground shadows and dust.
+static func soft_disc() -> Texture2D:
+	if _disc != null:
+		return _disc
+	var n := 64
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	var c := float(n - 1) * 0.5
+	for y in range(n):
+		for x in range(n):
+			var dx := (float(x) - c) / c
+			var dy := (float(y) - c) / c
+			var rr := sqrt(dx * dx + dy * dy)
+			var a := pow(clampf(1.0 - rr, 0.0, 1.0), 1.6)
+			img.set_pixel(x, y, Color(1.0, 1.0, 1.0, a))
+	_disc = ImageTexture.create_from_image(img)
+	return _disc
+
+
+## A flat, soft ground-shadow disc to ground a character. Lies on the XZ plane.
+static func make_ground_shadow(diameter: float) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = Vector2(diameter, diameter)
+	mi.mesh = q
+	mi.rotation_degrees = Vector3(-90.0, 0.0, 0.0)
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.albedo_color = Color(0.0, 0.0, 0.0, 0.40)
+	m.albedo_texture = soft_disc()
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mi.material_override = m
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return mi

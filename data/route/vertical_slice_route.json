@@ -1,0 +1,29 @@
+{
+  "id": "vertical_slice_route",
+  "title": "Burden Fallen Vertical Slice Route",
+  "start_chapter": "city_of_destruction",
+  "end_chapter": "valley_shadow_death",
+  "completion_flag": "completed_vertical_slice",
+  "chapters": [
+    "city_of_destruction",
+    "wilderness_road",
+    "slough_of_despond",
+    "wicket_gate",
+    "cross_and_tomb",
+    "interpreter_house",
+    "hill_difficulty",
+    "palace_beautiful",
+    "valley_humiliation",
+    "valley_shadow_death"
+  ],
+  "required_global_systems": [
+    "EventBus",
+    "GameState",
+    "ChapterManager",
+    "DialogueManager",
+    "SpiritualStateManager",
+    "QuestManager",
+    "SaveManager",
+    "DataValidator"
+  ]
+}

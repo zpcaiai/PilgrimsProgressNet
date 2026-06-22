@@ -1,0 +1,44 @@
+{
+  "id": "vanity_trial",
+  "nodes": {
+    "start": {
+      "speaker": "Trial Judge",
+      "text": "You disturb the fair by desiring what we do not sell.",
+      "choices": [
+        {
+          "id": "stand",
+          "text": "Stand with Faithful.",
+          "effects": {
+            "faith": 10,
+            "perseverance": 8,
+            "fear": 8
+          },
+          "flags": {
+            "faithful_trial_started": true,
+            "faithful_witnessed": true
+          },
+          "next": "end"
+        },
+        {
+          "id": "silent",
+          "text": "Stay silent in fear.",
+          "effects": {
+            "fear": 10,
+            "shame": 8,
+            "humility": 3
+          },
+          "flags": {
+            "faithful_trial_started": true,
+            "faithful_witnessed": true
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

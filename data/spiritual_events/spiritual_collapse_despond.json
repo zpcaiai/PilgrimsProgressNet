@@ -1,0 +1,14 @@
+{
+  "id": "spiritual_collapse_despond",
+  "title": "Collapsed in Despond",
+  "trigger": "despair_100",
+  "conditions": {
+    "despair_min": 100
+  },
+  "effects": {
+    "humility": 5,
+    "hope": -5
+  },
+  "repentance_prompt": true,
+  "message": "You sink beneath the weight of despair, yet the way back is not closed."
+}

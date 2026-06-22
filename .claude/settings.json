@@ -1,0 +1,20 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "network": {
+      "allowedDomains": [
+        "huggingface.co",
+        "*.huggingface.co",
+        "*.hf.space",
+        "vercel.app",
+        "*.vercel.app",
+        "api.vercel.com",
+        "neon.tech",
+        "*.neon.tech",
+        "*.upstash.io",
+        "google.com",
+        "*.google.com"
+      ]
+    }
+  }
+}

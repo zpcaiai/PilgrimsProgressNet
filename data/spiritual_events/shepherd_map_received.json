@@ -1,0 +1,16 @@
+{
+  "id": "shepherd_map_received",
+  "title": "The Shepherds' Map",
+  "trigger": "receive_shepherd_map",
+  "effects": {
+    "watchfulness": 10,
+    "discernment": 5
+  },
+  "special": {
+    "grant_shepherd_map": true
+  },
+  "flags": {
+    "received_shepherd_warning": true,
+    "has_shepherd_map": true
+  }
+}
