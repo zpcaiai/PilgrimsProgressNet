@@ -3,48 +3,68 @@
   "nodes": {
     "start": {
       "speaker": "Shining One",
+      "speaker_zh": "闪光者",
       "text": "The river is behind you.",
+      "text_zh": "那河，已在你身后。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "resisted_sleep" },
+          "text": "You did not sleep on the Enchanted Ground — and only the awake can recognize this shore. The river is behind you now.",
+          "text_zh": "你在魔境没有沉睡——唯有醒着的人，才认得出此岸。那河，如今已在你身后。"
+        },
+        {
+          "conditions": { "requires_flag": "defeated_apollyon" },
+          "text": "Not even these dark waters could close over one who stood firm before Apollyon. The river is behind you.",
+          "text_zh": "连这幽暗的河水，也没能淹过曾在亚玻伦面前站立的人。那河，已在你身后。"
+        }
+      ],
       "choices": [
         {
           "id": "hopeful",
           "text": "Look to Hopeful.",
-          "effects": {
-            "hope": 5,
-            "humility": 5
-          },
-          "flags": {
-            "welcomed_by_shining_ones": true
-          },
+          "text_zh": "望向盼望。",
+          "effects": { "hope": 5, "humility": 5 },
+          "flags": { "welcomed_by_shining_ones": true },
           "next": "hopeful"
         },
         {
           "id": "gate",
           "text": "Look toward the gate.",
-          "effects": {
-            "faith": 5,
-            "hope": 5
-          },
-          "flags": {
-            "welcomed_by_shining_ones": true
-          },
+          "text_zh": "望向那门。",
+          "effects": { "faith": 5, "hope": 5 },
+          "flags": { "welcomed_by_shining_ones": true },
           "next": "gate"
         }
       ]
     },
     "hopeful": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "We have crossed.",
+      "text_zh": "我们渡过来了。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "hopeful_joined" },
+          "text": "We have crossed — together, just as I promised at the Fair. I told you I would remember aloud what we had seen; I never had to. You kept walking.",
+          "text_zh": "我们渡过来了——一同渡过，正如我在集市答应你的。我说过会大声替你记起我们见过的一切；可我从没用上。你一直在走。"
+        }
+      ],
       "next": "gate"
     },
     "gate": {
       "speaker": "Shining One",
+      "speaker_zh": "闪光者",
       "text": "What was promised is now before you.",
+      "text_zh": "所应许的，如今就在你眼前。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "burden_fallen" },
+          "text": "The burden you carried out of the City fell at the Cross; now even the river of death is behind you. What was promised is now before you.",
+          "text_zh": "你从那城背出来的重担，已在十字架前滚落；如今连那死亡之河也已过去。所应许的，就在你眼前。"
+        }
+      ],
       "next": "end"
     },
-    "end": {
-      "speaker": "",
-      "text": "",
-      "end": true
-    }
+    "end": { "speaker": "", "text": "", "end": true }
   }
 }

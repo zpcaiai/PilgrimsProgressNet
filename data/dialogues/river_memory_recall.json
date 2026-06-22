@@ -3,55 +3,44 @@
   "nodes": {
     "start": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "Remember what has carried you before.",
+      "text_zh": "记起从前是什么托住了你。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "found_promise_key" },
+          "text": "Remember what has carried you — the Cross that took your burden, and the Promise that unlocked the giant's cell. This water cannot take what those gave you.",
+          "text_zh": "记起是什么托住了你——那除去你重担的十字架，那打开巨人牢门的应许。这河水，夺不走它们给你的。"
+        }
+      ],
       "choices": [
         {
           "id": "cross",
           "text": "Remember the Cross.",
-          "effects": {
-            "faith": 15,
-            "shame": -10,
-            "fear": -10
-          },
-          "flags": {
-            "river_memory_recalled": true
-          },
+          "text_zh": "记起十字架。",
+          "effects": { "faith": 15, "shame": -10, "fear": -10 },
+          "flags": { "river_memory_recalled": true },
           "next": "end"
         },
         {
           "id": "key",
           "text": "Remember the Promise Key.",
-          "conditions": {
-            "flag_required": "found_promise_key"
-          },
-          "effects": {
-            "hope": 15,
-            "despair": -15
-          },
-          "flags": {
-            "river_memory_recalled": true
-          },
+          "text_zh": "记起那应许之钥。",
+          "conditions": { "requires_flag": "found_promise_key" },
+          "effects": { "hope": 15, "despair": -15 },
+          "flags": { "river_memory_recalled": true },
           "next": "end"
         },
         {
           "id": "hopeful",
           "text": "Listen to Hopeful.",
-          "effects": {
-            "hope": 10,
-            "humility": 5,
-            "fear": -8
-          },
-          "flags": {
-            "river_memory_recalled": true
-          },
+          "text_zh": "听盼望说。",
+          "effects": { "hope": 10, "humility": 5, "fear": -8 },
+          "flags": { "river_memory_recalled": true },
           "next": "end"
         }
       ]
     },
-    "end": {
-      "speaker": "",
-      "text": "",
-      "end": true
-    }
+    "end": { "speaker": "", "text": "", "end": true }
   }
 }

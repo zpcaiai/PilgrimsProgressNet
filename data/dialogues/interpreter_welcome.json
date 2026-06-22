@@ -28,6 +28,13 @@
           "text_zh": "我急着赶路，却也不轻看教训。"
         }
       ],
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "rescued_from_slough" },
+          "text": "Welcome, pilgrim. You nearly drowned in the Slough learning that you cannot lift yourself — and at the Cross the burden fell from a back you had stopped trusting. Good. These rooms will deepen that very lesson.",
+          "text_zh": "欢迎，朝圣者。你曾在绝望泥潭里几乎沉没，学到了人无法自救；又在十字架前，让重担从一个你已不再倚靠的背上落下。很好。这些房间，要把这一课教得更深。"
+        }
+      ],
       "text_zh": "欢迎，朝圣者。重担已经落下，但心仍需教导。慢慢走过这些房间；每一间都点出一种怜悯有意医治的危险。"
     },
     "guide": {

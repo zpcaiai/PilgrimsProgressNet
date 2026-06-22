@@ -3,50 +3,61 @@
   "nodes": {
     "start": {
       "speaker": "Shepherd Knowledge",
-      "text": "Vision is mercy when the road has narrowed your sight.",
+      "speaker_zh": "牧人·知识",
+      "text": "Vision is mercy when the road has narrowed your sight. Come, look from the Delectable Mountains.",
+      "text_zh": "当道路使你的眼界变窄，能看见远象便是怜悯。来，从喜悦山上眺望。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "defeated_apollyon" },
+          "text": "We know you — you stood in the Valley when Apollyon filled the whole road. Eyes that have faced the destroyer have earned this far green view. Come and look.",
+          "text_zh": "我们认得你——你曾在屈辱谷中站住，那时亚玻伦塞满了整条路。直面过那毁灭者的眼，配得这一片远方的青翠。来，眺望吧。"
+        },
+        {
+          "conditions": { "requires_flag": "faithful_lost" },
+          "text": "Word reached even these hills of Faithful's end at the Fair. Grieve — but lift your eyes; the city he ran to is in plain sight from here. Come and look.",
+          "text_zh": "连这些山上都听见了忠信在集市的结局。哀伤吧——但举目；他所奔向的那城，从这里清晰可见。来，眺望吧。"
+        }
+      ],
       "choices": [
         {
           "id": "look",
           "text": "Look long toward the city.",
-          "effects": {
-            "hope": 15,
-            "faith": 5
-          },
-          "flags": {
-            "met_shepherds": true,
-            "saw_celestial_city_from_mountains": true
-          },
+          "text_zh": "久久望向那城。",
+          "effects": { "hope": 15, "faith": 5 },
+          "flags": { "met_shepherds": true, "saw_celestial_city_from_mountains": true },
           "next": "warning"
         },
         {
           "id": "ask",
           "text": "Ask Hopeful what he sees.",
-          "effects": {
-            "hope": 10,
-            "humility": 5
-          },
-          "flags": {
-            "met_shepherds": true,
-            "saw_celestial_city_from_mountains": true
-          },
+          "text_zh": "问盼望，他看见了什么。",
+          "effects": { "hope": 10, "humility": 5 },
+          "flags": { "met_shepherds": true, "saw_celestial_city_from_mountains": true },
           "next": "hopeful"
         }
       ]
     },
     "hopeful": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "After the castle, even green hills feel unbelievable.",
+      "text_zh": "经过那城堡之后，连青山都让人难以置信。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "found_promise_key" },
+          "text": "You remembered the Promise in that cell, and it became a key. I have not forgotten it — keep it ready. The road still has locks.",
+          "text_zh": "你在那牢房里记起了应许，它便成了钥匙。我没有忘记——把它备好。前路仍有锁。"
+        }
+      ],
       "next": "warning"
     },
     "warning": {
       "speaker": "Shepherd Watchful",
-      "text": "The next ground is not violent. That is why it is dangerous.",
+      "speaker_zh": "牧人·警醒",
+      "text": "The next ground is not violent. That is why it is dangerous. Its air is sweet, and sweetness here means sleep. Keep talking, keep walking.",
+      "text_zh": "前面那片地并不凶暴。正因如此才危险。那里空气甘甜，而此处的甘甜意味着沉睡。不住地交谈，不住地前行。",
       "next": "end"
     },
-    "end": {
-      "speaker": "",
-      "text": "",
-      "end": true
-    }
+    "end": { "speaker": "", "text": "", "end": true }
   }
 }
