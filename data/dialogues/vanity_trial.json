@@ -3,11 +3,26 @@
   "nodes": {
     "start": {
       "speaker": "Trial Judge",
+      "speaker_zh": "审判官",
       "text": "You disturb the fair by desiring what we do not sell.",
+      "text_zh": "你扰乱了这集市——因为你渴慕的，是我们不贩卖的东西。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "met_interpreter" },
+          "text": "You disturb the fair by desiring what we do not sell. The Interpreter warned you of this very street, did he not? And still you came — and still you will not buy.",
+          "text_zh": "你扰乱了这集市——因为你渴慕的，是我们不贩卖的东西。解经者早警戒过你这条街，不是吗？你竟还是来了——竟还是不肯买。"
+        },
+        {
+          "conditions": { "requires_flag": "defeated_apollyon" },
+          "text": "You disturb the fair by desiring what we do not sell. You bested the Destroyer with a blade — but here there is nothing to strike, only a price to refuse. Will you?",
+          "text_zh": "你扰乱了这集市——因为你渴慕的，是我们不贩卖的东西。你曾以刀胜过那毁灭者——可这里无物可砍，只有一个价码任你拒绝。你拒不拒？"
+        }
+      ],
       "choices": [
         {
           "id": "stand",
           "text": "Stand with Faithful.",
+          "text_zh": "与忠信站在一处。",
           "effects": {
             "faith": 10,
             "perseverance": 8,
@@ -17,11 +32,12 @@
             "faithful_trial_started": true,
             "faithful_witnessed": true
           },
-          "next": "end"
+          "next": "verdict"
         },
         {
           "id": "silent",
           "text": "Stay silent in fear.",
+          "text_zh": "因惧怕而沉默。",
           "effects": {
             "fear": 10,
             "shame": 8,
@@ -31,6 +47,22 @@
             "faithful_trial_started": true,
             "faithful_witnessed": true
           },
+          "next": "verdict"
+        }
+      ]
+    },
+    "verdict": {
+      "speaker": "Trial Judge",
+      "speaker_zh": "审判官",
+      "text": "The fair has heard enough. Faithful is condemned — yet he looks past us, as though the verdict were already overturned in a higher court.",
+      "text_zh": "集市已经听够了。忠信被定了罪——他却越过我们望出去，仿佛这判决，早已在更高的法庭上被推翻。",
+      "choices": [
+        {
+          "id": "remember",
+          "text": "Mark what Faithful would not sell, and carry it on.",
+          "text_zh": "记住忠信不肯出卖的，把它带在身上走下去。",
+          "effects": { "faith": 8, "hope": 6, "shame": -6 },
+          "flags": { "remembered_faithful_witness": true },
           "next": "end"
         }
       ]

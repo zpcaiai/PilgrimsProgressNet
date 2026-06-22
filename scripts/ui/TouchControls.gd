@@ -10,10 +10,10 @@ extends CanvasLayer
 ## Playable in both portrait and landscape: the pad lays out from the viewport size.
 
 const MARGIN := 0.05      # all sizes are fractions of min(viewport w, h)
-const DPAD_R := 0.078
-const ACT_R := 0.10
-const UTIL_R := 0.058
-const CHOICE_R := 0.05
+const DPAD_R := 0.066
+const ACT_R := 0.085
+const UTIL_R := 0.050
+const CHOICE_R := 0.044
 
 # id -> keycode. WASD use physical keys (actions are bound to physical W/A/S/D);
 # the rest are read as event.keycode by the UI handlers.
@@ -40,6 +40,8 @@ var _was_paused := false
 # finger index -> button id currently held by that finger
 var _fingers := {}
 var _pad: Control
+# user-adjustable size multiplier (Options -> Touch Button Size), saved in user://settings.cfg
+var _btn_scale := 1.0
 
 
 class _Pad extends Control:
@@ -67,12 +69,27 @@ func _ready() -> void:
 	_connect(EventBus, "dialogue_started", _on_dialogue_started)
 	_connect(EventBus, "dialogue_node_changed", _on_dialogue_node)
 	_connect(EventBus, "dialogue_ended", _on_dialogue_ended)
+	_connect(EventBus, "settings_changed", _on_settings_changed)
+	_btn_scale = _read_btn_scale()
 	_refresh()
 
 
 func _connect(obj: Object, sig: String, cb: Callable) -> void:
 	if obj and obj.has_signal(sig) and not obj.is_connected(sig, cb):
 		obj.connect(sig, cb)
+
+
+func _read_btn_scale() -> float:
+	var cf := ConfigFile.new()
+	if cf.load("user://settings.cfg") == OK:
+		return clampf(float(cf.get_value("input", "touch_button_scale", 1.0)), 0.5, 2.0)
+	return 1.0
+
+
+func _on_settings_changed() -> void:
+	_btn_scale = _read_btn_scale()
+	if _pad:
+		_pad.queue_redraw()
 
 
 # --- Public: Main toggles this when entering / leaving gameplay ---
@@ -154,11 +171,12 @@ func _layout() -> Dictionary:
 	# Returns id -> {center:Vector2, radius:float}
 	var s := _vsize()
 	var u: float = min(s.x, s.y)
+	var sc := _btn_scale
 	var m := u * MARGIN
-	var dr := u * DPAD_R
-	var ar := u * ACT_R
-	var ur := u * UTIL_R
-	var cr := u * CHOICE_R
+	var dr := u * DPAD_R * sc
+	var ar := u * ACT_R * sc
+	var ur := u * UTIL_R * sc
+	var cr := u * CHOICE_R * sc
 	var out := {}
 	# WASD d-pad, bottom-left (plus layout)
 	var dc := Vector2(m + dr * 2.3, s.y - m - dr * 2.3)

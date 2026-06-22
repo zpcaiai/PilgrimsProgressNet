@@ -3,11 +3,31 @@
   "nodes": {
     "start": {
       "speaker": "Gatekeeper",
-      "text": "Enter with joy.",
+      "speaker_zh": "守门者",
+      "text": "Enter with joy. The King has watched every step of your road.",
+      "text_zh": "欢欢喜喜地进来吧。你这一路的每一步，王都看在眼里。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "faithful_lost" },
+          "text": "Enter with joy. Faithful is already within — he ran ahead of you through the fire, and he is not forgotten here. Every step of your road was watched.",
+          "text_zh": "欢欢喜喜地进来吧。忠信已经在里面了——他穿过烈火先你而行，在这里没有被忘记。你这一路的每一步，都被看在眼里。"
+        },
+        {
+          "conditions": { "requires_flag": "defeated_apollyon" },
+          "text": "Enter with joy. We saw you stand in the Valley when Apollyon straddled the whole breadth of the way — and you did not stand by your own strength. That is why you stand here now.",
+          "text_zh": "欢欢喜喜地进来吧。我们看见你在屈辱谷中站立，那时亚玻伦拦住整条道路——而你不是靠自己的力量站住的。正因如此，你今日才站在这里。"
+        },
+        {
+          "conditions": { "requires_flag": "hopeful_joined" },
+          "text": "Enter with joy — and not alone. The one called Hopeful came because he saw the road in you. The King has watched every step you both walked.",
+          "text_zh": "欢欢喜喜地进来吧——而且不是独自一人。那名叫盼望的，因在你身上看见了这条路才同行。你们二人所走的每一步，王都看在眼里。"
+        }
+      ],
       "choices": [
         {
           "id": "enter",
-          "text": "Enter with Hopeful.",
+          "text": "Enter.",
+          "text_zh": "进去。",
           "flags": {
             "entered_celestial_city": true,
             "journey_completed": true
@@ -24,6 +44,7 @@
     "final": {
       "speaker": "",
       "text": "The burden was gone. The road was finished. The welcome remained.",
+      "text_zh": "重担已经卸下。道路已经走完。那欢迎，长存。",
       "flags": {
         "journey_review_completed": true
       },

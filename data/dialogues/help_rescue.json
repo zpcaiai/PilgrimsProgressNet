@@ -47,6 +47,13 @@
           },
           "text": "I see despair has nearly closed over your head — all the more reason to take my hand. The mire has no bottom for the one determined to be his own savior, but it has a firm edge for the one who will be helped.",
           "text_zh": "我看见绝望几乎要没过你的头顶——这就更该拉住我的手。这泥沼对一心要自己作救主的人没有底，但对肯受帮助的人却有一道坚实的岸。"
+        },
+        {
+          "conditions": {
+            "requires_flag": "pliable_shallow"
+          },
+          "text": "Your light-footed friend turned back at the first cold step, didn't he? Pliable loved the glory, not the road. Do not refuse help now as he refused the way — give me your hand.",
+          "text_zh": "你那位脚步轻快的同伴，在第一步寒凉里就掉头回去了，是吗？易迁爱的是那荣耀，不是这条路。别像他弃绝正路那样弃绝此刻的帮助——把手给我。"
         }
       ],
       "text_zh": "稳住，朋友。我从这洼里拉上来过许多人。把手给我；这泥沼对一心要自己作救主的人没有底。"

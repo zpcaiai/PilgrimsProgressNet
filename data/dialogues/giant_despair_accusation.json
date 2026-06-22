@@ -3,33 +3,82 @@
   "nodes": {
     "start": {
       "speaker": "Giant Despair",
-      "text": "You have failed too often to call this a journey.",
+      "speaker_zh": "巨人绝望",
+      "text": "You have failed too often to call this a journey. The cell is honest; the road was the lie.",
+      "text_zh": "你失败得太多，不配称这是什么旅程。这牢房才诚实；那条路才是谎言。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "defeated_apollyon" },
+          "text": "You faced Apollyon and lived — but that only means more pride for me to break. One locked door can undo a hundred victories.",
+          "text_zh": "你面对过亚玻伦还活着——可那不过是更多该让我碾碎的骄傲。一道锁住的门，足以抹掉一百场胜利。"
+        },
+        {
+          "conditions": { "requires_flag": "faithful_lost" },
+          "text": "Your friend Faithful burned for his faith at the Fair. Where did it get him? The same silence is waiting for you here.",
+          "text_zh": "你的朋友忠信在集市上为信仰被焚。那让他得着了什么？同样的沉默，在这里等着你。"
+        }
+      ],
       "choices": [
         {
           "id": "believe",
-          "text": "Believe the accusation.",
-          "effects": {
-            "despair": 15,
-            "shame": 10
-          },
-          "next": "end"
+          "text": "Believe the accusation, and lie down.",
+          "text_zh": "信了这控告，躺下不动。",
+          "effects": { "despair": 15, "shame": 10 },
+          "next": "deeper"
         },
         {
           "id": "gate",
           "text": "I cannot see the road, but I remember the gate.",
-          "effects": {
-            "faith": 5,
-            "hope": 5,
-            "shame": -5
-          },
-          "next": "end"
+          "text_zh": "我看不见路，但我记得那门。",
+          "effects": { "faith": 5, "hope": 5, "shame": -5 },
+          "next": "remember"
+        },
+        {
+          "id": "promise",
+          "text": "(Take out the Promise.) 'He who promised is faithful.'",
+          "text_zh": "（取出应许。）「那应许我们的，是信实的。」",
+          "conditions": { "requires_flag": "used_promise_hope" },
+          "effects": { "faith": 10, "hope": 12, "despair": -15, "shame": -10 },
+          "flags": { "recalled_promise_in_cell": true },
+          "next": "key"
         }
       ]
     },
-    "end": {
+    "deeper": {
+      "speaker": "Giant Despair",
+      "speaker_zh": "巨人绝望",
+      "text": "Good. Stay down. Many who once walked bravely have rotted in this very cell.",
+      "text_zh": "很好。躺着别动。许多曾勇敢前行的人，都在这间牢房里烂掉了。",
+      "choices": [
+        {
+          "id": "rise",
+          "text": "No. Even here, mercy can reach me. I will search for a way out.",
+          "text_zh": "不。即使在这里，怜悯也能寻见我。我要去寻一条出路。",
+          "effects": { "perseverance": 8, "hope": 6, "despair": -10 },
+          "next": "remember"
+        }
+      ]
+    },
+    "remember": {
       "speaker": "",
-      "text": "",
-      "end": true
-    }
+      "text": "A word returns from the Slough, from a stone of promise you once held: the way back is never closed to the one who will be helped. You begin to feel along the cold wall.",
+      "text_zh": "一句话从泥潭、从你曾握住的应许之石上回到心头：归途，对肯受帮助的人，从不关闭。你开始沿着冰冷的墙摸索。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "used_promise_perseverance" },
+          "text": "A word returns from the Slough — 'One true step is still obedience. Take it.' Your fingers find something forgotten in your breast pocket.",
+          "text_zh": "一句话从泥潭回来——「一步真实的顺服，仍是顺服。迈出去。」你的指尖在胸前口袋里摸到了一样被遗忘的东西。"
+        }
+      ],
+      "next": "end"
+    },
+    "key": {
+      "speaker": "",
+      "text": "The Promise warms in your hand like a key long forgotten. Despair's grip loosens. There is a way out of Doubting Castle.",
+      "text_zh": "那应许在你掌中温热起来，像一把久被遗忘的钥匙。绝望的钳制松开了。怀疑城堡，有路可出。",
+      "flags": { "found_promise_key": true },
+      "next": "end"
+    },
+    "end": { "speaker": "", "text": "", "end": true }
   }
 }

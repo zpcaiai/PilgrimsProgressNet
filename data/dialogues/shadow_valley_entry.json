@@ -3,11 +3,21 @@
   "nodes": {
     "start": {
       "speaker": "Pilgrim",
+      "speaker_zh": "朝圣者",
       "text": "I cannot see far. I can still take one step.",
+      "text_zh": "我看不了多远。可我仍能迈出一步。",
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "defeated_apollyon" },
+          "text": "I stood against Apollyon with sword and promise. This valley gives me nothing to strike — only dark, and voices. One step is still mine to take.",
+          "text_zh": "我曾持刀与应许，抵挡亚玻伦站立得住。可这幽谷里没有可砍之物——只有黑暗，和那些声音。但迈出一步，仍在我手中。"
+        }
+      ],
       "choices": [
         {
           "id": "pray",
           "text": "Pray for light.",
+          "text_zh": "祷告求光。",
           "effects": {
             "fear": -10,
             "hope": 5,
@@ -24,6 +34,7 @@
         {
           "id": "rush",
           "text": "Rush forward blindly.",
+          "text_zh": "盲目地向前冲。",
           "effects": {
             "fear": 5,
             "weariness": 5
@@ -34,7 +45,9 @@
     },
     "echo": {
       "speaker": "Prayer Echo",
+      "speaker_zh": "祷告的回响",
       "text": "One step is enough for this moment.",
+      "text_zh": "此刻，一步就够了。",
       "next": "end"
     },
     "end": {

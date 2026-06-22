@@ -31,6 +31,13 @@
       "text_variants": [
         {
           "conditions": {
+            "requires_flag": "faithful_lost"
+          },
+          "text": "I saw them take Faithful — saw how he died without bitterness, even singing. His blood is the reason I am standing here. What the two of you refused to buy, I now refuse as well. Let me take his place at your side.",
+          "text_zh": "我看见他们带走了忠信——看见他怎样毫无苦毒地死去，口里还在歌唱。他的血，是我此刻站在这里的缘由。你们二人所不肯买的，如今我也不买了。让我接替他，站到你的身旁。"
+        },
+        {
+          "conditions": {
             "requires_flag": "interpreter_full"
           },
           "text": "Some pilgrims hurry past the Interpreter's rooms; you stayed and considered them all — I heard it on the road, and I see it now in how you refused this fair. Let me walk the rest of the way with one who learned to look.",

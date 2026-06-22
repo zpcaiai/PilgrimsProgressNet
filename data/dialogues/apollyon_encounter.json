@@ -98,6 +98,13 @@
           "text_zh": "站稳、祷告，以应许回应。（战斗开始。）"
         }
       ],
+      "text_variants": [
+        {
+          "conditions": { "requires_flag": "received_armor" },
+          "text": "Then stand there and be broken — armor and all. That steel they buckled on you at the Palace will not turn what I send: I drown men in fear and shame, not blades.",
+          "text_zh": "那就站在那里，被打碎吧——连你的甲胄一并打碎。他们在华美宫为你扣上的那身钢铁，挡不住我所发的：我淹没人，用的是恐惧与羞耻，不是刀剑。"
+        }
+      ],
       "text_zh": "那就站在那里，被打碎吧。我若不能拥有你，就用恐惧与羞耻把你淹没。"
     },
     "end": {
