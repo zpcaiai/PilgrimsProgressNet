@@ -1,0 +1,30 @@
+{
+  "id": "faithful_fellowship",
+  "nodes": {
+    "start": {
+      "speaker": "Faithful",
+      "speaker_zh": "忠信",
+      "text": "Well met, brother! We came different roads but to the same City. This fair hates us both — shall we stand in it together?",
+      "text_zh": "弟兄，幸会！我们走的路不同，去的城却是同一座。这集市恨我们两个——我们就在其中一同站立，好吗？",
+      "choices": [
+        {
+          "id": "together",
+          "text": "Together. Whatever they do, we will not buy what they sell.",
+          "text_zh": "一同站立。无论他们怎样行，我们都不买他们所卖的。",
+          "effects": { "faith": 6, "perseverance": 6, "hope": 4 },
+          "flags": { "walked_with_faithful": true },
+          "next": "end"
+        },
+        {
+          "id": "afraid",
+          "text": "I am afraid of this place — but I would rather be afraid beside you than safe alone.",
+          "text_zh": "我怕这地方——但我宁可与你一同惧怕，也不愿独自苟安。",
+          "effects": { "perseverance": 5, "humility": 4 },
+          "flags": { "walked_with_faithful": true },
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

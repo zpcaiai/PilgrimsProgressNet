@@ -1,0 +1,37 @@
+{
+  "id": "ignorance_optional",
+  "nodes": {
+    "start": {
+      "speaker": "Ignorance",
+      "speaker_zh": "无知",
+      "text": "I am from the country of Conceit, and I keep to the good rules I know. My heart tells me I shall be welcomed at the City. Does not yours tell you the same?",
+      "text_zh": "我从「自负之地」来，谨守我所知道的好规矩。我的心告诉我，我在天城必蒙接纳。你的心不也这样告诉你吗？",
+      "choices": [
+        {
+          "id": "warn",
+          "text": "A heart can flatter as well as fear. I trust the Word's verdict, not my own.",
+          "text_zh": "心既会惧怕，也会奉承。我信靠真道的判语，而非我自己的感觉。",
+          "effects": { "discernment": 7, "watchfulness": 4 },
+          "flags": { "met_ignorance": true },
+          "next": "shrug"
+        },
+        {
+          "id": "kind",
+          "text": "I once thought as you do. Do not rest on the gate without the King's own welcome.",
+          "text_zh": "我从前也这样想。不要在没有王亲自接纳的情况下，就安心倚靠那门。",
+          "effects": { "humility": 4, "discernment": 4 },
+          "flags": { "met_ignorance": true },
+          "next": "shrug"
+        }
+      ]
+    },
+    "shrug": {
+      "speaker": "Ignorance",
+      "speaker_zh": "无知",
+      "text": "You think too darkly, pilgrim. I shall keep my own pace, and my own good hope.",
+      "text_zh": "朝圣者，你想得太灰暗了。我自走我的步调，存我自己的好指望。",
+      "choices": [ { "id": "ok", "text": "Then I pray you find true ground before the river.", "text_zh": "那我愿你在那河之前，寻得真实的根基。", "next": "end" } ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

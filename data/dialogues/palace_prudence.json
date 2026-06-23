@@ -1,0 +1,37 @@
+{
+  "id": "palace_prudence",
+  "nodes": {
+    "start": {
+      "speaker": "Prudence",
+      "speaker_zh": "谨慎",
+      "text": "Do you not still, at times, feel the country you came from pulling at you — the old thoughts, the old comforts?",
+      "text_zh": "你是否仍会时时感到你所离开的那地在拉扯你——旧日的念头，旧日的安逸？",
+      "choices": [
+        {
+          "id": "yes",
+          "text": "I do. But when they come, I remember the Cross and they lose their hold.",
+          "text_zh": "是的。但它们来时，我就记起十字架，它们便抓不住我了。",
+          "effects": { "watchfulness": 6, "discernment": 5, "deception": -5 },
+          "flags": { "met_prudence": true },
+          "next": "counsel"
+        },
+        {
+          "id": "struggle",
+          "text": "Often. Some days the pull is very strong.",
+          "text_zh": "常常。有些日子，那拉力很强。",
+          "effects": { "humility": 4, "watchfulness": 3 },
+          "flags": { "met_prudence": true },
+          "next": "counsel"
+        }
+      ]
+    },
+    "counsel": {
+      "speaker": "Prudence",
+      "speaker_zh": "谨慎",
+      "text": "Then keep watch over your heart. When the valley accuses you, do not argue in your own strength — answer with the promise. That is the wisdom that keeps a pilgrim.",
+      "text_zh": "那就看守你的心。当那幽谷控告你时，不要凭自己的力量争辩——以应许回答。这就是保守朝圣者的智慧。",
+      "choices": [ { "id": "ok", "text": "I will keep watch. Thank you, Prudence.", "text_zh": "我必看守。谢谢你，谨慎。", "next": "end" } ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

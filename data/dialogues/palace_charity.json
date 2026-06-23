@@ -1,0 +1,37 @@
+{
+  "id": "palace_charity",
+  "nodes": {
+    "start": {
+      "speaker": "Charity",
+      "speaker_zh": "仁爱",
+      "text": "You have a family, have you not? Why did you not bring them with you on this way?",
+      "text_zh": "你是有家室的，不是吗？你为何没有带他们同走这路？",
+      "choices": [
+        {
+          "id": "begged",
+          "text": "I begged them to come. They would not — yet I pray for them still.",
+          "text_zh": "我曾恳求他们同来。他们不肯——但我至今仍为他们祷告。",
+          "effects": { "humility": 5, "hope": 5 },
+          "flags": { "met_charity": true },
+          "next": "comfort"
+        },
+        {
+          "id": "grief",
+          "text": "It grieves me daily that they stayed behind.",
+          "text_zh": "他们留在后面，这事天天叫我痛心。",
+          "effects": { "humility": 4, "despair": 3 },
+          "flags": { "met_charity": true },
+          "next": "comfort"
+        }
+      ]
+    },
+    "comfort": {
+      "speaker": "Charity",
+      "speaker_zh": "仁爱",
+      "text": "You have done what love could do — gone before them and held them up in prayer. Carry no false guilt down the valley; carry love, and keep praying.",
+      "text_zh": "你已做了爱所能做的——先他们而行，又在祷告中托住他们。不要把虚假的愧疚带下幽谷；要带着爱，并不住祷告。",
+      "choices": [ { "id": "ok", "text": "Thank you, Charity. I will keep praying for them.", "text_zh": "谢谢你，仁爱。我必为他们不住祷告。", "effects": {"despair": -4, "hope": 4}, "next": "end" } ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

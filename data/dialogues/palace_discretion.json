@@ -1,0 +1,44 @@
+{
+  "id": "palace_discretion",
+  "nodes": {
+    "start": {
+      "speaker": "Discretion",
+      "speaker_zh": "明辨",
+      "text": "Before you are welcomed in, tell me truly: do you come trusting your own goodness, or the mercy that pardoned you at the Cross?",
+      "text_zh": "在你被迎进来之前，请如实告诉我：你来，是倚靠自己的良善，还是倚靠那在十字架前赦免你的怜悯？",
+      "choices": [
+        {
+          "id": "mercy",
+          "text": "Only the mercy. My burden fell there, not by my strength.",
+          "text_zh": "唯靠那怜悯。我的重担在那里落下，并非靠我的力量。",
+          "effects": { "humility": 6, "faith": 5, "pride": -6 },
+          "flags": { "met_discretion": true },
+          "next": "welcome"
+        },
+        {
+          "id": "try",
+          "text": "I have tried hard to be worthy of this place.",
+          "text_zh": "我已尽力，想配得上这地方。",
+          "effects": { "humility": 3, "pride": 2 },
+          "flags": { "met_discretion": true },
+          "next": "gentle"
+        }
+      ]
+    },
+    "gentle": {
+      "speaker": "Discretion",
+      "speaker_zh": "明辨",
+      "text": "Worth did not bring you up the hill — grace did. Rest in that, and you will rest indeed.",
+      "text_zh": "把你带上山的不是配得，是恩典。安息于此，你才真得安息。",
+      "choices": [ { "id": "ok", "text": "You are right. I will rest in grace.", "text_zh": "你说得对。我要安息在恩典里。", "effects": {"pride": -4, "hope": 4}, "next": "end" } ]
+    },
+    "welcome": {
+      "speaker": "Discretion",
+      "speaker_zh": "明辨",
+      "text": "Then you are welcome here. Come in, and let my sisters search and strengthen your heart.",
+      "text_zh": "那么，欢迎你。进来吧，让我的姊妹们察验、坚固你的心。",
+      "choices": [ { "id": "ok", "text": "Thank you, Discretion.", "text_zh": "谢谢你，明辨。", "next": "end" } ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

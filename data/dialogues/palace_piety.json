@@ -1,0 +1,37 @@
+{
+  "id": "palace_piety",
+  "nodes": {
+    "start": {
+      "speaker": "Piety",
+      "speaker_zh": "虔诚",
+      "text": "Tell me what you have seen since you set out. Naming the mercies you have met will steady you for what lies ahead.",
+      "text_zh": "把你出发以来所见的告诉我。一一数算你所遇见的恩典，会让你为前路站立得稳。",
+      "choices": [
+        {
+          "id": "slough",
+          "text": "I sank in the Slough, and a hand called Help lifted me out.",
+          "text_zh": "我曾陷在泥潭，一只叫「帮助」的手把我拉了出来。",
+          "effects": { "hope": 5, "faith": 4 },
+          "flags": { "met_piety": true },
+          "next": "bless"
+        },
+        {
+          "id": "cross",
+          "text": "I came to the Cross, and the burden rolled from my back into the tomb.",
+          "text_zh": "我来到十字架前，重担从我背上滚落，进了空坟。",
+          "effects": { "faith": 6, "hope": 5, "shame": -6 },
+          "flags": { "met_piety": true },
+          "next": "bless"
+        }
+      ]
+    },
+    "bless": {
+      "speaker": "Piety",
+      "speaker_zh": "虔诚",
+      "text": "The same grace that brought you this far will carry you down the valley and up to the City. Go armed, not afraid.",
+      "text_zh": "那把你带到这里的同一恩典，必带你下那幽谷，并上到天城。披甲而去，不要惧怕。",
+      "choices": [ { "id": "ok", "text": "Amen. Thank you, Piety.", "text_zh": "阿们。谢谢你，虔诚。", "next": "end" } ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "palace_porter",
+  "nodes": {
+    "start": {
+      "speaker": "Watchful, the Porter",
+      "speaker_zh": "看门的·儆醒",
+      "text": "Peace, pilgrim. This house was built by the Lord of the hill for the relief and security of pilgrims. Whence come you, and whither are you bound?",
+      "text_zh": "平安，朝圣者。这house是山之主为朝圣者的歇息与稳妥所建。你从哪里来，要往哪里去？",
+      "choices": [
+        {
+          "id": "tell",
+          "text": "From the City of Destruction; I am going to the Celestial City.",
+          "text_zh": "从将亡之城来；我要往天城去。",
+          "effects": { "hope": 4, "watchfulness": 4 },
+          "flags": { "met_porter": true },
+          "next": "reply"
+        },
+        {
+          "id": "rest",
+          "text": "May I rest here? Night is coming and the way has been long.",
+          "text_zh": "我可以在此歇息吗？夜将至，路已远。",
+          "effects": { "perseverance": 3, "weariness": -5 },
+          "flags": { "met_porter": true },
+          "next": "reply"
+        }
+      ]
+    },
+    "reply": {
+      "speaker": "Watchful, the Porter",
+      "speaker_zh": "看门的·儆醒",
+      "text": "Stay then till morning. I will call the damsels of the house — Discretion, Prudence, Piety and Charity — to speak with you, and they will show you the armoury before you go down to the valley.",
+      "text_zh": "那就住到天明。我去叫这家的姑娘——明辨、谨慎、虔诚、仁爱——来与你交谈；下到幽谷之前，她们会带你看那军械库。",
+      "choices": [
+        { "id": "ok", "text": "Thank you. I will gladly speak with them.", "text_zh": "谢谢。我很乐意与她们交谈。", "next": "end" }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

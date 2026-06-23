@@ -1,0 +1,30 @@
+{
+  "id": "timorous_mistrust",
+  "nodes": {
+    "start": {
+      "speaker": "Timorous & Mistrust",
+      "speaker_zh": "怯懦 与 多疑",
+      "text": "Go back! There are lions in the way ahead — we saw them and fled. The further you go, the more danger you meet!",
+      "text_zh": "回头吧！前面的路上有狮子——我们看见了就逃了回来。你越往前走，遇见的危险就越多！",
+      "choices": [
+        {
+          "id": "press",
+          "text": "To go back is death; to go on is feared death and then life. I will go on.",
+          "text_zh": "回去是死；前行不过是所惧怕的死，之后却是生。我要前行。",
+          "effects": { "perseverance": 8, "faith": 5, "fear": -6 },
+          "flags": { "passed_timorous": true },
+          "next": "end"
+        },
+        {
+          "id": "tremble",
+          "text": "Their fear shakes me — but the lions may be chained. I will look before I flee.",
+          "text_zh": "他们的惧怕动摇了我——但那些狮子或许是被链子拴着的。我要看清楚，再决定逃不逃。",
+          "effects": { "watchfulness": 6, "discernment": 5, "fear": 3 },
+          "flags": { "passed_timorous": true },
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}
