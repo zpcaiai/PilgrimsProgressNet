@@ -335,19 +335,33 @@ static func _city_of_destruction(parent: Node3D) -> void:
 ## a far promise of solid ground.
 static func _slough(parent: Node3D) -> void:
 	var rng := _rng(102)
+	# A broad MUDDY mire flanking the narrow causeway — dark, opaque sludge (not
+	# clear water), so it reads as a bog even before the water shader/AgX. The
+	# central causeway stays walkable.
+	var mud_shallow := Color(0.30, 0.27, 0.20)
+	var mud_deep := Color(0.13, 0.12, 0.08)
 	for s in [-1.0, 1.0]:
-		_water(parent, Vector3(s * 10.0, 0.15, -16), Vector2(11, 40), Color(0.36, 0.34, 0.28), Color(0.1, 0.12, 0.09), 0.86)
-		_accent(parent, Vector3(s * 9.0, 0.6, -16), Color(0.4, 0.5, 0.38), 1.4, 16.0)
+		_water(parent, Vector3(s * 10.5, 0.12, -14), Vector2(14, 46), mud_shallow, mud_deep, 0.95)
+		_accent(parent, Vector3(s * 9.0, 0.5, -16), Color(0.32, 0.36, 0.26), 1.2, 16.0)
+	# Mud mounds & sludge breaking the surface so the swamp is unmistakable.
+	var mud_mat := MaterialKit.make("mud", Color(0.26, 0.22, 0.16))
+	for i in range(16):
+		var mx := (-1.0 if i % 2 == 0 else 1.0) * rng.randf_range(5.5, 15.0)
+		var mound := _mi(_dome(rng.randf_range(0.5, 1.3)), mud_mat, Vector3(mx, 0.05, rng.randf_range(-36, 2)))
+		mound.scale = Vector3(1.4, rng.randf_range(0.3, 0.5), 1.4)
+		parent.add_child(mound)
+	# Low swamp mist hanging over the mire.
+	PropKit.mist(parent, Vector3(0, 0, -16), Vector2(34, 44), 1.6, Color(0.5, 0.52, 0.5))
 	for i in range(8):
-		var x := (-1.0 if i % 2 == 0 else 1.0) * rng.randf_range(8, 13)
+		var x := (-1.0 if i % 2 == 0 else 1.0) * rng.randf_range(7, 14)
 		_dead_tree(parent, Vector3(x, 0, rng.randf_range(-32, 2)), rng.randf_range(2.6, 4.2), rng)
-	# Broken cart / posts half-sunk near the deepest mire.
-	for i in range(5):
-		var post := _mi(_box(Vector3(0.3, rng.randf_range(1.2, 2.2), 0.3)), MaterialKit.make("wood", Color(0.3, 0.26, 0.2)), Vector3(rng.randf_range(-7, 7), 0.4, rng.randf_range(-34, -20)))
-		post.rotation_degrees = Vector3(rng.randf_range(-25, 25), 0, rng.randf_range(-25, 25))
+	# Broken cart / posts half-sunk in the sludge.
+	for i in range(6):
+		var post := _mi(_box(Vector3(0.3, rng.randf_range(1.2, 2.2), 0.3)), MaterialKit.make("wood", Color(0.3, 0.26, 0.2)), Vector3((-1.0 if i % 2 == 0 else 1.0) * rng.randf_range(5, 13), 0.3, rng.randf_range(-34, -8)))
+		post.rotation_degrees = Vector3(rng.randf_range(-30, 30), 0, rng.randf_range(-30, 30))
 		parent.add_child(post)
-	PropKit.reeds(parent, Vector3(-8, 0, -6), Vector2(7, 14), 30, Color(0.4, 0.45, 0.34))
-	PropKit.reeds(parent, Vector3(8, 0, -40), Vector2(7, 12), 26, Color(0.38, 0.43, 0.32))
+	PropKit.reeds(parent, Vector3(-9, 0, -6), Vector2(8, 16), 36, Color(0.38, 0.43, 0.30))
+	PropKit.reeds(parent, Vector3(9, 0, -40), Vector2(8, 14), 30, Color(0.36, 0.41, 0.28))
 	# Solid ground waiting beyond (exit at -50).
 	_glow_disc(parent, Vector3(0, 4, -50), 5.0, Color(0.9, 0.88, 0.7), 1.0)
 	_accent(parent, Vector3(0, 3, -48), Color(1.0, 0.9, 0.65), 2.2, 18.0)

@@ -44,3 +44,11 @@ rb:dress
 rb:art
 rb:postfx
 rebuild_end
+=== ready_start wilderness_road ===
+spawn_player (0.0, 1.0, 0.0)
+build_start
+setup_environment
+spawn_player (0.0, 1.0, 40.0)
+build_end
+rebuild_start
+rebuild_end

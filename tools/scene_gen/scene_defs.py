@@ -370,8 +370,7 @@ def build_wilderness_road():
         {"kind": "box", "size": (0.9, 0.5, 0.7), "color": (0.48, 0.45, 0.40), "pos": (0.2, 1.1, 0.1)},
     ], pos=(3.6, 0, 8))
 
-    # A wayside chapel beside the road through the waste.
-    _chapel(s, "PROP_Chapel", (-9, 0, 4), rot=(0, 90, 0))
+    # (No chapel here — the Wilderness Road is meant to be barren and austere.)
 
     # Rocks, dead trees, broken fence, dry brush -- the parched in-between land.
     s.composite("PROP_RockCluster_01", [
