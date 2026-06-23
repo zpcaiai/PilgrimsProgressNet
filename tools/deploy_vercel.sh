@@ -33,6 +33,11 @@ for f in index.wasm index.pck index.js; do
   [[ -f "$WEB_DIR/$f" ]] || echo "⚠ build/web/$f missing — export may be incomplete." >&2
 done
 
+# 1.5) Activate Node 20 via nvm (the patched vercel install with proxy support).
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+nvm use 20 >/dev/null 2>&1 || { echo "✗ Node 20 not available via nvm. Run: nvm install 20" >&2; exit 1; }
+
 # 2) Ensure the Vercel CLI is available.
 if ! command -v vercel >/dev/null 2>&1; then
   echo "→ Vercel CLI not found; installing globally (npm i -g vercel)…"
@@ -66,6 +71,17 @@ json.dump(data, open(path, "w"), indent=2)
 print("  rewrites merged into", os.path.basename(path))
 PY
   echo "  (reminder: set NetConfig.base_url = \"/api/v1\" and realtime = false, then re-export.)"
+fi
+
+# 3d) Guard: Vercel rejects any single file > 100 MB. Catch it locally with a
+#     clear message instead of a late, cryptic deploy error.
+big="$(find "$WEB_DIR" -type f -size +100M 2>/dev/null)"
+if [[ -n "$big" ]]; then
+  echo "✗ Over Vercel's 100 MB per-file limit — shrink before deploying:" >&2
+  while IFS= read -r f; do echo "    $(du -h "$f" | cut -f1)  ${f#$WEB_DIR/}" >&2; done <<< "$big"
+  echo "  Usually index.pck. Reduce texture sizes (tools/gen_pbr.py / import max size)," >&2
+  echo "  re-export the Web build, then run this again." >&2
+  exit 1
 fi
 
 # 4) Deploy the static folder to production.

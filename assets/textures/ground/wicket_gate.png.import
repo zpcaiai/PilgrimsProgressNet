@@ -3,19 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bxh0w6b08p0xh"
-path="res://.godot/imported/wicket_gate.png-94ca449196ade68d14d6bfaee87452d6.ctex"
+path.s3tc="res://.godot/imported/wicket_gate.png-94ca449196ade68d14d6bfaee87452d6.s3tc.ctex"
+path.etc2="res://.godot/imported/wicket_gate.png-94ca449196ade68d14d6bfaee87452d6.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/textures/ground/wicket_gate.png"
-dest_files=["res://.godot/imported/wicket_gate.png-94ca449196ade68d14d6bfaee87452d6.ctex"]
+dest_files=["res://.godot/imported/wicket_gate.png-94ca449196ade68d14d6bfaee87452d6.s3tc.ctex", "res://.godot/imported/wicket_gate.png-94ca449196ade68d14d6bfaee87452d6.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -37,4 +39,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

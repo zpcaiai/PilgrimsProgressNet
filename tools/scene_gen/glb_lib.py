@@ -69,7 +69,7 @@ def tex_paths(name):
 # Cap textures embedded into per-scene GLBs so the base geometry stays light
 # (the full-res 1024px maps are loaded at runtime by MaterialKit for hero props;
 # baked ground/walls only need a modest embedded copy).
-EMBED_MAX = 512
+EMBED_MAX = 160
 
 
 def _embed_bytes(png_path, max_dim=EMBED_MAX):

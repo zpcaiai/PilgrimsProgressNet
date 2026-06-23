@@ -3,19 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://hthjkk06t45y"
-path="res://.godot/imported/city_of_destruction_r.png-14ce11721daa9dc3797b4c07b76ed560.ctex"
+path.s3tc="res://.godot/imported/city_of_destruction_r.png-14ce11721daa9dc3797b4c07b76ed560.s3tc.ctex"
+path.etc2="res://.godot/imported/city_of_destruction_r.png-14ce11721daa9dc3797b4c07b76ed560.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/textures/ground/city_of_destruction_r.png"
-dest_files=["res://.godot/imported/city_of_destruction_r.png-14ce11721daa9dc3797b4c07b76ed560.ctex"]
+dest_files=["res://.godot/imported/city_of_destruction_r.png-14ce11721daa9dc3797b4c07b76ed560.s3tc.ctex", "res://.godot/imported/city_of_destruction_r.png-14ce11721daa9dc3797b4c07b76ed560.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -37,4 +39,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0
