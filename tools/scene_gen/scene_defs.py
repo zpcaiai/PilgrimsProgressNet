@@ -1193,6 +1193,47 @@ def build_vanity_fair():
 # ===========================================================================
 # CHAPTER 12 - Doubting Castle
 # ===========================================================================
+def _battlement_wall(s, name, run, pos, color, axis="x", height=7.5,
+                     thick=1.2, merlon=0.9):
+    """A curtain wall with a crenellated top (alternating merlons). `axis` is the
+    horizontal direction the wall runs along ('x' or 'z'); `run` is its length.
+    The rampart blocks the pilgrim; the merlons sit on top out of reach."""
+    if axis == "x":
+        s.box(name, (run, height, thick), color, (pos[0], height / 2.0, pos[2]))
+    else:
+        s.box(name, (thick, height, run), color, (pos[0], height / 2.0, pos[2]))
+    parts = []
+    n = max(2, int(run // 1.7))
+    start = -((n - 1) * 1.7) / 2.0
+    for i in range(n):
+        off = start + i * 1.7
+        if axis == "x":
+            parts.append({"kind": "box", "size": (1.0, 0.9, thick + 0.08),
+                          "color": color, "pos": (off, height + 0.45, 0)})
+        else:
+            parts.append({"kind": "box", "size": (thick + 0.08, 0.9, 1.0),
+                          "color": color, "pos": (0, height + 0.45, off)})
+    s.composite(name + "_Merlon", parts, pos=(pos[0], 0, pos[2]))
+
+
+def _keep_tower(s, name, pos, color, height=9.5, radius=1.7):
+    """A stout round dungeon tower: tapered shaft + a corbelled battlement ring
+    + a conical slate cap, so the keep reads as a brooding fortress turret."""
+    shaft = [(radius, 0), (radius * 1.06, 0.4 * height), (radius * 0.92, 0.82 * height),
+             (radius * 1.12, 0.86 * height), (radius * 1.12, 0.94 * height),
+             (radius * 0.5, 0.95 * height), (0.0, height)]
+    s.lathe(name, shaft, color, pos)
+    # crenellation ring on the corbel
+    parts = []
+    import math as _m
+    for i in range(10):
+        a = 2.0 * _m.pi * i / 10.0
+        parts.append({"kind": "box", "size": (0.5, 0.8, 0.5), "color": color,
+                      "pos": (radius * 1.12 * _m.cos(a), 0.9 * height,
+                              radius * 1.12 * _m.sin(a))})
+    s.composite(name + "_Crown", parts, pos=pos)
+
+
 def build_doubting_castle():
     s = Scene("doubting_castle")
     stone = (0.34, 0.34, 0.38)
@@ -1203,8 +1244,8 @@ def build_doubting_castle():
     s.box("ENV_Doubting_Cell", (10, 0.1, 10), (0.22, 0.22, 0.26), (0, 0.06, -8))
     s.box("ENV_Doubting_DarkHall", (6, 0.1, 16), (0.2, 0.2, 0.24), (0, 0.06, 2))
     _road(s, "ENV_Doubting_EscapePath", 14, -22, 5, (0.3, 0.32, 0.3))
-    _wall(s, "ENV_Doubting_CellWallL", (0.5, 4, 10), (-5, 2, -8), stone)
-    _wall(s, "ENV_Doubting_CellWallR", (0.5, 4, 10), (5, 2, -8), stone)
+    _wall(s, "ENV_Doubting_CellWallL", (0.6, 7, 10), (-5, 3.5, -8), stone)
+    _wall(s, "ENV_Doubting_CellWallR", (0.6, 7, 10), (5, 3.5, -8), stone)
 
     s.box("PROP_CellDoor", (3, 3.4, 0.3), (0.4, 0.34, 0.2), (0, 1.7, -3), emissive=(0.1, 0.08, 0.04))
     s.composite("PROP_CellChains", [
@@ -1226,6 +1267,34 @@ def build_doubting_castle():
               (1.9, 10.2), (1.3, 11.0), (0.0, 12.6)]
     s.lathe("PROP_CastleTower_Left", _tower, stone, (-11, 0, -8))
     s.lathe("PROP_CastleTower_Right", _tower, stone, (11, 0, -8))
+
+    # --- A real fortress: crenellated curtain walls ringing the bailey, with a
+    # gate gap at the front (x≈0, z=7) and an escape gap at the back (x≈0, z=-19),
+    # four tall corner towers, and a stone keep clenched around the dungeon cell.
+    wall_dim = (0.34, 0.32, 0.37)
+    _battlement_wall(s, "PROP_CastleWall_FrontL", 10.4, (-7.8, 0, 7), wall_dim, "x")
+    _battlement_wall(s, "PROP_CastleWall_FrontR", 10.4, (7.8, 0, 7), wall_dim, "x")
+    _battlement_wall(s, "PROP_CastleWall_BackL", 10.8, (-7.6, 0, -19), wall_dim, "x")
+    _battlement_wall(s, "PROP_CastleWall_BackR", 10.8, (7.6, 0, -19), wall_dim, "x")
+    _battlement_wall(s, "PROP_CastleWall_Left", 26.0, (-13, 0, -6), wall_dim, "z")
+    _battlement_wall(s, "PROP_CastleWall_Right", 26.0, (13, 0, -6), wall_dim, "z")
+    # Tall corner towers (reuse the brooding tower profile).
+    s.lathe("PROP_CastleTower_FrontLeft", _tower, stone, (-13, 0, 7))
+    s.lathe("PROP_CastleTower_FrontRight", _tower, stone, (13, 0, 7))
+    s.lathe("PROP_CastleTower_BackLeft", _tower, stone, (-13, 0, -19))
+    s.lathe("PROP_CastleTower_BackRight", _tower, stone, (13, 0, -19))
+    # The keep: four dungeon turrets clenched around the cell (x=±5, z=-3/-13),
+    # so the pilgrim wakes inside the heart of a great stone keep.
+    keep_stone = (0.3, 0.3, 0.34)
+    s.composite("PROP_KeepWallBack", [
+        {"kind": "box", "size": (3.6, 7.0, 0.7), "color": keep_stone, "pos": (-3.4, 3.5, 0)},
+        {"kind": "box", "size": (3.6, 7.0, 0.7), "color": keep_stone, "pos": (3.4, 3.5, 0)},
+        {"kind": "box", "size": (10.6, 1.0, 0.7), "color": keep_stone, "pos": (0, 7.4, 0)},
+    ], pos=(0, 0, -13))
+    _keep_tower(s, "PROP_KeepTower_FrontLeft", (-5, 0, -3), keep_stone)
+    _keep_tower(s, "PROP_KeepTower_FrontRight", (5, 0, -3), keep_stone)
+    _keep_tower(s, "PROP_KeepTower_BackLeft", (-5, 0, -13), keep_stone)
+    _keep_tower(s, "PROP_KeepTower_BackRight", (5, 0, -13), keep_stone)
     # A chapel out in the By-Path meadow — mercy within reach of the dungeon.
     _chapel(s, "PROP_Chapel", (-12, 0, 20), rot=(0, 90, 0))
     # --- 精装修: a grimmer castle ground (graves, dead trees, puddles, chains) ---
@@ -1439,6 +1508,13 @@ def build_river_of_death():
     s.box("ENV_River_DeepChannel", (44, 0.1, 14), (0.05, 0.07, 0.16), (0, 0.04, -6))
     s.box("ENV_River_FarBank", (44, 0.12, 16), (0.4, 0.42, 0.4), (0, 0.06, -30))
     _road(s, "ENV_River_CityApproach", 12, -40, 6, (0.6, 0.6, 0.5))
+    # A real waist-high water SURFACE the pilgrim wades INTO: a translucent, glossy
+    # sheet at ~0.95 m over the crossing band, so stepping off the near bank sinks
+    # him to the waist and the deep water hides his legs (RiverWaterZone toggles the
+    # swim posture; the dark WaterPlane below shows through as the river's depth).
+    s.box("ENV_River_WaterSurface", (44, 0.1, 32), (0.16, 0.32, 0.46, 0.55), (0, 0.95, -7),
+          emissive=(0.05, 0.12, 0.2), metallic=0.1, roughness=0.05, bevel=False,
+          blend=True, double_sided=True)
 
     s.composite("PROP_RiverStone_01", [
         {"kind": "box", "size": (1.4, 0.6, 1.4), "color": (0.4, 0.42, 0.44), "pos": (0, 0.3, 0)}], pos=(-3, 0, 4))
@@ -1469,6 +1545,10 @@ def build_river_of_death():
     s.marker("NPC_Hopeful", (1.5, 0, 14))
     s.marker("NPC_ShiningOne_01", (-2, 0, -30))
     s.marker("NPC_ShiningOne_02", (2, 0, -30))
+    # The river creature: it surfaces mid-stream to bar the crossing and lunges at
+    # the pilgrim's heart (fear/despair). It is symbolic, never lethal — when faith
+    # outweighs fear it sinks back and the water opens. (RiverMonster.gd)
+    s.marker("ENEMY_RiverMonster", (0, 0.9, -4))
 
     s.zone("TRIGGER_EnterRiver", (10, 4, 3), (0, 2, 12))
     s.zone("TRIGGER_MidRiverFear", (12, 4, 4), (0, 2, -6))
@@ -1477,6 +1557,9 @@ def build_river_of_death():
     s.zone("COL_RiverFearZone", (24, 4, 10), (0, 2, 2), color=(0.1, 0.12, 0.25, 0.4))
     s.zone("COL_RiverDeepZone", (24, 4, 10), (0, 2, -10), color=(0.05, 0.07, 0.2, 0.5))
     s.zone("COL_RiverMemoryPromptZone", (24, 4, 6), (0, 2, -14), color=(0.2, 0.2, 0.35, 0.3))
+    # The wet stretch: entering it sinks the pilgrim to the waist and starts the
+    # swim/wade posture; faith vs. fear sets how hard the water pulls. (RiverWaterZone)
+    s.zone("COL_RiverWater", (44, 4, 32), (0, 2, -7), color=(0.12, 0.3, 0.5, 0.16))
 
     for nm, pos in [("VFX_RiverMist", (0, 1.5, -6)), ("VFX_CityGlowAcrossRiver", (0, 6, -44)),
                     ("VFX_MemoryLight_Cross", (-3, 1.5, -8)), ("VFX_MemoryLight_Key", (3, 1.5, -10)),

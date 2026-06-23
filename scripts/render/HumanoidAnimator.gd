@@ -24,6 +24,7 @@ var mover: Node3D = null        # whose world motion drives the walk (null => id
 var make_shadow: bool = true
 var shadow_width: float = 0.62
 var height_scale: float = 1.0   # so the vertical bob stays proportional to size
+var swimming: bool = false      # when true, override the walk with a swim stroke
 
 # tuning
 const WALK_FREQ := 7.5          # stride cadence (rad/s base)
@@ -36,6 +37,8 @@ const IDLE_BOB := 0.01
 const LEAN := 0.08              # forward lean (rad) at full stride
 const TARGET_SPEED := 4.5       # m/s that counts as a full-amplitude stride
 const MOVE_THRESHOLD := 0.5     # m/s before "walking" kicks in
+const SWIM_FREQ := 3.6          # swim-stroke cadence (rad/s)
+const SWIM_PITCH := 0.85        # forward pitch of the body while swimming (rad)
 
 var _base_body_y: float = 0.0
 var _t: float = 0.0
@@ -87,6 +90,10 @@ static func find_in(root: Node) -> HumanoidAnimator:
 
 func _process(delta: float) -> void:
 	if body == null or delta <= 0.0:
+		return
+
+	if swimming:
+		_swim(delta)
 		return
 
 	# --- measure travel speed from the mover's horizontal displacement ---
@@ -141,3 +148,30 @@ func _process(delta: float) -> void:
 	body.rotation.x = lerpf(body.rotation.x, lean_target, clampf(delta * 6.0, 0.0, 1.0))
 	# Subtle idle weight-shift when standing still.
 	body.rotation.z = sin(_t * 0.6) * 0.018 * (1.0 - _gait)
+
+
+## A front-crawl swim cycle: the body pitches forward into the water and bobs,
+## the arms windmill overhead in alternation, and the legs flutter-kick. Used by
+## the pilgrim while crossing the River of Death (PlayerController.set_swimming).
+func _swim(delta: float) -> void:
+	_phase += delta * SWIM_FREQ
+	var sw := sin(_phase)
+	# Body: pitch forward (face toward the water) and rise/fall with the stroke.
+	body.rotation.x = lerpf(body.rotation.x, SWIM_PITCH, clampf(delta * 4.0, 0.0, 1.0))
+	body.rotation.z = lerpf(body.rotation.z, 0.0, clampf(delta * 4.0, 0.0, 1.0))
+	body.position.y = _base_body_y + sin(_phase * 2.0) * 0.06 * height_scale
+	# Arms: alternating overhead crawl. arm pivot rot.x ~ -2.4 (reach overhead) to
+	# +0.6 (pull through under the body); the two arms are half a cycle apart.
+	if is_instance_valid(arm_l):
+		arm_l.rotation.x = -0.9 + sw * 1.5
+	if is_instance_valid(arm_r):
+		arm_r.rotation.x = -0.9 - sw * 1.5
+	# Legs: small flutter kick, knees barely bent (trailing in the water).
+	if is_instance_valid(hip_l):
+		hip_l.rotation.x = sw * 0.3
+	if is_instance_valid(hip_r):
+		hip_r.rotation.x = -sw * 0.3
+	if is_instance_valid(knee_l):
+		knee_l.rotation.x = -0.18 - maxf(0.0, sw) * 0.18
+	if is_instance_valid(knee_r):
+		knee_r.rotation.x = -0.18 - maxf(0.0, -sw) * 0.18

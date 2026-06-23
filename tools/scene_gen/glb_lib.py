@@ -65,6 +65,32 @@ def tex_paths(name):
         nrm = None
     return alb, nrm
 
+
+# Cap textures embedded into per-scene GLBs so the base geometry stays light
+# (the full-res 1024px maps are loaded at runtime by MaterialKit for hero props;
+# baked ground/walls only need a modest embedded copy).
+EMBED_MAX = 512
+
+
+def _embed_bytes(png_path, max_dim=EMBED_MAX):
+    """PNG bytes for embedding, downscaled to <= max_dim. Falls back to the raw
+    file if Pillow is unavailable (keeps the writer dependency-free-optional)."""
+    try:
+        import io
+        from PIL import Image
+        im = Image.open(png_path)
+        if max(im.size) > max_dim:
+            s = max_dim / float(max(im.size))
+            im = im.resize((max(1, round(im.size[0] * s)), max(1, round(im.size[1] * s))), Image.LANCZOS)
+            buf = io.BytesIO()
+            im.save(buf, format="PNG")
+            return buf.getvalue()
+    except Exception:
+        pass
+    with open(png_path, "rb") as f:
+        return f.read()
+
+
 # glTF component / target constants
 _FLOAT = 5126
 _UINT = 5125
@@ -772,8 +798,7 @@ class GLB:
         """Embed a PNG into the GLB and return its texture index (cached)."""
         if png_path in self._tex_cache:
             return self._tex_cache[png_path]
-        with open(png_path, "rb") as f:
-            data = f.read()
+        data = _embed_bytes(png_path)
         view = self._add_view(data)  # image data: no buffer target
         img_idx = len(self.images)
         self.images.append({"bufferView": view, "mimeType": "image/png"})
@@ -951,8 +976,9 @@ class Scene:
     # --- visible primitives ---
     def box(self, name, size, color, pos=(0, 0, 0), rot=(0, 0, 0),
             emissive=None, metallic=None, roughness=None, bevel=True,
-            tex=None, tile=1.4):
-        mat = self._mat(name, color, emissive, metallic, roughness, tex=tex)
+            tex=None, tile=1.4, blend=False, double_sided=False):
+        mat = self._mat(name, color, emissive, metallic, roughness, tex=tex,
+                        blend=blend, double_sided=double_sided)
         if tex:
             P, N, UV, I = box_uv(*size, tile=tile)
             mesh = self.glb.mesh_uv(P, N, UV, I, mat)

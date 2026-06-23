@@ -23,6 +23,7 @@ var _interactor: Area3D
 var _current_target: Interactable = null
 var _breath_timer: float = 0.0
 var _glancing: bool = false
+var _swimming: bool = false
 # Footstep / landing dust
 var _dust: CPUParticles3D
 var _land_puff: CPUParticles3D
@@ -443,3 +444,26 @@ func glance_toward(point: Vector3) -> void:
 func teleport(pos: Vector3) -> void:
 	global_position = pos
 	velocity = Vector3.ZERO
+
+
+## Enter / leave the water (River of Death). While swimming, the body sinks so
+## the pilgrim is submerged to the waist (the river's surface plane hides his
+## legs) and the figure switches to a swim stroke. The physics capsule is left
+## flush, so movement stays robust — only the visible mesh dips. Driven by
+## RiverWaterZone when the player crosses into the wet stretch.
+func set_swimming(on: bool) -> void:
+	if on == _swimming:
+		return
+	_swimming = on
+	if is_instance_valid(_fig):
+		var anim := HumanoidAnimator.find_in(_fig)
+		if anim != null:
+			anim.swimming = on
+	if is_instance_valid(_mesh_root):
+		var sink := -0.45 if on else 0.0
+		var tw := create_tween()
+		tw.tween_property(_mesh_root, "position:y", sink, 0.5).set_trans(Tween.TRANS_SINE)
+
+
+func is_swimming() -> bool:
+	return _swimming

@@ -10,8 +10,13 @@ signal stats_changed()
 var resolve: float = 100.0
 var max_resolve: float = 100.0
 var promise_charge: int = 1
+const MAX_PROMISE := 3
 var prayer_cooldown: float = 0.0
 const PRAYER_CD := 6.0
+# Promises also slowly return to mind on their own, so a pilgrim who forgets to
+# guard is never permanently stranded at zero with no way to answer.
+var _promise_regen: float = 0.0
+const PROMISE_REGEN_CD := 5.0
 
 var guarding: bool = false
 var _player: Node3D = null
@@ -32,6 +37,15 @@ func _process(delta: float) -> void:
 	else:
 		var regen := 7.0 + SpiritualStateManager.hope * 0.06 + SpiritualStateManager.faith * 0.06
 		resolve = min(max_resolve, resolve + regen * delta)
+	# Slowly recall a promise even without a parry (capped), so the answer is
+	# always within reach.
+	if promise_charge < MAX_PROMISE:
+		_promise_regen += delta
+		if _promise_regen >= PROMISE_REGEN_CD:
+			_promise_regen = 0.0
+			promise_charge += 1
+	else:
+		_promise_regen = 0.0
 	emit_signal("stats_changed")
 
 
@@ -76,8 +90,8 @@ func take_hit(effects: Dictionary, _source_type: String) -> void:
 func _stagger() -> void:
 	EventBus.toast("Your resolve breaks for a moment, but collapse is not the end.")
 	# Despair surges; if it reaches 100 the collapse/repentance flow fires.
-	SpiritualStateManager.modify_state("despair", 20)
-	resolve = max_resolve * 0.4
+	SpiritualStateManager.modify_state("despair", 10)
+	resolve = max_resolve * 0.5
 	Juice.shake(0.9)
 	Juice.hitstop(0.12)
 	Juice.flash(Color(0.55, 0.1, 0.5, 0.35), 0.5)
@@ -101,7 +115,7 @@ func light_attack() -> void:
 	if e:
 		e.receive_counter("light_attack", 12.0)
 		Juice.shake(0.18)
-		EventBus.toast("You strike at the shadow, but truth must finish the work.")
+		EventBus.toast("You press the truth in — keep at it, and answer with a promise (U).")
 
 
 func dodge() -> void:
@@ -142,6 +156,8 @@ func pray() -> void:
 		return
 	prayer_cooldown = PRAYER_CD
 	SpiritualStateManager.apply_effects({"fear": -10, "despair": -10, "hope": 5})
+	# Prayer brings a promise to mind — so you always have something to answer with.
+	promise_charge = min(MAX_PROMISE, promise_charge + 1)
 	_prayer_flash()
 	Juice.shake(0.22)
 	Juice.flash(Color(1.0, 0.96, 0.72, 0.16), 0.35)

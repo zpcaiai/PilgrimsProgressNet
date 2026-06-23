@@ -798,13 +798,15 @@ func _apply_environment(prof: Dictionary) -> void:
 		env.glow_hdr_threshold = g_threshold
 		env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
 
+	var photoreal := RenderConfig.is_realistic()
+
 	var tm: Dictionary = prof.get("tonemap", {})
-	# Realistic mode uses one consistent tonemapper (ACES) across all scenes so
-	# the whole journey shares a coordinated colour response; the per-chapter
-	# filmic/agx choices are kept for the stylised oil look.
+	# Realistic mode: AgX — the filmic, photographic tonemapper (it rolls highlights
+	# off the way a real camera sensor does), applied consistently across all 16
+	# scenes. Oil/children mode keeps the per-chapter ACES/filmic choices.
 	var tm_mode := String(tm.get("mode", "aces"))
-	if RenderConfig.is_realistic():
-		tm_mode = "aces"
+	if photoreal:
+		tm_mode = "agx"
 	env.tonemap_mode = _tonemap_enum(tm_mode)
 	env.tonemap_exposure = float(tm.get("exposure", 1.0))
 	env.tonemap_white = float(tm.get("white", 1.0))
@@ -812,14 +814,40 @@ func _apply_environment(prof: Dictionary) -> void:
 	var adj: Dictionary = prof.get("adjust", {})
 	env.adjustment_enabled = true
 	env.adjustment_brightness = float(adj.get("brightness", 1.0))
-	env.adjustment_contrast = float(adj.get("contrast", 1.05))
-	env.adjustment_saturation = float(adj.get("saturation", 1.08))
+	# Photoreal: restrained grade so colour reads natural, not painted/graded.
+	env.adjustment_contrast = float(adj.get("contrast", 1.02 if photoreal else 1.05))
+	env.adjustment_saturation = float(adj.get("saturation", 1.0 if photoreal else 1.08))
 
+	# Ambient occlusion grounds every object with contact shadow; photoreal mode
+	# tightens the radius and pairs it with screen-space indirect light.
 	env.ssao_enabled = bool(prof.get("ssao", true))
 	if env.ssao_enabled:
-		env.ssao_radius = 2.0
-		env.ssao_intensity = 1.5
-	env.ssil_enabled = bool(prof.get("ssil", false))
+		env.ssao_radius = 1.2 if photoreal else 2.0
+		env.ssao_intensity = 2.2 if photoreal else 1.5
+	env.ssil_enabled = bool(prof.get("ssil", photoreal))
+
+	# ---- Photoreal-only (Forward+ desktop): real GI + reflections. ----
+	# Every property below is silently ignored by the gl_compatibility (web)
+	# renderer, so the web build is unaffected; the Forward+ desktop build gains
+	# bounced light and real reflections — the biggest step toward "photographed".
+	if photoreal:
+		# Real-time global illumination: sky/sun light bounces between surfaces.
+		env.sdfgi_enabled = true
+		env.sdfgi_use_occlusion = true
+		env.sdfgi_bounce_feedback = 0.5
+		env.sdfgi_energy = 1.0
+		# Screen-space reflections on water, wet stone, polished floors and metal.
+		env.ssr_enabled = true
+		env.ssr_max_steps = 56
+		env.ssr_fade_in = 0.15
+		env.ssr_fade_out = 2.0
+		# Let the sky drive image-based ambient + reflections when it's the bg.
+		if env.background_mode == Environment.BG_SKY:
+			env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+		# Stronger ambient fill stands in for bounced GI on the gl_compatibility
+		# (web) renderer — where SDFGI/SSAO are unavailable — so shadowed faces
+		# read as softly lit rather than pitch black. Works on every renderer.
+		env.ambient_light_energy = maxf(env.ambient_light_energy, 1.15)
 
 
 func _tonemap_enum(mode: String) -> int:

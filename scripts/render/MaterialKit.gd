@@ -41,8 +41,11 @@ static func make(surface: String, tint: Color = Color(1, 1, 1), opts: Dictionary
 	var p: Dictionary = SURFACES.get(surface, SURFACES["stone"])
 	var m := StandardMaterial3D.new()
 
+	var realistic := RenderConfig.is_realistic()
 	var base: Color = p.get("color", Color(0.5, 0.5, 0.5))
-	var blend: float = float(opts.get("tint_blend", 0.45))
+	# Photoreal mode lets the texture dominate (small tint nudge); oil mode keeps
+	# the stronger painterly tint blend.
+	var blend: float = float(opts.get("tint_blend", 0.18 if realistic else 0.45))
 	var col: Color = base
 	if not (is_equal_approx(tint.r, 1.0) and is_equal_approx(tint.g, 1.0) and is_equal_approx(tint.b, 1.0)):
 		col = base.lerp(tint, blend)
@@ -50,12 +53,19 @@ static func make(surface: String, tint: Color = Color(1, 1, 1), opts: Dictionary
 
 	m.roughness = float(opts.get("roughness", p.get("rough", 0.9)))
 	m.metallic = float(opts.get("metallic", p.get("metallic", 0.0)))
-	m.metallic_specular = float(opts.get("specular", p.get("specular", 0.35)))
+	# Dielectric default closer to physical (0.5) in realistic mode.
+	m.metallic_specular = float(opts.get("specular", p.get("specular", 0.5 if realistic else 0.35)))
 
 	var texname: String = String(opts.get("tex", p.get("tex", surface)))
 	var alb := AssetLib.pbr(texname, "albedo")
 	if alb != null:
 		m.albedo_texture = alb
+		# The new PBR albedo already carries the surface's true colour. In
+		# realistic mode keep albedo_color near white so the texture is NOT
+		# multiplied down into mud by the preset/tint colour (just a light nudge
+		# toward the gameplay tint for per-instance variety).
+		if realistic:
+			m.albedo_color = Color(1, 1, 1).lerp(col, 0.25)
 	var nrm := AssetLib.pbr(texname, "normal")
 	if nrm != null:
 		m.normal_enabled = true

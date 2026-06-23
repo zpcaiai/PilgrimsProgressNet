@@ -42,6 +42,22 @@ const NPC_DIALOGUE := {
 	"NPC_ShiningOne_01": "shining_ones_welcome",
 	"NPC_ShiningOne_02": "shining_ones_welcome",
 	"NPC_Gatekeeper": "final_gate_entry",
+	# Palace Beautiful — the porter and the four damsels (previously unmapped, so
+	# their [E] Talk prompt fired nothing).
+	"NPC_Watchman": "palace_porter",
+	"NPC_Discretion": "palace_discretion",
+	"NPC_Prudence": "palace_prudence",
+	"NPC_Piety": "palace_piety",
+	"NPC_Charity": "palace_charity",
+	# Other scene NPCs that were never mapped.
+	"NPC_TrialJudge": "vanity_trial",
+	"NPC_Merchant_Comfort": "merchant_applause",
+	"NPC_Merchant_Influence": "merchant_applause",
+	"NPC_Faithful": "faithful_fellowship",
+	"NPC_Timorous": "timorous_mistrust",
+	"NPC_Mistrust": "timorous_mistrust",
+	"NPC_Diffidence": "giant_despair_accusation",
+	"NPC_Ignorance_Optional": "ignorance_optional",
 }
 
 # Per-chapter overrides for NPCs that appear in more than one chapter and speak
@@ -107,9 +123,14 @@ static func bind_scene(chapter: Node3D, glb_path: String) -> Vector3:
 		if nm == "SPAWN_Player_Start":
 			spawn = n.global_position
 		elif nm.begins_with("ENV_"):
-			_add_env_collision(n)
+			# The raised river surface is a wade-through water sheet, not a floor.
+			if "WaterSurface" not in nm:
+				_add_env_collision(n)
 		elif nm == "ENEMY_ApollyonBoss":
 			_setup_boss(chapter, n.global_position)
+			n.visible = false
+		elif nm == "ENEMY_RiverMonster":
+			_setup_river_monster(chapter, n.global_position)
 			n.visible = false
 		elif nm.begins_with("NPC_"):
 			_bind_npc(chapter, n)
@@ -182,7 +203,8 @@ static func _is_solid(nm: String) -> bool:
 			"Pollen", "Mist", "AwakeStone", "FaintPathMarker", "Book",
 			"ScrollMarker", "SealMarker", "NewGarment", "GateDoor", "CellDoor",
 			"Grass", "Tuft", "Foliage", "Flower", "Bush", "Crow", "Smoke",
-			"Ember", "Sheep", "Crowd", "Hedge", "Ridge", "Cairn"]:
+			"Ember", "Sheep", "Crowd", "Hedge", "Ridge", "Cairn",
+			"Merlon", "Crown", "WaterSurface"]:
 		if skip in nm:
 			return false
 	return true
@@ -238,6 +260,16 @@ static func _story(chapter: Node3D, node: Node, effects: Dictionary,
 # ---------------------------------------------------------------------------
 static func _bind_npc(chapter: Node3D, node: Node) -> void:
 	var nm := String(node.name)
+	# Giant Despair is no generic NPC capsule: spawn the real towering Giant who
+	# prowls the castle hall, looms over the pilgrim, and can be faced (his
+	# accusation). He presses despair as a presence; escape is by the Promise key.
+	if nm == "NPC_GiantDespair":
+		var giant := GiantDespair.new()
+		chapter.add_child(giant)
+		giant.global_position = node.global_position
+		if node is Node3D:
+			(node as Node3D).visible = false
+		return
 	if nm == "NPC_Hopeful" and GameState.has_companion("hopeful"):
 		if node is Node3D:
 			(node as Node3D).visible = false
@@ -245,6 +277,12 @@ static func _bind_npc(chapter: Node3D, node: Node) -> void:
 	# The family is shown as one figure (your_family.webp); the Children marker is
 	# folded into the Wife's family figure so there are not two generic capsules.
 	if nm == "NPC_Children":
+		if node is Node3D:
+			(node as Node3D).visible = false
+		return
+	# Apollyon is represented by the boss (ENEMY_ApollyonBoss at the same spot);
+	# don't also spawn a talkable NPC figure overlapping him.
+	if nm == "NPC_Apollyon":
 		if node is Node3D:
 			(node as Node3D).visible = false
 		return
@@ -390,7 +428,12 @@ static func _bind_hazard(chapter: Node3D, node: Node, nm: String) -> void:
 			(node as Node3D).visible = false
 		return
 	var z: Area3D = null
-	if "MudZone_Deep" in nm:
+	if "RiverWater" in nm:
+		# The wet stretch: drives the swim posture + the fear/faith wade slowdown.
+		z = RiverWaterZone.new()
+		chapter.add_child(z)
+		(z as RiverWaterZone).setup(size)
+	elif "MudZone_Deep" in nm:
 		z = MudZone.new()
 		chapter.add_child(z)
 		(z as MudZone).setup(size, true)
@@ -552,3 +595,11 @@ static func _setup_boss(chapter: Node3D, pos: Vector3) -> void:
 	var enc := BossEncounter.new()
 	chapter.add_child(enc)
 	enc.setup("apollyon_encounter", pos)
+
+
+## The River of Death creature: a symbolic, non-lethal leviathan that bars the
+## crossing and presses fear, sinking away once faith leads.
+static func _setup_river_monster(chapter: Node3D, pos: Vector3) -> void:
+	var m := RiverMonster.new()
+	chapter.add_child(m)
+	m.global_position = pos

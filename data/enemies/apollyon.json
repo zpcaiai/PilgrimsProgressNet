@@ -2,14 +2,15 @@
   "id": "apollyon",
   "display_name": "Apollyon",
   "enemy_type": "boss",
-  "influence": 300,
+  "influence": 160,
   "move_speed": 2.4,
   "attack_range": 3.5,
   "attack_cooldown": 2.6,
   "color": [0.5, 0.12, 0.12],
+  "weaknesses": { "promise": 1.5, "prayer": 1.4, "light_attack": 0.85, "faith_guard": 1.0 },
   "phases": [
-    { "phase": 1, "name": "Intimidation", "threshold": 220, "attack_effects": { "fear": 7, "faith": -2 } },
-    { "phase": 2, "name": "Accusation", "threshold": 120, "attack_effects": { "shame": 11, "hope": -4 } },
+    { "phase": 1, "name": "Intimidation", "threshold": 116, "attack_effects": { "fear": 7, "faith": -2 } },
+    { "phase": 2, "name": "Accusation", "threshold": 60, "attack_effects": { "shame": 11, "hope": -4 } },
     { "phase": 3, "name": "Desperate Assault", "threshold": 0, "attack_effects": { "fear": 6, "shame": 6, "despair": 6 } }
   ],
   "victory_effects": { "faith": 15, "perseverance": 15, "hope": 10, "fear": -30, "shame": -30 }
