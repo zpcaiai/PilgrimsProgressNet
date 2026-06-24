@@ -35,5 +35,53 @@
   ],
   "music": "res://assets/audio/music/wilderness_road.ogg",
   "ambient": "res://assets/audio/ambient/wilderness_road.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/wilderness_road.glb"
+  "imported_scene_path": "res://assets/imported_scenes/wilderness_road.glb",
+  "design": {
+    "provenance": "Original bridging scene (between attachment Ch1 and Ch2) — kept as-is; barren by design.",
+    "spiritual_layer": "Narrative + Temptation",
+    "seven_beats": {
+      "arrival": "The road doglegs down out of the city; the sky behind still smoulders.",
+      "orientation": "A signpost and a wayside stone; the distant light holds steady ahead — no chapel here, only resolve.",
+      "encounter": "Obstinate turns back; Pliable wavers at your side as the city voices call after you.",
+      "temptation": "The pull of the city behind — voices urging a reasonable return.",
+      "choice": "Answer Obstinate without pride / steady Pliable without flattery / fix your eyes on the light.",
+      "consequence": "Fixing the eyes forward steadies perseverance; trading words breeds pride or fear.",
+      "grace": "Keep the light ahead until the ground begins to fail at the edge of the Slough."
+    },
+    "chapel": null,
+    "primary_temptation": {
+      "type": "return_to_city",
+      "hook_zh": "回头吧，这条路只属于疯子。",
+      "resisted_by": {
+        "perseverance_min": 20,
+        "or_item": "has_scroll"
+      }
+    },
+    "repentance": {
+      "at": "none (fix eyes on the distant light)",
+      "restores": {
+        "perseverance": 5
+      }
+    },
+    "key_choices": [
+      {
+        "id": "fix_eyes_on_light",
+        "text_zh": "定睛远处的光",
+        "effects": {
+          "perseverance": 6,
+          "watchfulness": 4
+        }
+      },
+      {
+        "id": "answer_obstinate_calmly",
+        "text_zh": "平静回应顽固",
+        "effects": {
+          "humility": 5,
+          "pride": -3
+        }
+      }
+    ],
+    "stat_arc_note": "Transitional: small perseverance gain; the burden is still carried.",
+    "kept_original": "No chapel — austere by design; not one of the attachment's 16 core scenes."
+  }
 }

@@ -24,6 +24,7 @@ var _current_target: Interactable = null
 var _breath_timer: float = 0.0
 var _glancing: bool = false
 var _swimming: bool = false
+var _sink_depth: float = 0.0  # mud sink (visual), driven by MudSystem
 # Footstep / landing dust
 var _dust: CPUParticles3D
 var _land_puff: CPUParticles3D
@@ -467,3 +468,18 @@ func set_swimming(on: bool) -> void:
 
 func is_swimming() -> bool:
 	return _swimming
+
+
+## Sink the pilgrim's visible body into the mud (separate from swimming). `depth`
+## is in metres (0 restores). The physics capsule stays flush so movement is
+## robust — only the mesh dips, so stepping into the mire really sinks you.
+## Driven each frame by MudSystem from mud-zone occupancy.
+func set_sink_depth(depth: float) -> void:
+	if _swimming:
+		return
+	if is_equal_approx(depth, _sink_depth):
+		return
+	_sink_depth = depth
+	if is_instance_valid(_mesh_root):
+		var tw := create_tween()
+		tw.tween_property(_mesh_root, "position:y", -depth, 0.35).set_trans(Tween.TRANS_SINE)

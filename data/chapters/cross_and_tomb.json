@@ -33,5 +33,78 @@
   ],
   "music": "res://assets/audio/music/cross_and_tomb.ogg",
   "ambient": "res://assets/audio/ambient/cross_and_tomb.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/cross_and_tomb.glb"
+  "imported_scene_path": "res://assets/imported_scenes/cross_and_tomb.glb",
+  "design": {
+    "provenance": "Attachment Ch4 十架山与赦罪 (Skill 18). Burden release runs through the existing cross_grace event.",
+    "spiritual_layer": "Narrative + Redemption (the climax of justification)",
+    "seven_beats": {
+      "arrival": "An uphill path under a sky turning from storm to dawn; the weight grows heavier as you climb.",
+      "orientation": "The cross is revealed through parting clouds, an empty tomb behind it and an open-air chapel beside.",
+      "encounter": "No one bars the way — the cross itself is the meeting.",
+      "temptation": "No assault; the only trial is the weight, and the quiet question of whether grace is for you.",
+      "choice": "Kneel silently / confess your need aloud / ask whether this grace is for you — posture, not whether you are forgiven.",
+      "consequence": "However you kneel, the burden's strap breaks and it rolls into the empty tomb.",
+      "grace": "Burdened becomes forgiven: you receive the scroll of assurance, the seal, and a new garment."
+    },
+    "chapel": {
+      "verse_zh": "他的重担在十字架前脱落。",
+      "verse_en": "There at the cross the burden fell from his back.",
+      "hint_zh": "跪在十字架前，不再背负你不能除去的重担。",
+      "restore_faith": 25,
+      "type": "calvary"
+    },
+    "primary_temptation": {
+      "type": "doubt",
+      "hook_zh": "这恩典岂是为你存留的？",
+      "resisted_by": {
+        "faith_min": 1,
+        "note": "answered by kneeling, not by a stat gate"
+      }
+    },
+    "repentance": {
+      "at": "kneel at the cross (the definitive repentance)",
+      "restores": {
+        "faith": 25,
+        "hope": 25,
+        "despair": -30,
+        "shame": -30
+      },
+      "special": [
+        "remove_burden",
+        "grant_scroll",
+        "grant_seal",
+        "grant_new_garment"
+      ]
+    },
+    "key_choices": [
+      {
+        "id": "kneel_silently",
+        "text_zh": "默然跪下",
+        "effects": {
+          "humility": 12,
+          "faith": 10
+        }
+      },
+      {
+        "id": "confess_need",
+        "text_zh": "承认自己的需要",
+        "effects": {
+          "humility": 18,
+          "faith": 12,
+          "despair": -10
+        }
+      },
+      {
+        "id": "ask_grace_for_me",
+        "text_zh": "问这恩典是否为我",
+        "effects": {
+          "hope": 15,
+          "faith": 8,
+          "despair": -15
+        }
+      }
+    ],
+    "stat_arc_note": "has_burden -> false here for the whole game; faith/hope rise steeply, despair/shame collapse. Identity: forgiven.",
+    "kept_original": "Release stays wired through the existing cross_grace spiritual_event, not duplicated in chapter effects."
+  }
 }

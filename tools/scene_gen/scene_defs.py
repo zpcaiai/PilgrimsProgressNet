@@ -19,8 +19,10 @@ from glb_lib import Scene
 # ---------------------------------------------------------------------------
 # Shared dressing helpers
 # ---------------------------------------------------------------------------
-def _road(s, name, length, z_center, width=6.0, color=(0.30, 0.26, 0.22)):
-    s.box(name, (width, 0.12, length), color, (0, 0.06, z_center))
+def _road(s, name, length, z_center, width=6.0, color=(0.30, 0.26, 0.22),
+          tex=None, tile=1.4):
+    s.box(name, (width, 0.12, length), color, (0, 0.06, z_center),
+          tex=tex, tile=tile, bevel=False)
 
 
 def _wall(s, name, size, pos, color=(0.46, 0.42, 0.38)):
@@ -71,11 +73,45 @@ def _sign(s, name, pos, color=(0.55, 0.45, 0.3)):
     ], pos=pos)
 
 
-def _chapel(s, name, pos, rot=(0, 0, 0), wall=(0.84, 0.8, 0.74),
-            roof=(0.5, 0.28, 0.24), brick=True):
+# Seven chapel visual variants (art bible / Batch 7 Skill 49). Each tunes the
+# wall, roof-tile, steeple cap and the styling of the cross atop the steeple, so
+# the chapel-cross language stays unified but shifts with the soul's journey:
+# ruined (desolation), gate (entering), calvary (forgiveness), pilgrim (en-route
+# restoration), trial (witness/martyrdom), river (faith facing death), celestial
+# (ultimate worship). The node is still named PROP_Chapel so the binder attaches
+# the Worship interactable.
+_CHAPEL_KINDS = {
+    "pilgrim":   {"wall": (0.84, 0.80, 0.74), "tile": (0.78, 0.50, 0.42), "roof": (0.50, 0.28, 0.24),
+                  "cross": (0.96, 0.90, 0.60), "cross_emis": (0.55, 0.50, 0.25), "cross_scale": 1.0},
+    "ruined":    {"wall": (0.50, 0.48, 0.44), "tile": (0.42, 0.34, 0.30), "roof": (0.32, 0.28, 0.26),
+                  "cross": (0.80, 0.78, 0.62), "cross_emis": (0.34, 0.32, 0.20), "cross_scale": 0.95},
+    "gate":      {"wall": (0.82, 0.80, 0.76), "tile": (0.70, 0.46, 0.36), "roof": (0.46, 0.30, 0.26),
+                  "cross": (1.00, 0.94, 0.66), "cross_emis": (0.72, 0.62, 0.32), "cross_scale": 1.0},
+    "calvary":   {"wall": (0.86, 0.82, 0.72), "tile": (0.74, 0.50, 0.40), "roof": (0.50, 0.30, 0.24),
+                  "cross": (1.00, 0.96, 0.74), "cross_emis": (0.85, 0.78, 0.45), "cross_scale": 1.35},
+    "trial":     {"wall": (0.66, 0.64, 0.60), "tile": (0.50, 0.42, 0.40), "roof": (0.40, 0.30, 0.28),
+                  "cross": (0.90, 0.86, 0.66), "cross_emis": (0.45, 0.40, 0.22), "cross_scale": 1.0},
+    "river":     {"wall": (0.80, 0.82, 0.84), "tile": (0.50, 0.50, 0.56), "roof": (0.40, 0.34, 0.40),
+                  "cross": (0.86, 0.92, 1.00), "cross_emis": (0.45, 0.55, 0.75), "cross_scale": 1.1},
+    "celestial": {"wall": (0.95, 0.90, 0.72), "tile": (0.95, 0.78, 0.30), "roof": (0.95, 0.78, 0.30),
+                  "cross": (1.00, 0.98, 0.84), "cross_emis": (0.95, 0.85, 0.55), "cross_scale": 1.3},
+}
+
+
+def _chapel(s, name, pos, rot=(0, 0, 0), wall=None, roof=None, brick=True, kind="pilgrim"):
     """A small wayside chapel: nave + pitched roof + steeple crowned with a
     cross, a glowing rose window and warm-lit side windows. Bound to a
-    'Worship' interactable by ImportedSceneBinder (PROP_Chapel)."""
+    'Worship' interactable by ImportedSceneBinder (PROP_Chapel).
+
+    `kind` selects one of the seven _CHAPEL_KINDS visual variants; an explicit
+    `wall`/`roof` still overrides the kind's defaults."""
+    k = _CHAPEL_KINDS.get(kind, _CHAPEL_KINDS["pilgrim"])
+    if wall is None:
+        wall = k["wall"]
+    if roof is None:
+        roof = k["roof"]
+    tile = k["tile"]
+    cc = k["cross"]; ce = k["cross_emis"]; cs = k["cross_scale"]
     nave = {"kind": "box", "size": (5, 4, 7), "color": wall, "pos": (0, 2, 0)}
     tower = {"kind": "box", "size": (2.2, 7.5, 2.2), "color": wall, "pos": (0, 3.75, 4.3)}
     if brick:
@@ -83,17 +119,17 @@ def _chapel(s, name, pos, rot=(0, 0, 0), wall=(0.84, 0.8, 0.74),
         tower["tex"] = "brick"; tower["tile"] = 1.3
     s.composite(name, [
         nave,
-        {"kind": "box", "size": (5.4, 0.5, 7.4), "color": (0.78, 0.5, 0.42),
+        {"kind": "box", "size": (5.4, 0.5, 7.4), "color": tile,
          "pos": (0, 4.05, 0), "tex": "rooftile", "tile": 1.0},
-        {"kind": "pyramid", "size": (5.7, 7.7), "height": 2.2, "color": (0.78, 0.5, 0.42),
+        {"kind": "pyramid", "size": (5.7, 7.7), "height": 2.2, "color": tile,
          "pos": (0, 5.2, 0), "tex": "rooftile", "tile": 1.0},
         tower,
         {"kind": "cone", "radius": 1.5, "height": 3.0, "color": roof, "pos": (0, 9.0, 4.3)},
-        # cross atop the steeple
-        {"kind": "box", "size": (0.18, 1.5, 0.18), "color": (0.96, 0.9, 0.6),
-         "pos": (0, 11.0, 4.3), "emissive": (0.55, 0.5, 0.25)},
-        {"kind": "box", "size": (0.8, 0.18, 0.18), "color": (0.96, 0.9, 0.6),
-         "pos": (0, 11.05, 4.3), "emissive": (0.55, 0.5, 0.25)},
+        # cross atop the steeple (styled by chapel kind)
+        {"kind": "box", "size": (0.18, 1.5 * cs, 0.18), "color": cc,
+         "pos": (0, 11.0, 4.3), "emissive": ce},
+        {"kind": "box", "size": (0.8 * cs, 0.18, 0.18), "color": cc,
+         "pos": (0, 11.05, 4.3), "emissive": ce},
         # arched door
         {"kind": "box", "size": (1.3, 2.3, 0.25), "color": (0.3, 0.22, 0.16), "pos": (0, 1.15, 5.55)},
         # glowing rose window
@@ -214,6 +250,339 @@ def _lantern(s, name, pos, col=(1.0, 0.86, 0.5)):
 
 
 # ===========================================================================
+# Low-poly population & life helpers (living worlds: people, shops, goods,
+# flora, fauna, feast, and the throne). Deterministic (name-seeded LCG, no
+# imports) so every rebuild is identical. People/crowd names carry the binder
+# "Crowd" skip-token so the player walks among them (non-solid); flora/fauna use
+# their own skip-tokens (Flower/Grass/Foliage/Crow/Sheep).
+# ===========================================================================
+_ROBES = [(0.42, 0.36, 0.42), (0.5, 0.34, 0.3), (0.34, 0.4, 0.5), (0.55, 0.5, 0.34),
+          (0.4, 0.44, 0.4), (0.6, 0.4, 0.46), (0.46, 0.42, 0.5), (0.5, 0.46, 0.4)]
+_SKIN = [(0.74, 0.6, 0.5), (0.6, 0.46, 0.36), (0.82, 0.68, 0.56), (0.5, 0.38, 0.3)]
+
+
+class _Rng:
+    """Tiny deterministic LCG seeded from a string — reproducible scatter."""
+    def __init__(self, name):
+        v = 2166136261
+        for c in str(name):
+            v = ((v ^ ord(c)) * 16777619) & 0xffffffff
+        self.s = v or 1
+
+    def f(self):
+        self.s = (1103515245 * self.s + 12345) & 0x7fffffff
+        return self.s / 0x7fffffff
+
+    def rng(self, a, b):
+        return a + (b - a) * self.f()
+
+    def pick(self, seq):
+        return seq[int(self.f() * len(seq)) % len(seq)]
+
+
+def _person_parts(x, z, robe, skin, h=1.5, arm=False):
+    """Composite parts for one low-poly figure standing at local (x, z)."""
+    parts = [
+        {"kind": "cylinder", "radius": 0.34, "height": h, "color": robe, "pos": (x, h * 0.5, z), "sides": 7},
+        {"kind": "sphere", "radius": 0.25, "color": skin, "pos": (x, h + 0.16, z)},
+        {"kind": "box", "size": (0.5, 0.32, 0.5), "color": robe, "pos": (x, h * 0.78, z)},  # shoulders
+    ]
+    if arm:
+        parts.append({"kind": "cylinder", "radius": 0.08, "height": 0.7, "color": robe,
+                      "pos": (x + 0.32, h * 0.86, z), "rot": (0, 0, 38)})
+    return parts
+
+
+def _crowd(s, name, pos, rows=3, cols=4, spacing=1.25, robes=None, hands_raised=False):
+    """A dense crowd of low-poly figures (rows×cols). Name should contain
+    'Crowd' so it stays non-solid (the player moves through the throng)."""
+    rng = _Rng(name)
+    robes = robes or _ROBES
+    parts = []
+    for i in range(rows):
+        for j in range(cols):
+            x = (j - (cols - 1) / 2.0) * spacing + rng.rng(-0.22, 0.22)
+            z = (i - (rows - 1) / 2.0) * spacing + rng.rng(-0.22, 0.22)
+            parts += _person_parts(x, z, rng.pick(robes), rng.pick(_SKIN),
+                                   h=rng.rng(1.3, 1.7), arm=(hands_raised and rng.f() > 0.4))
+    s.composite(name, parts, pos=pos)
+
+
+def _market_goods(s, name, pos, palette=None):
+    """A heap of bright wares on a stall counter (crates, fruit, bolts of cloth,
+    trinkets). Small + elevated, off the walkable path."""
+    rng = _Rng(name)
+    pal = palette or [(0.9, 0.3, 0.2), (0.95, 0.78, 0.2), (0.3, 0.6, 0.8), (0.7, 0.2, 0.6),
+                      (0.4, 0.7, 0.3), (0.95, 0.5, 0.15)]
+    parts = []
+    for k in range(7):
+        kind = "sphere" if rng.f() > 0.5 else "box"
+        c = rng.pick(pal)
+        x = rng.rng(-1.1, 1.1); z = rng.rng(-0.6, 0.6); r = rng.rng(0.16, 0.3)
+        if kind == "sphere":
+            parts.append({"kind": "sphere", "radius": r, "color": c, "pos": (x, 0.05 + r, z)})
+        else:
+            parts.append({"kind": "box", "size": (r * 1.6, r * 1.6, r * 1.6), "color": c, "pos": (x, 0.05 + r, z), "tex": "cloth"})
+    s.composite(name, parts, pos=pos)
+
+
+def _shop(s, name, pos, awning=(0.8, 0.2, 0.25), rot=(0, 0, 0)):
+    """A merchant booth: timber counter + back stall + striped awning + wares +
+    a shopkeeper. Solid frame; placed off the central street."""
+    s.composite(name, [
+        {"kind": "box", "size": (3.4, 1.0, 1.2), "color": (0.45, 0.32, 0.2), "pos": (0, 0.5, 1.0), "tex": "wood", "tile": 0.8},
+        {"kind": "box", "size": (3.6, 2.6, 0.3), "color": (0.4, 0.3, 0.2), "pos": (0, 1.3, -1.4), "tex": "wood"},
+        {"kind": "box", "size": (0.2, 2.4, 0.2), "color": (0.34, 0.26, 0.18), "pos": (-1.7, 1.2, 0.9), "tex": "wood"},
+        {"kind": "box", "size": (0.2, 2.4, 0.2), "color": (0.34, 0.26, 0.18), "pos": (1.7, 1.2, 0.9), "tex": "wood"},
+        {"kind": "box", "size": (4.0, 0.16, 2.6), "color": awning, "pos": (0, 2.5, 0.0), "rot": (12, 0, 0)},
+    ], pos=pos, rot=rot)
+    _market_goods(s, name + "_Goods", (pos[0], 1.05, pos[2] + 1.0))
+    rng = _Rng(name)
+    s.composite(name + "_Keeper_Crowd", _person_parts(0, 0, rng.pick(_ROBES), rng.pick(_SKIN), h=1.6, arm=True),
+                pos=(pos[0], 0, pos[2] - 0.6))
+
+
+def _flora(s, name, pos, kind="flower", n=6):
+    """A small cluster of flowers / grass tufts / ferns (non-solid via the
+    Flower/Grass/Foliage skip-tokens — embed one in `name`)."""
+    rng = _Rng(name)
+    cols = {"flower": [(0.92, 0.6, 0.72), (0.95, 0.85, 0.4), (0.7, 0.6, 0.95), (0.95, 0.5, 0.4)],
+            "grass": [(0.42, 0.56, 0.28), (0.36, 0.5, 0.24)],
+            "fern": [(0.28, 0.46, 0.26), (0.32, 0.5, 0.3)]}.get(kind, [(0.5, 0.7, 0.4)])
+    parts = []
+    for k in range(n):
+        x = rng.rng(-0.8, 0.8); z = rng.rng(-0.8, 0.8); hh = rng.rng(0.3, 0.7)
+        parts.append({"kind": "cylinder", "radius": 0.04, "height": hh, "color": (0.34, 0.46, 0.26), "pos": (x, hh / 2, z), "sides": 4})
+        if kind == "flower":
+            parts.append({"kind": "sphere", "radius": 0.12, "color": rng.pick(cols), "pos": (x, hh, z)})
+        else:
+            parts.append({"kind": "cone", "radius": 0.12, "height": 0.4, "color": rng.pick(cols), "pos": (x, hh, z)})
+    s.composite(name, parts, pos=pos)
+
+
+def _fauna(s, name, pos, kind="bird"):
+    """A single small creature. Use skip-token names: Crow (birds), Sheep, or
+    Foliage (small critters) so they never wall the player."""
+    if kind == "sheep":
+        s.composite(name, [
+            {"kind": "sphere", "radius": 0.5, "color": (0.86, 0.84, 0.8), "pos": (0, 0.7, 0)},
+            {"kind": "sphere", "radius": 0.22, "color": (0.25, 0.22, 0.2), "pos": (0, 0.85, 0.5)},
+            {"kind": "box", "size": (0.12, 0.5, 0.12), "color": (0.3, 0.27, 0.24), "pos": (0.25, 0.25, 0.3)},
+            {"kind": "box", "size": (0.12, 0.5, 0.12), "color": (0.3, 0.27, 0.24), "pos": (-0.25, 0.25, 0.3)},
+        ], pos=pos)
+    elif kind == "dog":
+        s.composite(name, [
+            {"kind": "box", "size": (0.9, 0.4, 0.35), "color": (0.4, 0.3, 0.22), "pos": (0, 0.5, 0)},
+            {"kind": "sphere", "radius": 0.2, "color": (0.42, 0.32, 0.24), "pos": (0.5, 0.6, 0)},
+        ], pos=pos)
+    else:  # perched/winged bird
+        s.composite(name, [
+            {"kind": "sphere", "radius": 0.14, "color": (0.16, 0.15, 0.16), "pos": (0, 0, 0)},
+            {"kind": "box", "size": (0.5, 0.04, 0.18), "color": (0.12, 0.11, 0.12), "pos": (0, 0.02, 0)},
+        ], pos=pos)
+
+
+def _feast_table(s, name, pos, length=7.0, rot=(0, 0, 0)):
+    """A long banquet table (the marriage supper): white cloth + benches + a
+    heap of food and gold goblets."""
+    parts = [
+        {"kind": "box", "size": (1.6, 0.16, length), "color": (0.96, 0.93, 0.86), "pos": (0, 1.0, 0), "tex": "cloth", "tile": 1.4},
+        {"kind": "box", "size": (1.5, 1.0, length - 0.4), "color": (0.92, 0.88, 0.8), "pos": (0, 0.5, 0)},
+        {"kind": "box", "size": (0.5, 0.4, length), "color": (0.7, 0.55, 0.3), "pos": (1.4, 0.4, 0), "tex": "wood"},
+        {"kind": "box", "size": (0.5, 0.4, length), "color": (0.7, 0.55, 0.3), "pos": (-1.4, 0.4, 0), "tex": "wood"},
+    ]
+    rng = _Rng(name)
+    fruit = [(0.9, 0.3, 0.2), (0.95, 0.8, 0.25), (0.6, 0.2, 0.5), (0.4, 0.7, 0.3)]
+    for k in range(int(length)):
+        z = (k - length / 2.0) + 0.6
+        parts.append({"kind": "sphere", "radius": rng.rng(0.16, 0.26), "color": rng.pick(fruit), "pos": (rng.rng(-0.4, 0.4), 1.18, z)})
+        parts.append({"kind": "cylinder", "radius": 0.1, "height": 0.32, "color": (0.95, 0.82, 0.4), "pos": (rng.rng(-0.5, 0.5), 1.24, z + 0.3), "emissive": (0.4, 0.34, 0.12)})
+    s.composite(name, parts, pos=pos, rot=rot)
+
+
+def _angel(s, name, pos, h=2.2, rot=(0, 0, 0)):
+    """A radiant winged figure (white robe, soft gold light, broad wings)."""
+    s.composite(name, [
+        {"kind": "cylinder", "radius": 0.4, "height": h, "color": (0.97, 0.95, 0.86), "pos": (0, h * 0.5, 0), "emissive": (0.4, 0.38, 0.28)},
+        {"kind": "sphere", "radius": 0.28, "color": (0.98, 0.92, 0.78), "pos": (0, h + 0.2, 0), "emissive": (0.5, 0.45, 0.3)},
+        {"kind": "box", "size": (0.18, 2.4, 1.0), "color": (0.99, 0.97, 0.9), "pos": (0.6, h * 0.7, -0.2), "rot": (0, 0, 28), "emissive": (0.45, 0.42, 0.32)},
+        {"kind": "box", "size": (0.18, 2.4, 1.0), "color": (0.99, 0.97, 0.9), "pos": (-0.6, h * 0.7, -0.2), "rot": (0, 0, -28), "emissive": (0.45, 0.42, 0.32)},
+    ], pos=pos, rot=rot)
+
+
+def _enthroned_lord(s, base, pos):
+    """The crowned Lord enthroned in glory (Rev 4-5; 19) — reverent and symbolic,
+    not a literal face: a radiant white-and-gold robed figure, a gold crown, a
+    halo of light, hand raised in welcome, upon a gilded throne under a shaft of
+    glory. Marble dais + steps. Solid throne; the figure reads as light."""
+    # gilded throne + marble dais
+    s.composite(base + "_Throne", [
+        {"kind": "box", "size": (5.0, 0.6, 5.0), "color": (0.92, 0.9, 0.84), "pos": (0, 0.3, 0), "tex": "marble", "tile": 1.0},
+        {"kind": "box", "size": (3.6, 0.5, 3.6), "color": (0.95, 0.92, 0.86), "pos": (0, 0.85, 0), "tex": "marble", "tile": 1.0},
+        {"kind": "box", "size": (3.0, 2.0, 1.0), "color": (0.96, 0.82, 0.36), "pos": (0, 2.1, -1.3), "tex": "gold", "emissive": (0.55, 0.45, 0.18)},
+        {"kind": "box", "size": (0.7, 3.4, 0.7), "color": (0.96, 0.82, 0.36), "pos": (-1.4, 2.7, -1.3), "tex": "gold", "emissive": (0.55, 0.45, 0.18)},
+        {"kind": "box", "size": (0.7, 3.4, 0.7), "color": (0.96, 0.82, 0.36), "pos": (1.4, 2.7, -1.3), "tex": "gold", "emissive": (0.55, 0.45, 0.18)},
+        {"kind": "box", "size": (1.0, 1.2, 1.0), "color": (0.98, 0.86, 0.4), "pos": (0, 1.7, -0.3)},  # seat
+    ], pos=pos)
+    # the radiant figure (face left to light), crown, halo, raised hand
+    s.composite(base + "_Lord_Glow", [
+        {"kind": "cylinder", "radius": 0.6, "height": 2.6, "color": (0.99, 0.97, 0.9), "pos": (0, 1.3, 0), "emissive": (0.7, 0.66, 0.5)},
+        {"kind": "box", "size": (1.7, 0.5, 0.7), "color": (0.99, 0.97, 0.9), "pos": (0, 2.0, 0), "emissive": (0.6, 0.56, 0.42)},  # shoulders/mantle
+        {"kind": "sphere", "radius": 0.4, "color": (1.0, 0.98, 0.92), "pos": (0, 2.95, 0), "emissive": (0.85, 0.8, 0.62)},  # head as light
+        {"kind": "torus", "ring_r": 0.62, "tube_r": 0.08, "color": (1.0, 0.95, 0.7), "pos": (0, 3.0, -0.05), "rot": (90, 0, 0), "emissive": (0.95, 0.85, 0.5)},  # halo
+        {"kind": "cone", "radius": 0.5, "height": 0.5, "color": (0.98, 0.85, 0.35), "pos": (0, 3.35, 0), "emissive": (0.7, 0.55, 0.2)},  # crown band
+        {"kind": "box", "size": (0.16, 0.5, 0.16), "color": (0.98, 0.86, 0.4), "pos": (0, 3.7, 0), "emissive": (0.7, 0.55, 0.2)},  # crown peak
+        {"kind": "cylinder", "radius": 0.12, "height": 1.0, "color": (0.99, 0.97, 0.9), "pos": (0.7, 2.1, 0.3), "rot": (0, 0, 52), "emissive": (0.6, 0.56, 0.42)},  # raised hand of welcome
+    ], pos=(pos[0], pos[1] + 1.1, pos[2] - 0.3))
+    # shaft of glory + a small Lamb at the foot of the throne (Rev 5)
+    s.box(base + "_GloryShaft_Glow", (4.5, 16, 4.5), (1.0, 0.96, 0.8), (pos[0], pos[1] + 9, pos[2]),
+          emissive=(0.7, 0.64, 0.4), blend=True, bevel=False)
+    s.composite(base + "_Lamb", [
+        {"kind": "sphere", "radius": 0.42, "color": (0.98, 0.96, 0.92), "pos": (0, 0.5, 0), "emissive": (0.4, 0.38, 0.3)},
+        {"kind": "sphere", "radius": 0.22, "color": (0.98, 0.96, 0.92), "pos": (0, 0.7, 0.4), "emissive": (0.4, 0.38, 0.3)},
+    ], pos=(pos[0], pos[1] + 0.7, pos[2] + 2.6))
+
+
+# ---------------------------------------------------------------------------
+# Living-worlds pass: ambient fauna & inhabitants
+# ---------------------------------------------------------------------------
+# Small, deterministic creatures and stand-in figures used to make each place
+# feel inhabited. ALL are decorative and must stay walk-through: embed a binder
+# skip-token in the node name (Fauna / Critter / Household / Crow / Dove /
+# Butterfly / Firefly / Crowd / Sheep / Foliage). Geometry is deliberately tiny
+# (a handful of primitives each) to keep GLBs small.
+def _bird(s, name, pos, kind="songbird", rot=(0, 0, 0)):
+    """A single posed bird. `name` MUST contain a skip-token (e.g. Crow/Dove/
+    Fauna) so it never blocks the player."""
+    if kind == "heron":          # tall wader: long legs, S-neck, dagger beak
+        parts = [
+            {"kind": "cylinder", "radius": 0.05, "height": 1.3, "color": (0.7, 0.66, 0.5), "pos": (-0.12, 0.65, 0), "sides": 5},
+            {"kind": "cylinder", "radius": 0.05, "height": 1.3, "color": (0.7, 0.66, 0.5), "pos": (0.12, 0.65, 0), "sides": 5},
+            {"kind": "sphere", "radius": 0.3, "color": (0.62, 0.66, 0.72), "pos": (0, 1.45, 0), "segs": 8, "rings": 5},
+            {"kind": "cylinder", "radius": 0.07, "height": 0.8, "color": (0.66, 0.7, 0.76), "pos": (0, 1.95, 0.1), "rot": (24, 0, 0), "sides": 5},
+            {"kind": "sphere", "radius": 0.12, "color": (0.6, 0.64, 0.7), "pos": (0, 2.35, 0.22), "segs": 7, "rings": 4},
+            {"kind": "cone", "radius": 0.05, "height": 0.4, "color": (0.92, 0.78, 0.3), "pos": (0, 2.4, 0.45), "rot": (90, 0, 0), "sides": 5}]
+    elif kind == "duck":         # rounded floating body + head + bill
+        parts = [
+            {"kind": "sphere", "radius": 0.3, "color": (0.4, 0.34, 0.26), "pos": (0, 0.18, 0), "segs": 9, "rings": 5},
+            {"kind": "sphere", "radius": 0.16, "color": (0.18, 0.4, 0.3), "pos": (0.26, 0.34, 0), "segs": 8, "rings": 4, "emissive": (0.04, 0.1, 0.07)},
+            {"kind": "cone", "radius": 0.07, "height": 0.22, "color": (0.9, 0.74, 0.28), "pos": (0.42, 0.32, 0), "rot": (0, 0, -90), "sides": 5}]
+    elif kind == "swan":         # white body, long curved neck, orange bill
+        parts = [
+            {"kind": "sphere", "radius": 0.4, "color": (0.97, 0.96, 0.94), "pos": (0, 0.3, 0), "segs": 10, "rings": 6, "emissive": (0.18, 0.18, 0.18)},
+            {"kind": "cylinder", "radius": 0.07, "height": 0.7, "color": (0.97, 0.96, 0.94), "pos": (0.18, 0.7, 0.05), "rot": (24, 0, -12), "sides": 6, "emissive": (0.14, 0.14, 0.14)},
+            {"kind": "sphere", "radius": 0.13, "color": (0.97, 0.96, 0.94), "pos": (0.32, 1.0, 0.12), "segs": 7, "rings": 4, "emissive": (0.16, 0.16, 0.16)},
+            {"kind": "cone", "radius": 0.05, "height": 0.2, "color": (0.92, 0.5, 0.2), "pos": (0.46, 0.98, 0.12), "rot": (0, 0, -90), "sides": 5}]
+    elif kind == "dove":         # small radiant body, wings tucked-up (flight)
+        parts = [
+            {"kind": "sphere", "radius": 0.15, "color": (0.98, 0.97, 0.94), "pos": (0, 0, 0), "segs": 7, "rings": 4, "emissive": (0.4, 0.4, 0.38)},
+            {"kind": "box", "size": (0.56, 0.04, 0.2), "color": (0.97, 0.96, 0.92), "pos": (0, 0.06, 0), "rot": (0, 0, 18), "emissive": (0.3, 0.3, 0.28)},
+            {"kind": "cone", "radius": 0.1, "height": 0.28, "color": (0.95, 0.94, 0.9), "pos": (-0.2, 0, 0), "rot": (0, 0, 90), "sides": 5}]
+    elif kind == "peacock":      # noble fan tail + crest
+        parts = [
+            {"kind": "sphere", "radius": 0.26, "color": (0.1, 0.3, 0.5), "pos": (0, 0.5, 0), "segs": 9, "rings": 5, "emissive": (0.04, 0.12, 0.2)},
+            {"kind": "cylinder", "radius": 0.07, "height": 0.5, "color": (0.12, 0.34, 0.46), "pos": (0, 0.85, 0.05), "rot": (16, 0, 0), "sides": 6},
+            {"kind": "sphere", "radius": 0.12, "color": (0.12, 0.38, 0.5), "pos": (0, 1.12, 0.1), "segs": 7, "rings": 4, "emissive": (0.05, 0.16, 0.22)},
+            {"kind": "pyramid", "size": (1.7, 0.16), "height": 1.7, "color": (0.16, 0.42, 0.34), "pos": (0, 0.95, -0.7), "rot": (74, 0, 0), "emissive": (0.06, 0.18, 0.14)},
+            {"kind": "sphere", "radius": 0.08, "color": (0.2, 0.5, 0.3), "pos": (0, 1.5, -1.15), "segs": 6, "rings": 4, "emissive": (0.1, 0.3, 0.16)}]
+    elif kind == "owl":          # round body, big head, eye-spots (perched)
+        parts = [
+            {"kind": "sphere", "radius": 0.24, "color": (0.42, 0.36, 0.28), "pos": (0, 0.2, 0), "segs": 8, "rings": 5},
+            {"kind": "sphere", "radius": 0.2, "color": (0.46, 0.4, 0.32), "pos": (0, 0.52, 0), "segs": 8, "rings": 5},
+            {"kind": "sphere", "radius": 0.06, "color": (0.95, 0.82, 0.3), "pos": (-0.08, 0.56, 0.16), "segs": 6, "rings": 4, "emissive": (0.5, 0.42, 0.12)},
+            {"kind": "sphere", "radius": 0.06, "color": (0.95, 0.82, 0.3), "pos": (0.08, 0.56, 0.16), "segs": 6, "rings": 4, "emissive": (0.5, 0.42, 0.12)}]
+    elif kind == "raptor":       # dark soaring bird (hawk / vulture), wings out
+        parts = [
+            {"kind": "sphere", "radius": 0.18, "color": (0.14, 0.12, 0.12), "pos": (0, 0, 0), "segs": 7, "rings": 4},
+            {"kind": "box", "size": (1.7, 0.05, 0.4), "color": (0.12, 0.1, 0.1), "pos": (0, 0.02, 0), "rot": (0, 0, 8)},
+            {"kind": "box", "size": (0.3, 0.04, 0.4), "color": (0.1, 0.09, 0.09), "pos": (-0.1, 0, -0.3)}]
+    else:                         # songbird / lark / kingfisher (small perched)
+        body = {"songbird": (0.5, 0.34, 0.22), "lark": (0.55, 0.46, 0.3),
+                "kingfisher": (0.12, 0.46, 0.7)}.get(kind, (0.5, 0.34, 0.22))
+        breast = (0.85, 0.5, 0.25) if kind == "kingfisher" else (0.7, 0.6, 0.4)
+        parts = [
+            {"kind": "sphere", "radius": 0.13, "color": body, "pos": (0, 0, 0), "segs": 7, "rings": 4},
+            {"kind": "sphere", "radius": 0.09, "color": breast, "pos": (0.04, -0.04, 0.08), "segs": 6, "rings": 4},
+            {"kind": "cone", "radius": 0.06, "height": 0.28, "color": body, "pos": (-0.16, 0.02, 0), "rot": (0, 0, 90), "sides": 5},
+            {"kind": "cone", "radius": 0.03, "height": 0.14, "color": (0.9, 0.74, 0.3), "pos": (0.2, 0.0, 0), "rot": (0, 0, -90), "sides": 4}]
+    s.composite(name, parts, pos=pos, rot=rot)
+
+
+def _critter(s, name, pos, kind="frog", rot=(0, 0, 0), col=None):
+    """A small ground/water/air critter. `name` MUST contain a skip-token
+    (Critter / Fauna / Butterfly / Foliage). `col` tints butterfly/moth wings."""
+    if kind in ("frog", "toad"):
+        body = (0.3, 0.5, 0.26) if kind == "frog" else (0.42, 0.36, 0.24)
+        parts = [
+            {"kind": "sphere", "radius": 0.18, "color": body, "pos": (0, 0.12, 0), "segs": 8, "rings": 4},
+            {"kind": "sphere", "radius": 0.06, "color": body, "pos": (-0.08, 0.24, 0.08), "segs": 6, "rings": 4},
+            {"kind": "sphere", "radius": 0.06, "color": body, "pos": (0.08, 0.24, 0.08), "segs": 6, "rings": 4},
+            {"kind": "sphere", "radius": 0.03, "color": (0.95, 0.85, 0.2), "pos": (-0.08, 0.27, 0.12), "segs": 5, "rings": 3, "emissive": (0.4, 0.36, 0.1)},
+            {"kind": "sphere", "radius": 0.03, "color": (0.95, 0.85, 0.2), "pos": (0.08, 0.27, 0.12), "segs": 5, "rings": 3, "emissive": (0.4, 0.36, 0.1)}]
+    elif kind == "dragonfly":    # thin body + 2 pairs of shimmering wings
+        parts = [
+            {"kind": "cylinder", "radius": 0.03, "height": 0.5, "color": (0.2, 0.55, 0.55), "pos": (0, 0, 0), "rot": (90, 0, 0), "sides": 5, "emissive": (0.1, 0.3, 0.3)},
+            {"kind": "box", "size": (0.5, 0.02, 0.14), "color": (0.7, 0.85, 0.9), "pos": (0, 0.02, 0.06), "emissive": (0.4, 0.5, 0.55)},
+            {"kind": "box", "size": (0.5, 0.02, 0.14), "color": (0.7, 0.85, 0.9), "pos": (0, 0.02, -0.06), "emissive": (0.4, 0.5, 0.55)},
+            {"kind": "sphere", "radius": 0.05, "color": (0.2, 0.6, 0.6), "pos": (0, 0, 0.24), "segs": 6, "rings": 4, "emissive": (0.1, 0.34, 0.34)}]
+    elif kind == "butterfly":    # 2 colourful wings + slim body (or pale moth)
+        col = col or (0.95, 0.6, 0.2)
+        parts = [
+            {"kind": "cylinder", "radius": 0.02, "height": 0.22, "color": (0.15, 0.12, 0.1), "pos": (0, 0, 0), "rot": (90, 0, 0), "sides": 4},
+            {"kind": "box", "size": (0.26, 0.02, 0.22), "color": col, "pos": (0.14, 0.01, 0), "rot": (0, 0, 24), "emissive": (col[0]*0.4, col[1]*0.4, col[2]*0.3)},
+            {"kind": "box", "size": (0.26, 0.02, 0.22), "color": col, "pos": (-0.14, 0.01, 0), "rot": (0, 0, -24), "emissive": (col[0]*0.4, col[1]*0.4, col[2]*0.3)}]
+    elif kind == "fish":         # a back breaking the surface + ripple ring
+        parts = [
+            {"kind": "torus", "ring_r": 0.5, "tube_r": 0.04, "color": (0.6, 0.7, 0.75), "pos": (0, 0.02, 0), "rot": (90, 0, 0), "emissive": (0.2, 0.26, 0.3)},
+            {"kind": "sphere", "radius": 0.16, "color": (0.42, 0.46, 0.5), "pos": (0, 0.06, 0), "segs": 8, "rings": 4},
+            {"kind": "cone", "radius": 0.12, "height": 0.2, "color": (0.4, 0.44, 0.48), "pos": (-0.2, 0.12, 0), "rot": (0, 0, 70), "sides": 4}]
+    elif kind == "deer":         # graceful quadruped
+        tan = (0.52, 0.38, 0.24)
+        parts = [
+            {"kind": "box", "size": (0.5, 0.55, 1.3), "color": tan, "pos": (0, 1.0, 0)},
+            {"kind": "cylinder", "radius": 0.07, "height": 1.0, "color": tan, "pos": (0.17, 0.5, 0.45), "sides": 5},
+            {"kind": "cylinder", "radius": 0.07, "height": 1.0, "color": tan, "pos": (-0.17, 0.5, 0.45), "sides": 5},
+            {"kind": "cylinder", "radius": 0.07, "height": 1.0, "color": tan, "pos": (0.17, 0.5, -0.45), "sides": 5},
+            {"kind": "cylinder", "radius": 0.07, "height": 1.0, "color": tan, "pos": (-0.17, 0.5, -0.45), "sides": 5},
+            {"kind": "cylinder", "radius": 0.11, "height": 0.7, "color": tan, "pos": (0, 1.5, 0.7), "rot": (52, 0, 0), "sides": 6},
+            {"kind": "sphere", "radius": 0.2, "color": tan, "pos": (0, 1.85, 0.95), "segs": 8, "rings": 5}]
+    elif kind == "fox":          # small russet quadruped + bushy tail
+        red = (0.7, 0.36, 0.16)
+        parts = [
+            {"kind": "box", "size": (0.34, 0.32, 0.95), "color": red, "pos": (0, 0.45, 0)},
+            {"kind": "sphere", "radius": 0.2, "color": red, "pos": (0, 0.55, 0.55), "segs": 8, "rings": 5},
+            {"kind": "cone", "radius": 0.08, "height": 0.2, "color": red, "pos": (-0.08, 0.74, 0.6), "sides": 4},
+            {"kind": "cone", "radius": 0.08, "height": 0.2, "color": red, "pos": (0.08, 0.74, 0.6), "sides": 4},
+            {"kind": "cylinder", "radius": 0.12, "height": 0.6, "color": (0.85, 0.6, 0.4), "pos": (0, 0.45, -0.6), "rot": (70, 0, 0), "sides": 6},
+            {"kind": "cylinder", "radius": 0.05, "height": 0.4, "color": (0.2, 0.16, 0.12), "pos": (0.12, 0.2, 0.3), "sides": 4},
+            {"kind": "cylinder", "radius": 0.05, "height": 0.4, "color": (0.2, 0.16, 0.12), "pos": (-0.12, 0.2, -0.3), "sides": 4}]
+    elif kind == "hare":         # small rounded body + long ears
+        gr = (0.55, 0.48, 0.38)
+        parts = [
+            {"kind": "sphere", "radius": 0.22, "color": gr, "pos": (0, 0.22, 0), "segs": 8, "rings": 5},
+            {"kind": "sphere", "radius": 0.13, "color": gr, "pos": (0, 0.38, 0.2), "segs": 7, "rings": 4},
+            {"kind": "box", "size": (0.05, 0.34, 0.1), "color": gr, "pos": (-0.06, 0.6, 0.16), "rot": (12, 0, -6)},
+            {"kind": "box", "size": (0.05, 0.34, 0.1), "color": gr, "pos": (0.06, 0.6, 0.16), "rot": (12, 0, 6)}]
+    elif kind == "midges":       # a faint hovering cloud of gnats over the bog
+        rng = _Rng(name)
+        parts = [{"kind": "sphere", "radius": 0.025, "color": (0.2, 0.2, 0.16),
+                  "pos": (rng.rng(-0.5, 0.5), rng.rng(-0.3, 0.3), rng.rng(-0.5, 0.5)),
+                  "segs": 4, "rings": 3, "emissive": (0.1, 0.1, 0.06)} for _ in range(9)]
+    else:
+        parts = [{"kind": "sphere", "radius": 0.1, "color": (0.4, 0.4, 0.4), "pos": (0, 0.1, 0), "segs": 6, "rings": 4}]
+    s.composite(name, parts, pos=pos, rot=rot)
+
+
+def _household_figure(s, name, pos, robe=None, skin=None, h=1.55, arm=False, rot=(0, 0, 0)):
+    """One placed inhabitant (servant, guest, attendant). `name` MUST contain
+    a skip-token (Household / Crowd) so the player walks past, not into, them."""
+    rng = _Rng(name)
+    robe = robe or rng.pick(_ROBES)
+    skin = skin or rng.pick(_SKIN)
+    s.composite(name, _person_parts(0, 0, robe, skin, h=h, arm=arm), pos=pos, rot=rot)
+
+
+# ===========================================================================
 # CHAPTER 1 - City of Destruction
 # ===========================================================================
 def build_city_of_destruction():
@@ -221,9 +590,12 @@ def build_city_of_destruction():
     # Cold, oppressive palette — a doomed city under a leaden sky.
     cold = (0.20, 0.22, 0.26)
     s.ground("ENV_City_Ground", (44, 74), cold)
-    _road(s, "ENV_City_Road_Main", 60, -2, 6, (0.15, 0.17, 0.20))
-    s.box("ENV_City_TownSquare", (14, 0.1, 14), (0.22, 0.24, 0.27), (0, 0.05, 12))
-    _road(s, "ENV_City_OuterRoad", 16, -27, 5, (0.14, 0.16, 0.19))
+    _road(s, "ENV_City_Road_Main", 60, -2, 6, (0.30, 0.30, 0.33),
+          tex="cobble", tile=2.6)
+    s.box("ENV_City_TownSquare", (14, 0.1, 14), (0.34, 0.34, 0.37),
+          (0, 0.05, 12), tex="cobble", tile=3.0, bevel=False)
+    _road(s, "ENV_City_OuterRoad", 16, -27, 5, (0.28, 0.28, 0.31),
+          tex="cobble", tile=1.6)
 
     cwall = (0.34, 0.37, 0.42)   # cold grey-blue masonry
     croof = (0.23, 0.24, 0.28)
@@ -250,12 +622,21 @@ def build_city_of_destruction():
     ], pos=(1.4, 0, 4))
 
     s.composite("PROP_CityGate", [
-        {"kind": "box", "size": (2, 6, 2), "color": (0.4, 0.38, 0.35),
-         "pos": (-4, 3, 0)},
-        {"kind": "box", "size": (2, 6, 2), "color": (0.4, 0.38, 0.35),
-         "pos": (4, 3, 0)},
-        {"kind": "box", "size": (10.5, 1.2, 1.6), "color": (0.34, 0.31, 0.28),
-         "pos": (0, 6.4, 0)},
+        {"kind": "box", "size": (2, 6, 2), "color": (0.5, 0.49, 0.46),
+         "pos": (-4, 3, 0), "tex": "stone", "tile": 1.4},
+        {"kind": "box", "size": (2, 6, 2), "color": (0.5, 0.49, 0.46),
+         "pos": (4, 3, 0), "tex": "stone", "tile": 1.4},
+        {"kind": "box", "size": (10.5, 1.2, 1.6), "color": (0.46, 0.44, 0.40),
+         "pos": (0, 6.4, 0), "tex": "stone", "tile": 1.2},
+        # keystone + iron-banded posts + a guttering gate lantern (opening stays clear)
+        {"kind": "box", "size": (1.4, 1.1, 1.8), "color": (0.5, 0.48, 0.44),
+         "pos": (0, 6.95, 0), "tex": "stone"},
+        {"kind": "box", "size": (2.15, 0.28, 2.15), "color": (0.16, 0.15, 0.15),
+         "pos": (-4, 1.4, 0), "tex": "wood"},
+        {"kind": "box", "size": (2.15, 0.28, 2.15), "color": (0.16, 0.15, 0.15),
+         "pos": (4, 1.4, 0), "tex": "wood"},
+        {"kind": "box", "size": (0.34, 0.8, 0.34), "color": (0.72, 0.52, 0.26),
+         "pos": (-2.9, 5.1, 1.0), "emissive": (0.55, 0.32, 0.12)},
     ], pos=(0, 0, -19))
 
     s.composite("PROP_WarningBell", [
@@ -272,10 +653,13 @@ def build_city_of_destruction():
     _merl = [{"kind": "box", "size": (1.3, 1.3, 1.8), "color": rstone,
               "pos": (mx, 9.4, 0)} for mx in range(-18, 19, 4)]
     s.composite("ENV_CityWall_Back", [
-        {"kind": "box", "size": (40, 9, 1.8), "color": rstone, "pos": (0, 4.5, 0)},
+        {"kind": "box", "size": (40, 9, 1.8), "color": (0.42, 0.44, 0.48),
+         "pos": (0, 4.5, 0), "tex": "mossy_stone", "tile": 3.2},
     ] + _merl, pos=(0, 0, -33))
-    s.box("ENV_CityWall_Left", (1.8, 8, 60), (0.25, 0.27, 0.32), (-21, 4, 0))
-    s.box("ENV_CityWall_Right", (1.8, 8, 60), (0.25, 0.27, 0.32), (21, 4, 0))
+    s.box("ENV_CityWall_Left", (1.8, 8, 60), (0.42, 0.44, 0.48), (-21, 4, 0),
+          tex="mossy_stone", tile=3.0)
+    s.box("ENV_CityWall_Right", (1.8, 8, 60), (0.42, 0.44, 0.48), (21, 4, 0),
+          tex="mossy_stone", tile=3.0)
 
     # Black smoke pouring up from the burning quarters (rooftop height -> harmless).
     for i, (px, pz) in enumerate([(12, 22), (-11, 24), (4, -24)], start=1):
@@ -289,8 +673,82 @@ def build_city_of_destruction():
         ], pos=(px, 0, pz))
 
     # The last chapel still standing in the doomed city.
-    _chapel(s, "PROP_Chapel", (-16, 0, -15), rot=(0, 90, 0),
-            wall=(0.5, 0.46, 0.46), roof=(0.3, 0.24, 0.26), brick=True)
+    _chapel(s, "PROP_Chapel", (-16, 0, -15), rot=(0, 90, 0), kind="ruined")
+
+    # ----- textured detail, market clutter & story props -----
+    # cracked dry-earth breaking through the cobbles (thin, non-solid decals)
+    for i, (cx, cz, cw) in enumerate([(-6, 14, 3.0), (8, 10, 2.6), (-3, -8, 2.4), (5, 18, 2.2)], start=1):
+        s.box("PROP_DryPatch_Cairn_%02d" % i, (cw, 0.05, cw * 0.8), (0.32, 0.28, 0.23),
+              (cx, 0.08, cz), tex="dry_earth", tile=1.0, bevel=False)
+    # a proclamation board in the square -- the city's official "all is well"
+    s.composite("PROP_ProclamationBoard", [
+        {"kind": "box", "size": (0.22, 2.4, 0.22), "color": (0.3, 0.24, 0.18), "pos": (-1.0, 1.2, 0), "tex": "wood"},
+        {"kind": "box", "size": (0.22, 2.4, 0.22), "color": (0.3, 0.24, 0.18), "pos": (1.0, 1.2, 0), "tex": "wood"},
+        {"kind": "box", "size": (2.6, 1.6, 0.12), "color": (0.62, 0.55, 0.4), "pos": (0, 2.0, 0), "tex": "wood", "tile": 0.8},
+        {"kind": "box", "size": (2.2, 0.14, 0.14), "color": (0.5, 0.12, 0.1), "pos": (0, 2.5, 0.08), "emissive": (0.18, 0.03, 0.02)},
+    ], pos=(6.5, 0, 9))
+    # an abandoned market stall, awning sagging
+    s.composite("PROP_MarketStall", [
+        {"kind": "box", "size": (3.2, 0.18, 2.0), "color": (0.4, 0.3, 0.2), "pos": (0, 1.0, 0), "tex": "wood", "tile": 0.8},
+        {"kind": "box", "size": (0.18, 1.0, 0.18), "color": (0.32, 0.24, 0.16), "pos": (-1.4, 0.5, -0.8), "tex": "wood"},
+        {"kind": "box", "size": (0.18, 1.0, 0.18), "color": (0.32, 0.24, 0.16), "pos": (1.4, 0.5, -0.8), "tex": "wood"},
+        {"kind": "box", "size": (0.18, 1.7, 0.18), "color": (0.32, 0.24, 0.16), "pos": (-1.4, 1.85, 0.8), "tex": "wood"},
+        {"kind": "box", "size": (0.18, 1.7, 0.18), "color": (0.32, 0.24, 0.16), "pos": (1.4, 1.85, 0.8), "tex": "wood"},
+        {"kind": "box", "size": (3.5, 0.16, 2.5), "color": (0.5, 0.18, 0.16), "pos": (0, 2.55, 0.1), "rot": (8, 0, 0)},
+    ], pos=(9.6, 0, 11))
+    # a dry well -- the city's water gone
+    s.composite("PROP_DryWell", [
+        {"kind": "cylinder", "radius": 1.1, "height": 1.3, "color": (0.42, 0.44, 0.48), "pos": (0, 0.65, 0), "tex": "mossy_stone"},
+        {"kind": "box", "size": (0.2, 2.2, 0.2), "color": (0.3, 0.24, 0.18), "pos": (-0.9, 1.6, 0), "tex": "wood"},
+        {"kind": "box", "size": (0.2, 2.2, 0.2), "color": (0.3, 0.24, 0.18), "pos": (0.9, 1.6, 0), "tex": "wood"},
+        {"kind": "box", "size": (2.5, 0.18, 1.3), "color": (0.36, 0.28, 0.2), "pos": (0, 2.75, 0), "tex": "wood", "tile": 0.7},
+    ], pos=(-7.6, 0, 15))
+    # a broken cart by a frontage (off the central road)
+    s.composite("PROP_BrokenCart", [
+        {"kind": "box", "size": (2.4, 0.5, 1.2), "color": (0.34, 0.26, 0.18), "pos": (0, 0.7, 0), "tex": "wood", "tile": 0.8},
+        {"kind": "cylinder", "radius": 0.7, "height": 0.18, "color": (0.28, 0.22, 0.16), "pos": (-1.0, 0.7, 0.7), "rot": (90, 0, 0), "tex": "wood"},
+        {"kind": "cylinder", "radius": 0.7, "height": 0.18, "color": (0.28, 0.22, 0.16), "pos": (-1.0, 0.7, -0.7), "rot": (90, 0, 0), "tex": "wood"},
+        {"kind": "box", "size": (0.18, 1.7, 0.18), "color": (0.3, 0.24, 0.18), "pos": (1.3, 1.1, 0), "rot": (0, 0, 24), "tex": "wood"},
+    ], pos=(13.8, 0, 2))
+    # rubble heaps against the walls (off the path)
+    for i, (rx, rz, rr) in enumerate([(16.8, 9, 0.9), (-16.8, 6, 0.8), (14.8, -7, 0.7), (-14.5, 16, 0.7)], start=1):
+        s.composite("PROP_Rubble_%02d" % i, [
+            {"kind": "sphere", "radius": rr, "color": (0.34, 0.35, 0.39), "pos": (0, rr * 0.5, 0), "tex": "stone"},
+            {"kind": "box", "size": (rr, rr * 0.7, rr * 1.2), "color": (0.32, 0.33, 0.37), "pos": (rr * 0.7, rr * 0.35, 0.2), "rot": (0, 20, 12), "tex": "stone"},
+        ], pos=(rx, 0, rz))
+    # cold guttering street lanterns lining the road (clear of the 6-wide road)
+    for i, (lx, lz) in enumerate([(-4.2, 0), (4.2, -8), (-4.2, -15)], start=1):
+        s.composite("PROP_StreetLantern_%02d" % i, [
+            {"kind": "cylinder", "radius": 0.1, "height": 3.4, "color": (0.22, 0.22, 0.25), "pos": (0, 1.7, 0), "tex": "wood"},
+            {"kind": "box", "size": (0.5, 0.6, 0.5), "color": (0.72, 0.56, 0.3), "pos": (0, 3.6, 0), "emissive": (0.5, 0.32, 0.12)},
+        ], pos=(lx, 0, lz))
+        s.marker("LIGHT_StreetLanternGlow_%02d" % i, (lx, 3.6, lz))
+    # a single dead tree clawing at the leaden sky
+    s.composite("PROP_DeadTree", [
+        {"kind": "cylinder", "radius": 0.35, "height": 4.2, "color": (0.2, 0.17, 0.14), "pos": (0, 2.1, 0), "tex": "bark"},
+        {"kind": "cylinder", "radius": 0.12, "height": 2.0, "color": (0.2, 0.17, 0.14), "pos": (0.7, 3.6, 0), "rot": (0, 0, 40), "tex": "bark"},
+        {"kind": "cylinder", "radius": 0.12, "height": 1.8, "color": (0.2, 0.17, 0.14), "pos": (-0.6, 3.7, 0.2), "rot": (0, 0, -38), "tex": "bark"},
+    ], pos=(-13.5, 0, 19))
+
+    # ----- the burning quarters behind: a layered skyline + fire glow -----
+    for i, (bx, bw, bh, bz) in enumerate([(-14, 5, 9, 41), (-7, 4, 12, 44), (0, 6, 10, 42),
+                                          (7, 4, 13, 45), (15, 5, 8, 41)], start=1):
+        s.box("PROP_DistantTower_Silhouette_%02d" % i, (bw, bh, 1.5), (0.10, 0.10, 0.13),
+              (bx, bh / 2, bz), bevel=False)
+    s.box("PROP_FireWall_Glow", (46, 16, 1.0), (0.9, 0.4, 0.18), (0, 8, 47),
+          emissive=(0.85, 0.32, 0.10), bevel=False)
+    for i, (ex, ez) in enumerate([(-8, 38), (4, 39), (12, 37)], start=1):
+        s.marker("VFX_EmberField_%02d" % i, (ex, 5, ez))
+
+    # ----- cinematic atmosphere markers (read by the art / VFX systems) -----
+    s.marker("VFX_SmokeColumn_03", (4, 0, -24))
+    s.marker("VFX_AshFall_01", (0, 11, 6))
+    s.marker("VFX_AshFall_02", (-8, 11, 0))
+    s.marker("VFX_GroundFog_01", (0, 0.6, 2))
+    s.marker("VFX_GroundFog_02", (6, 0.6, -12))
+    s.marker("VFX_GodRay_01", (-4, 9, 2), rot=(20, 0, 8))
+    s.marker("VFX_GodRay_02", (8, 9, -6), rot=(20, 0, -8))
+    s.marker("LIGHT_FireGlowWarm", (0, 7, 40))
 
     s.marker("NPC_Wife", (-3.0, 0, 5.0))
     s.marker("NPC_Children", (-3.8, 0, 5.6))
@@ -301,6 +759,7 @@ def build_city_of_destruction():
     s.zone("TRIGGER_ReadBook", (3, 3, 3), (1.4, 1.5, 4))
     s.zone("TRIGGER_ObstinateConfrontation", (8, 3, 4), (3, 1.5, -13))
     s.zone("TRIGGER_PliableJoin", (8, 3, 4), (-3, 1.5, -13))
+    s.zone("TRIGGER_ProclamationRead", (3.5, 3, 3.5), (6.5, 1.5, 9))
     s.zone("TRIGGER_Exit_WildernessRoad", (11, 4, 2), (0, 1.5, -21))
 
     s.marker("VFX_SmokeColumn_01", (12, 0, 22))
@@ -489,8 +948,19 @@ def build_wilderness_road():
 def build_slough_of_despond():
     s = Scene("slough_of_despond")
     # Murkier, colder mire — heavier and more hopeless underfoot.
-    s.ground("ENV_Slough_Ground", (40, 96), (0.18, 0.22, 0.21))
-    s.box("ENV_Slough_MudBasin", (26, 0.3, 50), (0.15, 0.19, 0.17), (0, -0.1, -18))
+    # Paler, drier moor around the mire so the dark wet bog reads with strong
+    # contrast (the mud was previously the same tone as the ground = invisible).
+    s.ground("ENV_Slough_Ground", (40, 96), (0.40, 0.38, 0.31))
+    # The mire bed: RAISED to just under the stone path, widened to fill both
+    # sides, and made a DARK, wet brown-black so it clearly reads as a swamp
+    # against the pale moor and the grey safe path.
+    s.box("ENV_Slough_MudBasin", (30, 0.34, 56), (0.16, 0.16, 0.11), (0, 0.0, -18),
+          tex="mud", tile=3.0, roughness=0.5)
+    # The deep despair bog at the centre: a near-black sheet of standing water,
+    # proud of the mud so it reads as a wide, drowning pool.
+    s.box("ENV_Slough_DeepBog_WaterSurface", (18, 0.12, 30), (0.07, 0.09, 0.08),
+          (0, 0.19, -26), tex="mud", tile=2.0, roughness=0.32, metallic=0.1,
+          emissive=(0.015, 0.02, 0.018), bevel=False)
     s.box("ENV_Slough_SafeStonePath", (3, 0.2, 60), (0.5, 0.5, 0.55),
           (0, 0.08, -10))
     s.box("ENV_Slough_ExitSlope", (10, 0.12, 10), (0.34, 0.36, 0.3), (0, 0.05, -48))
@@ -538,6 +1008,15 @@ def build_slough_of_despond():
     for i, (mx, mz, mr) in enumerate([(3, -10, 0.5), (-4, -34, 0.45), (6, -22, 0.4)], start=1):
         s.composite("PROP_MireFoliage_%02d" % i, [
             {"kind": "sphere", "radius": mr, "color": (0.3, 0.34, 0.28), "pos": (0, mr * 0.35, 0)}], pos=(mx, 0, mz))
+
+    # Half-sunken chapel adrift in the mire: nave swallowed by the bog, only the
+    # weathered roof and the cross standing above the muck -- "out of the depths
+    # I cry to you" (Ps 130). A landmark of hope you cannot quite reach while
+    # struggling, not a save point; named with the 'Silhouette' skip-token so it
+    # stays non-solid and off the safe stone path.
+    _chapel(s, "PROP_SunkenChapel_Silhouette", (-9.5, -4.1, -19), rot=(0, 16, 0), kind="ruined")
+    s.marker("VFX_SunkenChapelCrossGlow", (-9.5, 7.0, -19))
+    s.marker("LIGHT_SunkenChapelPrayerGlow", (-9.5, 6.4, -19))
 
     s.marker("NPC_Pliable", (-2, 0, 2))
     s.marker("NPC_Help", (0, 0, -38))
@@ -608,6 +1087,13 @@ def build_wicket_gate():
             {"kind": "sphere", "radius": br * 0.6, "color": (0.22, 0.23, 0.28), "pos": (br * 0.7, br * 0.4, 0.3)},
         ], pos=(bx, 0, bz))
 
+    # Small gate chapel just inside the narrow way -- a place to kneel and give
+    # thanks the moment grace draws you through. "Enter through the narrow gate"
+    # (Mt 7:13). A real worship/restore point (PROP_Chapel) set on the platform's
+    # left, clear of the central road, the exit portal and the arrow zone behind.
+    _chapel(s, "PROP_Chapel", (-4.2, 0, -11), rot=(0, 90, 0), kind="gate")
+    s.marker("LIGHT_WicketChapelGlow", (-4.2, 3.2, -11))
+
     s.marker("NPC_Goodwill", (0, 0, -10.5))
     s.zone("TRIGGER_GateKnock", (3.4, 4, 1.6), (0, 2, -8),
            color=(0.9, 0.8, 0.4, 0.25))
@@ -638,7 +1124,7 @@ def build_cross_and_tomb():
     s.ramp("ENV_Cross_HillPath", 8, 12, 1.0, (0.5, 0.46, 0.34), (0, 0, -2))
     s.box("ENV_Cross_Hilltop", (22, 1.0, 16), (0.42, 0.48, 0.36), (0, 0.5, -22))
     s.box("ENV_Cross_TombSlope", (10, 0.1, 7), (0.4, 0.42, 0.34), (-7, 1.05, -18))
-    _chapel(s, "PROP_Chapel", (13, 0, 6), rot=(0, -90, 0))
+    _chapel(s, "PROP_Chapel", (13, 0, 6), rot=(0, -90, 0), kind="calvary")
     # --- 精装修: life returning to the hill of grace (flowers, light, doves) ---
     for i, (fx, fz, fc) in enumerate([(-3, -16, (0.95, 0.85, 0.4)), (3, -14, (0.9, 0.5, 0.6)),
                                       (-5, -22, (0.86, 0.86, 0.95)), (5, -20, (0.95, 0.8, 0.45)),
@@ -703,8 +1189,8 @@ def build_interpreter_house():
     wall = (0.4, 0.34, 0.28)
     s.box("ENV_InterpreterHouse_Floor", (40, 0.4, 40), (0.3, 0.24, 0.2),
           (0, -0.2, 0))
-    s.box("ENV_InterpreterHouse_MainHall", (12, 0.1, 12), (0.36, 0.3, 0.24),
-          (0, 0.06, 0))
+    s.box("ENV_InterpreterHouse_MainHall", (12, 0.1, 12), (0.46, 0.36, 0.26),
+          (0, 0.06, 0), tex="wood", tile=2.2)
     s.box("ENV_InterpreterHouse_DustRoom", (10, 0.1, 10), (0.34, 0.3, 0.26),
           (-14, 0.06, 0))
     s.box("ENV_InterpreterHouse_FireRoom", (10, 0.1, 10), (0.4, 0.3, 0.24),
@@ -725,7 +1211,7 @@ def build_interpreter_house():
     # Warm hanging lamps pooling light through the instructive hall.
     s.sphere("PROP_HallLight_01", 0.42, (1.0, 0.92, 0.7), (-4, 3.3, -2), emissive=(0.95, 0.82, 0.5))
     s.sphere("PROP_HallLight_02", 0.42, (1.0, 0.92, 0.7), (4, 3.3, -3), emissive=(0.95, 0.82, 0.5))
-    _chapel(s, "PROP_Chapel", (-12, 0, 13), rot=(0, 0, 0), wall=(0.8, 0.74, 0.66))
+    _chapel(s, "PROP_Chapel", (-12, 0, 13), rot=(0, 0, 0), kind="gate")
     # --- 精装修: a warmly furnished house of instruction ---
     for i, (lx, lz) in enumerate([(-6, 6), (6, 6), (-6, -6), (6, -6)], start=3):
         s.composite("PROP_HallLight_%02d" % i, [
@@ -814,7 +1300,7 @@ def build_hill_difficulty():
         {"kind": "box", "size": (2.4, 0.9, 0.2), "color": (0.4, 0.32, 0.2),
          "pos": (0, 1.0, -0.4)},
     ], pos=(6, 0, 0))
-    _chapel(s, "PROP_Chapel", (11, 0, 9), rot=(0, -90, 0))
+    _chapel(s, "PROP_Chapel", (11, 0, 9), rot=(0, -90, 0), kind="pilgrim")
     # --- 精装修: scree, pines and a wayside spring on the climb ---
     for i, (bx, bz, br) in enumerate([(-4.5, -4, 0.7), (4.5, -10, 0.6), (-4, -18, 0.8), (4.5, -24, 0.65)], start=1):
         s.composite("PROP_Scree_%02d" % i, [
@@ -876,8 +1362,10 @@ def build_palace_beautiful():
     s = Scene("palace_beautiful")
     stone = (0.55, 0.5, 0.44)
     s.ground("ENV_Palace_Ground", (48, 60), (0.4, 0.42, 0.36))
-    s.box("ENV_Palace_GateCourt", (16, 0.1, 12), (0.5, 0.47, 0.42), (0, 0.06, 16))
-    s.box("ENV_Palace_MainHall", (18, 0.1, 16), (0.5, 0.46, 0.4), (0, 0.06, 0))
+    s.box("ENV_Palace_GateCourt", (16, 0.1, 12), (0.62, 0.6, 0.56), (0, 0.06, 16),
+          tex="marble", tile=2.4)
+    s.box("ENV_Palace_MainHall", (18, 0.1, 16), (0.66, 0.64, 0.6), (0, 0.06, 0),
+          tex="marble", tile=2.8)
     s.box("ENV_Palace_RestRoom", (10, 0.1, 10), (0.48, 0.44, 0.4), (-15, 0.06, -2))
     s.box("ENV_Palace_ArmorRoom", (10, 0.1, 10), (0.5, 0.46, 0.42), (15, 0.06, -2))
     s.box("ENV_Palace_Balcony", (14, 0.1, 6), (0.46, 0.44, 0.4), (0, 0.06, -16))
@@ -895,8 +1383,8 @@ def build_palace_beautiful():
          "pos": (0, 7.2, 0)},
     ], pos=(0, 0, 22))
     s.composite("PROP_DiningTable", [
-        {"kind": "box", "size": (5, 0.3, 1.6), "color": (0.4, 0.3, 0.2),
-         "pos": (0, 1.0, 0)}], pos=(0, 0, 0))
+        {"kind": "box", "size": (5, 0.3, 1.6), "color": (0.5, 0.38, 0.24),
+         "pos": (0, 1.0, 0), "tex": "wood", "tile": 1.2}], pos=(0, 0, 0))
     s.composite("PROP_Bed", [
         {"kind": "box", "size": (2.2, 0.6, 3.6), "color": (0.5, 0.42, 0.4),
          "pos": (0, 0.5, 0)},
@@ -920,7 +1408,7 @@ def build_palace_beautiful():
     s.sphere("PROP_HearthGlow", 0.6, (1.0, 0.6, 0.3), (-15, 0.8, -5), emissive=(0.95, 0.45, 0.15))
     s.box("PROP_GateBanner_Left", (0.16, 2.2, 1.2), (0.72, 0.2, 0.26), (-4, 8.3, 22), emissive=(0.32, 0.06, 0.08))
     s.box("PROP_GateBanner_Right", (0.16, 2.2, 1.2), (0.72, 0.2, 0.26), (4, 8.3, 22), emissive=(0.32, 0.06, 0.08))
-    _chapel(s, "PROP_Chapel", (-11, 0, 15), rot=(0, 0, 0), wall=(0.86, 0.82, 0.76))
+    _chapel(s, "PROP_Chapel", (-11, 0, 15), rot=(0, 0, 0), kind="pilgrim")
     # --- 精装修: a richer noble hall (columns, banners, hearth, urns) ---
     _hcol = [(0.5, 0), (0.6, 0.3), (0.42, 0.6), (0.4, 4.6), (0.56, 5.0), (0.66, 5.4)]
     for i, (cx, cz) in enumerate([(-7, 6), (7, 6), (-7, -6), (7, -6)], start=1):
@@ -985,7 +1473,7 @@ def build_valley_humiliation():
     # Brimstone embers smouldering on the field.
     s.sphere("PROP_EmberGlow_01", 0.5, (1.0, 0.3, 0.12), (-8, 0.6, -12), emissive=(0.95, 0.25, 0.05))
     s.sphere("PROP_EmberGlow_02", 0.42, (1.0, 0.35, 0.14), (8, 0.5, -12), emissive=(0.9, 0.28, 0.06))
-    _chapel(s, "PROP_Chapel", (13, 0, 18), rot=(0, -90, 0))
+    _chapel(s, "PROP_Chapel", (13, 0, 18), rot=(0, -90, 0), kind="pilgrim")
     # --- 精装修: more battlefield wreckage ---
     for i, (sx2, sz2, sa) in enumerate([(-8, 2, 60), (9, -6, -50), (-9, -10, 40), (8, 4, 75)], start=2):
         s.cylinder("PROP_BrokenSpear_%02d" % i, 0.07, 2.4, (0.4, 0.34, 0.26), (sx2, 0.4, sz2), rot=(0, 0, sa))
@@ -1042,7 +1530,7 @@ def build_valley_shadow_death():
           (-7, 5, 0))
     s.box("ENV_ShadowValley_ExitSlope", (8, 0.12, 12), (0.3, 0.3, 0.34), (0, 0.05, -44))
     # A prayer chapel against the valley wall at the entrance — light before the dark.
-    _chapel(s, "PROP_Chapel", (-3.5, 0, 25), rot=(0, 0, 0))
+    _chapel(s, "PROP_Chapel", (-3.5, 0, 25), rot=(0, 0, 0), kind="ruined")
 
     for i, z in enumerate((24, 8, -8, -24), start=1):
         s.composite("PROP_FaintPathMarker_%02d" % i, [
@@ -1140,21 +1628,48 @@ def build_vanity_fair():
     s.box("PROP_Banner_Crimson_01", (0.2, 3.6, 1.5), (0.86, 0.1, 0.32), (0, 2.3, 20), emissive=(0.4, 0.05, 0.14))
     s.box("PROP_TrialPlatform", (8, 1.0, 6), (0.5, 0.42, 0.4), (0, 0.5, -14))
     # Crowd figures: a robed body (cylinder) topped with a head (sphere).
-    _crowd = [part
-              for x in (-1, 0, 1) for z in (0, 1)
-              for part in (
-                  {"kind": "cylinder", "radius": 0.34, "height": 1.5,
-                   "color": (0.42, 0.36, 0.42), "pos": (x * 1.0, 0.75, z * 1.1)},
-                  {"kind": "sphere", "radius": 0.26, "color": (0.72, 0.6, 0.52),
-                   "pos": (x * 1.0, 1.68, z * 1.1)})]
-    s.composite("PROP_CrowdCluster_01", _crowd, pos=(-6, 0, -10))
-    s.composite("PROP_CrowdCluster_02", _crowd, pos=(6, 0, -10))
-    s.composite("PROP_CrowdCluster_03", _crowd, pos=(-10, 0, 5))
-    s.composite("PROP_CrowdCluster_04", _crowd, pos=(10, 0, 6))
+    _cparts = [part
+               for x in (-1, 0, 1) for z in (0, 1)
+               for part in (
+                   {"kind": "cylinder", "radius": 0.34, "height": 1.5,
+                    "color": (0.42, 0.36, 0.42), "pos": (x * 1.0, 0.75, z * 1.1)},
+                   {"kind": "sphere", "radius": 0.26, "color": (0.72, 0.6, 0.52),
+                    "pos": (x * 1.0, 1.68, z * 1.1)})]
+    s.composite("PROP_CrowdCluster_01", _cparts, pos=(-6, 0, -10))
+    s.composite("PROP_CrowdCluster_02", _cparts, pos=(6, 0, -10))
+    s.composite("PROP_CrowdCluster_03", _cparts, pos=(-10, 0, 5))
+    s.composite("PROP_CrowdCluster_04", _cparts, pos=(10, 0, 6))
     s.composite("PROP_BrokenPilgrimSign", [
         {"kind": "box", "size": (0.2, 1.4, 0.2), "color": (0.4, 0.34, 0.24), "pos": (0, 0.7, 0), "rot": (0, 0, 20)}], pos=(10, 0, 18))
+    # ----- a teeming fair: piled goods, merchant shops, and dense crowds -----
+    # goods heaped on every named stall counter
+    for _gnm, _gp in [("Applause", (-8, 1.3, 9.3)), ("Comfort", (8, 1.3, 9.3)),
+                      ("Influence", (0, 1.3, 13.3)), ("Riches", (-12, 1.3, 3.3)),
+                      ("Pleasure", (12, 1.3, 3.3)), ("Honor", (0, 1.3, 20.3))]:
+        _market_goods(s, "PROP_StallGoods_%s" % _gnm, _gp)
+    # merchant shops lining the fair street (solid, set off the central road)
+    _shop(s, "PROP_Shop_Silks", (-13.5, 0, 11), awning=(0.7, 0.18, 0.5))
+    _shop(s, "PROP_Shop_Goldsmith", (13.5, 0, 11), awning=(0.9, 0.72, 0.2))
+    _shop(s, "PROP_Shop_Wines", (-14, 0, 0), awning=(0.55, 0.12, 0.16))
+    _shop(s, "PROP_Shop_Relics", (14, 0, 0), awning=(0.4, 0.3, 0.7))
+    _shop(s, "PROP_Shop_Trinkets", (-13.5, 0, 18), awning=(0.2, 0.6, 0.6))
+    _shop(s, "PROP_Shop_Masks", (13.5, 0, 18), awning=(0.8, 0.4, 0.2))
+    # the great press of fairgoers (non-solid 'Crowd' -- the player wades through)
+    for _ci, (_cx, _cz, _rw, _cl) in enumerate(
+            [(-5, 3, 3, 4), (5, 3, 3, 4), (-7, 15, 3, 4), (7, 15, 3, 4), (0, 17, 2, 5),
+             (-4, -4, 3, 4), (4, -4, 3, 4), (0, -6, 2, 4), (-6, -12, 3, 4), (6, -12, 3, 4)], start=5):
+        _crowd(s, "PROP_CrowdCluster_%02d" % _ci, (_cx, 0, _cz), rows=_rw, cols=_cl)
+    # hawkers' hand-carts of wares dotted through the square
+    for _wi, (_wx, _wz) in enumerate([(-3, 8), (3, 8), (-2, 16), (2, -2)], start=1):
+        s.composite("PROP_WaresCart_%02d" % _wi, [
+            {"kind": "box", "size": (1.8, 0.5, 1.0), "color": (0.42, 0.3, 0.2), "pos": (0, 0.7, 0), "tex": "wood"},
+            {"kind": "cylinder", "radius": 0.5, "height": 0.16, "color": (0.3, 0.24, 0.16), "pos": (-0.7, 0.5, 0.6), "rot": (90, 0, 0), "tex": "wood"},
+            {"kind": "cylinder", "radius": 0.5, "height": 0.16, "color": (0.3, 0.24, 0.16), "pos": (-0.7, 0.5, -0.6), "rot": (90, 0, 0), "tex": "wood"},
+        ], pos=(_wx, 0, _wz))
+        _market_goods(s, "PROP_WaresCart_%02d_Goods" % _wi, (_wx, 0.95, _wz))
+
     # A quiet chapel at the edge of the clamouring fair.
-    _chapel(s, "PROP_Chapel", (-16, 0, -4), rot=(0, 90, 0), wall=(0.8, 0.78, 0.74))
+    _chapel(s, "PROP_Chapel", (-16, 0, -4), rot=(0, 90, 0), kind="trial")
 
     s.marker("NPC_Faithful", (-2, 0, -10))
     s.marker("NPC_Hopeful", (2, 0, -10))
@@ -1295,7 +1810,7 @@ def build_doubting_castle():
     _keep_tower(s, "PROP_KeepTower_BackLeft", (-5, 0, -13), keep_stone)
     _keep_tower(s, "PROP_KeepTower_BackRight", (5, 0, -13), keep_stone)
     # A chapel out in the By-Path meadow — mercy within reach of the dungeon.
-    _chapel(s, "PROP_Chapel", (-12, 0, 20), rot=(0, 90, 0))
+    _chapel(s, "PROP_Chapel", (-12, 0, 20), rot=(0, 90, 0), kind="ruined")
     # --- 精装修: a grimmer castle ground (graves, dead trees, puddles, chains) ---
     for i, (gx, gz) in enumerate([(7, 18), (11, 22), (5, 25)], start=1):
         s.composite("PROP_GraveCairn_%02d" % i, [
@@ -1364,7 +1879,7 @@ def build_delectable_mountains():
     s.box("PROP_DistantCelestialCity", (18, 8, 2), (0.93, 0.91, 0.72), (0, 10, -40), emissive=(0.74, 0.68, 0.46))
     s.composite("PROP_PastureStone_01", [
         {"kind": "box", "size": (1.4, 1.0, 1.2), "color": (0.5, 0.5, 0.46), "pos": (0, 0.5, 0)}], pos=(8, 0, 6))
-    _chapel(s, "PROP_Chapel", (12, 0, 8), rot=(0, -90, 0), wall=(0.86, 0.84, 0.78))
+    _chapel(s, "PROP_Chapel", (12, 0, 8), rot=(0, -90, 0), kind="pilgrim")
     s.composite("PROP_PastureTree_01", [
         {"kind": "cylinder", "radius": 0.28, "height": 2.4,
          "color": (0.34, 0.24, 0.16), "pos": (0, 1.2, 0)},
@@ -1398,6 +1913,19 @@ def build_delectable_mountains():
     s.zone("TRIGGER_ReceiveShepherdMap", (5, 3, 5), (-10, 1.5, 8))
     s.zone("TRIGGER_Exit_EnchantedGround", (8, 4, 2), (0, 1.5, -32))
     s.zone("COL_ErrorCliffWarningZone", (6, 3, 6), (-9, 1.5, -10), color=(0.5, 0.3, 0.3, 0.3))
+
+    # ----- a living pasture: a grazing flock, a shepherd's dog, wildflowers, birds -----
+    for _i, (_fx, _fz) in enumerate([(-7, 10), (-9, 6), (-6, 13), (8, 11), (10, 7),
+                                     (7, 4), (-8, -2), (9, -3), (-5, 2), (6, 15)], start=1):
+        _fauna(s, "PROP_Sheep_%02d" % _i, (_fx, 0, _fz), kind="sheep")
+    _fauna(s, "PROP_ShepherdDog_Foliage", (-7, 0, -7), kind="dog")
+    for _i, (_gx, _gz) in enumerate([(-4, 8), (4, 6), (-10, 12), (10, 13), (-3, 14),
+                                     (5, -4), (-9, 2), (8, 0), (2, 12), (-6, 5)], start=1):
+        _flora(s, "PROP_Flower_%02d" % _i, (_gx, 0, _gz), kind="flower", n=7)
+    for _i, (_tx, _tz) in enumerate([(-12, 4), (12, 9), (-11, -6)], start=1):
+        _flora(s, "PROP_GrassTuft_%02d" % _i, (_tx, 0, _tz), kind="grass", n=8)
+    _fauna(s, "PROP_Crow_Hill_01", (-2, 3.2, 6), kind="bird")
+    _fauna(s, "PROP_Crow_Hill_02", (3, 3.0, 9), kind="bird")
 
     s.marker("VFX_CelestialCityDistantGlow", (0, 10, -40))
     s.marker("VFX_MountainWind", (0, 3, 0))
@@ -1467,7 +1995,7 @@ def build_enchanted_ground():
     s.box("PROP_TestimonyMarker_Cross", (0.4, 1.4, 0.4), (0.8, 0.7, 0.4), (-3, 0.7, 0))
     s.box("PROP_TestimonyMarker_Slough", (0.4, 1.4, 0.4), (0.6, 0.6, 0.4), (3, 0.7, -10))
     s.box("PROP_TestimonyMarker_Castle", (0.4, 1.4, 0.4), (0.5, 0.5, 0.55), (-3, 0.7, -22))
-    _chapel(s, "PROP_Chapel", (-11, 0, 8), rot=(0, 90, 0), wall=(0.82, 0.82, 0.72))
+    _chapel(s, "PROP_Chapel", (-11, 0, 8), rot=(0, 90, 0), kind="pilgrim")
 
     s.marker("NPC_Hopeful", (1.5, 0, 16))
     s.marker("NPC_Ignorance_Optional", (4, 0, -24))
@@ -1523,7 +2051,7 @@ def build_river_of_death():
         {"kind": "cone", "radius": 1.0, "height": 3.0, "color": (1.0, 0.95, 0.75), "pos": (0, 1.5, 0), "emissive": (0.95, 0.88, 0.65)},
         {"kind": "sphere", "radius": 1.2, "color": (1.0, 0.96, 0.8), "pos": (0, 3.5, 0), "emissive": (0.95, 0.9, 0.7)}], pos=(0, 0, -30))
     s.box("PROP_DistantCelestialGate", (12, 9, 2), (0.98, 0.93, 0.72), (0, 6, -44), emissive=(0.9, 0.82, 0.55))
-    _chapel(s, "PROP_Chapel", (-14, 0, 16), rot=(0, 90, 0), wall=(0.8, 0.8, 0.76))
+    _chapel(s, "PROP_Chapel", (-14, 0, 16), rot=(0, 90, 0), kind="river")
     # --- 精装修: reedy near bank, stepping stones, driftwood, radiant far shore ---
     for i, (rx, rz) in enumerate([(-12, 16), (10, 18), (-16, 14), (14, 15)], start=1):
         s.composite("PROP_BankReeds_%02d" % i, [
@@ -1584,7 +2112,13 @@ def build_celestial_city():
     s.box("ENV_Celestial_FarBank", (40, 1.0, 14), (0.62, 0.56, 0.42), (0, 0.0, 20))
     _road(s, "ENV_Celestial_ApproachRoad", 40, 0, 8, (0.96, 0.86, 0.58))
     s.box("ENV_Celestial_GatePlatform", (16, 0.3, 12), (0.98, 0.89, 0.64), (0, 0.1, -16))
-    s.box("ENV_Celestial_CityInteriorHint", (30, 16, 3), (0.99, 0.90, 0.6), (0, 8, -26), emissive=(0.92, 0.74, 0.4))
+    # The gate opens into a REAL, walkable interior (the City within) -- not a wall.
+    s.box("ENV_Celestial_InteriorFloor", (32, 0.3, 40), (0.95, 0.90, 0.72), (0, 0.1, -44),
+          tex="marble", tile=2.4, bevel=False)
+    _road(s, "ENV_Celestial_InteriorAisle", 40, -44, 6, (0.98, 0.92, 0.62),
+          tex="marble", tile=2.0)
+    s.box("ENV_Celestial_FarRadiance_Glow", (44, 28, 2), (1.0, 0.96, 0.78), (0, 13, -66),
+          emissive=(0.92, 0.80, 0.5), blend=True, bevel=False)
 
     # Gilded lintel + a radiant halo ring and finials crowning the gate.
     s.composite("PROP_CelestialGate", [
@@ -1628,17 +2162,58 @@ def build_celestial_city():
         s.lathe("PROP_CelestialSpire_%02d" % i, _spire(hh), (0.96, 0.9, 0.64),
                 (sxp, 0, -29), emissive=(0.5, 0.42, 0.22))
 
-    _chapel(s, "PROP_Chapel", (-10, 0, 8), rot=(0, 90, 0), wall=(0.92, 0.88, 0.74))
-    s.marker("PROP_JourneyReviewMarker", (0, 1.5, 0))
+    # ----- the City within: the throne, the host of heaven, the marriage supper -----
+    s.box("ENV_Celestial_InteriorWallLeft", (1.6, 13, 40), (0.93, 0.86, 0.66),
+          (-15.5, 6.5, -44), tex="marble", tile=3.0, emissive=(0.24, 0.22, 0.14))
+    s.box("ENV_Celestial_InteriorWallRight", (1.6, 13, 40), (0.93, 0.86, 0.66),
+          (15.5, 6.5, -44), tex="marble", tile=3.0, emissive=(0.24, 0.22, 0.14))
+    # the crowned Lord enthroned in glory at the far end (reverent, symbolic)
+    _enthroned_lord(s, "PROP_Celestial", (0, 0.3, -56))
+    s.composite("PROP_ThroneSteps", [
+        {"kind": "box", "size": (10 - k * 1.6, 0.3, 1.4), "color": (0.95, 0.9, 0.72),
+         "pos": (0, 0.15 + k * 0.3, k * 1.0), "tex": "marble"} for k in range(4)], pos=(0, 0, -51))
+    # ranks of angels flanking the aisle
+    for i, (ax, az) in enumerate([(-5, -32), (5, -32), (-5, -42), (5, -42), (-5, -50), (5, -50)], start=1):
+        _angel(s, "PROP_Angel_Crowd_%02d" % i, (ax, 0, az), rot=(0, (90 if ax < 0 else -90), 0))
+    # the great multitude of the redeemed in white, lining the way, rejoicing
+    _white = [(0.97, 0.95, 0.9), (0.95, 0.93, 0.86), (0.99, 0.97, 0.92), (0.93, 0.9, 0.84)]
+    for i, (cx, cz) in enumerate([(-10, -30), (10, -30), (-11, -38), (11, -38),
+                                  (-10, -46), (10, -46), (-9, -53), (9, -53)], start=1):
+        _crowd(s, "PROP_SaintHost_Crowd_%02d" % i, (cx, 0, cz), rows=3, cols=4, robes=_white, hands_raised=True)
+    # the marriage supper of the Lamb -- long laden feast tables to the sides
+    _feast_table(s, "PROP_FeastTable_01", (-12.5, 0, -40), length=9.0)
+    _feast_table(s, "PROP_FeastTable_02", (12.5, 0, -40), length=9.0)
+    _feast_table(s, "PROP_FeastTable_03", (-12.5, 0, -52), length=7.0)
+    _feast_table(s, "PROP_FeastTable_04", (12.5, 0, -52), length=7.0)
+    # the river of life (wade-through) and the tree of life (Rev 22)
+    s.box("ENV_RiverOfLife_WaterSurface", (2.6, 0.12, 34), (0.6, 0.85, 0.95),
+          (-14, 0.16, -46), tex="water", blend=True, bevel=False)
+    s.composite("PROP_TreeOfLife", [
+        {"kind": "cylinder", "radius": 0.7, "height": 6.0, "color": (0.5, 0.4, 0.28), "pos": (0, 3, 0), "tex": "bark"},
+        {"kind": "sphere", "radius": 3.0, "color": (0.6, 0.85, 0.45), "pos": (0, 7.0, 0), "emissive": (0.2, 0.3, 0.12)},
+        {"kind": "sphere", "radius": 2.0, "color": (0.7, 0.9, 0.5), "pos": (1.6, 6.2, 0.5), "emissive": (0.22, 0.32, 0.14)},
+    ], pos=(14, 0, -46))
+
+    _chapel(s, "PROP_Chapel", (-10, 0, 8), rot=(0, 90, 0), kind="celestial")
+    s.marker("PROP_JourneyReviewMarker", (0, 1.5, -49))
 
     s.marker("NPC_Hopeful", (1.6, 0, 6))
-    s.marker("NPC_ShiningOne_01", (-2, 0, -8))
-    s.marker("NPC_ShiningOne_02", (2, 0, -8))
+    s.marker("NPC_ShiningOne_01", (-3.5, 0, -30))   # greeters along the interior aisle
+    s.marker("NPC_ShiningOne_02", (3.5, 0, -34))
     s.marker("NPC_Gatekeeper", (0, 0, -16))
 
-    s.zone("TRIGGER_JourneyReview", (8, 4, 4), (0, 2, 0))
-    s.zone("TRIGGER_EnterCelestialCity", (8, 4, 3), (0, 2, -16))
-    s.zone("TRIGGER_EndCredits", (10, 4, 3), (0, 2, -22))
+    # Arrival is WALKED, not cut to credits: gate -> feast -> throne (the finale).
+    s.zone("TRIGGER_EnterCelestialCity", (8, 4, 3), (0, 2, -20))
+    s.zone("TRIGGER_FeastWelcome", (18, 4, 5), (0, 2, -38))
+    s.zone("TRIGGER_ThroneWorship", (10, 4, 4), (0, 2, -52))
+    # interior glory + feast lighting and cinematic camera anchors
+    s.marker("LIGHT_ThroneGlorySun", (0, 16, -56))
+    s.marker("LIGHT_FeastWarm_L", (-12, 5, -44))
+    s.marker("LIGHT_FeastWarm_R", (12, 5, -44))
+    s.marker("VFX_GloryMotes_Throne", (0, 6, -54))
+    s.marker("VFX_PetalFall_Aisle", (0, 8, -40))
+    s.marker("CAM_InteriorAisle", (0, 5, -26), rot=(-8, 0, 0))
+    s.marker("CAM_ThroneApproach", (0, 6, -46), rot=(-12, 0, 0))
 
     s.marker("VFX_CelestialGateGlow", (0, 6, -18))
     s.marker("VFX_CityLightRays", (0, 12, -24))
@@ -1731,6 +2306,50 @@ def _dress_slough(s):
     # The drowned moor closing the horizon (near + tall so it reads, not zooms out).
     _ridge(s, "PROP_Ridge_Moor", (0, 0, -56),
            [(-20, 22, 9), (-2, 26, 12), (20, 22, 10)], (0.18, 0.22, 0.24))
+    # --- 住满世界: the fen teems with cold, indifferent life (all walk-through) ---
+    # Herons stalking the mire to the sides of the safe stone path.
+    for i, (x, z) in enumerate([(-10, -6), (11, -20), (-12, -34), (10, 4)], 1):
+        _bird(s, "PROP_Fauna_Heron_%02d" % i, (x, 0, z), kind="heron",
+              rot=(0, 90 if x < 0 else -90, 0))
+    # Frogs & toads hunched on sunk logs and tussock mounds.
+    for i, (x, z) in enumerate([(-8, -10), (8, -34), (-3, -2), (3, -8), (5, -30), (-4, 0)], 1):
+        _critter(s, "PROP_Critter_Frog_%02d" % i, (x, 0.2, z),
+                 kind=("toad" if i % 2 else "frog"))
+    # Dragonflies and clouds of midges hanging over the muck.
+    for i, (x, z) in enumerate([(-5, -14), (6, -24), (-6, -4), (4, -38)], 1):
+        _critter(s, "PROP_Critter_Dragonfly_%02d" % i, (x, 0.9, z), kind="dragonfly", rot=(0, i * 47, 0))
+    for i, (x, z) in enumerate([(-7, -18), (7, -8), (-9, -30), (8, -22)], 1):
+        _critter(s, "PROP_Critter_Midges_%02d" % i, (x, 1.4, z), kind="midges")
+    # A lapwing or two calling from the reed fringe; a lone crow gliding over.
+    for i, (x, z) in enumerate([(-9, 14), (9, 10)], 1):
+        _bird(s, "PROP_Fauna_Marshbird_%02d" % i, (x, 1.0, z), kind="lark")
+    _bird(s, "PROP_Crow_Fen_01", (4, 5.5, -26), kind="raptor", rot=(0, 30, 0))
+    # Sparse marsh ferns clinging to the firmer hummocks.
+    for i, (x, z) in enumerate([(-11, -2), (11, -16), (-9, -38), (10, -28)], 1):
+        _flora(s, "PROP_Foliage_Marsh_%02d" % i, (x, 0, z), kind="fern", n=5)
+    # Dark standing-water pools on the shallower flanks of the mire (clear of the
+    # central deep bog; non-solid via the WaterSurface skip-token).
+    for i, (x, z, r) in enumerate([(-9, 4, 2.2), (9, 0, 2.0), (-11, -16, 2.0),
+                                   (11, -22, 1.9), (-9, -44, 2.2), (8, -44, 1.9)], 1):
+        s.cylinder("PROP_MudPool_%02d_WaterSurface" % i, r, 0.08, (0.08, 0.10, 0.09),
+                   (x, 0.20, z), sides=16, emissive=(0.012, 0.018, 0.015),
+                   metallic=0.08, roughness=0.4)
+    # Sickly green algae scum on the deep bog & pools — unmistakably a swamp
+    # (non-solid via the Foliage skip-token).
+    for i, (x, z, r) in enumerate([(-3, -22, 1.3), (3, -28, 1.5), (-2, -32, 1.1),
+                                   (4, -18, 1.0), (0, -36, 1.2), (-9, 4, 1.0),
+                                   (11, -22, 0.9)], 1):
+        s.composite("PROP_AlgaeScum_%02d_Foliage" % i, [
+            {"kind": "cylinder", "radius": r, "height": 0.04, "color": (0.34, 0.46, 0.2),
+             "pos": (0, 0, 0), "sides": 12, "emissive": (0.1, 0.16, 0.05),
+             "roughness": 0.95}], pos=(x, 0.28, z))
+    # Low, half-sunk mud mounds breaking the muck on the flanks (non-solid).
+    for i, (x, z, r) in enumerate([(-11, -8, 0.9), (11, -16, 1.0), (-10, -34, 0.8),
+                                   (10, -6, 0.85), (-12, -24, 0.95)], 1):
+        s.composite("PROP_MudMound_%02d_Foliage" % i, [
+            {"kind": "sphere", "radius": r, "color": (0.2, 0.17, 0.11),
+             "pos": (0, r * 0.3, 0), "segs": 9, "rings": 5, "roughness": 0.9}],
+            pos=(x, 0.16, z))
 
 
 def _dress_wicket(s):
@@ -1751,6 +2370,15 @@ def _dress_wicket(s):
     _ridge(s, "PROP_Ridge_Above_L", (-12, 0, 4), [(0, 18, 12), (8, 14, 9)], (0.12, 0.13, 0.18))
     _ridge(s, "PROP_Ridge_Above_R", (12, 0, 4), [(0, 18, 12), (-8, 14, 9)], (0.12, 0.13, 0.18))
     s.marker("LIGHT_GateCityGlow", (0, 5, -16))
+    # --- 住满世界: a sparse sign of life on the narrow way (restrained) ---
+    # Two small birds on the ravine rocks; a single dove waiting above the gate.
+    _bird(s, "PROP_Fauna_Songbird_01", (6.4, 1.6, 14), kind="songbird", rot=(0, -120, 0))
+    _bird(s, "PROP_Fauna_Songbird_02", (-6.4, 1.6, 8), kind="songbird", rot=(0, 120, 0))
+    _bird(s, "PROP_Dove_Gate_01", (2.2, 4.6, -8.5), kind="dove", rot=(0, 200, 0))
+    # A hare at the ravine edge; hardy tufts in the rock cracks.
+    _critter(s, "PROP_Critter_Hare_01", (-6, 0, 16), kind="hare", rot=(0, -30, 0))
+    for i, (x, z) in enumerate([(5, 4), (-5, 0)], 1):
+        _flora(s, "PROP_Grass_Crack_%02d" % i, (x, 0, z), kind="grass", n=4)
 
 
 def _dress_cross(s):
@@ -1769,6 +2397,17 @@ def _dress_cross(s):
         _grass(s, "PROP_Grass_Path_%02d" % i, (x, 0, z), (0.42, 0.56, 0.32))
     _ridge(s, "PROP_Ridge_GreenHills", (0, 0, -44),
            [(-20, 22, 7), (-2, 26, 9), (20, 24, 8)], (0.36, 0.46, 0.34))
+    # --- 住满世界: new life answering the grace of the Cross ---
+    # Butterflies dancing above the hill blossoms (hilltop surface ~y=1.0).
+    for i, (x, z) in enumerate([(-3, -16), (3, -14), (-5, -22), (4, -11)], 1):
+        _critter(s, "PROP_Butterfly_Grace_%02d" % i, (x, 1.7, z), kind="butterfly", rot=(0, i * 64, 0))
+    # Songbirds returned to the meadow oaks.
+    _bird(s, "PROP_Fauna_Songbird_01", (-15, 4.5, 6), kind="songbird", rot=(0, 60, 0))
+    _bird(s, "PROP_Fauna_Songbird_02", (16, 4.2, 2), kind="songbird", rot=(0, -70, 0))
+    # A white lamb resting near the empty tomb — the Lamb who was slain (Rev 5).
+    _fauna(s, "PROP_Sheep_Lamb_Tomb", (-6, 1.1, -17), kind="sheep")
+    # A hare in the greening grass below the hill.
+    _critter(s, "PROP_Critter_Hare_01", (5, 0, 4), kind="hare", rot=(0, -30, 0))
 
 
 def _dress_interpreter(s):
@@ -1801,6 +2440,19 @@ def _dress_interpreter(s):
     # Potted greenery softening the hall corners.
     for i, (x, z) in enumerate([(-5, 9), (5, 9), (-5, -16), (5, -16)], 1):
         _bush(s, "PROP_Bush_Pot_%02d" % i, (x, 0, z), 0.55, (0.26, 0.42, 0.26))
+    # --- 住满世界: the Interpreter's household (calm, attentive, indoors) ---
+    # Two pupils listening toward the Interpreter (who stands at z=-3); clear of
+    # the central instruction spot.
+    _household_figure(s, "PROP_Household_Pupil_01", (-4.5, 0, 3), robe=(0.36, 0.4, 0.5), h=1.5, rot=(0, 180, 0))
+    _household_figure(s, "PROP_Household_Pupil_02", (4.5, 0, 4), robe=(0.5, 0.42, 0.3), h=1.55, rot=(0, 180, 0))
+    # A servant tending the south hearth (arm raised), off in the corner.
+    _household_figure(s, "PROP_Household_Servant_01", (7, 0, 9), robe=(0.46, 0.36, 0.26), h=1.58, arm=True, rot=(0, -120, 0))
+    # A caged songbird's free cousin: a robin perched on the hall bookshelf, and
+    # one on a ceiling beam — small living warmth in the house of instruction.
+    _bird(s, "PROP_Fauna_Robin_01", (-5.5, 2.75, 5.5), kind="songbird", rot=(0, -90, 0))
+    _bird(s, "PROP_Fauna_Robin_02", (3, 3.7, -6), kind="songbird", rot=(0, 30, 0))
+    # The house-dog dozing by the warm hearth.
+    _fauna(s, "PROP_Sheep_HouseDog", (8.5, 0, 9.4), kind="dog")
 
 
 def _dress_hill(s):
@@ -1823,6 +2475,23 @@ def _dress_hill(s):
     # A grand mountain range crowning the summit horizon.
     _ridge(s, "PROP_Ridge_Peaks", (0, 0, -52),
            [(-24, 22, 13), (-6, 26, 17), (12, 24, 14), (28, 20, 11)], (0.34, 0.36, 0.46))
+    # --- 住满世界: mountain life (clear of the central climb) ---
+    # Larks perched in the pines; a hawk wheeling high over the summit.
+    _bird(s, "PROP_Fauna_Lark_01", (-9, 4.2, -2), kind="lark", rot=(0, 40, 0))
+    _bird(s, "PROP_Fauna_Lark_02", (9, 4.6, -16), kind="lark", rot=(0, -50, 0))
+    _bird(s, "PROP_Crow_Hawk_01", (0, 9.5, -24), kind="raptor", rot=(0, 20, 0))
+    _bird(s, "PROP_Fauna_Songbird_Arbor", (6, 1.45, -0.4), kind="songbird", rot=(0, 180, 0))
+    # Hares startled among the scree on the lower climb.
+    for i, (x, z) in enumerate([(-5, -6), (4.5, -22)], 1):
+        _critter(s, "PROP_Critter_Hare_%02d" % i, (x, 0, z), kind="hare", rot=(0, i * 70, 0))
+    # Two deer grazing the high summit meadow (summit top is y=2.0).
+    for i, (x, z) in enumerate([(-7, -30), (7, -31)], 1):
+        _critter(s, "PROP_Fauna_Deer_%02d" % i, (x, 2.0, z), kind="deer", rot=(0, -40 + i * 80, 0))
+    # Hardy alpine flowers and grass tufts along the verges and on the summit.
+    for i, (x, z, k, y) in enumerate([(-6, -4, "flower", 0.0), (6, -10, "grass", 0.0),
+                                      (-7, -20, "grass", 0.0), (-5, -30, "flower", 2.0),
+                                      (5, -28, "flower", 2.0)], 1):
+        _flora(s, "PROP_Flower_Alpine_%02d" % i, (x, y, z), kind=k, n=5)
 
 
 def _dress_palace(s):
@@ -1852,6 +2521,29 @@ def _dress_palace(s):
             {"kind": "box", "size": (0.12, 2.0, 1.4), "color": c, "pos": (0, 4.8, 0.7),
              "emissive": (c[0]*0.4, c[1]*0.4, c[2]*0.4)}], pos=(x, 0, z))
     _ridge(s, "PROP_Ridge_Distant", (0, 0, -30), [(-22, 20, 8), (4, 24, 10), (24, 18, 7)], (0.4, 0.43, 0.52))
+    # --- 住满世界: the House Beautiful as a living, praising household ---
+    # Rich, festive robes for the family of the house (brighter than the road).
+    house_robes = [(0.82, 0.3, 0.32), (0.3, 0.4, 0.72), (0.7, 0.6, 0.24),
+                   (0.5, 0.34, 0.6), (0.86, 0.84, 0.78)]
+    praise_robes = [(0.92, 0.9, 0.82), (0.95, 0.86, 0.5), (0.86, 0.88, 0.92)]
+    # Two servants attending the feast table (trays raised), off the centre aisle.
+    _household_figure(s, "PROP_Household_Servant_01", (-6, 0, 3), robe=(0.6, 0.5, 0.34), h=1.6, arm=True, rot=(0, -60, 0))
+    _household_figure(s, "PROP_Household_Servant_02", (6, 0, -3), robe=(0.58, 0.48, 0.32), h=1.58, arm=True, rot=(0, 120, 0))
+    # Family & guests gathered at the hall (non-solid clusters, off-aisle).
+    _crowd(s, "PROP_Household_Crowd_Hall_01", (-8, 0, -1), rows=2, cols=2, spacing=1.2, robes=house_robes)
+    _crowd(s, "PROP_Household_Crowd_Hall_02", (8, 0, 1), rows=2, cols=2, spacing=1.2, robes=house_robes)
+    # A small choir lifting praise toward the balcony (hands raised).
+    _crowd(s, "PROP_Household_Crowd_Choir_01", (-5, 0, -13), rows=2, cols=2, spacing=1.1, robes=praise_robes, hands_raised=True)
+    _crowd(s, "PROP_Household_Crowd_Choir_02", (5, 0, -13), rows=2, cols=2, spacing=1.1, robes=praise_robes, hands_raised=True)
+    # The porter's lad waiting in the gate court (beside the Watchman).
+    _household_figure(s, "PROP_Household_Porter_Lad", (-5, 0, 18), robe=(0.4, 0.42, 0.5), h=1.45, rot=(0, 0, 0))
+    # Peacocks strolling the cypress avenue; a loyal house-dog by the hearth.
+    for i, (x, z) in enumerate([(-5, 11), (5, 8)], 1):
+        _bird(s, "PROP_Fauna_Peacock_%02d" % i, (x, 0, z), kind="peacock", rot=(0, -40 + i * 80, 0))
+    _fauna(s, "PROP_Sheep_HouseDog", (-12, 0, -7), kind="dog")
+    # Doves perched along the garden wall / gate banners.
+    for i, (x, z, y) in enumerate([(-4, 22, 8.0), (4, 22, 8.0), (-9, 18, 2.2), (9, 18, 2.2)], 1):
+        _bird(s, "PROP_Dove_Court_%02d" % i, (x, y, z), kind="dove", rot=(0, i * 50, 0))
 
 
 def _dress_humiliation(s):
@@ -1882,6 +2574,10 @@ def _dress_humiliation(s):
              "pos": (0, 1.5, 0), "sides": 6}], pos=(x, 0, z))
     _ridge(s, "PROP_Ridge_Brood", (0, 0, -44),
            [(-20, 22, 10), (0, 26, 13), (20, 22, 11)], (0.16, 0.14, 0.16))
+    # --- 住满世界 (austere): only carrion birds dare this field ---
+    for i, (x, y, z) in enumerate([(-6, 11, -6), (6, 12, -10), (0, 13, -2)], 1):
+        _bird(s, "PROP_Crow_Vulture_%02d" % i, (x, y, z), kind="raptor", rot=(0, i * 80, 0))
+    _fauna(s, "PROP_Crow_Carrion_01", (12, 2.0, -10), kind="bird")
 
 
 def _dress_shadow(s):
@@ -1906,6 +2602,19 @@ def _dress_shadow(s):
     # Taller broken ridgelines above the chasm walls.
     _ridge(s, "PROP_Ridge_ChasmL", (-9, 0, 0), [(0, 10, 14), (0, 8, 10)], (0.05, 0.05, 0.08))
     _ridge(s, "PROP_Ridge_ChasmR", (9, 0, 0), [(0, 10, 14), (0, 8, 10)], (0.05, 0.05, 0.08))
+    # --- 住满世界 (austere): unseen things in the dark — restraint, not a zoo ---
+    # A couple of bats flitting high against the chasm; nothing on the path.
+    for i, (x, y, z) in enumerate([(-5, 7.0, 6), (5, 8.0, -18)], 1):
+        s.composite("PROP_Critter_Bat_%02d" % i, [
+            {"kind": "sphere", "radius": 0.1, "color": (0.06, 0.06, 0.08), "pos": (0, 0, 0), "segs": 6, "rings": 4},
+            {"kind": "box", "size": (0.7, 0.03, 0.22), "color": (0.05, 0.05, 0.07), "pos": (0, 0, 0), "rot": (0, 0, 22)}],
+            pos=(x, y, z), rot=(0, i * 60, 0))
+    # Faint watching eyes peering from clefts in the valley walls (just off-path).
+    for i, (x, z) in enumerate([(6.2, 2), (-6.2, -14), (6.0, -30)], 1):
+        s.composite("PROP_Fauna_Eyes_%02d" % i, [
+            {"kind": "sphere", "radius": 0.05, "color": (0.95, 0.75, 0.2), "pos": (-0.12, 0, 0), "segs": 5, "rings": 3, "emissive": (0.85, 0.6, 0.12)},
+            {"kind": "sphere", "radius": 0.05, "color": (0.95, 0.75, 0.2), "pos": (0.12, 0, 0), "segs": 5, "rings": 3, "emissive": (0.85, 0.6, 0.12)}],
+            pos=(x, 1.6, z))
 
 
 def _dress_vanity(s):
@@ -1971,6 +2680,20 @@ def _dress_doubting(s):
     for i, (x, z) in enumerate([(-5, 26), (5, 28), (-3, 22)], 1):
         _flower(s, "PROP_Flower_Bypath_%02d" % i, (x, 0, z), (0.9, 0.85, 0.4))
     _ridge(s, "PROP_Ridge_Storm", (0, 0, -34), [(-20, 22, 11), (2, 26, 14), (22, 20, 10)], (0.14, 0.14, 0.18))
+    # --- 住满世界: grim castle fauna vs. the By-Path meadow's false sweetness ---
+    # Vultures wheeling over the bailey; toads hunched in the dank corners.
+    for i, (x, y, z) in enumerate([(-4, 12.5, -8), (5, 13.5, -10), (0, 14.0, -4)], 1):
+        _bird(s, "PROP_Crow_Vulture_%02d" % i, (x, y, z), kind="raptor", rot=(0, i * 70, 0))
+    for i, (x, z) in enumerate([(-9, -4), (9, -14)], 1):
+        _critter(s, "PROP_Critter_Toad_%02d" % i, (x, 0.2, z), kind="toad", rot=(0, i * 90, 0))
+    # The By-Path meadow (behind, z>18) looks deceptively lovely: larks, bright
+    # butterflies, a hare — beauty that lures the weary off the King's highway.
+    _bird(s, "PROP_Fauna_Lark_01", (-8, 1.0, 24), kind="lark", rot=(0, 40, 0))
+    _bird(s, "PROP_Fauna_Lark_02", (8, 1.0, 22), kind="lark", rot=(0, -50, 0))
+    for i, (x, z) in enumerate([(-5, 26), (5, 28), (-3, 22)], 1):
+        _critter(s, "PROP_Butterfly_Bypath_%02d" % i, (x, 1.4, z), kind="butterfly",
+                 rot=(0, i * 70, 0), col=(0.95, 0.75, 0.3))
+    _critter(s, "PROP_Critter_Hare_01", (7, 0, 20), kind="hare", rot=(0, -30, 0))
 
 
 def _dress_delectable(s):
@@ -2022,6 +2745,21 @@ def _dress_enchanted(s):
             {"kind": "sphere", "radius": 0.1, "color": (0.95, 0.95, 0.6),
              "pos": (0, 0, 0), "emissive": (0.9, 0.88, 0.4), "segs": 6, "rings": 4}], pos=(x, 1.6, z))
     _ridge(s, "PROP_Ridge_DreamWood", (0, 0, -48), [(-20, 22, 8), (2, 24, 10), (20, 20, 8)], (0.38, 0.42, 0.34))
+    # --- 住满世界: drowsy dream-fauna (keep the sleepy, dangerous hush) ---
+    # A deer standing half-asleep in the soft field; an owl on the dream-arbor.
+    _critter(s, "PROP_Fauna_Deer_01", (7, 0, -12), kind="deer", rot=(0, -120, 0))
+    _bird(s, "PROP_Fauna_Owl_01", (-8.8, 3.1, -8), kind="owl", rot=(0, 60, 0))
+    # Pale moths drifting among the soporific dream-blooms (cool, dreamy tints).
+    moth = [(0.85, 0.86, 0.95), (0.95, 0.86, 0.7), (0.82, 0.92, 0.86)]
+    for i, (x, z) in enumerate([(-5, 18), (5, 6), (-7, -2), (7, -18), (-4, -32)], 1):
+        _critter(s, "PROP_Butterfly_Moth_%02d" % i, (x, 1.5, z), kind="butterfly",
+                 rot=(0, i * 58, 0), col=moth[i % len(moth)])
+    # A few more fireflies sparking low over the field.
+    for i in range(1, 5):
+        x = round(((i * 4) % 9) - 4, 1)
+        _critter(s, "PROP_Firefly_Extra_%02d" % i, (x, 1.5, 24 - i * 12), kind="midges")
+    # A hare folded in the soft grass patch.
+    _critter(s, "PROP_Critter_Hare_01", (-6, 0.1, -5), kind="hare", rot=(0, 40, 0))
 
 
 def _dress_river(s):
@@ -2044,6 +2782,33 @@ def _dress_river(s):
              "pos": (0, h / 2, 0), "emissive": (0.8, 0.72, 0.46), "sides": 8}], pos=(x, 0, -42))
     for i, (x, z) in enumerate([(-4, -30), (4, -30)], 1):
         _lantern(s, "PROP_Lantern_FarBank_%02d" % i, (x, 0, z), (1.0, 0.92, 0.66))
+    # --- 住满世界: river life (all walk-through; clear of the central wade) ---
+    # Herons stalking the reedy near shallows; one mid-shore sentinel.
+    for i, (x, z) in enumerate([(-11, 15), (12, 17), (-15, 12), (14, 13)], 1):
+        _bird(s, "PROP_Fauna_Heron_%02d" % i, (x, 0, z), kind="heron",
+              rot=(0, 90 if x < 0 else -90, 0))
+    # Ducks paddling the near calm water, swans gliding the far calm water.
+    for i, (x, z) in enumerate([(-6, 10), (7, 8), (-8, 6)], 1):
+        _bird(s, "PROP_Fauna_Duck_%02d" % i, (x, 0.9, z), kind="duck", rot=(0, i * 40, 0))
+    for i, (x, z) in enumerate([(-7, -24), (8, -26), (-5, -28)], 1):
+        _bird(s, "PROP_Fauna_Swan_%02d" % i, (x, 0.85, z), kind="swan", rot=(0, -120 + i * 40, 0))
+    # A kingfisher flashing on a near reed; songbirds on the bank.
+    _bird(s, "PROP_Fauna_Kingfisher_01", (-12, 1.3, 16), kind="kingfisher")
+    for i, (x, z) in enumerate([(13, 14), (-14, 19)], 1):
+        _bird(s, "PROP_Fauna_Lark_%02d" % i, (x, 1.1, z), kind="songbird")
+    # Dragonflies skimming the surface; fish breaking it (to the sides).
+    for i, (x, z) in enumerate([(-6, 4), (6, -2), (-5, -12), (7, 2), (-7, -18)], 1):
+        _critter(s, "PROP_Critter_Dragonfly_%02d" % i, (x, 1.25, z), kind="dragonfly", rot=(0, i * 55, 0))
+    for i, (x, z) in enumerate([(-8, 0), (8, -8), (-6, -16)], 1):
+        _critter(s, "PROP_Critter_Fish_%02d" % i, (x, 0.97, z), kind="fish")
+    # Marsh flora threading both banks.
+    for i, (x, z, k) in enumerate([(-13, 18, "fern"), (13, 19, "fern"), (-10, 13, "flower"),
+                                   (11, 12, "flower"), (-12, -28, "fern"), (12, -30, "flower")], 1):
+        _flora(s, "PROP_Flower_Bank_%02d" % i, (x, 0, z), kind=k, n=5)
+    # Doves rising before the radiant far shore (toward the Celestial City).
+    for i in range(1, 5):
+        _bird(s, "PROP_Dove_FarShore_%02d" % i, (round((i - 2.5) * 2.2, 1), 3.0 + (i % 2) * 0.7, -34),
+              kind="dove", rot=(0, i * 30, 0))
 
 
 def _dress_celestial(s):
@@ -2077,7 +2842,38 @@ def _dress_celestial(s):
              "pos": (0, h / 2, 0), "emissive": (0.7, 0.62, 0.38), "sides": 8}], pos=(x, 0, -34))
 
 
+def _dress_wilderness(s):
+    """The waste, but living: hardy roadside trees, wildflowers and small animals
+    soften the barren in-between road. Clutter to the verges, the road kept clear."""
+    # Hardy living trees + windswept scrub pines clinging to the verges.
+    for i, (x, z, h) in enumerate([(-8, 18, 4.2), (9, 8, 4.6), (-10, -8, 3.8),
+                                   (10, -26, 4.4), (-7, -34, 3.6)], 1):
+        _tree(s, "PROP_Foliage_ScrubTree_%02d" % i, (x, 0, z), h,
+              (0.34, 0.42, 0.24), (0.36, 0.28, 0.18))
+    for i, (x, z, h) in enumerate([(11, -2, 4.8), (-11, -20, 4.4)], 1):
+        _pine(s, "PROP_Foliage_ScrubPine_%02d" % i, (x, 0, z), h, (0.22, 0.36, 0.24))
+    # Hardy roadside wildflowers + dry grass tussocks.
+    for i, (x, z, c) in enumerate([(-4, 12, (0.95, 0.82, 0.4)), (4, 4, (0.9, 0.7, 0.85)),
+                                   (-5, -2, (0.95, 0.6, 0.4)), (5, -16, (0.92, 0.86, 0.5)),
+                                   (-4, -28, (0.85, 0.6, 0.8)), (4, 22, (0.95, 0.8, 0.45))], 1):
+        _flora(s, "PROP_Flower_Wayside_%02d" % i, (x, 0, z), kind="flower", n=6)
+    for i, (x, z) in enumerate([(-6, 6), (6, -6), (-7, -24), (7, 16)], 1):
+        _flora(s, "PROP_Grass_Waste_%02d" % i, (x, 0, z), kind="grass", n=4)
+    # Small animals: a fox, hares, larks, butterflies, and crows over the waste.
+    _critter(s, "PROP_Fauna_Fox_01", (9, 0, 4), kind="fox", rot=(0, -120, 0))
+    for i, (x, z) in enumerate([(-5, -4), (5, 26), (-6, -30)], 1):
+        _critter(s, "PROP_Critter_Hare_%02d" % i, (x, 0, z), kind="hare", rot=(0, i * 80, 0))
+    for i, (x, z) in enumerate([(-7, 14), (8, -10)], 1):
+        _bird(s, "PROP_Fauna_Lark_%02d" % i, (x, 1.0, z), kind="lark", rot=(0, i * 60, 0))
+    for i, (x, z) in enumerate([(-4, 12), (4, 4), (5, -16)], 1):
+        _critter(s, "PROP_Butterfly_Waste_%02d" % i, (x, 1.3, z), kind="butterfly",
+                 rot=(0, i * 70, 0), col=(0.95, 0.78, 0.35))
+    _fauna(s, "PROP_Crow_Waste_01", (7, 4.0, -20), kind="bird")
+    _bird(s, "PROP_Crow_Wheeling_01", (-3, 8.0, -10), kind="raptor", rot=(0, 40, 0))
+
+
 _DRESSERS = {
+    "wilderness_road": _dress_wilderness,
     "slough_of_despond": _dress_slough,
     "wicket_gate": _dress_wicket,
     "cross_and_tomb": _dress_cross,

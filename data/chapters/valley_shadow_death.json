@@ -39,5 +39,74 @@
   ],
   "music": "res://assets/audio/music/valley_shadow_death.ogg",
   "ambient": "res://assets/audio/ambient/valley_shadow_death.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/valley_shadow_death.glb"
+  "imported_scene_path": "res://assets/imported_scenes/valley_shadow_death.glb",
+  "design": {
+    "provenance": "Attachment Ch10 死荫谷 + darkness/prayer-path system (Skills 34-35).",
+    "spiritual_layer": "Temptation + Redemption (faith without sight)",
+    "seven_beats": {
+      "arrival": "A pitch-black valley mouth straight after Apollyon.",
+      "orientation": "An extremely narrow path with a ditch on the left and a quag on the right, a glimmer of a white cross ahead.",
+      "encounter": "Disembodied whispers from the fog: 'you are cast off; no one hears your prayer.'",
+      "temptation": "Fear and despair, luring you to stop, turn, or stray off the narrow track.",
+      "choice": "Enter in prayer / rush in confidently / hesitate in fear.",
+      "consequence": "Praying steadies faith and resolve; rushing breeds pride and loses watchfulness; hesitating feeds fear.",
+      "grace": "A pulse of prayer lights the next step; dawn breaks after the dark — give thanks."
+    },
+    "chapel": {
+      "verse_zh": "我虽然行过死荫的幽谷，也不怕遭害，因为你与我同在。",
+      "verse_en": "Though I walk through the valley of the shadow of death, I will fear no evil, for you are with me.",
+      "hint_zh": "不要偏左，也不要偏右，用祷告的微光看清下一步。",
+      "restore_faith": 16,
+      "type": "ruined"
+    },
+    "primary_temptation": {
+      "type": "despair",
+      "hook_zh": "你已经被丢弃了，你的祷告没有人听见。",
+      "resisted_by": {
+        "faith_min": 55,
+        "hope_min": 45,
+        "watchfulness_min": 50,
+        "or_item": "has_sword"
+      }
+    },
+    "repentance": {
+      "at": "prayer-pulse / shadow chapel prayer",
+      "restores": {
+        "faith": 8,
+        "fear": -5,
+        "watchfulness": 3
+      }
+    },
+    "key_choices": [
+      {
+        "id": "enter_in_prayer",
+        "text_zh": "祷告着进入",
+        "effects": {
+          "faith": 8,
+          "perseverance": 8,
+          "fear": -8
+        }
+      },
+      {
+        "id": "rush_in",
+        "text_zh": "自信冲入",
+        "effects": {
+          "pride": 8,
+          "watchfulness": -8,
+          "fear": 5
+        }
+      },
+      {
+        "id": "thanksgiving_after",
+        "text_zh": "出谷后感恩",
+        "effects": {
+          "faith": 12,
+          "hope": 12,
+          "humility": 8,
+          "fear": -15
+        }
+      }
+    ],
+    "stat_arc_note": "Not a boss — holding fast in darkness. Straying left/right (the ditch/quag hazards) costs hp + fear/despair."
+  }
 }

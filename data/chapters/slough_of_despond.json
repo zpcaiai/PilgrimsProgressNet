@@ -39,5 +39,71 @@
   ],
   "music": "res://assets/audio/music/slough_of_despond.ogg",
   "ambient": "res://assets/audio/ambient/slough_of_despond.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/slough_of_despond.glb"
+  "imported_scene_path": "res://assets/imported_scenes/slough_of_despond.glb",
+  "design": {
+    "provenance": "Attachment Ch2 沮丧泥潭 (Skill 16). Added a half-sunken chapel-cross landmark this pass.",
+    "spiritual_layer": "Temptation + Redemption",
+    "seven_beats": {
+      "arrival": "A cold mire under low fog; the mud drags at every step and floating words — guilt, fear, shame — drift on the slime.",
+      "orientation": "Promise-stones give footing; across the bog a half-sunken chapel still lifts its cross above the muck.",
+      "encounter": "Pliable sinks, despairs and turns back to the city; Help comes for the one who cries out.",
+      "temptation": "Despair pressing you to give up and go back — the heavier the burden, the deeper you sink.",
+      "choice": "Press on by the stones / cry out for Help / consider returning to the city.",
+      "consequence": "Crying for help lowers despair and lifts humble hope; turning back deepens despair and shame.",
+      "grace": "Help lifts the humble out of the mire and sets the feet toward the narrow gate."
+    },
+    "chapel": {
+      "verse_zh": "我从深处向你求告。",
+      "verse_en": "Out of the depths I cry to you, O LORD.",
+      "hint_zh": "呼求帮助，不要独自陷在泥潭里。",
+      "restore_faith": 8,
+      "type": "ruined (half-sunken)"
+    },
+    "primary_temptation": {
+      "type": "despair",
+      "hook_zh": "回去吧，你永远走不出这片泥。",
+      "resisted_by": {
+        "hope_min": 25,
+        "faith_min": 20,
+        "or_item": "has_scroll"
+      }
+    },
+    "repentance": {
+      "at": "cry for Help (the cry from the depths)",
+      "restores": {
+        "humility": 10,
+        "hope": 8,
+        "despair": -8
+      }
+    },
+    "key_choices": [
+      {
+        "id": "keep_moving_on_stones",
+        "text_zh": "踏着应许之石前行",
+        "effects": {
+          "faith": 8,
+          "hope": 5,
+          "despair": -5
+        }
+      },
+      {
+        "id": "call_for_help",
+        "text_zh": "向帮助呼求",
+        "effects": {
+          "humility": 10,
+          "hope": 8,
+          "despair": -8
+        }
+      },
+      {
+        "id": "consider_returning",
+        "text_zh": "想要回头",
+        "effects": {
+          "despair": 8,
+          "shame": 5
+        }
+      }
+    ],
+    "stat_arc_note": "Despair spikes in the mud, then falls sharply when the humble cry for Help."
+  }
 }

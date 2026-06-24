@@ -38,5 +38,88 @@
   ],
   "music": "res://assets/audio/music/vanity_fair.ogg",
   "ambient": "res://assets/audio/ambient/vanity_fair.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/vanity_fair.glb"
+  "imported_scene_path": "res://assets/imported_scenes/vanity_fair.glb",
+  "design": {
+    "provenance": "Attachment Ch11 虚华市 + Ch12 忠信受审与殉道 (Skills 36-39). Faithful's trial/martyrdom folded in.",
+    "spiritual_layer": "Temptation + Redemption + Witness",
+    "seven_beats": {
+      "arrival": "Faithful meets you at the gate; the fair blares with fame, wealth, comfort and power.",
+      "orientation": "Gaudy stalls and a stage; a chapel half-hidden behind the market signage.",
+      "encounter": "Merchants hawk glory; the mocking crowd jeers; you are called to public witness.",
+      "temptation": "Buy the fair's wares — a badge of fame, a silver coin, a soft bed; and worldliness creeps in by the minute.",
+      "choice": "'We buy the truth' / stay silent to avoid trouble / make a compromise / let Faithful answer.",
+      "consequence": "Bold witness lifts faith and resolve; compromise feeds deception and dulls watchfulness.",
+      "grace": "Arrest with Faithful leads to his trial and martyrdom; Hopeful, stirred by the witness, joins you — grace succeeds grace."
+    },
+    "chapel": {
+      "verse_zh": "不要爱世界和世界上的事。",
+      "verse_en": "Do not love the world or the things in the world.",
+      "hint_zh": "不是所有发光的，都来自真光。",
+      "restore_faith": 12,
+      "type": "trial"
+    },
+    "primary_temptation": {
+      "type": "vanity",
+      "hook_zh": "买下名声吧，全城都会认识你。",
+      "resisted_by": {
+        "watchfulness_min": 50,
+        "humility_min": 45,
+        "or_item": "has_armor"
+      }
+    },
+    "repentance": {
+      "at": "hidden chapel prayer / public witness",
+      "restores": {
+        "watchfulness": 10,
+        "humility": 8
+      }
+    },
+    "trial": {
+      "judge": "Lord Hate-good",
+      "jury": [
+        "Envy",
+        "Superstition",
+        "Pickthank"
+      ],
+      "outcome": "Faithful martyred; standing with him lets Hopeful join (companion succession)."
+    },
+    "key_choices": [
+      {
+        "id": "we_buy_the_truth",
+        "text_zh": "我们买真理",
+        "effects": {
+          "perseverance": 18,
+          "faith": 10,
+          "deception": -10
+        }
+      },
+      {
+        "id": "stand_with_faithful",
+        "text_zh": "与忠信同站",
+        "effects": {
+          "faith": 8,
+          "humility": 8,
+          "perseverance": 12
+        }
+      },
+      {
+        "id": "compromise",
+        "text_zh": "折中妥协",
+        "effects": {
+          "deception": 12,
+          "watchfulness": -8
+        }
+      },
+      {
+        "id": "buy_fame",
+        "text_zh": "买下名声徽章",
+        "effects": {
+          "deception": 20,
+          "pride": 12,
+          "humility": -15
+        }
+      }
+    ],
+    "stat_arc_note": "Worldliness maps to deception; bold witness maps to perseverance/faith. Hopeful joins after the martyrdom."
+  }
 }

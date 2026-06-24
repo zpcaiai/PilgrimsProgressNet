@@ -29,8 +29,8 @@ var _slamming: bool = false
 
 func _ready() -> void:
 	add_to_group("enemy")
-	collision_layer = 4   # foes sit on their own layer; the player (mask 1) passes
-	collision_mask = 1    # but the Giant still rests on the castle floor
+	collision_layer = 1   # SOLID: the pilgrim bumps the Giant instead of passing through
+	collision_mask = 1    # the Giant rests on the floor and is stopped by the castle walls
 	_origin = global_position
 	_patrol_a = _origin + Vector3(-3.5, 0, 0)
 	_patrol_b = _origin + Vector3(3.5, 0, 0)

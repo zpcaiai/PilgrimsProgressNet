@@ -39,5 +39,104 @@
   ],
   "music": "res://assets/audio/music/palace_beautiful.ogg",
   "ambient": "res://assets/audio/ambient/palace_beautiful.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/palace_beautiful.glb"
+  "imported_scene_path": "res://assets/imported_scenes/palace_beautiful.glb",
+  "design": {
+    "provenance": "Attachment Ch6 美宫 + Ch7 神圣军装厅 (Skills 25-26) — the armory is folded into this scene.",
+    "spiritual_layer": "Narrative + Redemption (fellowship & equipping)",
+    "seven_beats": {
+      "arrival": "Watchful the porter halts you at the gate and asks who you are and why you come so late.",
+      "orientation": "A cross-crowned tower, a fellowship hall, a rest room, the armoury door, and a chapel.",
+      "encounter": "Discretion, Prudence, Piety and Charity welcome and examine you; you tell your story.",
+      "temptation": "Self-reliant boasting — to make much of how far YOU have come.",
+      "choice": "Rest with thanksgiving / review the journey in prayer / boast of your progress.",
+      "consequence": "Thanksgiving restores hope; boasting swells pride and dulls watchfulness.",
+      "grace": "Take up the whole armour of God before descending into the Valley of Humiliation."
+    },
+    "chapel": {
+      "verse_zh": "你们要彼此接待，如同基督接待你们。",
+      "verse_en": "Welcome one another as Christ has welcomed you.",
+      "hint_zh": "在团契中安息，并预备穿上军装。",
+      "restore_faith": 15,
+      "type": "pilgrim"
+    },
+    "primary_temptation": {
+      "type": "self_reliance",
+      "hook_zh": "看你走了多远，你已经够刚强了。",
+      "resisted_by": {
+        "humility_min": 40,
+        "watchfulness_min": 35
+      }
+    },
+    "repentance": {
+      "at": "review the journey in prayer",
+      "restores": {
+        "humility": 12,
+        "watchfulness": 8
+      }
+    },
+    "armory": {
+      "symbol": "Eph 6 — the whole armour of God",
+      "grants": [
+        "has_armor",
+        "has_sword",
+        "has_shield"
+      ],
+      "pieces": [
+        {
+          "piece": "belt_of_truth 真理带",
+          "guards": "truth / discerning true from false"
+        },
+        {
+          "piece": "breastplate_of_righteousness 公义护心镜",
+          "guards": "standing not on one's own merit"
+        },
+        {
+          "piece": "shoes_of_gospel_peace 平安福音鞋",
+          "guards": "steady footing, readiness of the gospel"
+        },
+        {
+          "piece": "shield_of_faith 信德盾牌",
+          "guards": "quenching the fiery darts"
+        },
+        {
+          "piece": "helmet_of_salvation 救恩头盔",
+          "guards": "the mind, the assurance of salvation"
+        },
+        {
+          "piece": "sword_of_spirit 圣灵宝剑",
+          "guards": "the Word — the one offensive weapon"
+        }
+      ]
+    },
+    "key_choices": [
+      {
+        "id": "rest_with_thanksgiving",
+        "text_zh": "带着感恩安息",
+        "effects": {
+          "hope": 15,
+          "faith": 8,
+          "perseverance": 5
+        }
+      },
+      {
+        "id": "review_in_prayer",
+        "text_zh": "在祷告中回顾旅程",
+        "effects": {
+          "humility": 12,
+          "watchfulness": 8,
+          "faith": 8
+        }
+      },
+      {
+        "id": "boast_of_progress",
+        "text_zh": "夸耀自己的进步",
+        "effects": {
+          "pride": 15,
+          "humility": -8,
+          "watchfulness": -6
+        }
+      }
+    ],
+    "stat_arc_note": "Rest restores hope/weariness; the armoury sets has_armor/has_sword/has_shield for the warfare arc."
+  }
 }

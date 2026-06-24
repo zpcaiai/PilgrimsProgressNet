@@ -48,6 +48,21 @@ _TEX = {
     "stone": ("stone_albedo.png", "stone_normal.png"),
     "wood": ("wood_albedo.png", "wood_normal.png"),
     "cobble": ("cobble_albedo.png", "cobble_normal.png"),
+    # Broadened so scene primitives can bake real albedo+normal from the full
+    # gen_pbr.py library (all exist under assets/textures/pbr/). Lets the greybox
+    # scenes carry surface detail instead of flat colour. (tex_paths() existence-
+    # checks, so a missing file simply falls back to flat colour.)
+    "mossy_stone": ("mossy_stone_albedo.png", "mossy_stone_normal.png"),
+    "marble": ("marble_albedo.png", "marble_normal.png"),
+    "ash": ("ash_albedo.png", "ash_normal.png"),
+    "dry_earth": ("dry_earth_albedo.png", "dry_earth_normal.png"),
+    "mud": ("mud_albedo.png", "mud_normal.png"),
+    "sand": ("sand_albedo.png", "sand_normal.png"),
+    "grass": ("grass_albedo.png", "grass_normal.png"),
+    "foliage": ("foliage_albedo.png", "foliage_normal.png"),
+    "bark": ("bark_albedo.png", "bark_normal.png"),
+    "gold": ("gold_albedo.png", "gold_normal.png"),
+    "cloth": ("cloth_albedo.png", "cloth_normal.png"),
 }
 
 

@@ -40,6 +40,8 @@ func _build_chapter() -> void:
 ## chapters that use one.
 func _attach_chapter_system() -> void:
 	match ChapterManager.current_chapter_id:
+		"slough_of_despond":
+			add_child(MudSystem.new())
 		"enchanted_ground":
 			add_child(SleepinessSystem.new())
 		"vanity_fair":

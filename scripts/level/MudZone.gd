@@ -7,15 +7,24 @@ class_name MudZone
 var movement_multiplier: float = 0.7
 var effects_per_tick: Dictionary = {"despair": 1, "weariness": 1}
 var tick_interval: float = 2.0
+var is_deep: bool = false
 var _player: PlayerController = null
 var _accum: float = 0.0
 var _tick_count: int = 0
+
+
+## True while the pilgrim is standing in this mud (read by MudSystem to drive
+## the visual sinking + footprints).
+func is_occupied() -> bool:
+	return _player != null
 
 
 func setup(size: Vector3, deep: bool = false, tint: Color = Color(0, 0, 0, 0)) -> void:
 	collision_layer = 0
 	collision_mask = 1
 	monitoring = true
+	is_deep = deep
+	add_to_group("mud_zone")
 	if deep:
 		movement_multiplier = 0.45
 		effects_per_tick = {"despair": 2, "fear": 1, "hope": -1}

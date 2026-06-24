@@ -36,5 +36,78 @@
   ],
   "music": "res://assets/audio/music/hill_difficulty.ogg",
   "ambient": "res://assets/audio/ambient/hill_difficulty.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/hill_difficulty.glb"
+  "imported_scene_path": "res://assets/imported_scenes/hill_difficulty.glb",
+  "design": {
+    "provenance": "Attachment Ch5 艰难山 + bypass-path system (Skills 23-24).",
+    "spiritual_layer": "Narrative + Temptation + Redemption (sanctification)",
+    "seven_beats": {
+      "arrival": "The foot of a steep hill where three paths fork.",
+      "orientation": "Difficulty climbs narrow and steep; Danger and Destruction spread broad and pretty; a hill chapel keeps its cross.",
+      "encounter": "Timorous and Mistrust flee downhill, warning of lions ahead.",
+      "temptation": "The easy bypath — why suffer the climb when a gentler road runs alongside?",
+      "choice": "Take the steep true path / slip onto a bypath / sleep carelessly at the rest arbor.",
+      "consequence": "The true path costs perseverance but keeps you; bypaths drain watchfulness; sleeping loses the scroll.",
+      "grace": "Pass the chained lions by faith and reach the lights of the Palace at the summit."
+    },
+    "chapel": {
+      "verse_zh": "进入神的国，必须经历许多艰难。",
+      "verse_en": "Through many tribulations we must enter the kingdom of God.",
+      "hint_zh": "不要走旁路，走窄而陡的正路。",
+      "restore_faith": 12,
+      "type": "pilgrim"
+    },
+    "primary_temptation": {
+      "type": "comfort_shortcut",
+      "hook_zh": "走这条平缓的近路吧，何必受苦？",
+      "resisted_by": {
+        "watchfulness_min": 40,
+        "perseverance_min": 30
+      }
+    },
+    "repentance": {
+      "at": "return from the bypath, pray at the hill chapel",
+      "restores": {
+        "humility": 10,
+        "watchfulness": 8
+      }
+    },
+    "key_choices": [
+      {
+        "id": "choose_difficulty_path",
+        "text_zh": "走艰难正路",
+        "effects": {
+          "faith": 8,
+          "perseverance": 8,
+          "watchfulness": 5
+        }
+      },
+      {
+        "id": "choose_bypath",
+        "text_zh": "走平缓旁路",
+        "effects": {
+          "watchfulness": -12,
+          "despair": 6,
+          "deception": 5
+        }
+      },
+      {
+        "id": "sleep_at_arbor",
+        "text_zh": "在凉亭沉睡",
+        "effects": {
+          "watchfulness": -20,
+          "despair": 8
+        }
+      },
+      {
+        "id": "pass_lions_by_faith",
+        "text_zh": "凭信走过狮子之间",
+        "effects": {
+          "faith": 12,
+          "perseverance": 12,
+          "fear": -10
+        }
+      }
+    ],
+    "stat_arc_note": "Perseverance is the currency here; carelessness can lose has_scroll, gating the Palace until recovered."
+  }
 }

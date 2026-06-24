@@ -4,53 +4,85 @@
     "start": {
       "speaker": "Your Family",
       "text": "Why do you speak as if the whole city were already burning? Come inside. Sit by the table. Surely this dread will pass by morning.",
+      "text_zh": "你为何说得好像整座城已经在烧？进屋来。在桌边坐下。这惊惧想必到天亮就过去了。",
       "choices": [
         {
           "id": "i_must_go",
           "text": "I cannot quiet what the book has awakened. The city will not stand.",
-          "effects": {
-            "perseverance": 4,
-            "despair": 3
-          },
-          "flags": {
-            "warned_family": true
-          },
-          "next": "plead",
-          "text_zh": "那本书所唤醒的，我无法平息。这城存留不住。"
+          "text_zh": "那本书所唤醒的，我无法平息。这城存留不住。",
+          "effects": { "perseverance": 4, "despair": 3 },
+          "flags": { "warned_family": true },
+          "next": "children"
+        },
+        {
+          "id": "invite_them",
+          "text": "Then come with me — all of you. I would not walk toward life alone.",
+          "text_zh": "那就和我一起走吧——你们都来。我不愿独自走向生命。",
+          "effects": { "humility": 6, "hope": 4 },
+          "flags": { "warned_family": true },
+          "next": "invite"
         },
         {
           "id": "stay_quiet",
           "text": "Say nothing for a moment, and look toward the distant light.",
-          "effects": {
-            "humility": 2
-          },
-          "next": "end",
-          "text_zh": "片刻不语，望向远处的光。"
+          "text_zh": "片刻不语，望向远处的光。",
+          "effects": { "humility": 2 },
+          "next": "end"
         }
-      ],
-      "text_zh": "你为何说得好像整座城已经在烧？进屋来。在桌边坐下。这惊惧想必到天亮就过去了。"
+      ]
+    },
+    "children": {
+      "speaker": "Your Family",
+      "text": "And the little ones asleep upstairs — who tells them their father chased a light in a book and left them to the dark? Is that love, or madness?",
+      "text_zh": "还有楼上熟睡的孩子——谁去告诉他们，父亲为了书里的一道光，撇下他们留在黑暗里？这是爱，还是疯了？",
+      "choices": [
+        {
+          "id": "for_them",
+          "text": "I go partly for them — that mercy might reach this house through an open door, not a closed one.",
+          "text_zh": "我去，也是为了他们——好叫怜悯能借着一道敞开的门、而非紧闭的门，临到这一家。",
+          "effects": { "faith": 6, "humility": 5, "perseverance": 4 },
+          "next": "plead"
+        },
+        {
+          "id": "waver",
+          "text": "Maybe... maybe I am being cruel. The thought of their faces nearly turns me back.",
+          "text_zh": "也许……也许我太狠心了。一想到他们的脸，我几乎要回头。",
+          "effects": { "fear": 8, "despair": 5 },
+          "flags": { "tempted_by_family": true },
+          "next": "plead"
+        }
+      ]
+    },
+    "invite": {
+      "speaker": "Your Family",
+      "text": "You ask me to fear a fire I cannot feel, and to leave all we have built on the strength of your dream. I cannot — not yet. But go, and... I will watch the road you take.",
+      "text_zh": "你要我去惧怕一团我感觉不到的火，凭你一个梦撇下我们建立的一切。我不能——还不能。但你去吧，我……我会望着你所走的那条路。",
+      "choices": [
+        {
+          "id": "watch_then",
+          "text": "Then watch it well. If the dread proves true, follow the same road. I will pray you do.",
+          "text_zh": "那就好好望着。若这惊惧应验了，就走同一条路。我必为你祷告，愿你跟上来。",
+          "effects": { "hope": 6, "humility": 4 },
+          "flags": { "family_may_follow": true },
+          "next": "end"
+        }
+      ]
     },
     "plead": {
       "speaker": "Your Family",
       "text": "Then go, if you must. But know this: love makes your leaving hurt more, not less.",
+      "text_zh": "那就去吧，你若非去不可。但要知道：爱，只会让你的离去更痛，而非更轻。",
       "choices": [
         {
           "id": "ill_return_for_you",
           "text": "I will not forget you. I go because mercy still calls; pray that you hear it too.",
-          "effects": {
-            "hope": 4,
-            "humility": 3
-          },
-          "next": "end",
-          "text_zh": "我不会忘记你。我去，是因怜悯仍在呼唤；愿你也听见它。"
+          "text_zh": "我不会忘记你。我去，是因怜悯仍在呼唤；愿你也听见它。",
+          "effects": { "hope": 4, "humility": 3 },
+          "flags": { "family_may_follow": true },
+          "next": "end"
         }
-      ],
-      "text_zh": "那就去吧，你若非去不可。但要知道：爱，只会让你的离去更痛，而非更轻。"
+      ]
     },
-    "end": {
-      "speaker": "",
-      "text": "",
-      "end": true
-    }
+    "end": { "speaker": "", "text": "", "end": true }
   }
 }

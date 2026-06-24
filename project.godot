@@ -44,6 +44,7 @@ LocaleManager="*res://scripts/core/LocaleManager.gd"
 ThemeManager="*res://scripts/ui/ThemeManager.gd"
 Settings="*res://scripts/core/Settings.gd"
 Juice="*res://scripts/fx/Juice.gd"
+TeachingGuidePanel="*res://scripts/ui/TeachingGuidePanel.gd"
 
 [debug]
 

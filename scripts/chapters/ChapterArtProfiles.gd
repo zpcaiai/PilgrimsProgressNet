@@ -55,16 +55,16 @@ static func _overrides(id: String) -> Dictionary:
 	match id:
 		"city_of_destruction":
 			return {
-				"sun": {"angle": Vector3(-14, -35, 0), "color": Color(1.0, 0.5, 0.26), "energy": 0.85},
-				"fill": {"angle": Vector3(-20, 150, 0), "color": Color(0.35, 0.4, 0.6), "energy": 0.2},
-				"ambient": {"color": Color(0.4, 0.28, 0.24), "energy": 0.5},
-				"fog": {"enabled": true, "color": Color(0.35, 0.21, 0.16), "density": 0.02,
-					"volumetric": true, "vol_density": 0.05, "albedo": Color(0.3, 0.22, 0.2),
+				"sun": {"angle": Vector3(-14, -35, 0), "color": Color(1.0, 0.52, 0.3), "energy": 1.25},
+				"fill": {"angle": Vector3(-20, 150, 0), "color": Color(0.4, 0.45, 0.65), "energy": 0.55},
+				"ambient": {"color": Color(0.54, 0.42, 0.38), "energy": 1.35},
+				"fog": {"enabled": true, "color": Color(0.35, 0.21, 0.16), "density": 0.013,
+					"volumetric": true, "vol_density": 0.032, "albedo": Color(0.3, 0.22, 0.2),
 					"emission": Color(0.5, 0.2, 0.08), "emission_energy": 0.4, "aerial": 0.6},
 				"glow": {"enabled": true, "intensity": 1.3, "strength": 1.1, "bloom": 0.3, "threshold": 0.7},
-				"tonemap": {"mode": "filmic", "exposure": 1.05, "white": 1.2},
-				"adjust": {"brightness": 1.0, "contrast": 1.12, "saturation": 1.05},
-				"post": {"tint": Vector3(1.0, 0.86, 0.72), "tint_amount": 0.14, "vignette_amount": 0.42},
+				"tonemap": {"mode": "filmic", "exposure": 1.45, "white": 1.2},
+				"adjust": {"brightness": 1.22, "contrast": 1.08, "saturation": 1.06},
+				"post": {"tint": Vector3(1.0, 0.86, 0.72), "tint_amount": 0.12, "vignette_amount": 0.24},
 				"dressing": [
 					{"op": "smoke", "pos": Vector3(-16, 2, -34), "scale": 2.2},
 					{"op": "smoke", "pos": Vector3(14, 2, -42), "scale": 2.6},

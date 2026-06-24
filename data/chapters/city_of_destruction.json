@@ -39,5 +39,69 @@
   ],
   "music": "res://assets/audio/music/city_of_destruction.ogg",
   "ambient": "res://assets/audio/ambient/city_of_destruction.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/city_of_destruction.glb"
+  "imported_scene_path": "res://assets/imported_scenes/city_of_destruction.glb",
+  "design": {
+    "provenance": "Attachment Ch1 灭亡城与觉醒 (Skill 15).",
+    "spiritual_layer": "Narrative + Temptation + Redemption",
+    "seven_beats": {
+      "arrival": "Wake before dawn, burdened and slow, in a grey doomed city under a distant firelight and a faint bell.",
+      "orientation": "A ruined chapel leans with its tilted cross; the open book names the coming judgement.",
+      "encounter": "Evangelist points past the wall to the far light and the narrow gate; Obstinate mocks; Pliable offers to come.",
+      "temptation": "The fear of leaving the familiar — 'to leave all you know is to lose all you have.'",
+      "choice": "Heed the call and flee / argue with Obstinate / linger at home / pray at the ruined chapel.",
+      "consequence": "Heeding lifts faith and resolve; arguing breeds pride; lingering deepens fear and shame.",
+      "grace": "Pass the city gate toward the wilderness, the burden still on your back but your face now turned to life."
+    },
+    "chapel": {
+      "verse_zh": "醒来吧，你这睡着的人，从死里复活。",
+      "verse_en": "Awake, O sleeper, and arise from the dead.",
+      "hint_zh": "朝远处的光走，寻找窄门。",
+      "restore_faith": 5,
+      "type": "ruined"
+    },
+    "primary_temptation": {
+      "type": "return_to_city",
+      "hook_zh": "为了书卷上几句话，就要离开熟悉的一切吗？",
+      "resisted_by": {
+        "faith_min": 30,
+        "perseverance_min": 20,
+        "or_item": "has_scroll"
+      }
+    },
+    "repentance": {
+      "at": "ruined chapel prayer",
+      "restores": {
+        "faith": 5,
+        "humility": 5
+      }
+    },
+    "key_choices": [
+      {
+        "id": "accept_evangelist_call",
+        "text_zh": "我愿意离开这城",
+        "effects": {
+          "faith": 12,
+          "perseverance": 8,
+          "fear": -4
+        }
+      },
+      {
+        "id": "argue_with_obstinate",
+        "text_zh": "与顽固争辩",
+        "effects": {
+          "pride": 10,
+          "watchfulness": -5
+        }
+      },
+      {
+        "id": "read_warning_scroll",
+        "text_zh": "读警醒的书卷",
+        "effects": {
+          "watchfulness": 8,
+          "discernment": 5
+        }
+      }
+    ],
+    "stat_arc_note": "Opens with despair/shame/fear high and has_burden true; heeding the call begins to lift faith/perseverance."
+  }
 }

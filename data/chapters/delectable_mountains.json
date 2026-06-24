@@ -40,5 +40,69 @@
   ],
   "music": "res://assets/audio/music/delectable_mountains.ogg",
   "ambient": "res://assets/audio/ambient/delectable_mountains.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/delectable_mountains.glb"
+  "imported_scene_path": "res://assets/imported_scenes/delectable_mountains.glb",
+  "design": {
+    "provenance": "Attachment Ch14 可喜山与牧人 (Skill 43).",
+    "spiritual_layer": "Narrative + Redemption (restoration & sight)",
+    "seven_beats": {
+      "arrival": "A high mountain after the castle — air of recovery and rest.",
+      "orientation": "A shepherds' camp and chapel; four shepherds — Knowledge, Experience, Watchful, Sincere.",
+      "encounter": "They explain why you strayed, show the City through the glass, and warn of the Enchanted Ground.",
+      "temptation": "A quiet doubt that the City is simply too far to reach.",
+      "choice": "Look with hope / look but doubt the distance / look together with Hopeful.",
+      "consequence": "Looking in hope lifts hope and lowers despair; doubting the distance keeps despair flickering.",
+      "grace": "Receive the shepherds' map and warning, and carry that sight into the last trials."
+    },
+    "chapel": {
+      "verse_zh": "他使我躺卧在青草地上，领我在可安歇的水边。",
+      "verse_en": "He makes me lie down in green pastures; he leads me beside still waters.",
+      "hint_zh": "听牧人的警戒，带着地图进入魔睡地。",
+      "restore_faith": 20,
+      "type": "pilgrim"
+    },
+    "primary_temptation": {
+      "type": "despair",
+      "hook_zh": "天城那么远，你真能走到吗？",
+      "resisted_by": {
+        "hope_min": 45,
+        "faith_min": 40
+      }
+    },
+    "repentance": {
+      "at": "shepherd chapel prayer / Sincere's honesty about weakness",
+      "restores": {
+        "hope": 10,
+        "humility": 5
+      }
+    },
+    "key_choices": [
+      {
+        "id": "look_with_hope",
+        "text_zh": "满怀盼望地眺望",
+        "effects": {
+          "hope": 20,
+          "faith": 10,
+          "despair": -15
+        }
+      },
+      {
+        "id": "look_but_doubt",
+        "text_zh": "眺望却疑惑路远",
+        "effects": {
+          "hope": 5,
+          "despair": 8
+        }
+      },
+      {
+        "id": "receive_shepherd_map",
+        "text_zh": "领受牧人的地图",
+        "effects": {
+          "watchfulness": 15,
+          "hope": 10,
+          "humility": 5
+        }
+      }
+    ],
+    "stat_arc_note": "Recovery beat: hope/weariness mend; receiving has_shepherd_map equips against the next scene's sleep."
+  }
 }

@@ -36,5 +36,56 @@
   ],
   "music": "res://assets/audio/music/celestial_city.ogg",
   "ambient": "res://assets/audio/ambient/celestial_city.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/celestial_city.glb"
+  "imported_scene_path": "res://assets/imported_scenes/celestial_city.glb",
+  "design": {
+    "provenance": "Attachment Ch16 天城 + ending/journey-review (Skills 46-47). Review = JourneyReviewScreen.",
+    "spiritual_layer": "Narrative + Redemption (glory & grace remembered)",
+    "seven_beats": {
+      "arrival": "Ashore from the river into glory and white robes.",
+      "orientation": "Your old gear is shown as witness, not weapons; crown-of-life imagery; a gate chapel.",
+      "encounter": "The Shining One greets you and opens the Book of the Journey.",
+      "temptation": "None — not a score-screen but a grace-review.",
+      "choice": "Review the journey / open the gate / enter the final worship.",
+      "consequence": "Every step is marked by grace, not merit; the false names, the fear and the burden cannot cross.",
+      "grace": "The gate opens, you enter, and the whole road gathers into praise. Identity: glorified."
+    },
+    "chapel": {
+      "verse_zh": "那美好的仗我已经打过了，当跑的路我已经跑尽了。",
+      "verse_en": "I have fought the good fight, I have finished the race, I have kept the faith.",
+      "hint_zh": "回顾这一路，不是你自己走到了这里，而是恩典带你到这里。",
+      "restore_faith": 30,
+      "type": "celestial"
+    },
+    "primary_temptation": null,
+    "repentance": {
+      "at": "none needed — the journey review remembers grace, not merit",
+      "restores": {}
+    },
+    "key_choices": [
+      {
+        "id": "open_journey_review",
+        "text_zh": "翻开旅程之书",
+        "effects": {
+          "faith": 20,
+          "hope": 20,
+          "fear": -30,
+          "despair": -30
+        }
+      },
+      {
+        "id": "enter_the_gate",
+        "text_zh": "进入天城之门",
+        "effects": {
+          "hope": 20,
+          "faith": 20
+        },
+        "special": [
+          "grant_final_seal",
+          "show_journey_review",
+          "show_credits"
+        ]
+      }
+    ],
+    "stat_arc_note": "The review gathers grace from beginning to end; identity -> glorified; grant_final_seal closes the journey."
+  }
 }

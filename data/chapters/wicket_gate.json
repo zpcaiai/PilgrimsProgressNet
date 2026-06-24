@@ -37,5 +37,68 @@
   ],
   "music": "res://assets/audio/music/wicket_gate.ogg",
   "ambient": "res://assets/audio/ambient/wicket_gate.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/wicket_gate.glb"
+  "imported_scene_path": "res://assets/imported_scenes/wicket_gate.glb",
+  "design": {
+    "provenance": "Attachment Ch2 窄门 (Skill 16). Added a gate prayer-chapel this pass.",
+    "spiritual_layer": "Narrative + Redemption",
+    "seven_beats": {
+      "arrival": "A narrow cliff path; arrows of accusation hiss from behind, urging a backward glance.",
+      "orientation": "The small narrow gate stands ahead with a cross carved over it; a gate chapel waits just inside.",
+      "encounter": "You knock, and Goodwill takes your hand and draws you through.",
+      "temptation": "Shame whispering that the gate will never open for one like you.",
+      "choice": "Knock and ask / press through the arrows / look back toward the city.",
+      "consequence": "Knocking lifts faith and quiets fear and despair; looking back deepens shame.",
+      "grace": "Goodwill admits you to the true way; kneel and give thanks at the gate chapel."
+    },
+    "chapel": {
+      "verse_zh": "你们要进窄门。",
+      "verse_en": "Enter through the narrow gate.",
+      "hint_zh": "叩门，门就给你们开。",
+      "restore_faith": 12,
+      "type": "gate"
+    },
+    "primary_temptation": {
+      "type": "shame",
+      "hook_zh": "你这样的人，门岂会为你开？",
+      "resisted_by": {
+        "faith_min": 20,
+        "or_flag": "knocked_at_gate"
+      }
+    },
+    "repentance": {
+      "at": "gate chapel prayer",
+      "restores": {
+        "faith": 8,
+        "hope": 5
+      }
+    },
+    "key_choices": [
+      {
+        "id": "knock_and_ask",
+        "text_zh": "叩门求进",
+        "effects": {
+          "faith": 10,
+          "hope": 10,
+          "fear": -5
+        }
+      },
+      {
+        "id": "press_through_arrows",
+        "text_zh": "顶着箭雨前行",
+        "effects": {
+          "perseverance": 8,
+          "fear": -5
+        }
+      },
+      {
+        "id": "look_back",
+        "text_zh": "回望灭亡城",
+        "effects": {
+          "shame": 8,
+          "despair": 5
+        }
+      }
+    ],
+    "stat_arc_note": "Faith rises and fear/despair fall as the gate opens to the asking."
+  }
 }

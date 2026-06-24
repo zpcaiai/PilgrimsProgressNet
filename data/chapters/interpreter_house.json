@@ -38,5 +38,68 @@
   ],
   "music": "res://assets/audio/music/interpreter_house.ogg",
   "ambient": "res://assets/audio/ambient/interpreter_house.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/interpreter_house.glb"
+  "imported_scene_path": "res://assets/imported_scenes/interpreter_house.glb",
+  "design": {
+    "provenance": "Attachment Ch3 讲解者之家 (Skill 17). Engine keeps it AFTER the cross; see kept_original.",
+    "spiritual_layer": "Narrative + Redemption (discipleship & discernment)",
+    "seven_beats": {
+      "arrival": "An interior larger than it looked, lit low, a quiet mystic hymn.",
+      "orientation": "The Interpreter welcomes you; six symbolic rooms wait, and a small chapel for prayer.",
+      "encounter": "He teaches by picture, dust, hidden fire, a palace battle, the iron cage, and a dream of judgement.",
+      "temptation": "The iron-caged man — a warning against despising grace until the heart hardens.",
+      "choice": "Read each room rightly, discerning the true meaning under the picture.",
+      "consequence": "Each lesson sharpens faith, humility, watchfulness and discernment.",
+      "grace": "The Interpreter points your longing onward to the cross and the road ahead."
+    },
+    "chapel": {
+      "verse_zh": "求你开我的眼睛，使我看出你律法中的奇妙。",
+      "verse_en": "Open my eyes, that I may behold wondrous things out of your law.",
+      "hint_zh": "完成每个房间的功课，再继续上路。",
+      "restore_faith": 10,
+      "type": "gate"
+    },
+    "primary_temptation": {
+      "type": "false_teaching",
+      "hook_zh": "你看见的，未必是它真正的意思。",
+      "resisted_by": {
+        "discernment_min": 20,
+        "or_item": "has_scroll"
+      }
+    },
+    "repentance": {
+      "at": "interpreter chapel prayer",
+      "restores": {
+        "faith": 8,
+        "discernment": 8
+      }
+    },
+    "key_choices": [
+      {
+        "id": "lesson_dust_room",
+        "text_zh": "尘土房间的功课",
+        "effects": {
+          "humility": 10,
+          "discernment": 5
+        }
+      },
+      {
+        "id": "lesson_fire_room",
+        "text_zh": "火焰房间的隐密恩典",
+        "effects": {
+          "hope": 10,
+          "faith": 10
+        }
+      },
+      {
+        "id": "lesson_iron_cage",
+        "text_zh": "铁笼之人的警戒",
+        "effects": {
+          "watchfulness": 12,
+          "humility": 8
+        }
+      }
+    ],
+    "stat_arc_note": "Burden does not drop here (it already fell at the cross); discernment/watchfulness climb before the hill.",
+    "kept_original": "Bunyan/attachment place Interpreter BEFORE the cross; the engine wires it after (burden_fallen gate). Order kept to preserve the flag chain."
+  }
 }

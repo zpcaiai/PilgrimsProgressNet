@@ -40,5 +40,82 @@
   ],
   "music": "res://assets/audio/music/doubting_castle.ogg",
   "ambient": "res://assets/audio/ambient/doubting_castle.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/doubting_castle.glb"
+  "imported_scene_path": "res://assets/imported_scenes/doubting_castle.glb",
+  "design": {
+    "provenance": "Attachment Ch13 疑惑堡与绝望巨人 + promise-key system (Skills 41-42). Boss = GiantDespair.gd.",
+    "spiritual_layer": "Temptation + Redemption (despair & the Promise)",
+    "seven_beats": {
+      "arrival": "Weary on the rough true road, travelling with Hopeful.",
+      "orientation": "A soft meadow looks easier than the hard road; a small warning cross stands at the fork.",
+      "encounter": "You stray into the meadow; a storm loses the road; Giant Despair seizes you into Doubting Castle.",
+      "temptation": "Despair editing the truth in the cell — Darkthought whispers your past failures back at you.",
+      "choice": "Listen to the accusations / let Hopeful encourage you / remember the Promise.",
+      "consequence": "The cell raises despair and shame the longer you stay; Hopeful's word lifts hope.",
+      "grace": "Remember the key of Promise in your own breast, unlock the door, escape — and leave a warning for others."
+    },
+    "chapel": null,
+    "cross_markers": [
+      "a cross scratched on the cell wall",
+      "a dawn cross at the escape gate"
+    ],
+    "primary_temptation": {
+      "type": "despair",
+      "hook_zh": "你已经走偏了；若你真有信心，怎会被关在这里？",
+      "resisted_by": {
+        "hope_min": 30,
+        "faith_min": 25,
+        "or_item": "has_promise_key"
+      }
+    },
+    "repentance": {
+      "at": "remember the Promise (after Hopeful's encouragement)",
+      "restores": {
+        "hope": 25,
+        "faith": 15,
+        "despair": -30
+      },
+      "special": [
+        "grant_promise_key"
+      ]
+    },
+    "key_choices": [
+      {
+        "id": "stay_on_true_road",
+        "text_zh": "留在正路上",
+        "effects": {
+          "watchfulness": 12,
+          "faith": 8,
+          "perseverance": 5
+        }
+      },
+      {
+        "id": "enter_bypath_meadow",
+        "text_zh": "走进近便的草场",
+        "effects": {
+          "watchfulness": -15,
+          "despair": 8
+        }
+      },
+      {
+        "id": "remember_promise",
+        "text_zh": "想起应许之钥",
+        "effects": {
+          "hope": 25,
+          "faith": 15,
+          "despair": -30
+        }
+      },
+      {
+        "id": "leave_warning",
+        "text_zh": "为后人留下警戒",
+        "effects": {
+          "humility": 10,
+          "perseverance": 8,
+          "watchfulness": 8
+        }
+      }
+    ],
+    "stat_arc_note": "Entry spikes despair / drains hope; the Promise (has_promise_key) reverses it. No chapel — only faint crosses, by design.",
+    "kept_original": "No formal chapel, matching the attachment — despair must be answered by the remembered Promise, not a save room."
+  }
 }

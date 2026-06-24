@@ -38,5 +38,70 @@
   ],
   "music": "res://assets/audio/music/enchanted_ground.ogg",
   "ambient": "res://assets/audio/ambient/enchanted_ground.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/enchanted_ground.glb"
+  "imported_scene_path": "res://assets/imported_scenes/enchanted_ground.glb",
+  "design": {
+    "provenance": "Attachment Ch14 魔睡地 + sleepwalk system (Skill 44).",
+    "spiritual_layer": "Temptation + Redemption (watchfulness)",
+    "seven_beats": {
+      "arrival": "A beautiful, quiet, soft field.",
+      "orientation": "Sleep-flowers everywhere; the longer you linger the drowsier you grow; a watchfulness chapel waits.",
+      "encounter": "Drowsiness rises and the risk of sleepwalking with it; Hopeful walks at your side.",
+      "temptation": "Comfortable forgetfulness — to sit, close your eyes, and let desire for the City fade.",
+      "choice": "Talk with Hopeful to stay awake (remember Calvary / remember Faithful / speak of the City) / use the shepherds' map / pray.",
+      "consequence": "Conversation and prayer restore watchfulness; lingering silently drifts you into a sleepwalk.",
+      "grace": "Stay awake through fellowship and reach the borders of Beulah."
+    },
+    "chapel": {
+      "verse_zh": "总要警醒祷告，免得入了迷惑。",
+      "verse_en": "Watch and pray, that you enter not into temptation.",
+      "hint_zh": "不要独自沉默前行，要与盼望彼此提醒。",
+      "restore_faith": 14,
+      "type": "pilgrim"
+    },
+    "primary_temptation": {
+      "type": "sleep",
+      "hook_zh": "歇一歇吧，闭上眼睛，这里很安全。",
+      "resisted_by": {
+        "watchfulness_min": 60,
+        "or_item": "has_shepherd_map"
+      }
+    },
+    "repentance": {
+      "at": "wake via Hopeful's talk / chapel prayer / the map",
+      "restores": {
+        "watchfulness": 15,
+        "hope": 12
+      }
+    },
+    "key_choices": [
+      {
+        "id": "remember_calvary",
+        "text_zh": "彼此提说十字架",
+        "effects": {
+          "faith": 8,
+          "hope": 8,
+          "watchfulness": 8
+        }
+      },
+      {
+        "id": "speak_of_city",
+        "text_zh": "谈论前面的天城",
+        "effects": {
+          "hope": 12,
+          "faith": 6,
+          "watchfulness": 6
+        }
+      },
+      {
+        "id": "drift_in_sleepwalk",
+        "text_zh": "陷入梦游漂移",
+        "effects": {
+          "watchfulness": -10,
+          "despair": 5,
+          "weariness": 10
+        }
+      }
+    ],
+    "stat_arc_note": "Sleepiness maps to weariness; silence drains watchfulness, fellowship restores it. SleepinessSystem drives the drift."
+  }
 }

@@ -71,6 +71,8 @@ const NPC_DIALOGUE_BY_CHAPTER := {
 }
 
 const TRIGGER_DIALOGUE := {
+	"TRIGGER_ProclamationRead": "city_proclamation",
+	"TRIGGER_FeastWelcome": "celestial_feast_welcome",
 	"TRIGGER_PliableLeaves": "pliable_leaves",
 	"TRIGGER_ObstinateReturns": "obstinate_road",
 	"TRIGGER_PliableRoadDialogue": "pliable_doubting",
@@ -204,7 +206,9 @@ static func _is_solid(nm: String) -> bool:
 			"ScrollMarker", "SealMarker", "NewGarment", "GateDoor", "CellDoor",
 			"Grass", "Tuft", "Foliage", "Flower", "Bush", "Crow", "Smoke",
 			"Ember", "Sheep", "Crowd", "Hedge", "Ridge", "Cairn",
-			"Merlon", "Crown", "WaterSurface"]:
+			"Merlon", "Crown", "WaterSurface",
+			# Living-worlds pass: ambient life is always walk-through.
+			"Fauna", "Critter", "Household", "Dove", "Butterfly", "Firefly"]:
 		if skip in nm:
 			return false
 	return true
@@ -306,9 +310,18 @@ static func _bind_trigger(chapter: Node3D, node: Node, nm: String):
 		_bind_exit(chapter, node)
 		return null
 	if nm == "TRIGGER_EnterCelestialCity":
-		_story(chapter, node, {}, {"entered_city": true, "journey_completed": true},
+		# The gate WELCOMES you in -- it no longer cuts to credits. The finale is
+		# now reached by walking the City: the host, the feast, and the throne.
+		_story(chapter, node, {"hope": 10, "faith": 10, "fear": -20, "despair": -20},
+			{"entered_city": true}, {},
+			"You pass through the gate. Within: light, white robes, the sound of a great multitude, and a feast spread down the length of the City. The welcome has only begun.")
+		return null
+	if nm == "TRIGGER_ThroneWorship":
+		# The true finale, before the throne -- only after the City is walked.
+		_story(chapter, node, {"faith": 20, "hope": 20},
+			{"entered_celestial_city": true, "journey_completed": true},
 			{"show_journey_review": true, "show_credits": true},
-			"You enter the City. The burden was gone, the road finished, the welcome remained.")
+			"You come at last before the throne. The crowned Lamb who was slain is seated in glory, and the host falls down in worship. Not by your strength, but by grace, you are home.")
 		return null
 	if nm == "TRIGGER_EndCredits" or nm == "TRIGGER_JourneyReview":
 		_story(chapter, node, {}, {"journey_review_requested": true}, {},

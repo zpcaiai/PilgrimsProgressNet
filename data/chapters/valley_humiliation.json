@@ -33,5 +33,87 @@
   ],
   "music": "res://assets/audio/music/valley_humiliation.ogg",
   "ambient": "res://assets/audio/ambient/valley_humiliation.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/valley_humiliation.glb"
+  "imported_scene_path": "res://assets/imported_scenes/valley_humiliation.glb",
+  "design": {
+    "provenance": "Attachment Ch8 降卑谷前置 + Ch9 亚玻伦之战 (Skills 27, 32-33). Boss = ApollyonBoss.gd.",
+    "spiritual_layer": "Temptation + Redemption + Combat",
+    "seven_beats": {
+      "arrival": "The road bends downward — the armour is for standing in humility, not for marching in pride.",
+      "orientation": "A low stone chapel, a humility stream, and ahead a scorched circle of ground.",
+      "encounter": "Apollyon bars the road, claiming you were once his servant.",
+      "temptation": "Accusation and fear: he recalls your past failures by name and tests your shield with fiery darts.",
+      "choice": "Stand in the armour / answer every lie with the promise / pray for light — never boast.",
+      "consequence": "Faith and resolve rise and fear/shame fall on victory; pride after victory undoes it.",
+      "grace": "His claim breaks; give thanks humbly (not boastfully) to leave the valley floor."
+    },
+    "chapel": {
+      "verse_zh": "神阻挡骄傲的人，赐恩给谦卑的人。",
+      "verse_en": "God opposes the proud but gives grace to the humble.",
+      "hint_zh": "不要凭骄傲迎战，要用信德的盾牌和圣灵的宝剑站立。",
+      "restore_faith": 18,
+      "type": "pilgrim"
+    },
+    "primary_temptation": {
+      "type": "self_reliance",
+      "hook_zh": "换了一件衣服，拿了一把剑，就不再是我的仆人吗？",
+      "resisted_by": {
+        "humility_min": 45,
+        "or_item": "has_armor"
+      }
+    },
+    "repentance": {
+      "at": "give thanks humbly after victory",
+      "restores": {
+        "humility": 15,
+        "faith": 10,
+        "pride": -10
+      }
+    },
+    "boss": {
+      "id": "apollyon",
+      "phases": [
+        "accusation",
+        "fire_darts",
+        "close_combat",
+        "final_accusation"
+      ],
+      "counters": {
+        "fiery_darts": "has_shield (raise shield)",
+        "accusation": "has_scroll / breastplate (read assurance)",
+        "memory_accusation": "has_sword (scripture strike)",
+        "dark_roar": "helmet (hold salvation)"
+      },
+      "note": "Accusation recalls past-failure flags; defeat is NOT game over — repent and stand. Must give thanks, not boast, to progress."
+    },
+    "key_choices": [
+      {
+        "id": "stand_in_faith",
+        "text_zh": "凭信站立",
+        "effects": {
+          "faith": 10,
+          "perseverance": 8,
+          "fear": -8
+        }
+      },
+      {
+        "id": "answer_with_promises",
+        "text_zh": "用应许回应控告",
+        "effects": {
+          "faith": 8,
+          "discernment": 8,
+          "shame": -10
+        }
+      },
+      {
+        "id": "give_thanks_humbly",
+        "text_zh": "谦卑感恩",
+        "effects": {
+          "humility": 15,
+          "faith": 10,
+          "pride": -10
+        }
+      }
+    ],
+    "stat_arc_note": "First real use of the armour; accusation maps to shame, fear stays fear; humble thanks gates the exit."
+  }
 }

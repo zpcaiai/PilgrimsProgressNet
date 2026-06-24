@@ -39,5 +39,82 @@
   ],
   "music": "res://assets/audio/music/river_of_death.ogg",
   "ambient": "res://assets/audio/ambient/river_of_death.ogg",
-  "imported_scene_path": "res://assets/imported_scenes/river_of_death.glb"
+  "imported_scene_path": "res://assets/imported_scenes/river_of_death.glb",
+  "design": {
+    "provenance": "Attachment Ch15 美地与死河 (Skill 45). Depth driven by RiverDepthSystem.",
+    "spiritual_layer": "Narrative + Temptation + Redemption (death & dependence)",
+    "seven_beats": {
+      "arrival": "The calm bright borders of Beulah; the City stands near, but across the river.",
+      "orientation": "No bridge and no boat — the river of death is unavoidable; a river chapel keeps its cross.",
+      "encounter": "You step in, and the water's depth rises with fear and falls with faith.",
+      "temptation": "The fear of death itself — 'the water is over your head; you are sinking.'",
+      "choice": "Enter with faith / cross together with Hopeful / fear and delay / pray before entering.",
+      "consequence": "Faith and hope make the water shallow; fear and despair make it deep and slow.",
+      "grace": "Hopeful steadies you — 'the far light is near' — and the far bank holds your feet."
+    },
+    "chapel": {
+      "verse_zh": "我已将这些事告诉你们，是要叫你们在我里面有平安。",
+      "verse_en": "These things I have spoken to you, that in me you may have peace.",
+      "hint_zh": "河必须经过，但不是独自经过。",
+      "restore_faith": 25,
+      "type": "river"
+    },
+    "primary_temptation": {
+      "type": "fear",
+      "hook_zh": "水漫过你的头，你要沉下去了。",
+      "resisted_by": {
+        "faith_min": 70,
+        "hope_min": 65,
+        "or_item": "has_scroll"
+      }
+    },
+    "repentance": {
+      "at": "pray before the river / turn your eyes to the far light",
+      "restores": {
+        "faith": 12,
+        "hope": 12,
+        "fear": -8
+      }
+    },
+    "key_choices": [
+      {
+        "id": "enter_with_faith",
+        "text_zh": "凭信下水",
+        "effects": {
+          "faith": 15,
+          "perseverance": 10,
+          "fear": -10
+        }
+      },
+      {
+        "id": "cross_with_hopeful",
+        "text_zh": "与盼望同过",
+        "effects": {
+          "hope": 18,
+          "humility": 8,
+          "faith": 8
+        }
+      },
+      {
+        "id": "fear_and_delay",
+        "text_zh": "惧怕而迟疑",
+        "effects": {
+          "fear": 15,
+          "despair": 8,
+          "hope": -5
+        }
+      },
+      {
+        "id": "pray_before_river",
+        "text_zh": "下水前先祷告",
+        "effects": {
+          "faith": 12,
+          "hope": 12,
+          "fear": -8,
+          "humility": 5
+        }
+      }
+    ],
+    "stat_arc_note": "River depth rises with fear/despair, falls with faith/hope; Hopeful's presence steadies. Not a game over — the final faith trial."
+  }
 }
