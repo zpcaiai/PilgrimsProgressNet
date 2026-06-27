@@ -274,6 +274,15 @@ static func _bind_npc(chapter: Node3D, node: Node) -> void:
 		if node is Node3D:
 			(node as Node3D).visible = false
 		return
+	# The pilgrim's family he leaves behind: his wife (same height as him) reaching
+	# out, with two children tugging her skirt. Replaces the single folded figure.
+	if nm == "NPC_Wife":
+		var fam := PilgrimFamily.new()
+		chapter.add_child(fam)
+		fam.global_position = node.global_position
+		if node is Node3D:
+			(node as Node3D).visible = false
+		return
 	if nm == "NPC_Hopeful" and GameState.has_companion("hopeful"):
 		if node is Node3D:
 			(node as Node3D).visible = false
@@ -511,13 +520,13 @@ static func _bind_prop(chapter: Node3D, node: Node, nm: String):
 		_make_interactable(chapter, pos, "在教堂礼拜 (Worship)", worship_cb, true, 2.4)
 		return null
 	if nm == "PROP_Book":
-		_make_interactable(chapter, pos, "Read the book",
+		_make_interactable(chapter, pos, "读那本书 (Read)",
 			func(_p): SpiritualStateManager.trigger_spiritual_event("receive_burden"))
 	elif nm == "PROP_WaysideStone":
 		var rest_cb := func(_p):
 			if not DialogueManager.is_active():
 				DialogueManager.start_dialogue("wilderness_burden")
-		_make_interactable(chapter, pos, "Rest beneath the burden", rest_cb, false, 1.8)
+		_make_interactable(chapter, pos, "在重担下停歇 (Rest)", rest_cb, false, 1.8)
 	elif nm.begins_with("PROP_PromiseStone_"):
 		var kind := "hope"
 		if "Faith" in nm:
@@ -542,28 +551,28 @@ static func _bind_prop(chapter: Node3D, node: Node, nm: String):
 		eq.setup("sword" if nm == "PROP_Sword" else "shield")
 		eq.global_position = pos
 	elif nm == "PROP_PromiseKey":
-		_make_interactable(chapter, pos, "Remember the promise",
+		_make_interactable(chapter, pos, "记起应许 (Remember)",
 			func(_p): SpiritualStateManager.trigger_spiritual_event("promise_key_escape"))
 	elif nm == "PROP_ShepherdMap":
-		_make_interactable(chapter, pos, "Receive the map",
+		_make_interactable(chapter, pos, "领受地图 (Receive map)",
 			func(_p): SpiritualStateManager.trigger_spiritual_event("shepherd_map_received"))
 	elif nm.begins_with("PROP_Viewpoint_"):
 		var vf := String(VIEWPOINT_FLAG.get(nm, "met_shepherds"))
-		_make_interactable(chapter, pos, "Look",
+		_make_interactable(chapter, pos, "观看远方 (Look)",
 			func(_p):
 				GameState.set_flag("met_shepherds", true)
 				GameState.set_flag(vf, true)
 				SpiritualStateManager.apply_effects({"hope": 8, "watchfulness": 3})
-				EventBus.toast("You look long, and the road comes into focus."))
+				EventBus.toast("你久久观看，道路渐渐清晰。"))
 	elif nm.begins_with("PROP_TestimonyMarker_"):
-		_make_interactable(chapter, pos, "Remember aloud",
+		_make_interactable(chapter, pos, "开口记念 (Remember aloud)",
 			func(_p):
 				GameState.set_flag("shared_testimony_with_hopeful", true)
 				GameState.set_flag("resisted_sleep", true)
 				SpiritualStateManager.apply_effects({"faith": 5, "hope": 5, "watchfulness": 5})
-				EventBus.toast("You tell Hopeful what carried you. Speaking it keeps you awake."))
+				EventBus.toast("你告诉盼望：一路是谁托住你。说出口，使你保持清醒。"))
 	elif nm == "PROP_CelestialGate":
-		_make_interactable(chapter, pos, "Enter",
+		_make_interactable(chapter, pos, "进入城门 (Enter)",
 			func(_p): DialogueManager.start_dialogue("final_gate_entry"))
 	elif nm == "PROP_RollingBurden":
 		return node

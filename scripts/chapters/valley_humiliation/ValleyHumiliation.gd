@@ -22,7 +22,7 @@ func _build_procedural() -> void:
 	make_block(Vector3(1, 6, 44), Color(0.3, 0.28, 0.26), Vector3(14, 3, -14))
 	make_block(Vector3(28, 6, 1), Color(0.3, 0.28, 0.26), Vector3(0, 3, -34))
 
-	make_floating_label("Valley of Humiliation — stand in grace", Vector3(0, 4.5, -28), Color(0.85, 0.6, 0.6))
+	make_floating_label("降卑谷：站在恩典中", Vector3(0, 4.5, -28), Color(0.85, 0.6, 0.6))
 
 	spawn_player(Vector3(0, 1, 10))
 
@@ -56,6 +56,6 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 func _on_victory(_v: bool) -> void:
 	QuestManager.update_quest_progress("valley_humiliation")
 	await get_tree().create_timer(2.0).timeout
-	EventBus.toast("The accuser's claim is broken. The valley opens, and a darker road waits ahead.")
+	EventBus.toast("控告者的权势破碎了。山谷打开，更幽暗的路仍在前方。")
 	await get_tree().create_timer(1.0).timeout
 	ChapterManager.go_to_next_chapter()

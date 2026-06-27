@@ -98,6 +98,41 @@ func _build_visual() -> void:
 		horn.material_override = body_mat
 		_head.add_child(horn)
 
+	# Jagged fangs lining the maw (upper row points down, lower row up).
+	var tooth_mat := _foe_mat(Color(0.86, 0.84, 0.72), 0.15)
+	for tx in [-0.6, -0.36, -0.12, 0.12, 0.36, 0.6]:
+		var ut := MeshInstance3D.new()
+		var utm := CylinderMesh.new()
+		utm.top_radius = 0.0
+		utm.bottom_radius = 0.06
+		utm.height = 0.3
+		ut.mesh = utm
+		ut.position = Vector3(tx, -0.18, 1.02)
+		ut.rotation = Vector3(PI, 0, 0)
+		ut.material_override = tooth_mat
+		_head.add_child(ut)
+		var lt := MeshInstance3D.new()
+		var ltm := CylinderMesh.new()
+		ltm.top_radius = 0.0
+		ltm.bottom_radius = 0.06
+		ltm.height = 0.28
+		lt.mesh = ltm
+		lt.position = Vector3(tx, -0.42, 1.0)
+		lt.material_override = tooth_mat
+		_head.add_child(lt)
+	# Raked gill slits on each side of the head.
+	var gill_mat := _foe_mat(Color(0.42, 0.08, 0.06), 0.7)
+	for sx in [-1.0, 1.0]:
+		for gz in [0.12, -0.08, -0.28]:
+			var gill := MeshInstance3D.new()
+			var gbm := BoxMesh.new()
+			gbm.size = Vector3(0.06, 0.5, 0.16)
+			gill.mesh = gbm
+			gill.position = Vector3(sx * 0.72, 0.06, gz)
+			gill.rotation = Vector3(0, 0, deg_to_rad(18))
+			gill.material_override = gill_mat
+			_head.add_child(gill)
+
 	# Coiled back humps trailing behind (-Z), each a little lower / smaller, so the
 	# beast reads as a long serpent looping through the surface.
 	var z := 0.9
@@ -114,6 +149,21 @@ func _build_visual() -> void:
 		_humps.append(hump)
 		z -= r * 1.35
 		r *= 0.82
+	# A ridge of dorsal spines/fins running down the back.
+	var fin_mat := _foe_mat(Color(0.08, 0.13, 0.15), 0.5)
+	for h in _humps:
+		var hr: float = (h.mesh as SphereMesh).radius
+		var fin := MeshInstance3D.new()
+		var fm := CylinderMesh.new()
+		fm.top_radius = 0.0
+		fm.bottom_radius = hr * 0.5
+		fm.height = hr * 1.3
+		fin.mesh = fm
+		fin.position = Vector3(0, hr * 0.92, 0)
+		fin.rotation = Vector3(deg_to_rad(-12), 0, 0)
+		fin.material_override = fin_mat
+		h.add_child(fin)
+
 	# Tail tip.
 	var tail := MeshInstance3D.new()
 	var tm := CylinderMesh.new()

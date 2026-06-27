@@ -104,6 +104,19 @@ static func make(name: String, height: float = 2.0, mover: Node3D = null,
 	head.material_override = skin_m
 	body.add_child(head)
 
+	# Eyes — two small spheres on the face (front, +Z) so the cast read as people
+	# rather than blank heads. (Foes get the menacing emissive look via _mat.)
+	var eye_m := _mat(Color(0.12, 0.1, 0.08), 0.4, foe)
+	for ex in [-1.0, 1.0]:
+		var eye := MeshInstance3D.new()
+		var em := SphereMesh.new()
+		em.radius = head_r * 0.17
+		em.height = head_r * 0.34
+		eye.mesh = em
+		eye.position = Vector3(ex * head_r * 0.42, head_y + head_r * 0.12, head_r * 0.82)
+		eye.material_override = eye_m
+		body.add_child(eye)
+
 	# Hair: a flattened cap raised onto the crown and pushed back, so the face
 	# (front) stays bare skin and the figure visibly faces +Z.
 	var hair := MeshInstance3D.new()

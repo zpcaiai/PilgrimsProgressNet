@@ -105,6 +105,21 @@ func _build() -> void:
 		sl.add_theme_font_size_override("font_size", 20)
 		sl.add_theme_color_override("font_color", Color(0.8, 0.86, 0.98))
 		box.add_child(sl)
+	var known_cards := ScriptureMemory.known_cards()
+	if known_cards.size() > 0:
+		var remembered: Array = []
+		for i in range(min(known_cards.size(), 3)):
+			var card: Dictionary = known_cards[i]
+			var theme := String(card.get("theme_zh", card.get("theme_en", ""))) if zh else LocaleManager.bilingual(String(card.get("theme_zh", "")), String(card.get("theme_en", "")))
+			remembered.append("%s %s" % [String(card.get("ref", "")), theme])
+		var vl := Label.new()
+		vl.text = "·  记在心里的经文：%s%s" % [
+			"；".join(PackedStringArray(remembered)),
+			(" 等 %d 张。" % known_cards.size()) if known_cards.size() > 3 else "。"
+		]
+		vl.add_theme_font_size_override("font_size", 18)
+		vl.add_theme_color_override("font_color", Color(0.92, 0.86, 0.58))
+		box.add_child(vl)
 
 	box.add_child(_spacer(10))
 	var coda := Label.new()

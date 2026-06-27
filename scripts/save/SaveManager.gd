@@ -37,12 +37,12 @@ func save_game(slot_id: String = "slot_1", announce: bool = true) -> void:
 	file.close()
 	EventBus.save_completed.emit(slot_id)
 	if announce:
-		EventBus.toast("Game saved.")
+		EventBus.toast("游戏已保存。")
 
 
 func load_game(slot_id: String = "slot_1") -> bool:
 	if not has_save(slot_id):
-		EventBus.toast("No save found.")
+		EventBus.toast("没有找到存档。")
 		return false
 	var text := FileAccess.get_file_as_string(_slot_path(slot_id))
 	var parsed: Variant = JSON.parse_string(text)
@@ -54,7 +54,7 @@ func load_game(slot_id: String = "slot_1") -> bool:
 	SpiritualStateManager.from_dict(data.get("spiritual_state", {}))
 	QuestManager.from_dict(data.get("quest_state", {}))
 	EventBus.load_completed.emit(slot_id)
-	EventBus.toast("Game loaded.")
+	EventBus.toast("存档已读取。")
 	return true
 
 

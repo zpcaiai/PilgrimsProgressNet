@@ -109,6 +109,22 @@ func _build() -> void:
 	_fig = HumanoidFigure.make("Pilgrim", 2.0, self)
 	_mesh_root.add_child(_fig)
 
+	# A short beard makes the protagonist read clearly as a person while keeping
+	# both hands free for the walk cycle.
+	var beard := MeshInstance3D.new()
+	var beard_mesh := SphereMesh.new()
+	beard_mesh.radius = 0.12
+	beard_mesh.height = 0.24
+	beard.mesh = beard_mesh
+	beard.scale = Vector3(1.0, 0.72, 0.6)
+	beard.position = Vector3(0, 1.72, 0.12)
+	beard.material_override = _make_material(Color(0.3, 0.22, 0.15))
+	var _body_node: Node3D = _fig.get_node_or_null("Body")
+	if _body_node != null:
+		_body_node.add_child(beard)
+	else:
+		_fig.add_child(beard)
+
 	# Burden: a real backpack on his back that he visibly drops at the Cross.
 	# The 3D body faces +Z (the travel direction), so the pack is flipped to sit
 	# behind him (-Z), and shown only while the burden is still carried.

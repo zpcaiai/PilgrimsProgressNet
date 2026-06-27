@@ -5,6 +5,25 @@ extends Node
 
 const CHAPTER_DIR := "res://data/chapters/"
 
+const CHAPTER_TITLE_ZH := {
+	"city_of_destruction": "灭亡城",
+	"wilderness_road": "旷野之路",
+	"slough_of_despond": "绝望泥潭",
+	"wicket_gate": "窄门",
+	"cross_and_tomb": "十字架与空墓",
+	"interpreter_house": "释经者之家",
+	"hill_difficulty": "艰难山",
+	"palace_beautiful": "美宫",
+	"valley_humiliation": "谦卑谷",
+	"valley_shadow_death": "死荫谷",
+	"vanity_fair": "虚华市集",
+	"doubting_castle": "怀疑城堡",
+	"delectable_mountains": "可悦山",
+	"enchanted_ground": "迷睡之地",
+	"river_of_death": "死河",
+	"celestial_city": "天城",
+}
+
 # Full canonical pilgrimage route.
 const CANONICAL_ROUTE := [
 	"city_of_destruction",
@@ -53,6 +72,11 @@ var _current_scene_instance: Node = null
 var current_chapter_id: String = ""
 
 
+func _ready() -> void:
+	if EventBus.has_signal("locale_changed"):
+		EventBus.locale_changed.connect(func(_loc): _data_cache.clear())
+
+
 func set_world_root(node: Node) -> void:
 	_world_root = node
 
@@ -72,10 +96,32 @@ func load_chapter_data(chapter_id: String) -> Dictionary:
 	var text := FileAccess.get_file_as_string(path)
 	var parsed: Variant = JSON.parse_string(text)
 	if parsed is Dictionary:
-		_data_cache[chapter_id] = parsed
-		return parsed
+		var data := _localize_chapter_data(chapter_id, parsed)
+		_data_cache[chapter_id] = data
+		return data
 	push_warning("ChapterManager: failed to parse " + path)
 	return {}
+
+
+func _localize_chapter_data(chapter_id: String, data: Dictionary) -> Dictionary:
+	var out := data.duplicate(true)
+	var title_zh := String(out.get("title_zh", CHAPTER_TITLE_ZH.get(chapter_id, "")))
+	var title_en := String(out.get("title", chapter_id))
+	out["title"] = LocaleManager.bilingual(title_zh, title_en) if not LocaleManager.is_zh() else (title_zh if title_zh != "" else LocaleManager.zh_or_mixed(title_en))
+	for field in ["subtitle", "spiritual_theme", "core_mechanic"]:
+		var zh := String(out.get(field + "_zh", ""))
+		var en := String(out.get(field, ""))
+		out[field] = LocaleManager.bilingual(zh, en) if not LocaleManager.is_zh() else (zh if zh != "" else LocaleManager.zh_or_mixed(en))
+	if out.has("intro"):
+		var intro: Array = out.get("intro", [])
+		var intro_zh: Array = out.get("intro_zh", [])
+		var localized: Array = []
+		for i in range(intro.size()):
+			var en_line := String(intro[i])
+			var zh_line := String(intro_zh[i]) if i < intro_zh.size() else ""
+			localized.append(LocaleManager.bilingual(zh_line, en_line) if not LocaleManager.is_zh() else (zh_line if zh_line != "" else LocaleManager.zh_or_mixed(en_line)))
+		out["intro"] = localized
+	return out
 
 
 func get_current_chapter_data() -> Dictionary:
@@ -190,7 +236,7 @@ func go_to_next_chapter() -> void:
 	complete_chapter(current_chapter_id)
 	if next_id == "":
 		# End of route: signal the game-complete flow.
-		EventBus.toast("The route is complete.")
+		EventBus.toast("这段朝圣路已经完成。")
 		return
 	start_chapter(next_id)
 

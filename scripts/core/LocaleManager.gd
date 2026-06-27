@@ -15,6 +15,7 @@ const TABLE := "res://assets/i18n/ui.json"
 
 var locale: String = "zh"               # "zh" or "en" (defaults to Chinese)
 var _t: Dictionary = {}                  # key -> {"en": ..., "zh": ...}
+const MISSING_ZH_PREFIX := "中文待补："
 
 
 func _ready() -> void:
@@ -38,8 +39,12 @@ func _detect() -> String:
 func _load_saved() -> String:
 	if FileAccess.file_exists(SETTINGS):
 		var s := FileAccess.get_file_as_string(SETTINGS).strip_edges()
-		if s == "zh" or s == "en":
+		if s == "zh":
 			return s
+		if s == "en":
+			# This build is Chinese-first; reopen in Chinese even if an older
+			# settings file had English saved.
+			return "zh"
 	# Default to Chinese on first open (no saved choice yet).
 	return "zh"
 
@@ -72,7 +77,29 @@ func toggle() -> void:
 
 ## A short label for a language-switch button (shows the language you'd switch TO).
 func switch_label() -> String:
-	return "English" if locale == "zh" else "中文"
+	return "中英" if locale == "zh" else "中文"
+
+
+func has_chinese(text: String) -> bool:
+	for i in range(text.length()):
+		var code := text.unicode_at(i)
+		if (code >= 0x3400 and code <= 0x9FFF) or (code >= 0xF900 and code <= 0xFAFF):
+			return true
+	return false
+
+
+func zh_or_mixed(text: String) -> String:
+	if text == "" or has_chinese(text):
+		return text
+	return MISSING_ZH_PREFIX + text
+
+
+func bilingual(zh: String, en: String) -> String:
+	if zh != "" and en != "" and zh != en:
+		return zh + " / " + en
+	if zh != "":
+		return zh
+	return zh_or_mixed(en)
 
 
 ## Translate a key. Fallback chain: current locale -> the other locale -> the
@@ -80,10 +107,11 @@ func switch_label() -> String:
 func t(key: String, fallback: String = "") -> String:
 	var e: Variant = _t.get(key, null)
 	if e is Dictionary:
-		var v := String(e.get(locale, ""))
-		if v != "":
-			return v
-		var other := String(e.get("en" if locale == "zh" else "zh", ""))
-		if other != "":
-			return other
-	return fallback if fallback != "" else key
+		var zh := String(e.get("zh", ""))
+		var en := String(e.get("en", ""))
+		if locale == "zh":
+			if zh != "":
+				return zh
+			return zh_or_mixed(en if en != "" else fallback)
+		return bilingual(zh, en if en != "" else fallback)
+	return zh_or_mixed(fallback if fallback != "" else key)

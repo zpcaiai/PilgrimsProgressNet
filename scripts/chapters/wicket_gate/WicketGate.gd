@@ -30,7 +30,7 @@ func _build_procedural() -> void:
 	make_npc("Goodwill", Vector3(0, 0, -26), Color(0.9, 0.85, 0.65), "", "")
 
 	# The knock interaction sits at the gate.
-	make_interactable(Vector3(0, 0, -21), "Knock at the gate",
+	make_interactable(Vector3(0, 0, -21), "叩窄门 (Knock)",
 		func(_p): DialogueManager.start_dialogue("wicket_gate_knock"),
 		null, Color(0.7, 0.6, 0.4), 0.0, 2.0)
 
@@ -50,5 +50,5 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 		if _arrows != null:
 			_arrows.active = false
 		QuestManager.update_quest_progress("enter_gate")
-		EventBus.toast("Goodwill draws you through; accusation stops at the threshold.")
+		EventBus.toast("善意把你拉进门内；控告停在门槛之外。")
 		_advance_after_delay()

@@ -30,7 +30,7 @@ func _build_procedural() -> void:
 	gate_light.omni_range = 40.0
 	add_child(gate_light)
 
-	make_floating_label("The Celestial City", Vector3(0, 11, -30), Color(1.0, 0.97, 0.82))
+	make_floating_label("天城 The Celestial City", Vector3(0, 11, -30), Color(1.0, 0.97, 0.82))
 
 	# Those who walked with you, waiting at the gate to welcome you in.
 	make_npc("Evangelist", Vector3(-3, 0, -27), Color(0.85, 0.82, 0.7))
@@ -54,16 +54,16 @@ func _arrive() -> void:
 	GameState.set_flag("entered_city", true)
 	QuestManager.update_quest_progress("enter_celestial_city")
 	ChapterManager.complete_chapter("celestial_city")
-	EventBus.toast("The gates open, and those who walked with you turn to welcome you home.")
+	EventBus.toast("城门打开，曾与你同行的人转身欢迎你回家。")
 	await get_tree().create_timer(2.6).timeout
 	if GameState.has_flag("interpreter_full"):
-		EventBus.toast("The Interpreter is among them: 'You looked at every lamp in my house. Now you stand in the Light they were lit from.'")
+		EventBus.toast("讲解者也在其中：“你看过我屋里的每盏灯。如今你站在点燃那些灯的光里。”")
 		await get_tree().create_timer(3.0).timeout
 	if GameState.has_flag("chapel_pilgrim"):
-		EventBus.toast("A Shepherd smiles: 'You knelt at the wayside chapels no one saw you enter. Heaven kept every one. Welcome.'")
+		EventBus.toast("一位牧人微笑：“你曾跪在无人看见的小堂里。天上记得每一次。欢迎你。”")
 		await get_tree().create_timer(3.0).timeout
-	EventBus.toast("You did not arrive by your own strength, but were carried by grace — every step held.")
+	EventBus.toast("你不是靠自己的力量抵达，而是被恩典托住：每一步都蒙保守。")
 	await get_tree().create_timer(3.0).timeout
-	EventBus.toast("The burden is long gone. The journey is finished. Enter into rest.")
+	EventBus.toast("重担早已远去。旅程已经完成。进入安息吧。")
 	await get_tree().create_timer(2.8).timeout
 	EventBus.demo_completed.emit()

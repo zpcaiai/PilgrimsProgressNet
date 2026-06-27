@@ -25,7 +25,7 @@ func _on_enter(body: Node) -> void:
 	_used = true
 	GameState.set_flag("used_prayer_light", true)
 	SpiritualStateManager.apply_effects({"fear": -10, "hope": 5, "watchfulness": 5})
-	EventBus.toast("You stop and pray. A small light steadies the path: one step is enough.")
+	EventBus.toast("你停下祷告。微光稳住道路：先走下一步就够了。")
 	var parent := get_parent()
 	if parent != null:
 		PrayerLight.activate(parent, global_position)

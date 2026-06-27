@@ -88,7 +88,7 @@ func take_hit(effects: Dictionary, _source_type: String) -> void:
 
 
 func _stagger() -> void:
-	EventBus.toast("Your resolve breaks for a moment, but collapse is not the end.")
+	EventBus.toast("你的定力暂时破碎，但跌倒不是终点。")
 	# Despair surges; if it reaches 100 the collapse/repentance flow fires.
 	SpiritualStateManager.modify_state("despair", 10)
 	resolve = max_resolve * 0.5
@@ -115,28 +115,30 @@ func light_attack() -> void:
 	if e:
 		e.receive_counter("light_attack", 12.0)
 		Juice.shake(0.18)
-		EventBus.toast("You press the truth in — keep at it, and answer with a promise (U).")
+		EventBus.toast("你按住真理继续站稳。键盘按 U 使用应许；移动版点「应许」回应。")
 
 
 func dodge() -> void:
 	if _player and _player.has_method("teleport"):
 		var back := -_player.global_transform.basis.z
 		_player.global_position += Vector3(back.x, 0, back.z).normalized() * 2.0
-	EventBus.toast("You step aside and refuse panic's command.")
+	EventBus.toast("你侧身避开，不让慌乱发号施令。")
 
 
 func faith_guard() -> void:
 	guarding = true
-	EventBus.toast("You stand firm beneath the promise.")
+	EventBus.toast("你在应许下站稳。")
 
 
 func use_promise() -> void:
 	if promise_charge <= 0:
-		EventBus.toast("No promise is ready on your lips. Stand firm, and remember.")
+		EventBus.toast("此刻还没有想起可回应的应许。先站稳、祷告或回想经文。")
 		return
 	promise_charge -= 1
 	var e := _nearest_enemy(8.0)
+	var trial_type := "deception"
 	if e:
+		trial_type = e.enemy_type
 		e.receive_counter("promise", 30.0)
 		Juice.shake(0.45)
 		Juice.hitstop(0.07)
@@ -146,13 +148,17 @@ func use_promise() -> void:
 			"despair": SpiritualStateManager.apply_effects({"despair": -25, "hope": 5})
 			"fear": SpiritualStateManager.apply_effects({"fear": -20, "faith": 5})
 			_: SpiritualStateManager.apply_effects({"deception": -20, "discernment": 5})
-	EventBus.toast("You answer the lie with a promise stronger than shame.")
+	var card := ScriptureMemory.use_for_trial(trial_type)
+	if card.is_empty():
+		EventBus.toast("你用应许回应谎言：真理比控告更有分量。")
+	else:
+		EventBus.toast("你用经文回应：%s｜%s" % [String(card.get("ref", "")), String(card.get("theme_zh", card.get("theme_en", "")))])
 	emit_signal("stats_changed")
 
 
 func pray() -> void:
 	if prayer_cooldown > 0.0:
-		EventBus.toast("Your breath is not ready for another prayer yet.")
+		EventBus.toast("还需要片刻安静，才能再次祷告。")
 		return
 	prayer_cooldown = PRAYER_CD
 	SpiritualStateManager.apply_effects({"fear": -10, "despair": -10, "hope": 5})
@@ -170,7 +176,8 @@ func pray() -> void:
 			if away.length() < 6.0:
 				foe.global_position += away.normalized() * 2.5
 				foe.receive_counter("prayer", 6.0)
-	EventBus.toast("You pray, and light opens where fear had crowded close.")
+	var remembered := ScriptureMemory.recall_current_chapter()
+	EventBus.toast(ScriptureMemory.recall_line(remembered))
 	emit_signal("stats_changed")
 
 

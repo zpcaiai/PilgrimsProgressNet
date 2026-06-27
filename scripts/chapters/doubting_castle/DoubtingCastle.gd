@@ -30,19 +30,19 @@ func _build_procedural() -> void:
 	# The key called Promise — sometimes already in the pilgrim's bosom.
 	if SpiritualStateManager.has_promise_key:
 		GameState.set_flag("found_promise_key", true)
-		EventBus.toast("You feel the key called Promise near your heart; despair had made you forget it.")
+		EventBus.toast("你摸到心口旁那把名叫“应许”的钥匙；绝望曾使你忘记它。")
 	else:
 		var _cb1 := func(_p):
 			SpiritualStateManager.has_promise_key = true
 			GameState.set_flag("found_promise_key", true)
 			QuestManager.update_quest_progress("escape_doubting_castle")
-			EventBus.toast("In your own breast pocket: Promise, waiting where despair told you not to look.")
-		make_interactable(Vector3(-2.8, 0, 2), "Search the cell",
+			EventBus.toast("就在你自己的胸袋里：应许一直等在那里，正是绝望叫你不要寻找的地方。")
+		make_interactable(Vector3(-2.8, 0, 2), "搜寻牢房 (Search)",
 			_cb1, null, Color(0.85, 0.8, 0.5), 0.8, 1.2, true)
 
 	# The locked door.
-	make_floating_label("Locked Door — Promise fits", Vector3(0, 4, -4), Color(0.8, 0.7, 0.6))
-	make_interactable(Vector3(0, 0, -4.6), "Unlock the door with Promise",
+	make_floating_label("锁门：应许能打开", Vector3(0, 4, -4), Color(0.8, 0.7, 0.6))
+	make_interactable(Vector3(0, 0, -4.6), "用应许开门 (Unlock)",
 		func(_p): _try_door(door), null, Color(0.3, 0.28, 0.24), 0.0, 1.6, false)
 
 	# Giant Despair prowls the hall beyond the cell.
@@ -77,11 +77,11 @@ func _process(delta: float) -> void:
 
 func _try_door(door: Node) -> void:
 	if not GameState.has_flag("found_promise_key"):
-		EventBus.toast("The door will not give to force. Remember the key called Promise.")
+		EventBus.toast("这门不能靠蛮力打开。记起那把名叫“应许”的钥匙。")
 		return
 	if is_instance_valid(door):
 		door.queue_free()
 	GameState.set_flag("escaped_castle", true)
 	QuestManager.update_quest_progress("escape_doubting_castle")
-	EventBus.toast("The lock turns easily. What despair called final opens into clean air.")
+	EventBus.toast("锁轻易转开。绝望称为终局的地方，竟通向清新的空气。")
 	_advance_after_delay()

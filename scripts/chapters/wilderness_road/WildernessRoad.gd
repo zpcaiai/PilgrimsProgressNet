@@ -21,7 +21,7 @@ func _build_procedural() -> void:
 	# The doomed city behind, the light ahead.
 	make_decor(Vector3(30, 10, 1), Color(0.3, 0.12, 0.1), Vector3(0, 5, 16), 0.6)
 	make_distant_light(Vector3(0, 5, -42))
-	make_floating_label("The ground will test the heart", Vector3(0, 3.2, -30), Color(0.8, 0.85, 0.7))
+	make_floating_label("脚下的地会试验内心", Vector3(0, 3.2, -30), Color(0.8, 0.85, 0.7))
 
 	make_npc("Obstinate", Vector3(2.5, 0, -6), Color(0.45, 0.4, 0.35), "obstinate_road")
 	make_npc("Pliable", Vector3(-2.5, 0, -16), Color(0.6, 0.7, 0.5), "pliable_doubting")
@@ -33,6 +33,6 @@ func _build_procedural() -> void:
 	var _cb1 := func(_b):
 		GameState.set_flag("entered_slough", true)
 		QuestManager.update_quest_progress("cross_wilderness")
-		EventBus.toast("The ground softens, and the first deep discouragement opens underfoot.")
+		EventBus.toast("脚下的地变软，第一处深深的灰心在你脚下裂开。")
 		_advance_after_delay()
 	make_trigger(Vector3(0, 1.5, -40), Vector3(12, 4, 2), _cb1, false)

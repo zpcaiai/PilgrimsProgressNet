@@ -4,7 +4,8 @@ extends CanvasLayer
 ## physical keyboard. Every button injects the matching InputEventKey (keycode +
 ## physical_keycode), so it drives the exact same handlers the keyboard does:
 ##   WASD = move_* actions · Space = jump · E = interact / advance dialogue
-##   1-4  = dialogue choices · C = heart · Tab = map · Esc = pause
+##   J/K/L/U/P = combat actions · 1-4 = dialogue choices · C = heart · Tab = map · Esc = pause.
+## Labels use player-facing touch words; the keyboard events are an internal bridge.
 ## Self-building, responsive (lays out from the viewport size), full multitouch
 ## (hold a direction + tap an action). Only active when a touchscreen is present.
 ## Playable in both portrait and landscape: the pad lays out from the viewport size.
@@ -20,13 +21,15 @@ const CHOICE_R := 0.044
 const KEYS := {
 	"W": KEY_W, "A": KEY_A, "S": KEY_S, "D": KEY_D,
 	"SPACE": KEY_SPACE, "E": KEY_E,
+	"J": KEY_J, "K": KEY_K, "L": KEY_L, "U": KEY_U, "P": KEY_P,
 	"C": KEY_C, "TAB": KEY_TAB, "ESC": KEY_ESCAPE,
 	"1": KEY_1, "2": KEY_2, "3": KEY_3, "4": KEY_4,
 }
 const LABELS := {
 	"W": "W", "A": "A", "S": "S", "D": "D",
-	"SPACE": "跳", "E": "用",
-	"C": "心", "TAB": "图", "ESC": "退",
+	"SPACE": "跳跃", "E": "互动",
+	"J": "攻击", "K": "闪避", "L": "站稳", "U": "应许", "P": "祷告",
+	"C": "心境", "TAB": "地图", "ESC": "暂停",
 	"1": "1", "2": "2", "3": "3", "4": "4",
 }
 
@@ -149,10 +152,15 @@ func _btn_ids() -> Array:
 		return []
 	var paused := get_tree().paused
 	var out: Array = []
+	if _dialogue and not paused:
+		out.append("ESC")
+		return out
 	if not paused and not _locked:
 		out.append_array(["W", "A", "S", "D", "SPACE"])
 	if not paused:
 		out.append("E")               # E also advances dialogue
+		if not _locked:
+			out.append_array(["J", "K", "L", "U", "P"])
 		out.append_array(["C", "TAB"])
 		if _dialogue and _choices > 0:
 			for i in range(min(_choices, 4)):
@@ -188,6 +196,15 @@ func _layout() -> Dictionary:
 	# Action buttons, bottom-right
 	out["SPACE"] = {"center": Vector2(s.x - m - ar, s.y - m - ar), "radius": ar}
 	out["E"] = {"center": Vector2(s.x - m - ar * 2.6, s.y - m - ar * 0.45), "radius": ar * 0.86}
+	var combat_r := ar * 0.58
+	var combat_y := s.y - m - ar * 2.55
+	var combat_x := s.x - m - combat_r
+	var combat_gap := combat_r * 2.22
+	out["P"] = {"center": Vector2(combat_x, combat_y), "radius": combat_r}
+	out["U"] = {"center": Vector2(combat_x - combat_gap, combat_y), "radius": combat_r}
+	out["L"] = {"center": Vector2(combat_x - combat_gap * 2.0, combat_y), "radius": combat_r}
+	out["K"] = {"center": Vector2(combat_x - combat_gap * 3.0, combat_y), "radius": combat_r}
+	out["J"] = {"center": Vector2(combat_x - combat_gap * 4.0, combat_y), "radius": combat_r}
 	# Utility, top-right row
 	var ey := m + ur
 	out["ESC"] = {"center": Vector2(s.x - m - ur, ey), "radius": ur}
@@ -296,6 +313,8 @@ func _draw_button(pad: Control, c: Vector2, r: float, label: String, on: bool) -
 	if get_tree().root.theme and get_tree().root.theme.default_font:
 		f = get_tree().root.theme.default_font
 	var fs := int(r * 0.95)
+	while fs > 10 and f.get_string_size(label, HORIZONTAL_ALIGNMENT_CENTER, -1, fs).x > r * 1.64:
+		fs -= 1
 	var ts := f.get_string_size(label, HORIZONTAL_ALIGNMENT_CENTER, -1, fs)
 	pad.draw_string(f, c + Vector2(-ts.x * 0.5, ts.y * 0.32), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.96, 0.95, 0.9, 0.95 if on else 0.8))
 

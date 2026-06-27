@@ -10,6 +10,10 @@ var _faith_bar: ProgressBar
 var _hope_bar: ProgressBar
 var _despair_bar: ProgressBar
 var _weariness_bar: ProgressBar
+var _humility_bar: ProgressBar
+var _watchfulness_bar: ProgressBar
+var _fear_bar: ProgressBar
+var _shame_bar: ProgressBar
 var _load_label: Label
 var _burden_label: Label
 var _prompt_label: Label
@@ -17,9 +21,12 @@ var _toast_label: Label
 var _toast_timer: float = 0.0
 var _stat_labels: Array = []
 var _lang_btn: Button
+var _quest_panel: Panel
+var _spiritual_panel: Panel
 
 # Dialogue
 var _dialogue_panel: Panel
+var _dialogue_hbox: HBoxContainer
 var _portrait: TextureRect
 var _speaker_label: Label
 var _text_label: RichTextLabel
@@ -31,10 +38,16 @@ var _grace_anim: AnimatedSprite2D
 
 const FONT_TITLE := 22
 const FONT_BODY := 18
+const MOBILE_FONT_TITLE := 30
+const MOBILE_FONT_BODY := 24
+const MOBILE_FONT_DIALOGUE := 28
+const MOBILE_FONT_CHOICE := 25
+const MOBILE_FONT_NARRATION := 26
 
 # Title card
 var _title_card: Control
 var _title_bg: TextureRect
+var _title_center: CenterContainer
 var _title_main: Label
 var _title_sub: Label
 
@@ -68,6 +81,8 @@ func _ready() -> void:
 	_build_grace_anim()
 	_connect_signals()
 	_build_lang_toggle()
+	get_viewport().size_changed.connect(_apply_responsive_layout)
+	_apply_responsive_layout()
 	_refresh_quest()
 
 
@@ -104,6 +119,172 @@ func _panel_style(bg: Color) -> StyleBoxFlat:
 	return s
 
 
+func _viewport_size() -> Vector2:
+	return get_viewport().get_visible_rect().size
+
+
+func _is_mobile_ui() -> bool:
+	var s := _viewport_size()
+	return DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
+
+
+func _body_font() -> int:
+	return MOBILE_FONT_BODY if _is_mobile_ui() else FONT_BODY
+
+
+func _title_font() -> int:
+	return MOBILE_FONT_TITLE if _is_mobile_ui() else FONT_TITLE
+
+
+func _dialogue_font() -> int:
+	return MOBILE_FONT_DIALOGUE if _is_mobile_ui() else FONT_BODY
+
+
+func _choice_font() -> int:
+	return MOBILE_FONT_CHOICE if _is_mobile_ui() else FONT_BODY
+
+
+func _show_dialogue_portrait() -> bool:
+	var s := _viewport_size()
+	return not _is_mobile_ui() or s.x >= 900.0
+
+
+func _set_bottom_wide_rect(control: Control, left: float, bottom: float, width: float, height: float) -> void:
+	var s := _viewport_size()
+	control.offset_left = left
+	control.offset_right = left + width - s.x
+	control.offset_top = -bottom - height
+	control.offset_bottom = -bottom
+
+
+func _apply_responsive_layout() -> void:
+	var s := _viewport_size()
+	var mobile := _is_mobile_ui()
+	var portrait := s.x < s.y
+	var body := _body_font()
+	var title := _title_font()
+	var dialogue := _dialogue_font()
+
+	if is_instance_valid(_quest_panel):
+		if mobile and portrait:
+			_quest_panel.position = Vector2(16, 16)
+			_quest_panel.size = Vector2(maxf(320.0, s.x - 32.0), 156)
+		elif mobile:
+			_quest_panel.position = Vector2(16, 16)
+			_quest_panel.size = Vector2(minf(460.0, s.x * 0.45), 156)
+		else:
+			_quest_panel.position = Vector2(20, 20)
+			_quest_panel.size = Vector2(340, 134)
+	if is_instance_valid(_quest_label):
+		_quest_label.add_theme_font_size_override("normal_font_size", body)
+
+	if is_instance_valid(_spiritual_panel):
+		if mobile and portrait:
+			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+			_spiritual_panel.position = Vector2(16, 184)
+			_spiritual_panel.size = Vector2(maxf(320.0, s.x - 32.0), 330)
+		elif mobile:
+			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+			_spiritual_panel.position = Vector2(-346, 76)
+			_spiritual_panel.size = Vector2(330, 330)
+		else:
+			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+			_spiritual_panel.position = Vector2(-272, 20)
+			_spiritual_panel.size = Vector2(252, 270)
+	for lbl in _stat_labels:
+		if is_instance_valid(lbl):
+			lbl.custom_minimum_size = Vector2(104 if mobile else 70, 0)
+			lbl.add_theme_font_size_override("font_size", body)
+	for bar in [_faith_bar, _hope_bar, _humility_bar, _watchfulness_bar, _despair_bar, _fear_bar, _shame_bar, _weariness_bar]:
+		if is_instance_valid(bar):
+			bar.custom_minimum_size = Vector2(170 if mobile else 120, 20 if mobile else 16)
+	if is_instance_valid(_burden_label):
+		_burden_label.add_theme_font_size_override("font_size", body)
+	if is_instance_valid(_load_label):
+		_load_label.add_theme_font_size_override("font_size", body)
+
+	if is_instance_valid(_prompt_label):
+		_prompt_label.add_theme_font_size_override("font_size", title)
+		var prompt_w := minf(520.0, s.x - 48.0)
+		_prompt_label.position = Vector2(-prompt_w * 0.5, -210 if mobile else -180)
+		_prompt_label.size = Vector2(prompt_w, 54 if mobile else 40)
+	if is_instance_valid(_toast_label):
+		_toast_label.add_theme_font_size_override("font_size", body)
+		var toast_w := minf(760.0, s.x - 48.0)
+		_toast_label.position = Vector2(-toast_w * 0.5, 116 if mobile else 130)
+		_toast_label.size = Vector2(toast_w, 58 if mobile else 30)
+		_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+	if is_instance_valid(_dialogue_panel):
+		if mobile:
+			var dialog_w := maxf(320.0, s.x - 48.0)
+			var dialog_h := clampf(s.y * 0.42, 300.0, 380.0)
+			_set_bottom_wide_rect(_dialogue_panel, 24.0, 64.0, dialog_w, dialog_h)
+		else:
+			_set_bottom_wide_rect(_dialogue_panel, 120.0, 30.0, 1040.0, 230.0)
+	if is_instance_valid(_dialogue_hbox):
+		_dialogue_hbox.add_theme_constant_override("separation", 10 if mobile else 16)
+	if is_instance_valid(_portrait):
+		_portrait.custom_minimum_size = Vector2(128, 128) if mobile else Vector2(168, 168)
+		if not _show_dialogue_portrait():
+			_portrait.visible = false
+	if is_instance_valid(_speaker_label):
+		_speaker_label.add_theme_font_size_override("font_size", title)
+	if is_instance_valid(_text_label):
+		_text_label.add_theme_font_size_override("normal_font_size", dialogue)
+		_text_label.custom_minimum_size = Vector2(0, 120 if mobile else 60)
+	if is_instance_valid(_choice_box):
+		_choice_box.add_theme_constant_override("separation", 8 if mobile else 4)
+		for child in _choice_box.get_children():
+			if child is Button:
+				(child as Button).add_theme_font_size_override("font_size", _choice_font())
+				(child as Button).custom_minimum_size = Vector2(0, 48 if mobile else 0)
+
+	if is_instance_valid(_title_center):
+		var title_w := minf(s.x - 48.0, 760.0) if mobile else 600.0
+		var title_h := 230.0 if mobile else 160.0
+		_title_center.position = Vector2(-title_w * 0.5, -title_h * 0.5)
+		_title_center.size = Vector2(title_w, title_h)
+	if is_instance_valid(_title_main):
+		_title_main.add_theme_font_size_override("font_size", 44 if mobile else 40)
+		_title_main.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if is_instance_valid(_title_sub):
+		_title_sub.add_theme_font_size_override("font_size", 28 if mobile else 22)
+		_title_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+	if is_instance_valid(_narration_panel):
+		if mobile:
+			var narr_w := maxf(320.0, s.x - 56.0)
+			_narration_panel.position = Vector2(-narr_w * 0.5, 8)
+			_narration_panel.size = Vector2(narr_w, 150)
+		else:
+			_narration_panel.position = Vector2(-420, 40)
+			_narration_panel.size = Vector2(840, 90)
+	if is_instance_valid(_narration_label):
+		_narration_label.add_theme_font_size_override("normal_font_size", MOBILE_FONT_NARRATION if mobile else 21)
+
+	if is_instance_valid(_char_panel):
+		if mobile:
+			var cw := minf(s.x - 48.0, 620.0)
+			var ch := minf(s.y - 96.0, 560.0)
+			_char_panel.position = Vector2(-cw * 0.5, -ch * 0.5)
+			_char_panel.size = Vector2(cw, ch)
+			_char_label.fit_content = false
+			_char_label.scroll_active = true
+		else:
+			_char_panel.position = Vector2(-230, -210)
+			_char_panel.size = Vector2(460, 420)
+			_char_label.fit_content = true
+			_char_label.scroll_active = false
+	if is_instance_valid(_char_label):
+		_char_label.add_theme_font_size_override("normal_font_size", body)
+
+	if is_instance_valid(_lang_btn):
+		_lang_btn.add_theme_font_size_override("font_size", 18 if mobile else 14)
+		_lang_btn.position = Vector2(16 if mobile else 20, -54 if mobile else -40)
+		_lang_btn.custom_minimum_size = Vector2(86, 42) if mobile else Vector2.ZERO
+
+
 func _build_darkness() -> void:
 	_darkness_overlay = ColorRect.new()
 	_darkness_overlay.color = Color(0.02, 0.0, 0.05, 0.0)
@@ -113,37 +294,41 @@ func _build_darkness() -> void:
 
 
 func _build_quest_tracker() -> void:
-	var panel := Panel.new()
-	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.05, 0.05, 0.09, 0.65)))
-	panel.position = Vector2(20, 20)
-	panel.size = Vector2(330, 90)
-	add_child(panel)
+	_quest_panel = Panel.new()
+	_quest_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.05, 0.05, 0.09, 0.65)))
+	_quest_panel.position = Vector2(20, 20)
+	_quest_panel.size = Vector2(340, 134)
+	add_child(_quest_panel)
 	_quest_label = RichTextLabel.new()
 	_quest_label.bbcode_enabled = true
 	_quest_label.fit_content = true
 	_quest_label.scroll_active = false
 	_quest_label.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_quest_label.add_theme_font_size_override("normal_font_size", FONT_BODY)
-	panel.add_child(_quest_label)
+	_quest_panel.add_child(_quest_label)
 
 
 func _build_spiritual_panel() -> void:
-	var panel := Panel.new()
-	panel.add_theme_stylebox_override("panel", _panel_style(Color(0.05, 0.05, 0.09, 0.65)))
-	panel.size = Vector2(240, 150)
-	panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	panel.position = Vector2(-260, 20)
-	add_child(panel)
+	_spiritual_panel = Panel.new()
+	_spiritual_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.05, 0.05, 0.09, 0.65)))
+	_spiritual_panel.size = Vector2(252, 270)
+	_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_spiritual_panel.position = Vector2(-272, 20)
+	add_child(_spiritual_panel)
 
 	var vb := VBoxContainer.new()
 	vb.set_anchors_preset(Control.PRESET_FULL_RECT)
 	vb.add_theme_constant_override("separation", 6)
-	panel.add_child(vb)
+	_spiritual_panel.add_child(vb)
 
-	_faith_bar = _add_stat_row(vb, "hud.faith", "Faith", Color(0.95, 0.85, 0.4))
-	_hope_bar = _add_stat_row(vb, "hud.hope", "Hope", Color(0.45, 0.8, 0.95))
-	_despair_bar = _add_stat_row(vb, "hud.despair", "Despair", Color(0.55, 0.35, 0.6))
-	_weariness_bar = _add_stat_row(vb, "hud.weariness", "Weariness", Color(0.6, 0.55, 0.4))
+	_faith_bar = _add_stat_row(vb, "hud.faith", "信心 Faith", Color(0.95, 0.85, 0.4))
+	_hope_bar = _add_stat_row(vb, "hud.hope", "盼望 Hope", Color(0.45, 0.8, 0.95))
+	_humility_bar = _add_stat_row(vb, "hud.humility", "谦卑 Humility", Color(0.55, 0.8, 0.5))
+	_watchfulness_bar = _add_stat_row(vb, "hud.watchfulness", "警醒 Vigilance", Color(0.5, 0.7, 0.95))
+	_despair_bar = _add_stat_row(vb, "hud.despair", "绝望 Despair", Color(0.6, 0.35, 0.62))
+	_fear_bar = _add_stat_row(vb, "hud.fear", "惧怕 Fear", Color(0.82, 0.42, 0.46))
+	_shame_bar = _add_stat_row(vb, "hud.shame", "羞愧 Shame", Color(0.72, 0.46, 0.36))
+	_weariness_bar = _add_stat_row(vb, "hud.weariness", "疲惫 Weariness", Color(0.6, 0.55, 0.4))
 
 	_burden_label = Label.new()
 	_burden_label.add_theme_font_size_override("font_size", FONT_BODY)
@@ -224,15 +409,14 @@ func _build_dialogue() -> void:
 	_dialogue_panel = Panel.new()
 	_dialogue_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.04, 0.04, 0.08, 0.92)))
 	_dialogue_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	_dialogue_panel.position = Vector2(120, -260)
-	_dialogue_panel.size = Vector2(1040, 230)
+	_set_bottom_wide_rect(_dialogue_panel, 120.0, 30.0, 1040.0, 230.0)
 	_dialogue_panel.visible = false
 	add_child(_dialogue_panel)
 
-	var hb := HBoxContainer.new()
-	hb.set_anchors_preset(Control.PRESET_FULL_RECT)
-	hb.add_theme_constant_override("separation", 16)
-	_dialogue_panel.add_child(hb)
+	_dialogue_hbox = HBoxContainer.new()
+	_dialogue_hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_dialogue_hbox.add_theme_constant_override("separation", 16)
+	_dialogue_panel.add_child(_dialogue_hbox)
 
 	# Optional speaker portrait (hidden when no art exists for the speaker).
 	_portrait = TextureRect.new()
@@ -240,12 +424,12 @@ func _build_dialogue() -> void:
 	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_portrait.visible = false
-	hb.add_child(_portrait)
+	_dialogue_hbox.add_child(_portrait)
 
 	var vb := VBoxContainer.new()
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_theme_constant_override("separation", 8)
-	hb.add_child(vb)
+	_dialogue_hbox.add_child(vb)
 
 	_speaker_label = Label.new()
 	_speaker_label.add_theme_font_size_override("font_size", FONT_TITLE)
@@ -288,14 +472,14 @@ func _build_title_card() -> void:
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_title_card.add_child(dim)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_CENTER)
-	center.position = Vector2(-300, -80)
-	center.size = Vector2(600, 160)
-	_title_card.add_child(center)
+	_title_center = CenterContainer.new()
+	_title_center.set_anchors_preset(Control.PRESET_CENTER)
+	_title_center.position = Vector2(-300, -80)
+	_title_center.size = Vector2(600, 160)
+	_title_card.add_child(_title_center)
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 6)
-	center.add_child(vb)
+	_title_center.add_child(vb)
 	_title_main = Label.new()
 	_title_main.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title_main.add_theme_font_size_override("font_size", 40)
@@ -331,6 +515,8 @@ func _on_chapter_started(chapter_id: String) -> void:
 	if not intro.is_empty():
 		_pending_intro = intro.duplicate()
 		_intro_delay = 3.4
+	# Refresh the objective/story panel so the new chapter's header + goal show at once.
+	_refresh_quest()
 
 
 # ---------------------------------------------------------------------------
@@ -464,7 +650,8 @@ func _toggle_char_panel() -> void:
 func _refresh_char_panel() -> void:
 	var s := SpiritualStateManager
 	var mode_label := LocaleManager.t("char.mode_child", "Children's Journey") if GameState.is_child_mode() else LocaleManager.t("char.mode_devout", "Devout Journey")
-	var t := "[b]" + LocaleManager.t("char.title", "The Pilgrim's Heart") + "[/b]   [color=#888888]" + LocaleManager.t("char.close_hint", "(C to close)") + "[/color]\n"
+	var close_hint := LocaleManager.t("char.close_hint_touch", "再次点「心境」关闭") if _is_mobile_ui() else LocaleManager.t("char.close_hint", "(C to close)")
+	var t := "[b]" + LocaleManager.t("char.title", "The Pilgrim's Heart") + "[/b]   [color=#888888]" + close_hint + "[/color]\n"
 	t += "[color=#9aa6c0]" + mode_label + "[/color]\n\n"
 	t += "[color=#f0e0a0]" + LocaleManager.t("char.graces", "Graces") + "[/color]\n"
 	t += "  %s %d   %s %d   %s %d\n" % [LocaleManager.t("hud.faith","Faith"), s.faith, LocaleManager.t("hud.hope","Hope"), s.hope, LocaleManager.t("hud.humility","Humility"), s.humility]
@@ -493,7 +680,11 @@ func _process(delta: float) -> void:
 	if is_instance_valid(_faith_bar):
 		_faith_bar.value = SpiritualStateManager.faith
 		_hope_bar.value = SpiritualStateManager.hope
+		_humility_bar.value = SpiritualStateManager.humility
+		_watchfulness_bar.value = SpiritualStateManager.watchfulness
 		_despair_bar.value = SpiritualStateManager.despair
+		_fear_bar.value = SpiritualStateManager.fear
+		_shame_bar.value = SpiritualStateManager.shame
 		_weariness_bar.value = SpiritualStateManager.weariness
 		var load_pct := int(round(SpiritualStateManager.get_movement_penalty() * 100.0))
 		_load_label.text = (LocaleManager.t("hud.load_slower", "Load: %d%% slower") % load_pct) if load_pct > 0 else LocaleManager.t("hud.load_light", "Load: light")
@@ -523,14 +714,28 @@ func _process(delta: float) -> void:
 func _refresh_quest() -> void:
 	if not is_instance_valid(_quest_label):
 		return
+	if ChapterManager.current_chapter_id == "":
+		_quest_label.text = LocaleManager.t("hud.quest_quiet", "这条路一片安静。")
+		return
+	# Always lead with the current chapter (its story line) so every chapter shows
+	# a populated objective/story panel — then the active quest step, or the
+	# chapter's own goal when no quest is running.
+	var data: Dictionary = ChapterManager.get_current_chapter_data()
+	var ctitle := String(data.get("title", ""))
+	var header := ""
+	if ctitle != "":
+		var order := int(data.get("order", 0))
+		var num := ("第%d章 · " % order) if order > 0 else ""
+		header = "[b][color=#ffe6a8]%s%s[/color][/b]\n" % [num, ctitle]
 	var quest := QuestManager.get_primary_active_quest()
 	if quest.is_empty():
-		_quest_label.text = "[color=#aaaaaa]" + LocaleManager.t("hud.quest_quiet", "The road is quiet.") + "[/color]"
+		var sub := String(data.get("subtitle", ""))
+		var goal := sub if sub != "" else LocaleManager.t("hud.quest_quiet", "The road is quiet.")
+		_quest_label.text = header + "[color=#cfcfe0]" + goal + "[/color]"
 		return
 	var qid := String(quest.get("id", ""))
 	var step := QuestManager.get_next_incomplete_step_text(qid)
-	var t := "[b]%s[/b]\n[color=#cfcfe0]%s[/color]" % [String(quest.get("title", "")), step]
-	_quest_label.text = t
+	_quest_label.text = header + "[b]%s[/b]\n[color=#cfcfe0]%s[/color]" % [String(quest.get("title", "")), step]
 
 
 # ---------------------------------------------------------------------------
@@ -539,7 +744,8 @@ func _refresh_quest() -> void:
 func _on_interaction_available(_id: String, prompt: String) -> void:
 	if DialogueManager.is_active():
 		return
-	_prompt_label.text = "[E]  " + prompt
+	var prefix := "点「互动」  " if _is_mobile_ui() else "[E]  "
+	_prompt_label.text = prefix + LocaleManager.zh_or_mixed(prompt)
 	_prompt_label.visible = true
 
 
@@ -569,7 +775,7 @@ func _on_dialogue_node(node: Dictionary) -> void:
 	_hide_prompt()
 	var spk := String(node.get("speaker", ""))
 	var pic := AssetLib.portrait(spk)
-	if pic != null:
+	if pic != null and _show_dialogue_portrait():
 		_portrait.texture = pic
 		_portrait.visible = true
 	else:
@@ -589,7 +795,9 @@ func _rebuild_choices() -> void:
 		var hint := DialogueManager.get_choice_effect_hint(choice)
 		btn.text = "%d.  %s%s" % [idx, String(choice.get("text", "")), ("    〔" + hint + "〕" if hint != "" else "")]
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		btn.add_theme_font_size_override("font_size", FONT_BODY)
+		btn.add_theme_font_size_override("font_size", _choice_font())
+		if _is_mobile_ui():
+			btn.custom_minimum_size = Vector2(0, 48)
 		var cid := String(choice.get("id", ""))
 		btn.pressed.connect(func(): _pick_choice(cid))
 		_choice_box.add_child(btn)
@@ -598,7 +806,9 @@ func _rebuild_choices() -> void:
 	if _current_choices.is_empty():
 		var btn := Button.new()
 		btn.text = LocaleManager.t("hud.continue", "(Continue)")
-		btn.add_theme_font_size_override("font_size", FONT_BODY)
+		btn.add_theme_font_size_override("font_size", _choice_font())
+		if _is_mobile_ui():
+			btn.custom_minimum_size = Vector2(0, 48)
 		btn.pressed.connect(func(): DialogueManager.end_dialogue())
 		_choice_box.add_child(btn)
 

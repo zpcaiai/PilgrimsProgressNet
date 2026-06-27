@@ -131,6 +131,12 @@ func _apply_choice(choice: Dictionary) -> void:
 		SpiritualStateManager.apply_effects(effects)
 	if choice.has("effects"):
 		SpiritualStateManager.apply_effects(choice["effects"])
+		for k in (choice["effects"] as Dictionary).keys():
+			if SpiritualStateManager.NUMERIC_STATES.has(k):
+				effects[k] = int(effects.get(k, 0)) + int(choice["effects"][k])
+	var value_feedback := ScriptureMemory.choice_feedback(effects)
+	if value_feedback != "":
+		EventBus.toast(value_feedback)
 	if choice.has("flags"):
 		for k in (choice["flags"] as Dictionary).keys():
 			GameState.set_flag(String(k), choice["flags"][k])
@@ -184,32 +190,26 @@ func _resolve_text_variant(node: Dictionary) -> Dictionary:
 
 
 ## Bilingual: when the locale is zh, swap in the node's text_zh / speaker_zh if
-## present. Dialogue JSON stays backward-compatible — untranslated nodes simply
-## keep their English text in both languages until a *_zh field is added.
+## present. Dialogue JSON stays backward-compatible; untranslated nodes are
+## clearly marked in Chinese instead of appearing as pure English.
 func _localize_node(node: Dictionary) -> Dictionary:
-	if not LocaleManager.is_zh():
-		return node
 	var copy := node.duplicate(true)
-	if node.has("text_zh") and String(node["text_zh"]) != "":
-		copy["text"] = String(node["text_zh"])
+	var en_text := String(node.get("text", ""))
+	var zh_text := String(node.get("text_zh", ""))
+	copy["text"] = (zh_text if zh_text != "" else LocaleManager.zh_or_mixed(en_text)) if LocaleManager.is_zh() else LocaleManager.bilingual(zh_text, en_text)
 	var spk := String(node.get("speaker", ""))
 	if spk != "":
 		# Per-node speaker_zh wins; otherwise the central npc.<name> table localizes it.
-		if node.has("speaker_zh") and String(node["speaker_zh"]) != "":
-			copy["speaker"] = String(node["speaker_zh"])
-		else:
-			copy["speaker"] = LocaleManager.t("npc." + spk, spk)
+		var spk_zh := String(node.get("speaker_zh", ""))
+		copy["speaker"] = spk_zh if spk_zh != "" and LocaleManager.is_zh() else LocaleManager.t("npc." + spk, spk)
 	return copy
 
 
 func _localize_choice(choice: Dictionary) -> Dictionary:
-	if not LocaleManager.is_zh():
-		return choice
-	var zh := String(choice.get("text_zh", ""))
-	if zh == "":
-		return choice
 	var c := choice.duplicate(true)
-	c["text"] = zh
+	var en := String(choice.get("text", ""))
+	var zh := String(choice.get("text_zh", ""))
+	c["text"] = (zh if zh != "" else LocaleManager.zh_or_mixed(en)) if LocaleManager.is_zh() else LocaleManager.bilingual(zh, en)
 	return c
 
 

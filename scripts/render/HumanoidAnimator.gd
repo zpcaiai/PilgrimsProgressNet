@@ -30,7 +30,7 @@ var swimming: bool = false      # when true, override the walk with a swim strok
 const WALK_FREQ := 7.5          # stride cadence (rad/s base)
 const IDLE_FREQ := 1.6
 const LEG_SWING := 0.5          # max hip swing (rad) at full stride (~29 deg)
-const ARM_SWING := 0.34
+const ARM_SWING := 0.58
 const KNEE_BEND := 0.85         # how far the swing-leg knee folds up (rad)
 const WALK_BOB := 0.05          # vertical bob per footfall (m, * height_scale)
 const IDLE_BOB := 0.01
@@ -129,8 +129,12 @@ func _process(delta: float) -> void:
 		hip_r.rotation.x = -swing * leg_amp
 	if is_instance_valid(arm_l):
 		arm_l.rotation.x = -swing * arm_amp
+		arm_l.rotation.y = lerpf(arm_l.rotation.y, 0.0, clampf(delta * 8.0, 0.0, 1.0))
+		arm_l.rotation.z = lerpf(arm_l.rotation.z, 0.0, clampf(delta * 8.0, 0.0, 1.0))
 	if is_instance_valid(arm_r):
 		arm_r.rotation.x = swing * arm_amp
+		arm_r.rotation.y = lerpf(arm_r.rotation.y, 0.0, clampf(delta * 8.0, 0.0, 1.0))
+		arm_r.rotation.z = lerpf(arm_r.rotation.z, 0.0, clampf(delta * 8.0, 0.0, 1.0))
 
 	# --- knees: the leg swinging FORWARD folds up so the foot clears the ground;
 	# the planted (rear) leg stays straight. Negative rotation tucks the shin back.

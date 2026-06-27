@@ -55,6 +55,7 @@ func _build_visual() -> void:
 	add_child(_fig)
 	_club = _make_club()
 	_fig.add_child(_club)
+	_add_ogre_features()
 
 	var label := Label3D.new()
 	label.text = "绝望巨人 / Giant Despair"
@@ -81,6 +82,77 @@ func _build_visual() -> void:
 	tcol.position = Vector3(0, 1.2, 0)
 	talk.add_child(tcol)
 	add_child(talk)
+
+
+## Brutish ogre features over the base figure — a heavy brow, a jutting tusked
+## jaw, and hunched shoulder/back humps — so Giant Despair reads as a monster,
+## not just a tall man. Attached to the figure's Body so they ride his motion.
+func _add_ogre_features() -> void:
+	var body: Node3D = _fig.get_node_or_null("Body")
+	if body == null:
+		return
+	var s := HEIGHT / 2.0
+	var head_y := 1.83 * s
+	var head_r := 0.16 * s
+	var shoulder_y := 1.58 * s
+	var hide := _ogre_mat(Color(0.15, 0.17, 0.22))
+	var tusk := _ogre_mat(Color(0.82, 0.78, 0.64))
+	# heavy brow ridge
+	var brow := MeshInstance3D.new()
+	var brow_m := BoxMesh.new()
+	brow_m.size = Vector3(head_r * 2.0, head_r * 0.5, head_r * 0.8)
+	brow.mesh = brow_m
+	brow.position = Vector3(0, head_y + head_r * 0.5, head_r * 0.6)
+	brow.material_override = hide
+	body.add_child(brow)
+	# jutting lower jaw
+	var jaw := MeshInstance3D.new()
+	var jaw_m := BoxMesh.new()
+	jaw_m.size = Vector3(head_r * 1.5, head_r * 0.7, head_r * 0.95)
+	jaw.mesh = jaw_m
+	jaw.position = Vector3(0, head_y - head_r * 0.7, head_r * 0.5)
+	jaw.material_override = hide
+	body.add_child(jaw)
+	# two tusks jutting up from the jaw
+	for sx in [-1.0, 1.0]:
+		var t := MeshInstance3D.new()
+		var tm := CylinderMesh.new()
+		tm.top_radius = 0.0
+		tm.bottom_radius = head_r * 0.16
+		tm.height = head_r * 0.7
+		t.mesh = tm
+		t.position = Vector3(sx * head_r * 0.5, head_y - head_r * 0.35, head_r * 0.72)
+		t.material_override = tusk
+		body.add_child(t)
+	# hunched shoulder humps + a heavy upper back
+	for sx in [-1.0, 1.0]:
+		var hump := MeshInstance3D.new()
+		var hm := SphereMesh.new()
+		hm.radius = head_r
+		hm.height = head_r * 2.0
+		hump.mesh = hm
+		hump.position = Vector3(sx * 0.62 * s, shoulder_y + 0.05 * s, -0.05 * s)
+		hump.material_override = hide
+		body.add_child(hump)
+	var back := MeshInstance3D.new()
+	var bm := SphereMesh.new()
+	bm.radius = head_r * 1.3
+	bm.height = head_r * 2.6
+	back.mesh = bm
+	back.position = Vector3(0, shoulder_y - 0.05 * s, -0.22 * s)
+	back.scale = Vector3(1.2, 1.0, 0.9)
+	back.material_override = hide
+	body.add_child(back)
+
+
+func _ogre_mat(c: Color) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = c
+	m.roughness = 0.85
+	m.emission_enabled = true
+	m.emission = c
+	m.emission_energy_multiplier = 0.35
+	return m
 
 
 ## A crude, heavy club resting against the right shoulder (knotted head + haft),

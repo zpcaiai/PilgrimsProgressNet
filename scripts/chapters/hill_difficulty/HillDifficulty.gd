@@ -18,8 +18,8 @@ func _build_procedural() -> void:
 
 	# Signposts at the three corridor mouths (the base, z > 0, is open so you
 	# can walk to any of them and choose).
-	make_floating_label("Danger →", Vector3(-12, 2.6, -1), Color(0.6, 0.7, 0.95))
-	make_floating_label("Difficulty (true)", Vector3(0, 2.6, -1), Color(0.95, 0.95, 0.8))
+	make_floating_label("危险小路 Danger →", Vector3(-12, 2.6, -1), Color(0.6, 0.7, 0.95))
+	make_floating_label("艰难正路 Difficulty", Vector3(0, 2.6, -1), Color(0.95, 0.95, 0.8))
 	make_floating_label("← Destruction", Vector3(12, 2.6, -1), Color(0.95, 0.7, 0.5))
 
 	# Dividing walls between the three corridors (only for z < 0, so the base
@@ -34,14 +34,14 @@ func _build_procedural() -> void:
 	make_block(Vector3(11, 4, 1), Color(0.3, 0.34, 0.4), Vector3(-12, 2, -26))
 	var _cb1 := func(_b):
 		SpiritualStateManager.apply_effects({"deception": 10, "discernment": -4})
-		EventBus.toast("Danger hides its end in thorns and shadow. Turn back to the true path.")
+		EventBus.toast("危险小路把终点藏在荆棘与阴影里。回到真实的路上。")
 	make_trigger(Vector3(-12, 1.5, -22), Vector3(10, 4, 2), _cb1, true)
 
 	# Right: Destruction — wide, comfortable, ending in a sudden drop.
 	make_block(Vector3(11, 4, 1), Color(0.5, 0.4, 0.34), Vector3(12, 2, -26))
 	var _cb2 := func(_b):
 		SpiritualStateManager.apply_effects({"despair": 12, "weariness": 8})
-		EventBus.toast("Destruction stays wide until it breaks beneath you. Stagger back to truth.")
+		EventBus.toast("毁灭之路一直宽阔，直到它在脚下断裂。踉跄也要回到真理。")
 	make_trigger(Vector3(12, 1.5, -22), Vector3(10, 4, 2), _cb2, true)
 
 	# Middle: the true, steep way — slow going, with a tempting rest arbor.
@@ -50,7 +50,7 @@ func _build_procedural() -> void:
 	_decorate_paths()
 
 	make_distant_light(Vector3(0, 7, -44), Color(1.0, 0.95, 0.7))
-	make_floating_label("The Summit", Vector3(0, 4, -36), Color(1, 0.97, 0.8))
+	make_floating_label("山顶 The Summit", Vector3(0, 4, -36), Color(1, 0.97, 0.8))
 
 	make_wayside_chapel(Vector3(-3.5, 0, -6), "hill", {"perseverance": 8, "hope": 4, "weariness": -4}, "A true chapel at the climb — not the arbor's false ease. You rise stronger.")
 
@@ -59,7 +59,7 @@ func _build_procedural() -> void:
 	var _cb3 := func(_b):
 		GameState.set_flag("reached_summit", true)
 		QuestManager.update_quest_progress("climb_hill")
-		EventBus.toast("You crest the summit, breathless and kept. Palace lights glow ahead.")
+		EventBus.toast("你越过山顶，气喘却蒙保守。美宫的光在前方亮起。")
 		_advance_after_delay()
 	make_trigger(Vector3(0, 1.5, -33), Vector3(10, 4, 2), _cb3, false)
 
@@ -109,7 +109,7 @@ func _add_steep_zone(pos: Vector3, size: Vector3) -> void:
 
 func _build_rest_arbor(pos: Vector3) -> void:
 	make_decor(Vector3(3, 0.3, 3), Color(0.4, 0.5, 0.35), pos + Vector3(0, 0.15, 0))
-	make_floating_label("Rest Arbor", pos + Vector3(0, 1.6, 0), Color(0.8, 0.85, 0.7))
+	make_floating_label("歇息亭 Rest Arbor", pos + Vector3(0, 1.6, 0), Color(0.8, 0.85, 0.7))
 	var arbor := Area3D.new()
 	arbor.collision_layer = 0
 	arbor.collision_mask = 1
@@ -136,4 +136,3 @@ func _on_arbor_enter(body: Node) -> void:
 func _on_arbor_exit(body: Node) -> void:
 	if body == _arbor_player:
 		_arbor_player = null
-

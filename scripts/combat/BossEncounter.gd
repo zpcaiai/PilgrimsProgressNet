@@ -30,4 +30,4 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 
 
 func _on_victory(_victory: bool) -> void:
-	EventBus.toast("The accuser's claim is broken. The valley opens, and a darker road waits ahead.")
+	EventBus.toast("控告者的权势破碎了。山谷打开，更幽暗的路仍在前方。")

@@ -35,7 +35,7 @@ func _build_procedural() -> void:
 	_light.omni_range = 25.0
 	add_child(_light)
 
-	make_floating_label("The Cross", Vector3(0, 7.5, -18), Color(1, 0.97, 0.8))
+	make_floating_label("十字架 The Cross", Vector3(0, 7.5, -18), Color(1, 0.97, 0.8))
 
 	spawn_player(Vector3(0, 1, 12))
 
@@ -64,11 +64,11 @@ func _begin_cross_event() -> void:
 	# When despair is overwhelming, the burden trembles but will not fall until the
 	# pilgrim names the truth. Grace is still not earned — confession only precedes it.
 	if SpiritualStateManager.despair >= 85:
-		EventBus.toast("The burden trembles at the Cross, but does not fall — first, name your true state.")
+		EventBus.toast("重担在十字架前震动，却还未落下：先诚实说出你的真实光景。")
 		await get_tree().create_timer(1.8).timeout
 		EventBus.toast("\"What I carry is too heavy; I cannot set it down myself. Have mercy.\"")
 		await get_tree().create_timer(2.0).timeout
-		EventBus.toast("And as the words are spoken, the burden loosens.")
+		EventBus.toast("当话说出口，重担开始松开。")
 		await get_tree().create_timer(0.9).timeout
 
 	# Grace: the burden falls regardless of the pilgrim's strength.
@@ -77,7 +77,7 @@ func _begin_cross_event() -> void:
 	GameState.set_flag("burden_fallen", true)
 	GameState.set_flag("mvp_completed", true)
 	QuestManager.update_quest_progress("reach_the_cross")
-	EventBus.toast("Your burden loosens, falls, and is answered by grace.")
+	EventBus.toast("你的重担松开、坠落，被恩典回应。")
 
 	# Roll the burden into the tomb and brighten the hill.
 	var tween := create_tween()
@@ -91,6 +91,6 @@ func _begin_cross_event() -> void:
 	)
 
 	await get_tree().create_timer(2.5).timeout
-	EventBus.toast("The Cross is not the end of the road; it is the mercy that makes the road possible.")
+	EventBus.toast("十字架不是道路的终点；它是使道路成为可能的怜悯。")
 	await get_tree().create_timer(1.5).timeout
 	ChapterManager.go_to_next_chapter()

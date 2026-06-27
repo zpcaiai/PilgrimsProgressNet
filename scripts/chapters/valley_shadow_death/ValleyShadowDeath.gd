@@ -23,7 +23,7 @@ func _build_procedural() -> void:
 	make_block(Vector3(1, 8, 90), Color(0.08, 0.08, 0.1), Vector3(-4.5, 4, -20))
 	make_block(Vector3(1, 8, 90), Color(0.08, 0.08, 0.1), Vector3(4.5, 4, -20))
 
-	make_wayside_chapel(Vector3(2.4, 0, -37), "shadow", {"faith": 8, "fear": -12, "hope": 4}, "A lit chapel in a cleft of the cliff. The dark cannot enter here; your lamp remembers.")
+	make_wayside_chapel(Vector3(2.4, 0, -37), "shadow", {"faith": 8, "fear": -12, "hope": 4}, "崖缝里有一座点亮的小堂。黑暗不能进入这里；你的灯重新记起光。")
 
 	spawn_player(Vector3(0, 1, 12))
 	var lantern := PlayerLight.new()
@@ -41,9 +41,9 @@ func _build_procedural() -> void:
 	_spawn_fear_shade(Vector3(-1.5, 1, -22))
 
 	# Whispers from the dark — each raises fear once.
-	_whisper(Vector3(0, 1.5, 2), "A voice hisses: 'The dark is telling the truth. You will not finish.'")
-	_whisper(Vector3(0, 1.5, -10), "Something laughs in the dark: 'Turn back while fear still sounds wise.'")
-	_whisper(Vector3(0, 1.5, -26), "A whisper presses close: 'No one sees you here. No one keeps you.'")
+	_whisper(Vector3(0, 1.5, 2), "有声音嘶嘶说：“黑暗才是真的。你走不到终点。”")
+	_whisper(Vector3(0, 1.5, -10), "黑暗中有东西笑着说：“趁惧怕还像智慧，回头吧。”")
+	_whisper(Vector3(0, 1.5, -26), "低语逼近：“这里没人看见你，也没人保守你。”")
 
 	# Lanterns of the Word — restore your light.
 	_place_lantern(Vector3(-2.5, 0, -6), lantern)
@@ -56,7 +56,7 @@ func _build_procedural() -> void:
 
 	# The dawn ahead.
 	make_distant_light(Vector3(0, 5, -48), Color(1.0, 0.9, 0.7))
-	make_floating_label("Toward the dawn you cannot yet see", Vector3(0, 3, -40), Color(0.8, 0.8, 0.7))
+	make_floating_label("朝向尚未看见的黎明", Vector3(0, 3, -40), Color(0.8, 0.8, 0.7))
 
 	# Closing-dark vignette (reusable node): edges drown as the lamp is snuffed.
 	_vignette = DarkVignette.new()
@@ -65,7 +65,7 @@ func _build_procedural() -> void:
 	var _cb1 := func(_b):
 		GameState.set_flag("crossed_shadow", true)
 		QuestManager.update_quest_progress("cross_shadow")
-		EventBus.toast("The path widens, and grey dawn proves the dark was not lord.")
+		EventBus.toast("道路渐宽，灰色晨光证明黑暗并非主宰。")
 		_advance_after_delay()
 	make_trigger(Vector3(0, 1.5, -44), Vector3(8, 4, 2), _cb1, false)
 
@@ -85,7 +85,7 @@ func _shadow(pos: Vector3) -> void:
 	area.body_entered.connect(func(b):
 		if b is PlayerController:
 			_shadow_player = b
-			EventBus.toast("The dark thickens and leans on your lamp. Keep moving.")
+			EventBus.toast("黑暗更浓，压向你的灯。继续走。")
 	)
 	area.body_exited.connect(func(b):
 		if b == _shadow_player:
@@ -128,7 +128,7 @@ func _place_lantern(pos: Vector3, lantern: PlayerLight) -> void:
 	var _cb3 := func(_p):
 		lantern.add_boost(4.0)
 		SpiritualStateManager.apply_effects({"fear": -10, "faith": 5})
-		EventBus.toast("The Word steadies the lamp, and the next step appears.")
+		EventBus.toast("话语稳住灯光，下一步显出来。")
 		AudioManager.play_sfx("lantern_word")
-	make_interactable(pos, "Read the lantern of the Word",
+	make_interactable(pos, "读灯中的话语 (Read)",
 		_cb3, null, Color(1.0, 0.9, 0.6), 1.5, 1.3, true)

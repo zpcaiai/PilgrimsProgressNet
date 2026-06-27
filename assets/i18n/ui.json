@@ -128,6 +128,10 @@
     "en": "(C to close)",
     "zh": "（按 C 关闭）"
   },
+  "char.close_hint_touch": {
+    "en": "Tap Heart again to close",
+    "zh": "再次点「心境」关闭"
+  },
   "char.mode_child": {
     "en": "Children's Journey",
     "zh": "孩童之旅"
@@ -276,6 +280,10 @@
     "en": "WASD move · Space jump · E interact · 1-4 choose · C heart · Tab map · Esc pause",
     "zh": "WASD 移动 · 空格跳 · E 互动 · 1-4 选择 · C 心境 · Tab 地图 · Esc 暂停"
   },
+  "menu.hint_touch": {
+    "en": "Use the left pad to move · Tap Jump · Tap Interact · Tap Heart for the heart panel · Tap Map · Tap Pause",
+    "zh": "左下方向区移动 · 点「跳跃」跳 · 点「互动」交互/继续对话 · 点「心境」查看/关闭心境 · 点「地图」看路线 · 点「暂停」打开菜单"
+  },
   "toast.child_mode": {
     "en": "Children's Journey — a gentle road. Take your time.",
     "zh": "孩童之旅——一条温柔的路。慢慢来。"
@@ -330,11 +338,19 @@
   },
   "combat.resolve": {
     "en": "Resolve",
-    "zh": "了结"
+    "zh": "定力"
   },
   "combat.hud": {
     "en": "[b]Promise:[/b] %d   [b]Prayer:[/b] %s   [b]Foes:[/b] %d\n[color=#aaaaaa]J strike  K dodge  L stand firm  U promise  P pray[/color]",
     "zh": "[b]应许：[/b] %d   [b]祷告：[/b] %s   [b]敌：[/b] %d\n[color=#aaaaaa]J 攻击  K 闪避  L 站稳  U 应许  P 祷告[/color]"
+  },
+  "combat.resolve_warning": {
+    "en": "⚠ 定力将尽 — 快按 U 应许 / P 祷告!  (Resolve failing — press U / P!)",
+    "zh": "⚠ 定力将尽：键盘按 U 应许 / P 祷告；移动版点「应许」或「祷告」"
+  },
+  "combat.boss_claim": {
+    "en": "%s 的控告 — 站立得住直到它破碎  (%s's claim — stand until it breaks)",
+    "zh": "%s 的控告：站立得住，直到它破碎"
   },
   "reward.title": {
     "en": "Season Reward",

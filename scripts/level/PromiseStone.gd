@@ -3,7 +3,7 @@ class_name PromiseStone
 ## An interactable stone bearing a short paraphrased line of hope. Single use:
 ## reading it relieves despair and raises a positive state, then dims.
 
-var line: String = "The way is not lost."
+var line: String = "路并没有失去。"
 var effects: Dictionary = {"hope": 8, "despair": -12}
 var flag: String = ""
 var _glow_mesh: MeshInstance3D
@@ -16,7 +16,7 @@ func setup(stone_line: String, stone_effects: Dictionary, set_flag: String = "")
 	effects = stone_effects
 	flag = set_flag
 	one_shot = true
-	prompt = "Read the promise stone"
+	prompt = "读应许石 (Read)"
 	# Visual
 	_glow_mesh = MeshInstance3D.new()
 	var bm := BoxMesh.new()

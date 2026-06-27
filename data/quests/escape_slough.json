@@ -1,9 +1,11 @@
 {
   "id": "escape_slough",
   "title": "Receive Help in the Slough",
+  "title_zh": "在泥潭中接受帮助",
   "description": "Despair sinks the proud. Read the promise stones, admit need, and take the offered hand.",
+  "description_zh": "绝望会使骄傲的人下沉。读应许石，承认需要，并握住所伸来的手。",
   "steps": [
-    { "id": "reach_solid_ground", "description": "Leave the mire by promise and Help, not self-rescue.", "required_flag": "left_slough" }
+    { "id": "reach_solid_ground", "description": "Leave the mire by promise and Help, not self-rescue.", "description_zh": "靠应许与帮助离开淤泥，不靠自救。", "required_flag": "left_slough" }
   ],
   "rewards": { "hope": 5, "humility": 5 }
 }

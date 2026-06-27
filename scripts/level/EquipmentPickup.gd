@@ -11,7 +11,7 @@ var item_id: String = "sword"
 func setup(p_item_id: String) -> void:
 	item_id = p_item_id
 	one_shot = true
-	prompt = "Take up the " + p_item_id
+	prompt = "拿起装备：" + _item_name(p_item_id)
 	var col := CollisionShape3D.new()
 	var sphere := SphereShape3D.new()
 	sphere.radius = 1.4
@@ -25,5 +25,17 @@ func _on_take(_player: Node) -> void:
 	GameState.set_flag("has_" + item_id, true)
 	GameState.add_inventory_item(item_id, 1)
 	SpiritualStateManager.apply_effects({"faith": 3, "watchfulness": 2})
-	EventBus.toast("You take up the " + item_id + ".")
+	EventBus.toast("你拿起装备：" + item_id + "。")
 	EventBus.interaction_unavailable.emit()
+
+
+func _item_name(id: String) -> String:
+	match id:
+		"sword":
+			return "剑 (Sword)"
+		"shield":
+			return "盾牌 (Shield)"
+		"armor":
+			return "军装 (Armor)"
+		_:
+			return id

@@ -20,7 +20,7 @@ func _build_procedural() -> void:
 	)
 	make_ground(Vector2(40, 90), Color(0.22, 0.26, 0.22))
 	make_distant_light(Vector3(0, 5, -52))
-	make_floating_label("Solid ground lies beyond received help", Vector3(0, 3.0, -40), Color(0.8, 0.85, 0.75))
+	make_floating_label("接受帮助之后，前方有坚实之地", Vector3(0, 3.0, -40), Color(0.8, 0.85, 0.75))
 
 	# Safe footing near the start.
 	_add_safe_stone(Vector3(0, 0, 6))
@@ -65,7 +65,7 @@ func _build_procedural() -> void:
 	var _cb2 := func(_b):
 		GameState.set_flag("left_slough", true)
 		QuestManager.update_quest_progress("escape_slough")
-		EventBus.toast("You climb out onto solid ground, humbled but not abandoned.")
+		EventBus.toast("你爬上坚实之地：被降卑，却没有被撇下。")
 		_advance_after_delay()
 	make_trigger(Vector3(0, 1.5, -50), Vector3(20, 4, 2), _cb2, false)
 

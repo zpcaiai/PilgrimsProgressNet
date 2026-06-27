@@ -17,7 +17,7 @@ static func grant_full_armor() -> void:
 		GameState.add_inventory_item(it, 1)
 	SpiritualStateManager.apply_effects(
 		{"faith": 10, "watchfulness": 10, "perseverance": 10})
-	EventBus.toast("You are clothed for the valley: faith, watchfulness, and perseverance are strengthened.")
+	EventBus.toast("你为山谷穿戴军装：信心、警醒与忍耐得了坚固。")
 	AudioManager.play_sfx("blessing")
 
 

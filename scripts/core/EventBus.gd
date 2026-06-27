@@ -21,6 +21,7 @@ signal cross_grace_applied()
 signal spiritual_collapse()
 signal repentance_started()
 signal repentance_completed()
+signal scripture_card_received(card_id: String)
 
 # --- Quests ---
 signal quest_started(quest_id: String)

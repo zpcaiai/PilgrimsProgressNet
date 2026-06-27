@@ -92,7 +92,7 @@ func _fall_asleep() -> void:
 	_warned = false
 	SpiritualStateManager.apply_effects({"watchfulness": -10, "weariness": 10})
 	GameState.set_flag("slept_on_enchanted_ground", true)
-	EventBus.toast("You drift to sleep... and wake further back than you began.")
+	EventBus.toast("你沉沉睡去……醒来时，发现自己退得更远了。")
 	if _player != null:
 		_player.teleport(entry_point)
 

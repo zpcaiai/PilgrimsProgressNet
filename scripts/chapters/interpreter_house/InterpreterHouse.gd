@@ -30,20 +30,20 @@ func _build_procedural() -> void:
 	make_npc("The Interpreter", Vector3(0, 0, 2), Color(0.85, 0.8, 0.6), "interpreter_welcome")
 
 	# Symbolic rooms — each is a one-shot lesson.
-	_lesson(Vector3(-6, 0, -8), "The Lamp", "The lamp fed in secret keeps burning when public strength is gone.", {"faith": 5, "perseverance": 4})
-	_lesson(Vector3(6, 0, -8), "The Dust", "Dry command can expose the dust; only living water settles the heart.", {"humility": 5, "discernment": 4})
-	_lesson(Vector3(0, 0, -16), "The Patient Man", "Patience waits for the promised portion and is not robbed by haste.", {"watchfulness": 5, "hope": 4})
+	_lesson(Vector3(-6, 0, -8), "灯 The Lamp", "暗中得油的灯，在外面的力量耗尽时仍会燃烧。", {"faith": 5, "perseverance": 4})
+	_lesson(Vector3(6, 0, -8), "尘土 The Dust", "干硬的命令能扬起尘土；只有活水能安定人心。", {"humility": 5, "discernment": 4})
+	_lesson(Vector3(0, 0, -16), "忍耐的人 The Patient Man", "忍耐等候所应许的份，不让急躁夺走心。", {"watchfulness": 5, "hope": 4})
 
 	make_distant_light(Vector3(0, 4, -30))
 	spawn_player(Vector3(0, 1, 8))
 
 	var _cb1 := func(_b):
 		if _lessons_seen < 2:
-			EventBus.toast("Do not hurry past mercy's instruction. Consider at least two of the rooms.")
+			EventBus.toast("不要匆匆掠过怜悯的教导。至少默想两个房间。")
 			return
 		GameState.set_flag("left_interpreter", true)
 		QuestManager.update_quest_progress("visit_interpreter")
-		EventBus.toast("You step out with clearer sight, and the hill waits ahead.")
+		EventBus.toast("你带着更清楚的眼光走出门去；艰难山在前方等候。")
 		_advance_after_delay()
 	make_trigger(Vector3(0, 1.5, -24), Vector3(20, 4, 2), _cb1, false)
 
@@ -77,8 +77,8 @@ func _lesson(pos: Vector3, title: String, text: String, effects: Dictionary) -> 
 		if _lessons_seen >= 3:
 			SpiritualStateManager.apply_effects({"discernment": 5, "watchfulness": 5, "hope": 3})
 			GameState.set_flag("interpreter_full", true)
-			EventBus.toast("All three rooms considered. A quiet insight settles — you will know the lamp, the dust, and the patient way when you meet them on the road. " + text)
+			EventBus.toast("三个房间都默想过了。安静的洞察落在心里：日后在路上，你会认得灯、尘土与忍耐之道。 " + text)
 		else:
-			EventBus.toast("(%d/2 considered)  %s" % [_lessons_seen, text])
-	make_interactable(pos, "Consider: " + title,
+			EventBus.toast("（已默想 %d/2）%s" % [_lessons_seen, text])
+	make_interactable(pos, "默想：" + title,
 		_cb2, null, Color(0.7, 0.6, 0.4), 0.6, 1.4, true)

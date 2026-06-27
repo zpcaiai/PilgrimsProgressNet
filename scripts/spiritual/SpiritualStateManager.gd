@@ -156,7 +156,7 @@ func _apply_special(special: Dictionary) -> void:
 		GameState.set_flag("used_prayer_light", true)
 	if bool(special.get("show_journey_review", false)):
 		GameState.set_flag("journey_review_requested", true)
-		EventBus.toast("The journey is remembered: the burden fell, help came, promises held, the river was crossed.")
+		EventBus.toast("旅程被纪念：重担卸下，帮助临到，应许托住，死河也被渡过。")
 	if bool(special.get("show_credits", false)):
 		GameState.set_flag("show_credits", true)
 	if special.has("trigger_event"):

@@ -585,6 +585,47 @@ def _household_figure(s, name, pos, robe=None, skin=None, h=1.55, arm=False, rot
 # ===========================================================================
 # CHAPTER 1 - City of Destruction
 # ===========================================================================
+def _urban_building(s, name, pos, size=(5, 8, 5), wall=(0.42, 0.4, 0.42),
+                    lit=True, brick=True, pitched=False):
+    """A multi-storey CITY building (not a village hut): brick-textured walls, a
+    flat stone parapet (or, rarely, a low pitched roof), and rows of windows
+    (mostly dark in the doomed city, a few lit). Taller than a cottage so the
+    skyline reads urban."""
+    w, h, d = size
+    win_lit = (0.96, 0.86, 0.56)
+    win_dead = (0.12, 0.12, 0.15)
+    wall_part = {"kind": "box", "size": size,
+                 "color": (0.5, 0.46, 0.44) if brick else wall, "pos": (0, h / 2, 0)}
+    if brick:
+        wall_part["tex"] = "brick"
+        wall_part["tile"] = 1.6
+    parts = [wall_part]
+    if pitched:
+        parts.append({"kind": "pyramid", "size": (w + 0.4, d + 0.4), "height": 1.6,
+                      "color": (0.3, 0.26, 0.24), "pos": (0, h + 0.8, 0),
+                      "tex": "rooftile", "tile": 0.9})
+    else:
+        parts.append({"kind": "box", "size": (w + 0.45, 0.55, d + 0.45),
+                      "color": (0.3, 0.3, 0.33), "pos": (0, h + 0.2, 0),
+                      "tex": "stone", "tile": 1.2})
+    floors = max(1, int(h // 2.4))
+    for f in range(floors):
+        wy = 1.4 + f * 2.4
+        if wy > h - 0.7:
+            break
+        for k, wx in enumerate((-w * 0.26, w * 0.26)):
+            on = lit and ((f + k) % 3 == 0)
+            parts.append({"kind": "box", "size": (0.7, 1.0, 0.12),
+                          "color": win_lit if on else win_dead,
+                          "pos": (wx, wy, d / 2 + 0.02),
+                          "emissive": (0.42, 0.34, 0.18) if on else (0.0, 0.0, 0.0)})
+            parts.append({"kind": "box", "size": (0.12, 1.0, 0.7),
+                          "color": win_lit if on else win_dead,
+                          "pos": (w / 2 + 0.02, wy, wx * 0.6),
+                          "emissive": (0.42, 0.34, 0.18) if on else (0.0, 0.0, 0.0)})
+    s.composite(name, parts, pos=pos)
+
+
 def build_city_of_destruction():
     s = Scene("city_of_destruction")
     # Cold, oppressive palette — a doomed city under a leaden sky.
@@ -601,18 +642,24 @@ def build_city_of_destruction():
     croof = (0.23, 0.24, 0.28)
     _cottage(s, "PROP_PlayerHouse", (-7, 0, 6), (5, 3.2, 5),
              (0.40, 0.41, 0.45), (0.28, 0.24, 0.24))
-    _cottage(s, "PROP_House_01", (9, 0, 8), wall=cwall, roof=croof)
-    _cottage(s, "PROP_House_02", (10, 0, -2), (4.5, 3.0, 4.5), cwall, croof)
-    _cottage(s, "PROP_House_03", (-10, 0, -4), (4.5, 3.2, 4.5), cwall, croof)
-    _cottage(s, "PROP_House_04", (12, 0, 14), (4.2, 2.8, 4.2), cwall, croof)
-    _cottage(s, "PROP_House_05", (-12, 0, 12), (4.2, 3.0, 4.2), cwall, croof)
-    _cottage(s, "PROP_House_06", (11, 0, -10), (4.6, 3.1, 4.6), cwall, croof)
-    # Denser, darker, abandoned housing pressing in on the streets.
-    _cottage(s, "PROP_House_07", (-13, 0, 2), (4.2, 3.4, 4.2), cwall, croof, lit=False)
-    _cottage(s, "PROP_House_08", (15, 0, 5), (4.0, 2.8, 4.0), cwall, croof, lit=False)
-    _cottage(s, "PROP_House_09", (-9, 0, 17), (4.0, 2.9, 4.0), cwall, croof, lit=False)
-    _cottage(s, "PROP_House_10", (6, 0, -7), (4.2, 3.0, 4.2), cwall, croof, lit=False)
-    _cottage(s, "PROP_House_11", (-15, 0, -8), (4.2, 3.2, 4.2), cwall, croof, lit=False)
+    # Multi-storey city blocks lining the streets (not village huts) — taller,
+    # brick, flat-parapet roofs, window rows mostly dark in the doomed city.
+    _urban_building(s, "PROP_House_01", (9, 0, 8), (5.0, 9.0, 5.0))
+    _urban_building(s, "PROP_House_02", (10, 0, -2), (4.6, 11.0, 4.6))
+    _urban_building(s, "PROP_House_03", (-10, 0, -4), (4.8, 8.0, 4.8), pitched=True)
+    _urban_building(s, "PROP_House_04", (12, 0, 14), (4.6, 10.0, 4.6))
+    _urban_building(s, "PROP_House_05", (-12, 0, 12), (4.6, 7.5, 4.6), pitched=True)
+    _urban_building(s, "PROP_House_06", (11, 0, -10), (5.0, 12.0, 5.0))
+    # Denser, darker, abandoned tenements pressing in on the streets.
+    _urban_building(s, "PROP_House_07", (-13.5, 0, 2), (4.4, 9.5, 4.4), lit=False)
+    _urban_building(s, "PROP_House_08", (15, 0, 5), (4.2, 7.0, 4.2), lit=False)
+    _urban_building(s, "PROP_House_09", (-9, 0, 17), (4.4, 8.5, 4.4), lit=False)
+    _urban_building(s, "PROP_House_10", (6.5, 0, -7), (4.4, 10.5, 4.4), lit=False)
+    _urban_building(s, "PROP_House_11", (-15.5, 0, -8), (4.4, 8.0, 4.4), lit=False)
+    # Tall ruined towers rising over the rooftops — a real city skyline.
+    _urban_building(s, "PROP_CityTower_01", (-16.5, 0, 9), (3.6, 15.0, 3.6), lit=False)
+    _urban_building(s, "PROP_CityTower_02", (16.5, 0, 16), (4.0, 17.0, 4.0), lit=True)
+    _urban_building(s, "PROP_CityTower_03", (-7, 0, -9), (3.4, 14.0, 3.4), lit=False, pitched=True)
 
     s.composite("PROP_Book", [
         {"kind": "box", "size": (0.6, 0.9, 0.6), "color": (0.3, 0.22, 0.16),

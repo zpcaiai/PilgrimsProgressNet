@@ -162,8 +162,13 @@ func _process(delta: float) -> void:
 
 	var enemies := get_tree().get_nodes_in_group("enemy").size()
 	var cd: float = _combat.prayer_cooldown
-	var cd_txt := "ready" if cd <= 0.0 else "%.1fs" % cd
-	_info.text = LocaleManager.t("combat.hud", "[b]Promise:[/b] %d   [b]Prayer:[/b] %s   [b]Foes:[/b] %d\n[color=#aaaaaa]J strike  K dodge  L stand firm  U promise  P pray[/color]") % [_combat.promise_charge, cd_txt, enemies]
+	var cd_txt := "就绪" if cd <= 0.0 else "%.1fs" % cd
+	var touch_hint := "移动版：点「攻击 / 闪避 / 站稳 / 应许 / 祷告」"
+	var hud_template := LocaleManager.t("combat.hud", "[b]Promise:[/b] %d   [b]Prayer:[/b] %s   [b]Foes:[/b] %d\n[color=#aaaaaa]J strike  K dodge  L stand firm  U promise  P pray[/color]")
+	var hud_args := [_combat.promise_charge, cd_txt, enemies] if LocaleManager.is_zh() else [_combat.promise_charge, cd_txt, enemies, _combat.promise_charge, cd_txt, enemies]
+	_info.text = hud_template % hud_args
+	if DisplayServer.is_touchscreen_available():
+		_info.text += "\n[color=#aaaaaa]" + touch_hint + "[/color]"
 
 	# When low, pulse the warning and highlight whichever recovery is available.
 	var low := pct <= LOW_PCT
@@ -192,6 +197,7 @@ func _process(delta: float) -> void:
 		_boss_bar.max_value = mi
 		_boss_bar.value = clampf(float(foe.get("influence")), 0.0, mi)
 		var nm: String = String(foe.get("display_name")) if foe.get("display_name") != null else "Apollyon"
-		_boss_lbl.text = LocaleManager.t("combat.boss_claim", "%s 的控告 — 站立得住直到它破碎  (%s's claim — stand until it breaks)") % [nm, nm]
+		var claim_template := LocaleManager.t("combat.boss_claim", "%s 的控告 — 站立得住直到它破碎  (%s's claim — stand until it breaks)")
+		_boss_lbl.text = (claim_template % [nm]) if LocaleManager.is_zh() else (claim_template % [nm, nm, nm])
 	else:
 		_boss_panel.visible = false

@@ -56,7 +56,7 @@ func _fire() -> void:
 	arrow.body_entered.connect(func(body):
 		if body.is_in_group("player"):
 			SpiritualStateManager.apply_effects(effects_on_hit)
-			EventBus.toast("An arrow of accusation strikes you.")
+			EventBus.toast("一支控告之箭击中了你。")
 			arrow.queue_free()
 	)
 	# Move the arrow over its lifetime.

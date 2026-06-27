@@ -43,6 +43,6 @@ func _process(delta: float) -> void:
 		SpiritualStateManager.apply_effects({"watchfulness": -5})
 		if GameState.has_companion("hopeful"):
 			SpiritualStateManager.apply_effects({"hope": 5, "watchfulness": 8, "weariness": -5})
-			EventBus.toast("You doze... Hopeful shakes you awake. 'Not here, friend. Keep walking, keep talking.'")
+			EventBus.toast("你打起盹来……盼望把你摇醒：“不是这里，朋友。继续走，继续说。”")
 		else:
-			EventBus.toast("Sleep takes you for a moment, and you lose ground. Keep moving.")
+			EventBus.toast("睡意夺走片刻，你退了一段路。继续走。")

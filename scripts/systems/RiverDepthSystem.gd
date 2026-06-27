@@ -28,6 +28,6 @@ func _process(delta: float) -> void:
 			and not GameState.has_flag("river_memory_recalled"):
 		_nudged = true
 		if GameState.has_companion("hopeful"):
-			EventBus.toast("Hopeful, beside you in the water: 'Be of good courage. I feel the bottom. Remember what carried you.'")
+			EventBus.toast("盼望在水中与你同行：“壮胆。我摸到底了。记得是谁托住你。”")
 		else:
-			EventBus.toast("The water is cold and deep, but the city has not moved. Remember what carried you before.")
+			EventBus.toast("水又冷又深，但城没有挪移。记得从前是谁托住你。")

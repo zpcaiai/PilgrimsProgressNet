@@ -33,7 +33,7 @@ func _build_procedural() -> void:
 	add_child(rest)
 	rest.setup(2.2)
 	rest.position = Vector3(-4, 0, -6)
-	make_floating_label("Rest", Vector3(-4, 1.8, -6), Color(0.85, 0.9, 0.7))
+	make_floating_label("歇息 Rest", Vector3(-4, 1.8, -6), Color(0.85, 0.9, 0.7))
 
 	make_npc("Watchful", Vector3(0, 0, -12), Color(0.85, 0.82, 0.65), "palace_welcome")
 
@@ -42,11 +42,11 @@ func _build_procedural() -> void:
 
 	# The library — records of pilgrims who walked before you.
 	make_decor(Vector3(3, 2, 0.6), Color(0.4, 0.3, 0.24), Vector3(-7, 1, -14))
-	make_floating_label("Library", Vector3(-7, 2.4, -14), Color(0.85, 0.82, 0.6))
+	make_floating_label("见证书室 Library", Vector3(-7, 2.4, -14), Color(0.85, 0.82, 0.6))
 	var _cb1 := func(_p):
 		SpiritualStateManager.apply_effects({"discernment": 6, "faith": 4, "hope": 4})
-		EventBus.toast("Account after account says the same thing: grace kept them, and grace can keep you.")
-	make_interactable(Vector3(-7, 0, -12.6), "Read the records of pilgrims who endured",
+		EventBus.toast("一篇又一篇见证都说同一件事：恩典保守了他们，也能保守你。")
+	make_interactable(Vector3(-7, 0, -12.6), "阅读忍耐者的见证 (Read records)",
 		_cb1, null, Color(0.6, 0.5, 0.4), 0.3, 1.4, true)
 
 	make_distant_label_to_valley()
@@ -54,14 +54,14 @@ func _build_procedural() -> void:
 
 	var _cb2 := func(_b):
 		if not GameState.has_flag("took_armour"):
-			EventBus.toast("The valley will accuse you. Speak with Watchful and take up the armour first.")
+			EventBus.toast("山谷将要控告你。先与守望者交谈，并穿戴军装。")
 			return
 		GameState.set_flag("left_palace", true)
 		QuestManager.update_quest_progress("rest_palace")
-		EventBus.toast("Armed with faith and warned by love, you descend toward the valley.")
+		EventBus.toast("带着信心的军装和爱的提醒，你下到山谷。")
 		_advance_after_delay()
 	make_trigger(Vector3(0, 1.5, -22), Vector3(16, 5, 2), _cb2, false)
 
 
 func make_distant_label_to_valley() -> void:
-	make_floating_label("Down to the Valley of Humiliation", Vector3(0, 3.4, -20), Color(0.8, 0.78, 0.85))
+	make_floating_label("下到降卑谷 Valley of Humiliation", Vector3(0, 3.4, -20), Color(0.8, 0.78, 0.85))

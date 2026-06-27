@@ -157,7 +157,7 @@ func _make_centered_box(parent: Control) -> VBoxContainer:
 
 func _add_title(vb: VBoxContainer, text: String, size: int, color: Color) -> void:
 	var lbl := Label.new()
-	lbl.text = text
+	lbl.text = LocaleManager.zh_or_mixed(text)
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.add_theme_font_size_override("font_size", size)
 	lbl.add_theme_color_override("font_color", color)
@@ -166,7 +166,7 @@ func _add_title(vb: VBoxContainer, text: String, size: int, color: Color) -> voi
 
 func _add_button(vb: VBoxContainer, text: String, cb: Callable) -> Button:
 	var btn := Button.new()
-	btn.text = text
+	btn.text = LocaleManager.zh_or_mixed(text)
 	btn.custom_minimum_size = Vector2(0, 46)
 	btn.add_theme_font_size_override("font_size", 20)
 	btn.pressed.connect(cb)
@@ -215,7 +215,7 @@ func _show_title() -> void:
 	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
 	_add_button(vb, LocaleManager.switch_label(), func(): LocaleManager.toggle(); _show_title())
 	var hint := Label.new()
-	hint.text = LocaleManager.t("menu.hint", "WASD move · Space jump · E interact · 1-4 choose · C heart · Tab map · Esc pause")
+	hint.text = LocaleManager.t("menu.hint_touch", "左下方向区移动 · 点「跳跃」跳 · 点「互动」交互/继续对话 · 点「心境」查看/关闭心境 · 点「地图」看路线 · 点「暂停」打开菜单") if DisplayServer.is_touchscreen_available() else LocaleManager.t("menu.hint", "WASD move · Space jump · E interact · 1-4 choose · C heart · Tab map · Esc pause")
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
 	vb.add_child(hint)
@@ -285,14 +285,25 @@ func _show_controls_hint() -> void:
 	vb.add_theme_constant_override("separation", 10)
 	panel.add_child(vb)
 	_add_title(vb, "操作指引 · Controls", 28, Color(0.95, 0.9, 0.6))
-	for s in [
-			"WASD / 方向键   移动 Move",
-			"空格 Space 跳 Jump      E 互动 Interact",
-			"1–4   对话选择 Dialogue choices",
-			"战斗 Combat:  J 攻击  K 闪避  L 站稳  U 应许  P 祷告",
-			"Tab 路线图 Map      Esc 暂停 / 设置 Pause & Settings",
-			"每章出口有发光传送门;答对该章经文方可通行。",
-			]:
+	var lines := [
+		"WASD / 方向键   移动 Move",
+		"空格 Space 跳 Jump      E 互动 Interact",
+		"1–4   对话选择 Dialogue choices",
+		"战斗 Combat:  J 攻击  K 闪避  L 站稳  U 应许  P 祷告",
+		"Tab 路线图 Map      Esc 暂停 / 设置 Pause & Settings",
+		"每章出口有发光传送门;答对该章经文方可通行。",
+	]
+	if DisplayServer.is_touchscreen_available():
+		lines = [
+			"左下方向区：按住或滑动来移动。",
+			"「跳跃」：跳过障碍。",
+			"「互动」：与人物/物件互动；没有选项的对话也用它继续。",
+			"对话有选项时，直接点屏幕里的大号选项。",
+			"「心境」：打开/关闭心境与信物面板。",
+			"「地图」：查看路线图；「暂停」：打开暂停/设置菜单。",
+			"每章出口有发光传送门；答对该章经文方可通行。",
+		]
+	for s in lines:
 		var l := Label.new()
 		l.text = s
 		l.add_theme_font_size_override("font_size", 18)
@@ -385,28 +396,28 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	layer.add_child(panel)
 
 	var vb := _make_centered_box(panel)
-	_add_title(vb, "Options", 36, Color(0.95, 0.9, 0.7))
-	_add_title(vb, "Volume", 20, Color(0.75, 0.8, 0.92))
-	_add_volume_slider(vb, "Master", "master")
-	_add_volume_slider(vb, "Music", "music")
-	_add_volume_slider(vb, "Ambience", "ambient")
-	_add_volume_slider(vb, "Sound FX", "sfx")
+	_add_title(vb, "设置 Options", 36, Color(0.95, 0.9, 0.7))
+	_add_title(vb, "音量 Volume", 20, Color(0.75, 0.8, 0.92))
+	_add_volume_slider(vb, "主音量 Master", "master")
+	_add_volume_slider(vb, "音乐 Music", "music")
+	_add_volume_slider(vb, "环境音 Ambience", "ambient")
+	_add_volume_slider(vb, "音效 Sound FX", "sfx")
 
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 12)
 	vb.add_child(spacer)
 
-	_add_title(vb, "Controls", 20, Color(0.75, 0.8, 0.92))
-	_add_range_slider(vb, "Mouse Look", "mouse_sensitivity", 0.05, 0.6, 0.01, 0.25, true)
-	_add_range_slider(vb, "Controller Look", "controller_look_sensitivity", 60.0, 360.0, 10.0, 150.0, false)
+	_add_title(vb, "控制 Controls", 20, Color(0.75, 0.8, 0.92))
+	_add_range_slider(vb, "鼠标视角 Mouse Look", "mouse_sensitivity", 0.05, 0.6, 0.01, 0.25, true)
+	_add_range_slider(vb, "手柄视角 Controller Look", "controller_look_sensitivity", 60.0, 360.0, 10.0, 150.0, false)
 	var inv := CheckButton.new()
-	inv.text = "Invert Look Y"
+	inv.text = "反转纵向视角 Invert Look Y"
 	inv.add_theme_font_size_override("font_size", 18)
 	inv.button_pressed = bool(_get_input_setting("invert_look_y", false))
 	inv.toggled.connect(func(on): _set_input_setting("invert_look_y", on))
 	vb.add_child(inv)
-	_add_range_slider(vb, "Touch Button Size", "touch_button_scale", 0.6, 1.4, 0.05, 1.0, true)
-	_add_range_slider(vb, "UI Scale", "ui_scale", 0.8, 1.6, 0.05, _ui_scale_default(), true)
+	_add_range_slider(vb, "触屏按钮大小 Touch Button Size", "touch_button_scale", 0.6, 1.4, 0.05, 1.0, true)
+	_add_range_slider(vb, "界面缩放 UI Scale", "ui_scale", 0.8, 1.6, 0.05, _ui_scale_default(), true)
 
 	var spacerA := Control.new()
 	spacerA.custom_minimum_size = Vector2(0, 12)
@@ -430,7 +441,7 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	vb.add_child(spacer2)
 
 	var cb := CheckButton.new()
-	cb.text = "Fullscreen"
+	cb.text = "全屏 Fullscreen"
 	cb.button_pressed = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
 	cb.add_theme_font_size_override("font_size", 18)
 	cb.toggled.connect(func(on):
@@ -440,7 +451,7 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	)
 	vb.add_child(cb)
 
-	_add_button(vb, "Back", func():
+	_add_button(vb, "返回 Back", func():
 		AudioManager.save_settings()
 		on_back.call()
 	)
@@ -450,7 +461,7 @@ func _add_volume_slider(vb: VBoxContainer, label_text: String, key: String) -> v
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	var lbl := Label.new()
-	lbl.text = label_text
+	lbl.text = LocaleManager.zh_or_mixed(label_text)
 	lbl.custom_minimum_size = Vector2(130, 0)
 	lbl.add_theme_font_size_override("font_size", 18)
 	row.add_child(lbl)
@@ -513,7 +524,7 @@ func _add_range_slider(vb: VBoxContainer, label_text: String, key: String,
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	var lbl := Label.new()
-	lbl.text = label_text
+	lbl.text = LocaleManager.zh_or_mixed(label_text)
 	lbl.custom_minimum_size = Vector2(130, 0)
 	lbl.add_theme_font_size_override("font_size", 18)
 	row.add_child(lbl)
@@ -574,13 +585,13 @@ func _open_pause() -> void:
 	panel.add_child(bg)
 	_pause_layer.add_child(panel)
 	var vb := _make_centered_box(panel)
-	_add_title(vb, "Paused", 36, Color(0.95, 0.9, 0.7))
-	_add_button(vb, "Resume", _resume_from_pause)
-	_add_button(vb, "Route Map", _pause_to_route)
-	_add_button(vb, "Save", _pause_save)
-	_add_button(vb, "Load", _load_from_pause)
-	_add_button(vb, "Options", _pause_to_options)
-	_add_button(vb, "Return to Title", _pause_to_title)
+	_add_title(vb, "暂停 Paused", 36, Color(0.95, 0.9, 0.7))
+	_add_button(vb, "继续 Resume", _resume_from_pause)
+	_add_button(vb, "路线图 Route Map", _pause_to_route)
+	_add_button(vb, "保存 Save", _pause_save)
+	_add_button(vb, "读取 Load", _load_from_pause)
+	_add_button(vb, "设置 Options", _pause_to_options)
+	_add_button(vb, "返回标题 Return to Title", _pause_to_title)
 	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
 
 
@@ -640,7 +651,7 @@ func _toggle_route_map() -> void:
 	center.add_child(vb)
 
 	var title := Label.new()
-	title.text = "THE PILGRIM'S ROAD"
+	title.text = "天路历程 THE PILGRIM'S ROAD"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 30)
 	title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.6))
@@ -653,7 +664,7 @@ func _toggle_route_map() -> void:
 		var label := Label.new()
 		var done: bool = GameState.has_flag(chapter_id + "_completed")
 		var is_current: bool = chapter_id == current
-		var mark: String = "[done]" if done else ("[ now ]" if is_current else "[    ]")
+		var mark: String = "[完成]" if done else ("[当前]" if is_current else "[    ]")
 		var color: Color = Color(0.6, 0.85, 0.6) if done else (Color(1, 0.95, 0.6) if is_current else Color(0.55, 0.55, 0.62))
 		label.text = "%s  %s" % [mark, String(data.get("title", chapter_id))]
 		label.add_theme_font_size_override("font_size", 20)
@@ -661,7 +672,7 @@ func _toggle_route_map() -> void:
 		vb.add_child(label)
 
 	var hint := Label.new()
-	hint.text = "Tab / Esc to close"
+	hint.text = "点「地图」或「暂停」关闭" if DisplayServer.is_touchscreen_available() else "Tab / Esc 关闭"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
 	vb.add_child(hint)

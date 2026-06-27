@@ -20,7 +20,7 @@ func _ready() -> void:
 
 func add_boost(amount: float) -> void:
 	boost = min(boost + amount, 8.0)
-	EventBus.toast("Light gathers around you.")
+	EventBus.toast("光聚集在你身旁。")
 
 
 ## Shadows pressing close drain the lamp; it recovers when you move clear.

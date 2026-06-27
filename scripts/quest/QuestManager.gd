@@ -50,7 +50,27 @@ func _read_json(path: String) -> Dictionary:
 
 
 func get_definition(quest_id: String) -> Dictionary:
-	return _definitions.get(quest_id, {})
+	return _localize_definition(_definitions.get(quest_id, {}))
+
+
+func _localize_definition(def: Dictionary) -> Dictionary:
+	if def.is_empty():
+		return {}
+	var out := def.duplicate(true)
+	for field in ["title", "description"]:
+		var zh := String(out.get(field + "_zh", ""))
+		var en := String(out.get(field, ""))
+		out[field] = LocaleManager.bilingual(zh, en) if not LocaleManager.is_zh() else (zh if zh != "" else LocaleManager.zh_or_mixed(en))
+	var steps: Array = []
+	for raw in out.get("steps", []):
+		if raw is Dictionary:
+			var step := (raw as Dictionary).duplicate(true)
+			var zh_step := String(step.get("description_zh", ""))
+			var en_step := String(step.get("description", ""))
+			step["description"] = LocaleManager.bilingual(zh_step, en_step) if not LocaleManager.is_zh() else (zh_step if zh_step != "" else LocaleManager.zh_or_mixed(en_step))
+			steps.append(step)
+	out["steps"] = steps
+	return out
 
 
 func start_quest(quest_id: String) -> void:
@@ -92,7 +112,7 @@ func complete_quest(quest_id: String) -> void:
 	if not rewards.is_empty():
 		SpiritualStateManager.apply_effects(rewards)
 	EventBus.quest_completed.emit(quest_id)
-	EventBus.toast("Quest complete: " + String(def.get("title", quest_id)))
+	EventBus.toast(LocaleManager.t("quest.complete", "任务完成 Quest complete: ") + String(def.get("title", quest_id)))
 
 
 func is_quest_active(quest_id: String) -> bool:

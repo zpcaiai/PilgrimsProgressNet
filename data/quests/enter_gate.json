@@ -1,10 +1,12 @@
 {
   "id": "enter_gate",
   "title": "Knock at the Wicket Gate",
+  "title_zh": "叩响窄门",
   "description": "Accusation says you have no right to ask. Come as burdened, and knock anyway.",
+  "description_zh": "控告说你没有资格祈求。即使背着重担，也照样来到门前叩门。",
   "steps": [
-    { "id": "knock", "description": "Knock while the arrows still fly.", "required_flag": "knocked_gate" },
-    { "id": "enter", "description": "Let Goodwill draw you through.", "required_flag": "passed_wicket_gate" }
+    { "id": "knock", "description": "Knock while the arrows still fly.", "description_zh": "箭仍飞来时，仍然叩门。", "required_flag": "knocked_gate" },
+    { "id": "enter", "description": "Let Goodwill draw you through.", "description_zh": "让善意把你拉进门内。", "required_flag": "passed_wicket_gate" }
   ],
   "rewards": { "faith": 5 }
 }

@@ -26,7 +26,8 @@ func _build_procedural() -> void:
 		env.fog_light_color = Color(0.5, 0.32, 0.24)
 		env.fog_sky_affect = 0.3
 
-	# The pilgrim's home — a real house right before him at the start.
+	# The pilgrim's home — a real house, with his wife (same height as him) and
+	# their two children pleading at the door (built inside _build_family_house).
 	_build_family_house(Vector3(-5.5, 0, 3.5))
 
 	# Neighbour houses hemming the road in (off the path).
@@ -44,7 +45,7 @@ func _build_procedural() -> void:
 
 	# The light of the gate, far ahead (forward = -Z), with a real gate + lanterns.
 	make_distant_light(Vector3(0, 5, -34))
-	make_floating_label("Toward the Wicket Gate", Vector3(0, 3.5, -20), Color(1, 0.95, 0.7))
+	make_floating_label("通往窄门 Toward the Wicket Gate", Vector3(0, 3.5, -20), Color(1, 0.95, 0.7))
 	PropKit.gate(self, Vector3(0, 0, -20), Color(0.45, 0.42, 0.38), true)
 	PropKit.lantern_post(self, Vector3(-3, 0, -1))
 	PropKit.lantern_post(self, Vector3(3, 0, -10))
@@ -84,7 +85,7 @@ func _try_leave_city() -> void:
 func _city_leave() -> void:
 	GameState.set_flag("left_city", true)
 	QuestManager.update_quest_progress("leave_city")
-	EventBus.toast("You leave the City of Destruction behind, carrying the burden into mercy's road.")
+	EventBus.toast("你离开灭亡城，背着重担走进怜悯的路。")
 	_advance_after_delay()
 
 
@@ -133,30 +134,17 @@ func _build_family_house(pos: Vector3) -> void:
 	# Drawing near home eases the heart once.
 	var family_solace := func(_b: Node) -> void:
 		SpiritualStateManager.apply_effects({"despair": -5, "weariness": -5})
-		EventBus.toast("Home's familiar warmth steadies you — despair and weariness ease a little.")
+	EventBus.toast("家中熟悉的温暖使你稍微站稳：绝望与疲惫减轻了一点。")
 	make_trigger(pos + Vector3(0, 1.0, 2.6), Vector3(8, 3, 7), family_solace)
 
-	# The family in the lit doorway — a real in-engine 3D body, a touch taller so
-	# they read clearly in the doorway. Standing (no mover), so they idle in place.
-	var spr := HumanoidFigure.make("Your Family", 2.2, null, true, Color(0.6, 0.45, 0.55))
-	spr.position.x = pos.x
-	spr.position.z = fz + 0.8
-	add_child(spr)
-
-	# Interaction at the door: the family begs the pilgrim to stay.
-	var area := Interactable.new()
-	area.name = "YourFamily"
-	area.position = Vector3(pos.x, 0, fz + 1.8)
-	area.prompt = "Dear My Love 求你别走"
-	area.interact_callback = func(_p): DialogueManager.start_dialogue("wife_concern")
-	var col := CollisionShape3D.new()
-	var sphere := SphereShape3D.new()
-	sphere.radius = 2.4
-	col.shape = sphere
-	col.position = Vector3(0, 0.9, 0)
-	area.add_child(col)
-	add_child(area)
-	make_floating_label("Dear My Love", Vector3(pos.x, 3.6, fz + 0.9), Color(0.85, 0.7, 0.7))
+	# The family at the lit doorway: the pilgrim's WIFE — built to the SAME height
+	# as him (2.0 m) — with their TWO CHILDREN at her sides, pleading. She reaches
+	# out; the children tug her skirt. (PilgrimFamily carries its own body figures,
+	# the wife_concern plea on interact, and its label.)
+	var family := PilgrimFamily.new()
+	family.position = Vector3(pos.x, 0, fz + 1.0)
+	add_child(family)
+	make_floating_label("Dear My Love 求你别走", Vector3(pos.x, 3.6, fz + 0.9), Color(0.85, 0.7, 0.7))
 
 
 ## A small warm-lit window: dark frame + an emissive amber pane.

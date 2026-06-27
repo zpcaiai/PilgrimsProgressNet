@@ -668,12 +668,12 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Diction
 			if not GameState.has_flag(pflag):
 				GameState.set_flag(pflag, true)
 				SpiritualStateManager.apply_effects({"watchfulness": 2})
-				EventBus.toast("A small chapel stands off the road. You slow, and breathe.")
+				EventBus.toast("路旁有一座小堂。你慢下来，重新呼吸。")
 	)
 	add_child(pause)
 
 	# Kneeling gives a one-time grace and lights the candle.
-	make_floating_label("A wayside chapel", pos + Vector3(0, 2.7, 1.5), Color(0.85, 0.82, 0.7))
+	make_floating_label("路旁小堂 Wayside Chapel", pos + Vector3(0, 2.7, 1.5), Color(0.85, 0.82, 0.7))
 	var _cb2 := func(_p):
 		if GameState.has_flag("found_chapel_" + chapel_id):
 			return
@@ -690,14 +690,14 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Diction
 		EventBus.toast(kneel_text)
 		AudioManager.play_sfx("chapel_kneel")
 		_check_chapel_meta()
-	make_interactable(pos + Vector3(0, 0, 1.0), "Kneel a moment",
+	make_interactable(pos + Vector3(0, 0, 1.0), "跪下片刻 (Kneel)",
 		_cb2, null, Color(0.7, 0.65, 0.5), 0.6, 1.4, true)
 
 
 func _check_chapel_meta() -> void:
 	if GameState.get_item_count("chapels_found") >= 4 and not GameState.has_flag("chapel_pilgrim"):
 		GameState.set_flag("chapel_pilgrim", true)
-		EventBus.toast("You have not passed one prayer-place by. This quiet faithfulness will be remembered at the end.")
+		EventBus.toast("你没有错过一处祷告之地。这安静的忠心，会在终点被纪念。")
 		AudioManager.play_sfx("blessing")
 
 

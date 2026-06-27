@@ -25,8 +25,8 @@ func _process(delta: float) -> void:
 	p = GameState.get_temporary_meter("vanity_pressure")
 	if p >= 50 and not _warned_50:
 		_warned_50 = true
-		EventBus.toast("The fair's music swells. Keep your eyes on the road through the crowd.")
+		EventBus.toast("市集的音乐更响了。穿过人群时，把眼睛放回道路。")
 	if p >= 80 and not _warned_80:
 		_warned_80 = true
 		SpiritualStateManager.apply_effects({"humility": 3})
-		EventBus.toast("The fair has taught your heart to measure itself by the crowd. Remember why you came.")
+		EventBus.toast("虚华市正在教你的心用人群衡量自己。记得你为何上路。")

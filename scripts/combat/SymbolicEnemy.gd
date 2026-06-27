@@ -35,7 +35,9 @@ func load_from_data(id: String) -> void:
 
 func _apply_data(d: Dictionary) -> void:
 	enemy_id = String(d.get("id", enemy_id))
-	display_name = String(d.get("display_name", display_name))
+	var name_zh := String(d.get("display_name_zh", ""))
+	var name_en := String(d.get("display_name", display_name))
+	display_name = (name_zh if name_zh != "" else LocaleManager.zh_or_mixed(name_en)) if LocaleManager.is_zh() else LocaleManager.bilingual(name_zh, name_en)
 	enemy_type = String(d.get("enemy_type", enemy_type))
 	influence = float(d.get("influence", influence))
 	max_influence = influence
@@ -120,7 +122,7 @@ func _attack() -> void:
 	var combats := get_tree().get_nodes_in_group("player_combat")
 	if combats.size() > 0:
 		combats[0].take_hit(attack_effects, enemy_type)
-	EventBus.toast(display_name + " presses in against you.")
+	EventBus.toast(display_name + LocaleManager.t("combat.enemy_press", " 正在逼近你 presses in against you."))
 
 
 func get_weakness_multiplier(source_type: String) -> float:
@@ -136,5 +138,5 @@ func receive_counter(source_type: String, amount: float) -> void:
 
 func on_defeated() -> void:
 	defeated.emit(enemy_id)
-	EventBus.toast(display_name + " loses its grip on you.")
+	EventBus.toast(display_name + LocaleManager.t("combat.enemy_defeated", " 对你的辖制松开了 loses its grip on you."))
 	queue_free()

@@ -1,10 +1,12 @@
 {
   "id": "visit_mountains",
   "title": "Receive Counsel on the Mountains",
+  "title_zh": "在山上领受劝告",
   "description": "Let the Shepherds restore perspective: warnings are mercy, and the City is real.",
+  "description_zh": "让牧人恢复你的眼光：警戒也是怜悯，而那城是真实的。",
   "steps": [
-    { "id": "see_city", "description": "Look through the glass toward the Celestial City.", "required_flag": "saw_celestial_city" },
-    { "id": "leave", "description": "Carry the Shepherds' warnings into the next ground.", "required_flag": "left_mountains" }
+    { "id": "see_city", "description": "Look through the glass toward the Celestial City.", "description_zh": "透过望远镜望向天城。", "required_flag": "saw_celestial_city" },
+    { "id": "leave", "description": "Carry the Shepherds' warnings into the next ground.", "description_zh": "带着牧人的警戒走向下一片地。", "required_flag": "left_mountains" }
   ],
   "rewards": { "watchfulness": 6 }
 }

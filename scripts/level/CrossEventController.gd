@@ -18,7 +18,7 @@ func play() -> void:
 	if _played:
 		return
 	_played = true
-	EventBus.toast("You can carry it no farther. You come to the Cross with empty hands.")
+	EventBus.toast("你再也背不动了。你空着手来到十字架前。")
 	if is_instance_valid(burden_node) and path_points.size() >= 1:
 		var tw := create_tween()
 		tw.tween_interval(0.4)
@@ -40,4 +40,4 @@ func _finish() -> void:
 		GameState.set_flag(f, true)
 	QuestManager.update_quest_progress("reach_the_cross")
 	AudioManager.play_sfx("blessing")
-	EventBus.toast("The burden loosens where no hand touched it. It falls, and rolls away. The road continues beyond the hill.")
+	EventBus.toast("无人触碰，重担却松开、坠落、滚远。道路从山后继续。")

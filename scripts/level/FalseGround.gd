@@ -63,4 +63,4 @@ func _on_enter(body: Node) -> void:
 		if child is CollisionShape3D:
 			child.set_deferred("disabled", true)
 	SpiritualStateManager.apply_effects(fall_effects)
-	EventBus.toast("The ground gives way beneath you!")
+	EventBus.toast("脚下的地忽然塌陷！")

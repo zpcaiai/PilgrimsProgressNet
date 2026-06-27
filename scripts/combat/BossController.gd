@@ -22,7 +22,7 @@ func start_boss_fight() -> void:
 	_boss.global_position = spawn_position
 	if _boss.has_signal("boss_defeated"):
 		_boss.connect("boss_defeated", _on_victory)
-	EventBus.toast("Apollyon blocks the valley. Stand in grace, not in yourself.")
+	EventBus.toast("亚玻伦挡住山谷：要站在恩典中，不是靠自己。")
 	fight_started.emit()
 
 

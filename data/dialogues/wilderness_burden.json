@@ -3,13 +3,13 @@
   "nodes": {
     "start": {
       "speaker": "",
-      "text": "The bundle on your back pulls heavier where the road climbs. A worn stone sits beside the path, smoothed by others who stopped here before you.",
-      "text_zh": "路一爬高，背上的包袱就坠得更沉。路旁有一块磨损的石头，被一个个曾在此停留的人磨得光滑。",
+      "text": "The bundle on your back pulls heavier where the road climbs. A worn rock sits beside the path, smoothed by others who stopped here before you.",
+      "text_zh": "路一爬高，背上的包袱就坠得更沉。路旁有一块磨损的磐石，被一个个曾在此停留的人磨得光滑。",
       "choices": [
         {
           "id": "pray",
-          "text": "Lean on the stone and pray for strength to carry it to the place of deliverance.",
-          "text_zh": "靠着石头，祈求力量，好把它一直背到得释放的地方。",
+          "text": "Lean on the rock and pray for strength to carry it to the place of deliverance.",
+          "text_zh": "靠着磐石，祈求力量，好把它一直背到得释放的地方。",
           "effects": { "perseverance": 6, "hope": 4, "weariness": -5 },
           "flags": { "steadied_burden": true },
           "next": "prayed"
@@ -38,8 +38,8 @@
     },
     "pressed": {
       "speaker": "",
-      "text": "You push past the stone without stopping. The weight stays, and so does the ache — but at least the road behind you grows longer.",
-      "text_zh": "你不停步，越过那石头。重担还在，酸痛也还在——但至少，身后的路在加长。",
+      "text": "You push past the rock without stopping. The weight stays, and so does the ache — but at least the road behind you grows longer.",
+      "text_zh": "你不停步，越过那磐石。重担还在，酸痛也还在——但至少，身后的路在加长。",
       "choices": [
         {
           "id": "go2",

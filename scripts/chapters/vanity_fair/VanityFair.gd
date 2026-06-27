@@ -9,6 +9,13 @@ class_name VanityFair
 var _active_ware: String = ""
 var _active_buy_effects: Dictionary = {}
 
+const WARE_ZH := {
+	"the Crown of Honour": "荣誉之冠",
+	"the Cup of Pleasures": "欢愉之杯",
+	"the Cloak of Reputation": "名声斗篷",
+	"the Glass of Flattery": "谄媚之镜",
+}
+
 
 func _build_procedural() -> void:
 	setup_environment(
@@ -37,8 +44,8 @@ func _build_procedural() -> void:
 	# Hopeful, a true companion in the crowd.
 	make_npc("Hopeful", Vector3(0, 0, -22), Color(0.55, 0.8, 0.7), "hopeful_joins")
 
-	make_floating_label("The far gate beyond the noise", Vector3(0, 3, -30), Color(0.85, 0.85, 0.7))
-	make_wayside_chapel(Vector3(-11, 0, -26), "vanity", {"discernment": 6, "pride": -6, "hope": 4}, "Behind the stalls, a chapel the fair forgot. Here peace is not for sale; it is given.")
+	make_floating_label("喧嚣之外的远门", Vector3(0, 3, -30), Color(0.85, 0.85, 0.7))
+	make_wayside_chapel(Vector3(-11, 0, -26), "vanity", {"discernment": 6, "pride": -6, "hope": 4}, "摊位后面有一座被市集遗忘的小堂。在这里，平安不是出售的商品，而是白白赐下。")
 
 	spawn_player(Vector3(0, 1, 10))
 
@@ -46,7 +53,7 @@ func _build_procedural() -> void:
 
 	var _cb1 := func(_b):
 		if not GameState.has_flag("hopeful_joined"):
-			EventBus.toast("Do not leave alone. Find Hopeful in the crowd.")
+			EventBus.toast("不要独自离开。先在人群中找到盼望。")
 			return
 		_leave_fair()
 	make_trigger(Vector3(0, 1.5, -32), Vector3(16, 4, 2), _cb1, false)
@@ -59,11 +66,11 @@ func _leave_fair() -> void:
 	var bought := GameState.get_item_count("vanity_token")
 	if bought >= 2:
 		SpiritualStateManager.apply_effects({"pride": 4, "weariness": 4})
-		EventBus.toast("You leave laden with baubles; Hopeful says nothing, but his eyes are sad.")
+		EventBus.toast("你带着一身小饰物离开；盼望没有说话，但眼神忧伤。")
 	elif bought == 1:
-		EventBus.toast("One trinket still jingles in your pocket. The road will quiet it soon enough.")
+		EventBus.toast("还有一件小玩意在你口袋里叮当作响。道路很快会让它安静下来。")
 	else:
-		EventBus.toast("You and Hopeful leave the fair with peace still unsold.")
+		EventBus.toast("你和盼望离开市集，平安仍未被卖掉。")
 	_advance_after_delay()
 
 
@@ -78,7 +85,7 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 		if GameState.has_flag("vanity_bought_pending"):
 			GameState.set_flag("vanity_bought_pending", false)
 			SpiritualStateManager.apply_effects(_active_buy_effects)
-			EventBus.toast("You buy " + _active_ware + ". Its shine is loud; its weight is quiet.")
+			EventBus.toast("你买下" + _ware_label(_active_ware) + "。它的光很吵，重量却很安静。")
 			AudioManager.play_sfx("vanity_buy")
 			if is_instance_valid(player):
 				player.refresh_vanity()
@@ -86,10 +93,14 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 
 func _stall(pos: Vector3, ware: String, color: Color, buy_effects: Dictionary) -> void:
 	make_decor(Vector3(2.5, 2.5, 2.5), color, pos + Vector3(0, 1.25, 0), 0.6)
-	make_floating_label(ware, pos + Vector3(0, 3, 0), color)
+	make_floating_label(_ware_label(ware), pos + Vector3(0, 3, 0), color)
 	var _cb2 := func(_p):
 		_active_ware = ware
 		_active_buy_effects = buy_effects
 		DialogueManager.start_dialogue("vanity_stall")
-	make_interactable(pos + Vector3(0, 0, 1.6), "Approach " + ware,
+	make_interactable(pos + Vector3(0, 0, 1.6), "靠近 " + _ware_label(ware),
 		_cb2, null, color.darkened(0.2), 0.4, 1.6, false)
+
+
+func _ware_label(ware: String) -> String:
+	return String(WARE_ZH.get(ware, ware)) + " (" + ware + ")"
