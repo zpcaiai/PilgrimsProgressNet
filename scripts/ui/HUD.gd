@@ -19,17 +19,10 @@ var _burden_label: Label
 var _prompt_label: Label
 var _toast_label: Label
 var _toast_timer: float = 0.0
-var _toast_queue: Array = []
-var _toast_fading: bool = false
-const TOAST_DURATION := 4.5
-const TOAST_FADE_SPEED := 2.0
 var _stat_labels: Array = []
 var _lang_btn: Button
 var _quest_panel: Panel
 var _spiritual_panel: Panel
-var _spiritual_toggle: Button
-var _spiritual_collapsed: bool = false
-var _spiritual_vb: VBoxContainer
 
 # Dialogue
 var _dialogue_panel: Panel
@@ -323,50 +316,30 @@ func _build_spiritual_panel() -> void:
 	_spiritual_panel.position = Vector2(-272, 20)
 	add_child(_spiritual_panel)
 
-	_spiritual_toggle = Button.new()
-	_spiritual_toggle.text = "▾"
-	_spiritual_toggle.add_theme_font_size_override("font_size", 16)
-	_spiritual_toggle.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_spiritual_toggle.position = Vector2(-22, 2)
-	_spiritual_toggle.size = Vector2(20, 20)
-	_spiritual_toggle.pressed.connect(_toggle_spiritual_panel)
-	_spiritual_panel.add_child(_spiritual_toggle)
+	var vb := VBoxContainer.new()
+	vb.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vb.add_theme_constant_override("separation", 6)
+	_spiritual_panel.add_child(vb)
 
-	_spiritual_vb = VBoxContainer.new()
-	_spiritual_vb.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_spiritual_vb.add_theme_constant_override("separation", 6)
-	_spiritual_panel.add_child(_spiritual_vb)
-
-	_faith_bar = _add_stat_row(_spiritual_vb, "hud.faith", "信心 Faith", Color(0.95, 0.85, 0.4))
-	_hope_bar = _add_stat_row(_spiritual_vb, "hud.hope", "盼望 Hope", Color(0.45, 0.8, 0.95))
-	_humility_bar = _add_stat_row(_spiritual_vb, "hud.humility", "谦卑 Humility", Color(0.55, 0.8, 0.5))
-	_watchfulness_bar = _add_stat_row(_spiritual_vb, "hud.watchfulness", "警醒 Vigilance", Color(0.5, 0.7, 0.95))
-	_despair_bar = _add_stat_row(_spiritual_vb, "hud.despair", "绝望 Despair", Color(0.6, 0.35, 0.62))
-	_fear_bar = _add_stat_row(_spiritual_vb, "hud.fear", "惧怕 Fear", Color(0.82, 0.42, 0.46))
-	_shame_bar = _add_stat_row(_spiritual_vb, "hud.shame", "羞愧 Shame", Color(0.72, 0.46, 0.36))
-	_weariness_bar = _add_stat_row(_spiritual_vb, "hud.weariness", "疲惫 Weariness", Color(0.6, 0.55, 0.4))
+	_faith_bar = _add_stat_row(vb, "hud.faith", "信心 Faith", Color(0.95, 0.85, 0.4))
+	_hope_bar = _add_stat_row(vb, "hud.hope", "盼望 Hope", Color(0.45, 0.8, 0.95))
+	_humility_bar = _add_stat_row(vb, "hud.humility", "谦卑 Humility", Color(0.55, 0.8, 0.5))
+	_watchfulness_bar = _add_stat_row(vb, "hud.watchfulness", "警醒 Vigilance", Color(0.5, 0.7, 0.95))
+	_despair_bar = _add_stat_row(vb, "hud.despair", "绝望 Despair", Color(0.6, 0.35, 0.62))
+	_fear_bar = _add_stat_row(vb, "hud.fear", "惧怕 Fear", Color(0.82, 0.42, 0.46))
+	_shame_bar = _add_stat_row(vb, "hud.shame", "羞愧 Shame", Color(0.72, 0.46, 0.36))
+	_weariness_bar = _add_stat_row(vb, "hud.weariness", "疲惫 Weariness", Color(0.6, 0.55, 0.4))
 
 	_burden_label = Label.new()
 	_burden_label.add_theme_font_size_override("font_size", FONT_BODY)
 	_burden_label.text = LocaleManager.t("hud.burden_carried", "Burden: carried")
 	_burden_label.modulate = Color(0.85, 0.7, 0.6)
-	_spiritual_vb.add_child(_burden_label)
+	vb.add_child(_burden_label)
 
 	_load_label = Label.new()
 	_load_label.add_theme_font_size_override("font_size", FONT_BODY)
 	_load_label.modulate = Color(0.8, 0.8, 0.88)
-	_spiritual_vb.add_child(_load_label)
-
-
-func _toggle_spiritual_panel() -> void:
-	_spiritual_collapsed = not _spiritual_collapsed
-	_spiritual_vb.visible = not _spiritual_collapsed
-	_spiritual_toggle.text = "▸" if _spiritual_collapsed else "▾"
-	if _spiritual_collapsed:
-		_spiritual_panel.size = Vector2(252, 28)
-	else:
-		var mobile := _is_mobile_ui()
-		_spiritual_panel.size = Vector2(330 if mobile else 252, 330 if mobile else 270)
+	vb.add_child(_load_label)
 
 
 func _add_stat_row(parent: VBoxContainer, key: String, fallback: String, color: Color) -> ProgressBar:
@@ -727,18 +700,7 @@ func _process(delta: float) -> void:
 	if _toast_timer > 0.0:
 		_toast_timer -= delta
 		if _toast_timer <= 0.0:
-			_toast_fading = true
-	if _toast_fading:
-		_toast_label.modulate.a = clampf(_toast_label.modulate.a - delta * TOAST_FADE_SPEED, 0.0, 1.0)
-		if _toast_label.modulate.a <= 0.0:
-			_toast_fading = false
 			_toast_label.visible = false
-			if not _toast_queue.is_empty():
-				_show_next_toast()
-
-	if is_instance_valid(_prompt_label) and _prompt_label.visible:
-		var pulse := 0.75 + 0.25 * sin(Time.get_ticks_msec() * 0.005)
-		_prompt_label.modulate.a = pulse
 
 	if _char_visible:
 		_refresh_char_panel()
@@ -792,25 +754,15 @@ func _on_interaction_unavailable() -> void:
 func _hide_prompt() -> void:
 	if is_instance_valid(_prompt_label):
 		_prompt_label.visible = false
-		_prompt_label.modulate.a = 1.0
 
 
 # ---------------------------------------------------------------------------
 # Toasts
 # ---------------------------------------------------------------------------
 func _on_toast(message: String) -> void:
-	_toast_queue.append(message)
-	_show_next_toast()
-
-
-func _show_next_toast() -> void:
-	if _toast_timer > 0.0 or _toast_queue.is_empty():
-		return
-	_toast_label.text = String(_toast_queue.pop_front())
+	_toast_label.text = message
 	_toast_label.visible = true
-	_toast_label.modulate.a = 1.0
-	_toast_timer = TOAST_DURATION
-	_toast_fading = false
+	_toast_timer = 3.0
 
 
 # ---------------------------------------------------------------------------
@@ -886,7 +838,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			KEY_2: num = 1
 			KEY_3: num = 2
 			KEY_4: num = 3
-			KEY_ENTER, KEY_KP_ENTER: num = 0
 		if num >= 0 and num < _current_choices.size():
 			_pick_choice(String(_current_choices[num].get("id", "")))
 			get_viewport().set_input_as_handled()

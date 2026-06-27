@@ -99,7 +99,6 @@ func _build() -> void:
 	_log_panel.position = Vector2(20, -320)
 	_log_panel.size = Vector2(440, 230)
 	_log_panel.modulate = Color(1, 1, 1, 0.92)
-	_log_panel.visible = false
 	add_child(_log_panel)
 	_log_scroll = ScrollContainer.new()
 	_log_scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -915,7 +914,6 @@ func _on_file_chosen(path: String) -> void:
 func _clear() -> void:
 	for c in _log_box.get_children():
 		c.queue_free()
-	_log_panel.visible = false
 
 
 func _on_history(items: Array) -> void:
@@ -1232,7 +1230,6 @@ func _highlight_mentions(text: String) -> String:
 
 
 func _append(node: Control) -> void:
-	_log_panel.visible = true
 	_log_box.add_child(node)
 	while _log_box.get_child_count() > MAX_ROWS:
 		_log_box.get_child(0).queue_free()
