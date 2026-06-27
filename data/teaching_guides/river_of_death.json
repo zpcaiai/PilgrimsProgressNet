@@ -1,0 +1,68 @@
+{
+  "chapter_id": "river_of_death",
+  "order": 15,
+  "title_zh": "死河",
+  "title_en": "The River of Death",
+  "story_summary_zh": "美地之后是没有桥的死河——通往天城必须经过。河水随惧怕加深、随信心变浅；盼望在水中扶持天路客『记得你所信的是谁，不是看水有多深』，直到双脚踏上彼岸。",
+  "story_summary_en": "Beyond Beulah lies the bridgeless River of Death—the City cannot be reached but through it. The water deepens with fear and grows shallow with faith; in the water Hopeful steadies the pilgrim, 'remember the one you trust, not how deep the water is', until his feet touch the far bank.",
+  "spiritual_theme_zh": "死亡是最后的试炼，不能靠装备、财富或名声渡过，唯靠信靠基督；惧怕使水加深，信心使水变浅。",
+  "spiritual_theme_en": "Death is the final trial, crossed not by gear, wealth, or fame but by trust in Christ; fear deepens the water, faith makes it shallow.",
+  "bible_references": [
+    {
+      "label_zh": "经过水，我必同在",
+      "label_en": "Through the waters",
+      "reference_zh": "以赛亚书 43:2",
+      "reference_en": "Isaiah 43:2",
+      "note_zh": "你从水中经过，我必与你同在；你趟过江河，水必不漫过你。",
+      "note_en": "When you pass through the waters I will be with you; the rivers shall not overwhelm you."
+    },
+    {
+      "label_zh": "死被得胜吞灭",
+      "label_en": "Death swallowed in victory",
+      "reference_zh": "哥林多前书 15:55-57",
+      "reference_en": "1 Corinthians 15:55-57",
+      "note_zh": "死啊，你得胜的权势在哪里？……感谢神，使我们借着主耶稣基督得胜。",
+      "note_en": "O death, where is your victory? Thanks be to God, who gives us victory through our Lord Jesus Christ."
+    },
+    {
+      "label_zh": "不怕遭害，你与我同在",
+      "label_en": "I will fear no evil",
+      "reference_zh": "诗篇 23:4",
+      "reference_en": "Psalm 23:4",
+      "note_zh": "我虽然行过死荫的幽谷，也不怕遭害，因为你与我同在。",
+      "note_en": "Though I walk through the valley of the shadow of death, I will fear no evil, for you are with me."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "为什么有时候水很深，有时候水很浅？",
+      "question_en": "Why is the water sometimes deep and sometimes shallow?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "盼望说『不要看水有多深，要记得你所信的是谁』。这对面对恐惧有什么帮助？",
+      "question_en": "Hopeful says 'don't look at the depth, remember the one you trust'. How does this help with fear?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "面对死亡或巨大的失去，什么使你的『水』变浅？什么使它变深？",
+      "question_en": "Facing death or great loss, what makes your 'water' shallow—what makes it deep?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "不要把死河讲得恐怖；重点是『不是独自经过』与信靠。",
+    "渡河不是凭感觉（感觉常说要沉了），而是凭所信的对象。"
+  ],
+  "teacher_notes_en": [
+    "Don't make the river ghoulish; the point is 'not crossing alone' and trust.",
+    "Crossing is not by feeling (feeling says you're sinking) but by the One trusted."
+  ],
+  "reflection_prompt_zh": "写下：什么『最后的河』是我惧怕的？哪一句应许能使那水变浅？",
+  "reflection_prompt_en": "Write down: what 'last river' do I fear—which promise can make that water shallow?",
+  "prayer_prompt_zh": "主啊，你应许我经过水时你与我同在；当我惧怕的水加深，求你叫我记得我所信的是你。",
+  "prayer_prompt_en": "Lord, you promise to be with me through the waters; when fear's water deepens, make me remember the One I trust is you."
+}

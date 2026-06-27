@@ -1,0 +1,68 @@
+{
+  "chapter_id": "doubting_castle",
+  "order": 12,
+  "title_zh": "疑惑堡",
+  "title_en": "Doubting Castle",
+  "story_summary_zh": "疲乏的天路客与盼望偏离正路，走进看似轻松的小路，被绝望巨人掳进疑惑堡。牢里绝望日增、黑念控告；直到盼望的鼓励使他想起怀中『应许之钥』，开门逃出，并为后人留下警戒。",
+  "story_summary_en": "Weary, the pilgrim and Hopeful stray onto an easier-looking path and are seized by Giant Despair into Doubting Castle. In the cell despair mounts and dark thoughts accuse, until Hopeful's encouragement makes him remember the Key of Promise in his own breast; he unlocks the door, escapes, and leaves a warning for those who follow.",
+  "spiritual_theme_zh": "即使走过十架、军装、得胜，疲乏的信徒仍可能因走捷径落入疑惑与绝望；出路是想起神的应许，并彼此扶持。",
+  "spiritual_theme_en": "Even after the Cross, armour, and victory, a weary believer can fall into doubt and despair by a shortcut; the way out is remembering God's promises and mutual encouragement.",
+  "bible_references": [
+    {
+      "label_zh": "绝望中神拯救",
+      "label_en": "Delivered from despair",
+      "reference_zh": "哥林多后书 1:8-10",
+      "reference_en": "2 Corinthians 1:8-10",
+      "note_zh": "我们……甚至连活命的指望都绝了……叫我们不靠自己，只靠叫死人复活的神。",
+      "note_en": "We despaired of life itself, that we might rely not on ourselves but on God who raises the dead."
+    },
+    {
+      "label_zh": "我心仍有指望",
+      "label_en": "Therefore I have hope",
+      "reference_zh": "耶利米哀歌 3:21-23",
+      "reference_en": "Lamentations 3:21-23",
+      "note_zh": "我想起这事，心里就有指望：耶和华的慈爱永不断绝……每早晨都是新的。",
+      "note_en": "This I recall, and therefore I have hope: the LORD's mercies never cease; they are new every morning."
+    },
+    {
+      "label_zh": "又宝贵又极大的应许",
+      "label_en": "Precious promises",
+      "reference_zh": "彼得后书 1:4",
+      "reference_en": "2 Peter 1:4",
+      "note_zh": "他已将又宝贵又极大的应许赐给我们。",
+      "note_en": "He has granted to us his precious and very great promises."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "天路客被关在牢里，最后是什么钥匙救了他？",
+      "question_en": "Locked in the cell, what key finally frees the pilgrim?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "『应许之钥』一直在他怀里，他却忘了。绝望怎样让人忘记自己已有的？",
+      "question_en": "The key was in his breast all along, yet he forgot. How does despair make us forget what we already have?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "盼望的『陪伴与提醒』为什么常是走出绝望的关键？",
+      "question_en": "Why is Hopeful's company and reminding so often the key to leaving despair?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "绝望会『编辑真相』——把暂时说成永远，把失败说成结局。",
+    "钥匙是『应许』：恢复常常是想起神已经说过的话，而非新的经历。"
+  ],
+  "teacher_notes_en": [
+    "Despair 'edits the truth'—calling the temporary permanent, calling failure the end.",
+    "The key is the Promise: recovery is often remembering what God has already said, not a new experience."
+  ],
+  "reflection_prompt_zh": "写下：我现在的绝望把什么『暂时』说成了『永远』？哪一句应许能开这扇门？",
+  "reflection_prompt_en": "Write down: what 'temporary' is my despair calling 'permanent'—which promise can open this door?",
+  "prayer_prompt_zh": "主啊，当我被疑惑囚禁，求你叫我想起你的应许，借着同行者的提醒重得盼望，逃出绝望。",
+  "prayer_prompt_en": "Lord, when doubt imprisons me, make me remember your promises, regain hope through a companion's reminder, and escape despair."
+}

@@ -1,0 +1,68 @@
+{
+  "chapter_id": "interpreter_house",
+  "order": 6,
+  "title_zh": "讲解者之家",
+  "title_en": "Interpreter's House",
+  "story_summary_zh": "讲解者用一间间象征的房间——画像、尘土、火焰、宫殿、铁笼、审判之梦——教导天路客分辨属灵的真实，预备他的眼睛与心。",
+  "story_summary_en": "The Interpreter teaches the pilgrim through symbolic rooms—a portrait, dust, hidden fire, a palace, an iron cage, a dream of judgement—training his eyes and heart to discern spiritual reality.",
+  "spiritual_theme_zh": "属灵分辨：求神开我们的眼，看出表象底下的真相，并被圣灵引导进入真理。",
+  "spiritual_theme_en": "Spiritual discernment: asking God to open our eyes to the truth beneath appearances, led into truth by the Spirit.",
+  "bible_references": [
+    {
+      "label_zh": "开我的眼睛",
+      "label_en": "Open my eyes",
+      "reference_zh": "诗篇 119:18",
+      "reference_en": "Psalm 119:18",
+      "note_zh": "求你开我的眼睛，使我看出你律法中的奇妙。",
+      "note_en": "Open my eyes, that I may behold wondrous things out of your law."
+    },
+    {
+      "label_zh": "圣灵引导进真理",
+      "label_en": "The Spirit guides",
+      "reference_zh": "约翰福音 16:13",
+      "reference_en": "John 16:13",
+      "note_zh": "真理的圣灵来了，要引导你们进入一切真理。",
+      "note_en": "When the Spirit of truth comes, he will guide you into all truth."
+    },
+    {
+      "label_zh": "属灵的事属灵分辨",
+      "label_en": "Spiritually discerned",
+      "reference_zh": "哥林多前书 2:14",
+      "reference_en": "1 Corinthians 2:14",
+      "note_zh": "属血气的人不领会神圣灵的事……惟有属灵的人才能看透。",
+      "note_en": "The natural person does not accept the things of the Spirit; they are spiritually discerned."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "讲解者之家里哪一个房间让你印象最深？为什么？",
+      "question_en": "Which room in the Interpreter's House struck you most, and why?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "火焰房间里，仇敌泼水却浇不灭火，因为有人在墙后浇油——这是什么意思？",
+      "question_en": "In the fire room, the enemy throws water but the fire won't die because someone pours oil behind the wall—what does this mean?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "你最近一次『看错』属灵的事，是什么让你后来看清的？",
+      "question_en": "When did you last misread something spiritual—what later helped you see clearly?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "铁笼之人是警戒，不要轻看恩典直到心硬。",
+    "讲解者最后指向十字架——分辨是为了走向基督。"
+  ],
+  "teacher_notes_en": [
+    "The man in the iron cage is a warning against despising grace until the heart hardens.",
+    "The Interpreter finally points to the Cross—discernment is for moving toward Christ."
+  ],
+  "reflection_prompt_zh": "写下：有什么属灵真相，我『知道』却还没有『看见』？",
+  "reflection_prompt_en": "Write down: what spiritual truth do I 'know' but have not yet 'seen'?",
+  "prayer_prompt_zh": "主啊，求你开我的眼睛，借着你的灵引导我进入真理，使我能分辨真假。",
+  "prayer_prompt_en": "Lord, open my eyes; by your Spirit guide me into truth, that I may discern the true from the false."
+}

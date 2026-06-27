@@ -1,0 +1,68 @@
+{
+  "chapter_id": "city_of_destruction",
+  "order": 1,
+  "title_zh": "灭亡城",
+  "title_en": "City of Destruction",
+  "story_summary_zh": "天路客读到自己的城将被审判，背着无法卸下的重担，在传福音者的指引下，不顾家人与顽固的拦阻，向着远处的光与窄门逃离。",
+  "story_summary_en": "The pilgrim reads that his city faces judgement. Burdened with a weight he cannot shed, and against the pull of family and Obstinate, he flees toward the distant light and the narrow gate, as Evangelist directs.",
+  "spiritual_theme_zh": "神的话唤醒人看见自己的罪与将来的审判；真正的觉醒会让人愿意离开熟悉却将亡的处境。",
+  "spiritual_theme_en": "God's word awakens a person to see sin and coming judgement; true awakening makes one willing to leave a familiar but doomed place.",
+  "bible_references": [
+    {
+      "label_zh": "审判临近",
+      "label_en": "Judgement is coming",
+      "reference_zh": "彼得后书 3:9-10",
+      "reference_en": "2 Peter 3:9-10",
+      "note_zh": "主不愿一人沉沦，乃愿人都悔改；主的日子要像贼一样来到。",
+      "note_en": "The Lord is patient, not willing that any perish; the Day of the Lord will come like a thief."
+    },
+    {
+      "label_zh": "逃离与不回头",
+      "label_en": "Flee and do not look back",
+      "reference_zh": "创世记 19:17",
+      "reference_en": "Genesis 19:17",
+      "note_zh": "逃命吧，不要回头看，免得被剿灭。",
+      "note_en": "Flee for your life; do not look back, lest you be swept away."
+    },
+    {
+      "label_zh": "我当怎样行",
+      "label_en": "What must I do",
+      "reference_zh": "使徒行传 2:37-38",
+      "reference_en": "Acts 2:37-38",
+      "note_zh": "众人觉得扎心，问当怎样行；彼得说要悔改。",
+      "note_en": "Cut to the heart, they ask what to do; Peter answers: repent."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "天路客背上的重担是什么？为什么家里人不明白他？",
+      "question_en": "What is the burden on the pilgrim's back, and why don't his family understand him?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "顽固说『为了书上几句话就要离开？』你怎么回应这种声音？",
+      "question_en": "Obstinate says, 'leave it all for a few words in a book?' How would you answer that voice?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "什么样的『话』曾真正唤醒过你？觉醒之后你做了什么？",
+      "question_en": "What 'word' has truly awakened you, and what did you do once awakened?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "重点不是恐吓审判，而是真理唤醒的恩典。",
+    "强调觉醒带来的不是绝望，而是逃向生命的行动。"
+  ],
+  "teacher_notes_en": [
+    "The point is not to terrify with judgement but the grace of being awakened by truth.",
+    "Stress that awakening leads not to despair but to a move toward life."
+  ],
+  "reflection_prompt_zh": "写下：现在有什么『熟悉却不安全』的处境，是我一直不愿离开的？",
+  "reflection_prompt_en": "Write down: what familiar-but-unsafe place have I been unwilling to leave?",
+  "prayer_prompt_zh": "主啊，求你用你的话唤醒我，使我看清自己的光景，并给我起身上路的勇气。",
+  "prayer_prompt_en": "Lord, awaken me by your word to see my true condition, and give me courage to rise and set out."
+}

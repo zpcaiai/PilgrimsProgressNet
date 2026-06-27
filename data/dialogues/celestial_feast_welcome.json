@@ -1,0 +1,43 @@
+{
+  "id": "celestial_feast_welcome",
+  "nodes": {
+    "start": {
+      "speaker": "A Shining One",
+      "text": "Welcome, pilgrim, to the supper of the Lamb. Look — these tables were set for you before the road ever began. The redeemed of every chapter are here: the ones Help pulled from the mire, the ones who stood at the trial, the ones the Promise freed from the dungeon. Come and be seated among them.",
+      "text_zh": "欢迎你，朝圣者，来赴羔羊的婚筵。看哪——这些席位，早在你上路之前就为你摆好了。历世历代蒙救赎的人都在这里：被「帮助」从泥潭里拉起来的、在受审之地站立的、被「应许」从牢狱中释放的。来，坐在他们中间罢。",
+      "choices": [
+        {
+          "id": "i_am_unworthy",
+          "text": "These are saints and martyrs. How can I sit at their table?",
+          "text_zh": "这些都是圣徒和殉道者。我怎能坐在他们的席上？",
+          "effects": { "humility": 10, "faith": 8, "shame": -20 },
+          "next": "by_grace"
+        },
+        {
+          "id": "i_see_them",
+          "text": "I know these faces — I met them on the road. Faithful is here. Hopeful... and so many more.",
+          "text_zh": "这些面孔我认得——我在路上遇见过他们。忠信在这里。盼望……还有这许多许多人。",
+          "effects": { "hope": 12, "humility": 6 },
+          "flags": { "saw_the_redeemed": true },
+          "next": "by_grace"
+        }
+      ]
+    },
+    "by_grace": {
+      "speaker": "A Shining One",
+      "text": "Not one at this table came by their own worth — every seat was bought by the Lamb. Eat, rest, and rejoice; but the feast is not the end. When you are ready, walk on to the throne. The King Himself is waiting to welcome you by name.",
+      "text_zh": "这席上没有一个人是凭自己的功劳来的——每一个座位都是羔羊用重价买来的。吃罢，安歇罢，欢喜罢；但这筵席还不是终点。你预备好了，就往宝座那里去。君王亲自在那里，要按你的名字迎接你。",
+      "choices": [
+        {
+          "id": "to_the_throne",
+          "text": "Then I will go on — to see the King, and to worship Him who carried me all the way home.",
+          "text_zh": "那我就往前去——去见君王，去敬拜那一路把我带回家的主。",
+          "effects": { "faith": 12, "hope": 12, "fear": -15 },
+          "flags": { "feast_welcomed": true },
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "chapter_id": "hill_difficulty",
+  "order": 7,
+  "title_zh": "艰难山",
+  "title_en": "Hill Difficulty",
+  "story_summary_zh": "三条路在山脚分岔：陡峭的正路，以及看似轻松的『危险』『毁灭』旁路。天路客选择艰难正路，在凉亭警醒不沉睡，凭信走过被锁的狮子，抵达美宫。",
+  "story_summary_en": "Three paths fork at the hill's foot: the steep true way, and the easy-looking bypaths Danger and Destruction. The pilgrim takes the hard road, stays watchful at the arbor, passes the chained lions by faith, and reaches the Palace.",
+  "spiritual_theme_zh": "成圣的道路是窄而难的；旁路虽轻松却通向危险。忍耐、警醒、拒绝捷径，是门徒的功课。",
+  "spiritual_theme_en": "The road of sanctification is narrow and hard; bypaths look easy but lead to danger. Endurance, watchfulness, and refusing shortcuts are the disciple's lessons.",
+  "bible_references": [
+    {
+      "label_zh": "经历艰难进神国",
+      "label_en": "Through tribulation",
+      "reference_zh": "使徒行传 14:22",
+      "reference_en": "Acts 14:22",
+      "note_zh": "我们进入神的国，必须经历许多艰难。",
+      "note_en": "Through many tribulations we must enter the kingdom of God."
+    },
+    {
+      "label_zh": "引到生命的路是窄的",
+      "label_en": "The hard way to life",
+      "reference_zh": "马太福音 7:14",
+      "reference_en": "Matthew 7:14",
+      "note_zh": "引到永生，那门是窄的，路是小的，找着的人也少。",
+      "note_en": "The gate is narrow and the way is hard that leads to life, and those who find it are few."
+    },
+    {
+      "label_zh": "存心忍耐奔那路程",
+      "label_en": "Run with endurance",
+      "reference_zh": "希伯来书 12:1",
+      "reference_en": "Hebrews 12:1",
+      "note_zh": "放下各样的重担……存心忍耐，奔那摆在我们前头的路程。",
+      "note_en": "Lay aside every weight, and run with endurance the race set before us."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "两条旁路看起来更好走，为什么走它们反而危险？",
+      "question_en": "The two bypaths look easier—why is taking them actually dangerous?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "在凉亭睡着会丢掉确据书卷。属灵上『在凉亭沉睡』是什么样子？",
+      "question_en": "Sleeping at the arbor loses the scroll. What does 'sleeping at the arbor' look like spiritually?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "你最近一次想抄『轻松的捷径』是什么？结果如何？",
+      "question_en": "When did you last want an easy shortcut—how did it turn out?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "旁路不是立刻毁灭，而是渐渐失去警醒——这正是危险所在。",
+    "狮子是被锁的：很多惧怕在凭信走近时显出其界限。"
+  ],
+  "teacher_notes_en": [
+    "Bypaths don't destroy at once but slowly erode watchfulness—that is the danger.",
+    "The lions are chained: many fears show their limits when approached by faith."
+  ],
+  "reflection_prompt_zh": "写下：我现在面前的『陡坡』是什么？哪条『旁路』在向我招手？",
+  "reflection_prompt_en": "Write down: what is the steep climb before me, and which bypath is beckoning?",
+  "prayer_prompt_zh": "主啊，求你给我忍耐走窄路，警醒不沉睡，不为图轻省而偏行旁路。",
+  "prayer_prompt_en": "Lord, give me endurance for the narrow road, watchfulness against sleep, and grace not to turn aside for ease."
+}

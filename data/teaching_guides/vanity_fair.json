@@ -1,0 +1,68 @@
+{
+  "chapter_id": "vanity_fair",
+  "order": 11,
+  "title_zh": "虚华市与忠信殉道",
+  "title_en": "Vanity Fair & Faithful's Martyrdom",
+  "story_summary_zh": "忠信在城门口与天路客会合，同进虚华市——名声、财富、安逸、宗教表演样样兜售，唯独不卖真理。他们拒绝货物、公开作见证，因而被捕；忠信受审殉道，盼望却因这见证被点燃，接续同行。",
+  "story_summary_en": "Faithful meets the pilgrim at the gate, and together they enter Vanity Fair—where fame, wealth, comfort, and religious show are all for sale, but never truth. They refuse the wares and bear public witness, and so are arrested; Faithful is tried and martyred, but Hopeful, set ablaze by the witness, joins to walk on.",
+  "spiritual_theme_zh": "不要爱世界；分辨假光，付代价作见证。忠心至死的见证不是失败，而是恩典的接续。",
+  "spiritual_theme_en": "Do not love the world; discern the false light, and bear costly witness. Faithfulness unto death is not failure but the passing-on of grace.",
+  "bible_references": [
+    {
+      "label_zh": "不要爱世界",
+      "label_en": "Do not love the world",
+      "reference_zh": "约翰一书 2:15-17",
+      "reference_en": "1 John 2:15-17",
+      "note_zh": "不要爱世界……这世界和其上的情欲都要过去，唯独遵行神旨意的永远长存。",
+      "note_en": "Do not love the world; the world is passing away, but whoever does the will of God abides forever."
+    },
+    {
+      "label_zh": "买真理，不可卖",
+      "label_en": "Buy truth, do not sell",
+      "reference_zh": "箴言 23:23",
+      "reference_en": "Proverbs 23:23",
+      "note_zh": "你当买真理，就是智慧、训诲和聪明，也都不可卖。",
+      "note_en": "Buy truth, and do not sell it; buy wisdom, instruction, and understanding."
+    },
+    {
+      "label_zh": "至死忠心得冠冕",
+      "label_en": "Faithful unto death",
+      "reference_zh": "启示录 2:10",
+      "reference_en": "Revelation 2:10",
+      "note_zh": "你务要至死忠心，我就赐给你那生命的冠冕。",
+      "note_en": "Be faithful unto death, and I will give you the crown of life."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "虚华市什么都卖，就是不卖什么？",
+      "question_en": "Vanity Fair sells everything—except what?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "天路客和忠信说『我们买真理』。在你的学校或网络上，什么是『虚华市的货物』？",
+      "question_en": "They say 'we buy the truth'. At your school or online, what are 'the wares of Vanity Fair'?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "忠信殉道，盼望却因此加入。为什么说见证的『代价』也是它的『能力』？",
+      "question_en": "Faithful is martyred, yet Hopeful joins because of it. Why is the cost of witness also its power?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "避免把世界简单等同于『娱乐』；虚华市也卖宗教表演与成功学。",
+    "处理殉道时要把悲伤导向盼望（盼望的加入），不要停在惨烈上。"
+  ],
+  "teacher_notes_en": [
+    "Don't reduce 'the world' to entertainment; Vanity Fair also sells religious show and success-worship.",
+    "Handle martyrdom by turning sorrow toward hope (Hopeful joining), not dwelling on horror."
+  ],
+  "reflection_prompt_zh": "写下：有什么『发光的东西』正在向我要价？它真来自真光吗？",
+  "reflection_prompt_en": "Write down: what 'shining thing' is asking a price of me—does it really come from the true light?",
+  "prayer_prompt_zh": "主啊，求你给我分辨假光的眼，和付代价作见证的勇气；叫我爱你过于爱世界。",
+  "prayer_prompt_en": "Lord, give me eyes to discern false light and courage for costly witness; let me love you more than the world."
+}

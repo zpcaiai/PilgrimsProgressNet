@@ -1,0 +1,178 @@
+{
+  "city_of_destruction": {
+    "id": "city_of_destruction",
+    "chapter_id": "city_of_destruction",
+    "ref": "希伯来书 11:7",
+    "theme_zh": "因信离开将倾之城",
+    "theme_en": "Leave the doomed city by faith",
+    "memory_zh": "信心使人听见警告后就预备道路，不再把安全感交给旧城。",
+    "memory_en": "Faith hears the warning and prepares a way forward instead of trusting the old city.",
+    "tags": ["faith", "fear", "decision"],
+    "effects": {"faith": 5, "fear": -6, "watchfulness": 3}
+  },
+  "wilderness_road": {
+    "id": "wilderness_road",
+    "chapter_id": "wilderness_road",
+    "ref": "诗篇 119:105",
+    "theme_zh": "让话语照亮脚前的路",
+    "theme_en": "Let the word light the next step",
+    "memory_zh": "神的话不是远处的装饰，而是脚前可走的光。",
+    "memory_en": "God's word is not distant ornament; it is light for the next step.",
+    "tags": ["discernment", "weariness", "guidance"],
+    "effects": {"discernment": 5, "weariness": -5, "hope": 3}
+  },
+  "slough_of_despond": {
+    "id": "slough_of_despond",
+    "chapter_id": "slough_of_despond",
+    "ref": "诗篇 40:2",
+    "theme_zh": "从淤泥中被扶起",
+    "theme_en": "Lifted from the miry pit",
+    "memory_zh": "沮丧不是终点；主能把脚放在磐石上，使步伐稳当。",
+    "memory_en": "Despondency is not the end; the Lord sets feet on rock and steadies the way.",
+    "tags": ["despair", "hope", "rescue"],
+    "effects": {"despair": -8, "hope": 6, "perseverance": 3}
+  },
+  "wicket_gate": {
+    "id": "wicket_gate",
+    "chapter_id": "wicket_gate",
+    "ref": "马太福音 7:7",
+    "theme_zh": "叩门并继续寻求",
+    "theme_en": "Knock and keep seeking",
+    "memory_zh": "寻求、叩门、祈求，是朝向恩典的真实行动。",
+    "memory_en": "Asking, seeking, and knocking are real movements toward grace.",
+    "tags": ["faith", "prayer", "decision"],
+    "effects": {"faith": 5, "hope": 4, "fear": -4}
+  },
+  "cross_and_tomb": {
+    "id": "cross_and_tomb",
+    "chapter_id": "cross_and_tomb",
+    "ref": "约翰福音 19:30",
+    "theme_zh": "成了，重担可以放下",
+    "theme_en": "It is finished; the burden can fall",
+    "memory_zh": "救恩不是靠背负更多，而是仰望已经成就的基督。",
+    "memory_en": "Salvation is not carrying more, but looking to Christ's finished work.",
+    "tags": ["shame", "faith", "grace"],
+    "effects": {"shame": -10, "faith": 8, "hope": 5}
+  },
+  "interpreter_house": {
+    "id": "interpreter_house",
+    "chapter_id": "interpreter_house",
+    "ref": "提摩太后书 3:16",
+    "theme_zh": "让圣经校准眼光",
+    "theme_en": "Let Scripture train the eye",
+    "memory_zh": "圣经教导、督责、归正、训练，使人看清真实。",
+    "memory_en": "Scripture teaches, corrects, restores, and trains the heart to see clearly.",
+    "tags": ["discernment", "deception", "teaching"],
+    "effects": {"discernment": 8, "deception": -8, "watchfulness": 4}
+  },
+  "hill_difficulty": {
+    "id": "hill_difficulty",
+    "chapter_id": "hill_difficulty",
+    "ref": "希伯来书 12:1",
+    "theme_zh": "忍耐奔那摆在前头的路",
+    "theme_en": "Run with endurance",
+    "memory_zh": "把缠累放下，忍耐不是硬撑，而是定睛前方。",
+    "memory_en": "Lay aside what entangles; endurance fixes its eyes ahead.",
+    "tags": ["perseverance", "weariness", "focus"],
+    "effects": {"perseverance": 8, "weariness": -7, "hope": 3}
+  },
+  "palace_beautiful": {
+    "id": "palace_beautiful",
+    "chapter_id": "palace_beautiful",
+    "ref": "以弗所书 6:11",
+    "theme_zh": "穿戴神所赐的全副军装",
+    "theme_en": "Put on the full armor of God",
+    "memory_zh": "争战需要真理、信心与义的保护，不只靠热心。",
+    "memory_en": "The struggle needs truth, faith, and righteousness, not zeal alone.",
+    "tags": ["fear", "deception", "armor"],
+    "effects": {"faith": 5, "fear": -8, "watchfulness": 6}
+  },
+  "valley_humiliation": {
+    "id": "valley_humiliation",
+    "chapter_id": "valley_humiliation",
+    "ref": "雅各书 4:6",
+    "theme_zh": "神赐恩给谦卑的人",
+    "theme_en": "Grace is given to the humble",
+    "memory_zh": "降卑不是失败；谦卑使心能领受恩典。",
+    "memory_en": "Humiliation is not defeat; humility opens the heart to grace.",
+    "tags": ["pride", "humility", "shame"],
+    "effects": {"humility": 8, "pride": -9, "shame": -4}
+  },
+  "valley_shadow_death": {
+    "id": "valley_shadow_death",
+    "chapter_id": "valley_shadow_death",
+    "ref": "诗篇 23:4",
+    "theme_zh": "死荫中仍有主同在",
+    "theme_en": "The Lord is present in the shadow",
+    "memory_zh": "黑暗真实，但同在更真实；因此不让惧怕发号施令。",
+    "memory_en": "The dark is real, but the Lord's presence is truer; fear does not command.",
+    "tags": ["fear", "despair", "presence"],
+    "effects": {"fear": -10, "despair": -6, "hope": 5}
+  },
+  "vanity_fair": {
+    "id": "vanity_fair",
+    "chapter_id": "vanity_fair",
+    "ref": "马太福音 16:26",
+    "theme_zh": "不以灵魂换取世界",
+    "theme_en": "Do not trade the soul for the world",
+    "memory_zh": "热闹的交易会问价钱；基督的道路先问灵魂。",
+    "memory_en": "The market asks for price; the way of Christ asks after the soul.",
+    "tags": ["deception", "pride", "discernment"],
+    "effects": {"deception": -9, "pride": -5, "discernment": 6}
+  },
+  "doubting_castle": {
+    "id": "doubting_castle",
+    "chapter_id": "doubting_castle",
+    "ref": "以赛亚书 41:10",
+    "theme_zh": "不要害怕，主必扶持",
+    "theme_en": "Do not fear; the Lord upholds",
+    "memory_zh": "疑惑的牢门不比主的扶持更坚固。",
+    "memory_en": "The prison door of doubt is not stronger than the Lord's upholding hand.",
+    "tags": ["despair", "fear", "promise"],
+    "effects": {"despair": -10, "fear": -7, "faith": 5}
+  },
+  "delectable_mountains": {
+    "id": "delectable_mountains",
+    "chapter_id": "delectable_mountains",
+    "ref": "诗篇 121:1-2",
+    "theme_zh": "帮助从造天地的主而来",
+    "theme_en": "Help comes from the Maker",
+    "memory_zh": "举目不是逃避现实，而是重新确认帮助的源头。",
+    "memory_en": "Lifting the eyes is not escape; it remembers the source of help.",
+    "tags": ["hope", "weariness", "guidance"],
+    "effects": {"hope": 7, "weariness": -6, "discernment": 3}
+  },
+  "enchanted_ground": {
+    "id": "enchanted_ground",
+    "chapter_id": "enchanted_ground",
+    "ref": "马太福音 26:41",
+    "theme_zh": "警醒祷告，免入迷睡",
+    "theme_en": "Watch and pray against sleep",
+    "memory_zh": "属灵困倦需要警醒和祷告，而不是假装无事。",
+    "memory_en": "Spiritual drowsiness needs watchful prayer, not pretending nothing is wrong.",
+    "tags": ["weariness", "watchfulness", "prayer"],
+    "effects": {"watchfulness": 8, "weariness": -8, "deception": -4}
+  },
+  "river_of_death": {
+    "id": "river_of_death",
+    "chapter_id": "river_of_death",
+    "ref": "哥林多前书 15:55",
+    "theme_zh": "死亡失去最终的夸胜",
+    "theme_en": "Death does not have the final victory",
+    "memory_zh": "河水会深，但复活的盼望比死亡更深。",
+    "memory_en": "The river is deep, yet resurrection hope is deeper than death.",
+    "tags": ["fear", "hope", "death"],
+    "effects": {"fear": -10, "hope": 8, "faith": 4}
+  },
+  "celestial_city": {
+    "id": "celestial_city",
+    "chapter_id": "celestial_city",
+    "ref": "启示录 21:4",
+    "theme_zh": "神擦去一切眼泪",
+    "theme_en": "God wipes away every tear",
+    "memory_zh": "终点不是逃离世界，而是进入神亲自更新的盼望。",
+    "memory_en": "The end is not escape from the world, but entering God's renewed hope.",
+    "tags": ["hope", "despair", "final"],
+    "effects": {"hope": 10, "despair": -10, "weariness": -6}
+  }
+}

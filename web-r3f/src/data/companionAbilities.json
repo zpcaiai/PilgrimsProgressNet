@@ -1,0 +1,18 @@
+{
+  "companions": [
+    {
+      "npcId": "faithful",
+      "abilities": [
+        { "id": "faithful_encourage", "nameCN": "彼此勉励", "descriptionCN": "忠信的同行让你在惧怕中刚强。", "cooldownSeconds": 30, "effects": { "courage": 10, "fear": -10 }, "countersTemptations": ["fear"] },
+        { "id": "faithful_testify", "nameCN": "公开见证", "descriptionCN": "忠信带头作见证，激励你不以福音为耻。", "cooldownSeconds": 45, "effects": { "witness": 12, "worldliness": -6 }, "countersTemptations": ["worldliness", "pride"] }
+      ]
+    },
+    {
+      "npcId": "hopeful",
+      "abilities": [
+        { "id": "hopeful_remind_promise", "nameCN": "提醒应许", "descriptionCN": "盼望提醒你神的应许，疑惑与绝望退去。", "cooldownSeconds": 30, "effects": { "hope": 12, "doubt": -10, "despair": -10 }, "countersTemptations": ["doubt", "despair"] },
+        { "id": "hopeful_sing", "nameCN": "牢中歌唱", "descriptionCN": "盼望在黑暗里歌唱，黑夜将尽。", "cooldownSeconds": 60, "effects": { "hope": 15, "fear": -8 }, "countersTemptations": ["despair", "fear"] }
+      ]
+    }
+  ]
+}

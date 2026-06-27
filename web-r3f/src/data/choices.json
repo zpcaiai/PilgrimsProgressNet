@@ -1,0 +1,53 @@
+{
+  "choices": [
+    {
+      "id": "choice_city_leave", "chapterId": "chapter_01", "sceneId": "city_of_destruction", "type": "obedience", "repeatable": false,
+      "promptCN": "传福音者指着远处的微光。你要离开灭亡城吗？",
+      "blockedByFlags": ["accepted_evangelist_call"],
+      "options": [
+        { "id": "leave_now", "textCN": "立刻动身，朝着微光奔跑", "effects": { "faith": 12, "hope": 8, "fear": -5, "burden": -3 }, "setFlags": ["accepted_evangelist_call"], "addItems": ["scroll_of_warning"], "consequenceCN": "你不顾邻舍的嘲笑，向窄门奔去。" },
+        { "id": "delay", "textCN": "再想想，先回家安排", "effects": { "doubt": 8, "worldliness": 6, "fear": 4 }, "consequenceCN": "拖延让重担更沉，惧怕悄悄滋长。" }
+      ]
+    },
+    {
+      "id": "choice_slough_response", "chapterId": "chapter_02", "sceneId": "slough_of_despond", "type": "perseverance", "repeatable": true,
+      "promptCN": "你陷在沮丧的泥潭里，越挣扎越下沉。",
+      "options": [
+        { "id": "call_for_help", "textCN": "向‘帮助’呼求", "effects": { "humility": 8, "hope": 10, "despair": -10 }, "setFlags": ["called_for_help"], "consequenceCN": "‘帮助’伸手把你拉上坚实的踏脚石。" },
+        { "id": "struggle_alone", "textCN": "靠自己拼命爬", "effects": { "despair": 10, "burden": 6, "fear": 5 }, "consequenceCN": "重担把你拖得更深，几乎绝望。" }
+      ]
+    },
+    {
+      "id": "choice_difficulty_path", "chapterId": "chapter_05", "sceneId": "hill_difficulty_base", "type": "shortcut", "repeatable": false,
+      "promptCN": "困难山前有三条路：正路向上，‘危险’与‘毁灭’绕向两侧。",
+      "options": [
+        { "id": "climb_straight", "textCN": "走窄而陡的正路上山", "effects": { "courage": 10, "faith": 8, "vigilance": 5 }, "setFlags": ["climbed_difficulty"], "consequenceCN": "山路艰难，但每一步都更靠近天城。" },
+        { "id": "take_bypath", "textCN": "选择看似轻松的岔路", "effects": { "worldliness": 8, "doubt": 6 }, "setFlags": ["took_bypath_difficulty"], "consequenceCN": "捷径把你引向迷途，不得不折返。" }
+      ]
+    },
+    {
+      "id": "choice_vanity_booth", "chapterId": "chapter_11", "sceneId": "vanity_fair", "type": "worldliness", "repeatable": true,
+      "promptCN": "虚华市的摊贩向你兜售名声、银钱与地位。",
+      "options": [
+        { "id": "refuse_buy", "textCN": "我只买真理", "effects": { "witness": 12, "courage": 8, "worldliness": -8 }, "setFlags": ["refused_vanity", "refused_vanity_fame"], "consequenceCN": "人群嘲笑你，但你的见证更显明亮。" },
+        { "id": "take_badge", "textCN": "戴上名声徽章", "effects": { "worldliness": 18, "pride": 12, "humility": -10 }, "addItems": ["badge_of_fame"], "consequenceCN": "众人称赞你，重担却悄悄加增。" }
+      ]
+    },
+    {
+      "id": "choice_bypath_meadow", "chapterId": "chapter_12", "sceneId": "trial_of_faithful", "type": "shortcut", "repeatable": false,
+      "promptCN": "路旁有一片柔软的草地，沿着栅栏似乎与正路平行、却更好走。",
+      "options": [
+        { "id": "stay_on_path", "textCN": "留在崎岖的正路上", "effects": { "vigilance": 10, "faith": 6 }, "setFlags": ["stayed_on_path"], "consequenceCN": "你忍受崎岖，避开了疑惑堡的陷阱。" },
+        { "id": "enter_meadow", "textCN": "翻过栅栏走草地", "effects": { "doubt": 10, "worldliness": 5 }, "setFlags": ["entered_bypath_meadow"], "consequenceCN": "草地把你引向绝望巨人的地界。" }
+      ]
+    },
+    {
+      "id": "choice_river_step", "chapterId": "chapter_15", "sceneId": "river_of_death", "type": "faith", "repeatable": true,
+      "promptCN": "死河横在天城之前，水深随你心中的惧怕而涨落。",
+      "options": [
+        { "id": "fix_eyes_above", "textCN": "定睛仰望对岸的天城", "effects": { "faith": 15, "hope": 15, "fear": -15, "despair": -10 }, "setFlags": ["crossed_in_faith"], "consequenceCN": "脚下的水忽然变浅，你稳稳前行。" },
+        { "id": "look_at_waves", "textCN": "盯着脚下翻涌的水", "effects": { "fear": 15, "doubt": 10, "despair": 8 }, "consequenceCN": "波浪几乎淹没你——直到盼望再次扶住你。" }
+      ]
+    }
+  ]
+}

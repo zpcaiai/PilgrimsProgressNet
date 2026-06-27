@@ -1,0 +1,88 @@
+{
+  "chapels": [
+    {
+      "id": "chapel_city_ruins", "chapterId": "chapter_01", "type": "ruined",
+      "sceneId": "city_of_destruction", "position": [-8, 0, -10],
+      "verseText": "醒来吧，你这睡着的人。", "restoreFaithAmount": 5,
+      "unlocksQuestHint": "朝远处的光走，寻找窄门。"
+    },
+    {
+      "id": "chapel_slough_sunken", "chapterId": "chapter_02", "type": "ruined",
+      "sceneId": "slough_of_despond", "position": [-10, -0.4, -18],
+      "verseText": "我从深处向你求告。", "restoreFaithAmount": 8,
+      "unlocksQuestHint": "呼求帮助，不要独自陷在泥潭中。"
+    },
+    {
+      "id": "chapel_interpreter_house", "chapterId": "chapter_03", "type": "gate",
+      "sceneId": "interpreter_house_interior", "position": [-8, 0, -4],
+      "verseText": "求你开我的眼睛，使我看出你律法中的奇妙。", "restoreFaithAmount": 10,
+      "unlocksQuestHint": "完成每个房间的功课，再继续前往十字架。"
+    },
+    {
+      "id": "chapel_calvary_cross", "chapterId": "chapter_04", "type": "calvary",
+      "sceneId": "calvary_hill", "position": [-7, 0, -18],
+      "verseText": "他的重担在十字架前脱落。", "restoreFaithAmount": 25,
+      "unlocksQuestHint": "跪在十字架前，不再背负你不能除去的重担。"
+    },
+    {
+      "id": "chapel_hill_difficulty", "chapterId": "chapter_05", "type": "pilgrim",
+      "sceneId": "hill_difficulty_base", "position": [-9, 2, -18],
+      "verseText": "你们进入神的国，必须经历许多艰难。", "restoreFaithAmount": 12,
+      "unlocksQuestHint": "不要走旁路，艰难的正路通向美宫。"
+    },
+    {
+      "id": "chapel_house_beautiful", "chapterId": "chapter_06", "type": "pilgrim",
+      "sceneId": "house_beautiful_interior", "position": [-10, 0, -12],
+      "verseText": "你们要彼此接待，如同基督接待你们一样。", "restoreFaithAmount": 15,
+      "unlocksQuestHint": "在团契中安息，并预备进入军装厅。"
+    },
+    {
+      "id": "chapel_armory_hall", "chapterId": "chapter_07", "type": "pilgrim",
+      "sceneId": "armory_hall", "position": [-12, 0, -18],
+      "verseText": "要穿戴神所赐的全副军装。", "restoreFaithAmount": 15,
+      "unlocksQuestHint": "逐件领取军装，并完成训练。"
+    },
+    {
+      "id": "chapel_valley_humiliation", "chapterId": "chapter_08", "type": "pilgrim",
+      "sceneId": "valley_humiliation_floor", "position": [-14, 0, -20],
+      "verseText": "神阻挡骄傲的人，赐恩给谦卑的人。", "restoreFaithAmount": 16,
+      "unlocksQuestHint": "下到低谷之前，先放下自恃。"
+    },
+    {
+      "id": "chapel_shadow_valley", "chapterId": "chapter_10", "type": "ruined",
+      "sceneId": "valley_shadow_death", "position": [-3, 0, -55],
+      "verseText": "黑暗不能遮蔽我使你不见。", "restoreFaithAmount": 16,
+      "unlocksQuestHint": "不要偏左，也不要偏右。用祷告的微光看清下一步。"
+    },
+    {
+      "id": "chapel_hidden_vanity_fair", "chapterId": "chapter_11", "type": "trial",
+      "sceneId": "vanity_fair", "position": [-18, 0, -50],
+      "verseText": "不要爱世界和世界上的事。", "restoreFaithAmount": 12,
+      "unlocksQuestHint": "不是所有发光的东西都来自真光。"
+    },
+    {
+      "id": "chapel_faithful_martyrdom", "chapterId": "chapter_12", "type": "trial",
+      "sceneId": "trial_of_faithful", "position": [-14, 0, -18],
+      "verseText": "你务要至死忠心，我就赐给你生命的冠冕。", "restoreFaithAmount": 20,
+      "unlocksQuestHint": "忠信的见证不是终点，盼望将接续同行。"
+    },
+    {
+      "id": "chapel_delectable_mountains", "chapterId": "chapter_14", "type": "pilgrim",
+      "sceneId": "delectable_mountains", "position": [-11, 1, -16],
+      "verseText": "我要向山举目。", "restoreFaithAmount": 16,
+      "unlocksQuestHint": "用牧人的望远镜远望天城，警醒不要在魔睡地沉睡。"
+    },
+    {
+      "id": "chapel_river_of_death", "chapterId": "chapter_15", "type": "river",
+      "sceneId": "river_of_death", "position": [-8, 0, 6],
+      "verseText": "你从水中经过，我必与你同在。", "restoreFaithAmount": 20,
+      "unlocksQuestHint": "记起那托住你一路的，水深夺不走它。"
+    },
+    {
+      "id": "chapel_celestial_city", "chapterId": "chapter_16", "type": "celestial",
+      "sceneId": "celestial_city", "position": [0, 0, -8],
+      "verseText": "神要擦去他们一切的眼泪。", "restoreFaithAmount": 30,
+      "unlocksQuestHint": "进入那为你存留的城。"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "chapter_id": "slough_of_despond",
+  "order": 3,
+  "title_zh": "沮丧泥潭",
+  "title_en": "Slough of Despond",
+  "story_summary_zh": "天路客陷入沮丧的泥潭，重担越重，越往下沉；易迁灰心折返，唯有谦卑呼求的人被『帮助』拉上岸，踏着应许之石走向窄门。",
+  "story_summary_en": "The pilgrim sinks in the mire of despondency; the heavier the burden, the deeper he sinks. Pliable despairs and turns back, but the one who humbly cries out is pulled up by Help and finds the stones of promise toward the gate.",
+  "spiritual_theme_zh": "初信的软弱与罪疚会使人下沉；出路不是自我挣扎，而是谦卑呼求与领受帮助。",
+  "spiritual_theme_en": "Early weakness and guilt drag a believer down; the way out is not self-struggle but a humble cry and receiving help.",
+  "bible_references": [
+    {
+      "label_zh": "从泥潭被拉起",
+      "label_en": "Lifted from the mire",
+      "reference_zh": "诗篇 40:1-3",
+      "reference_en": "Psalm 40:1-3",
+      "note_zh": "他从祸坑里、淤泥中把我拉上来，使我脚立在磐石上。",
+      "note_en": "He drew me up from the miry bog and set my feet upon a rock."
+    },
+    {
+      "label_zh": "从深处呼求",
+      "label_en": "Out of the depths",
+      "reference_zh": "诗篇 130:1-2",
+      "reference_en": "Psalm 130:1-2",
+      "note_zh": "耶和华啊，我从深处向你求告。",
+      "note_en": "Out of the depths I cry to you, O LORD."
+    },
+    {
+      "label_zh": "呼求必蒙应允",
+      "label_en": "Call and be heard",
+      "reference_zh": "诗篇 50:15",
+      "reference_en": "Psalm 50:15",
+      "note_zh": "在患难之日求告我，我必搭救你。",
+      "note_en": "Call upon me in the day of trouble; I will deliver you."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "天路客越用力越往下沉，是谁来把他拉上来？",
+      "question_en": "The harder he tries the deeper he sinks—who comes to pull him out?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "为什么易迁离开了，天路客却没有？两人有什么不同？",
+      "question_en": "Why does Pliable leave but the pilgrim does not—what is different about them?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "你有没有试过靠自己爬出『泥潭』？什么时候你才肯呼求帮助？",
+      "question_en": "Have you tried to climb out of a 'slough' alone—when did you finally cry for help?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "泥潭不是惩罚，而是罪疚与灰心的真实感受。",
+    "强调『呼求帮助』本身就是初步的悔改与信心。"
+  ],
+  "teacher_notes_en": [
+    "The slough is not punishment but the felt reality of guilt and discouragement.",
+    "Stress that crying for help is itself an early act of repentance and faith."
+  ],
+  "reflection_prompt_zh": "写下：现在有什么让我越挣扎越下沉？我愿意把它变成一句呼求吗？",
+  "reflection_prompt_en": "Write down: what makes me sink the harder I struggle—will I turn it into a single cry for help?",
+  "prayer_prompt_zh": "主啊，我从深处向你呼求；我不能自己爬出泥潭，求你伸手拉我上来，使我站在磐石上。",
+  "prayer_prompt_en": "Lord, out of the depths I cry; I cannot climb out alone—reach down, lift me, and set my feet on the rock."
+}

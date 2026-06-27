@@ -1,0 +1,68 @@
+{
+  "chapter_id": "wicket_gate",
+  "order": 4,
+  "title_zh": "窄门",
+  "title_en": "The Wicket Gate",
+  "story_summary_zh": "天路客顶着控告的箭，来到窄门前叩门；善意把他拉进门内，使他进入唯一正路。",
+  "story_summary_en": "Pressing through arrows of accusation, the pilgrim knocks at the narrow gate; Goodwill draws him through into the one true way.",
+  "spiritual_theme_zh": "信心是叩门与求问；恩典是为求问的人开门。进窄门是进入基督这唯一的门。",
+  "spiritual_theme_en": "Faith asks and knocks; grace opens to those who ask. To enter the narrow gate is to enter Christ, the one door.",
+  "bible_references": [
+    {
+      "label_zh": "叩门就开",
+      "label_en": "Knock and it opens",
+      "reference_zh": "马太福音 7:7-8",
+      "reference_en": "Matthew 7:7-8",
+      "note_zh": "叩门，就给你们开门；凡叩门的，就给他开门。",
+      "note_en": "Knock and it will be opened to you; everyone who knocks, the door is opened."
+    },
+    {
+      "label_zh": "进窄门",
+      "label_en": "Enter the narrow gate",
+      "reference_zh": "马太福音 7:13-14",
+      "reference_en": "Matthew 7:13-14",
+      "note_zh": "你们要进窄门……引到永生的路是窄的。",
+      "note_en": "Enter by the narrow gate; the way that leads to life is narrow."
+    },
+    {
+      "label_zh": "我就是门",
+      "label_en": "I am the door",
+      "reference_zh": "约翰福音 10:9",
+      "reference_en": "John 10:9",
+      "note_zh": "我就是门；凡从我进来的，必然得救。",
+      "note_en": "I am the door. If anyone enters by me, he will be saved."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "门很窄，可是是关着还是开着的？要先做什么？",
+      "question_en": "The gate is narrow—is it shut or open, and what must you do first?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "什么样的『箭』会让人不敢上前叩门？",
+      "question_en": "What kind of 'arrows' make a person afraid to step up and knock?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "『叩门』在你信心生活中具体是什么样子？你还在为什么叩门？",
+      "question_en": "What does 'knocking' look like in your life of faith—what are you still knocking for?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "窄不等于关；门是为叩门的人开的。",
+    "把窄门指向基督自己（约10:9），不要停在道德努力上。"
+  ],
+  "teacher_notes_en": [
+    "Narrow does not mean shut; the gate opens to those who knock.",
+    "Point the narrow gate to Christ himself (Jn 10:9), not mere moral effort."
+  ],
+  "reflection_prompt_zh": "写下：有什么是我一直在门外徘徊、却不敢叩的？",
+  "reflection_prompt_en": "Write down: what have I been lingering outside the door over, not daring to knock?",
+  "prayer_prompt_zh": "主啊，你是那门；我叩门，求你为我开，领我进入唯一的正路。",
+  "prayer_prompt_en": "Lord, you are the door; I knock—open to me and bring me into the one true way."
+}

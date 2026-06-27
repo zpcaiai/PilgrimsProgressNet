@@ -1,0 +1,68 @@
+{
+  "chapter_id": "wilderness_road",
+  "order": 2,
+  "title_zh": "旷野之路",
+  "title_en": "The Wilderness Road",
+  "story_summary_zh": "刚出城的天路客走在荒路上，顽固已经折返，易迁还在身旁动摇，城里的声音不断招他回头；他要定睛在远处的光，不凭争辩或讨好继续前行。",
+  "story_summary_en": "Newly out of the city, the pilgrim walks a bleak road. Obstinate has turned back, Pliable wavers at his side, and the city's voices call him home; he must fix his eyes on the far light and press on without arguing or flattering.",
+  "spiritual_theme_zh": "起步的代价：分别为圣、不回头，定睛于前面的呼召而非身后的声音。",
+  "spiritual_theme_en": "The cost of beginning: separation, not looking back, eyes fixed on the call ahead rather than the voices behind.",
+  "bible_references": [
+    {
+      "label_zh": "手扶犁不回头",
+      "label_en": "Hand to the plough",
+      "reference_zh": "路加福音 9:62",
+      "reference_en": "Luke 9:62",
+      "note_zh": "手扶着犁向后看的，不配进神的国。",
+      "note_en": "No one who puts a hand to the plough and looks back is fit for the kingdom."
+    },
+    {
+      "label_zh": "计算代价",
+      "label_en": "Count the cost",
+      "reference_zh": "路加福音 14:28",
+      "reference_en": "Luke 14:28",
+      "note_zh": "盖楼之前先坐下算计花费。",
+      "note_en": "Before building, sit down and count the cost."
+    },
+    {
+      "label_zh": "忘记背后",
+      "label_en": "Forgetting what is behind",
+      "reference_zh": "腓立比书 3:13-14",
+      "reference_en": "Philippians 3:13-14",
+      "note_zh": "忘记背后，努力面前，向着标竿直跑。",
+      "note_en": "Forgetting what lies behind, straining forward toward the goal."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "为什么易迁走着走着就想回家了？",
+      "question_en": "Why does Pliable start wanting to go home as they walk?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "『身后的声音』在你生活中可能是什么？怎样才能不回头？",
+      "question_en": "What are the 'voices behind' in your life, and how do you keep from looking back?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "你开始一段属灵旅程时，付过什么代价？哪些是你当时没料到的？",
+      "question_en": "What did beginning a spiritual journey cost you—what costs surprised you?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "这是过渡章节，重点在『坚定起步』而非新教义。",
+    "区分对顽固的回应（不争辩）与对易迁的扶持（不讨好）。"
+  ],
+  "teacher_notes_en": [
+    "A transitional chapter—focus on resolve to begin, not new doctrine.",
+    "Distinguish answering Obstinate (no arguing) from steadying Pliable (no flattery)."
+  ],
+  "reflection_prompt_zh": "写下：我前面那道『光』是什么？今天我可以为它放下哪一样身后之物？",
+  "reflection_prompt_en": "Write down: what is the 'light' ahead for me, and what one thing behind can I set down for it today?",
+  "prayer_prompt_zh": "主啊，求你坚固我刚起步的脚，使我定睛于你的呼召，不被身后的声音夺回。",
+  "prayer_prompt_en": "Lord, steady my newly-started feet; fix my eyes on your call, and let no voice behind draw me back."
+}

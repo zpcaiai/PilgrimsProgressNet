@@ -1,0 +1,47 @@
+{
+  "_comment": "Batch 7 / Skill 49 — global art-direction palette reference for the 16 ENGINE scenes. This is a DESIGN reference (the visual bible in data form); the RUNTIME source of truth for sky/fog/ambient/tonemap/glow remains scripts/chapters/ChapterArtProfiles.gd and the prose docs/ART_BIBLE.md. Use these palettes to keep new art, props and chapels consistent. Direction: Low-poly 3D + Sacred Lighting + Allegorical Fantasy + Spiritual Symbolism. NOT horror, NOT generic fantasy: every colour serves a spiritual meaning, and the scene colour shifts with the soul's journey (city grey-yellow -> Calvary dawn -> palace warm -> shadow black -> celestial gold-white).",
+  "light_languages": {
+    "true_light": {"hex": "#fff2b8", "desc_zh": "白金、柔和、稳定", "desc_en": "white-gold, soft, steady"},
+    "false_glory": {"hex": "#f2b84b", "desc_zh": "紫金、闪烁、过饱和", "desc_en": "purple-gold, flickering, oversaturated"},
+    "darkness": {"hex": "#151724", "desc_zh": "红黑、冷蓝、低频闪烁", "desc_en": "red-black, cold blue, low flicker"}
+  },
+  "material_rules": {
+    "stone_zh": "低模、高粗糙、不反光（城墙、山路、疑惑堡）",
+    "wood_zh": "棕色低饱和（门、十字架、休息亭、乡村小教堂）",
+    "metal_zh": "仅用于神圣军装、钥匙、锁链、天城门；强调圣洁而非炫耀"
+  },
+  "palettes": [
+    {"chapter_id": "city_of_destruction", "name_zh": "灭亡城", "key_light": "false_glory",
+     "colors": {"sky": "#6f6656", "fog": "#8a7f68", "ground": "#4b4038", "buildings": "#5a5148", "danger_light": "#b45a32", "chapel_cross": "#d8d0b0"}},
+    {"chapter_id": "wilderness_road", "name_zh": "旷野之路", "key_light": "true_light",
+     "colors": {"sky": "#7d7766", "fog": "#7a715f", "ground": "#574a3c", "rock": "#4f4a44", "distant_light": "#ffe9b0", "chapel_cross": "#d8d0b0"}},
+    {"chapter_id": "slough_of_despond", "name_zh": "沮丧泥潭", "key_light": "darkness",
+     "colors": {"sky": "#4a4d4a", "fog": "#3a3f3a", "mud": "#262b27", "stone_path": "#7f8088", "promise_glow": "#d6cf8a", "chapel_cross": "#cfd6c8"}},
+    {"chapter_id": "wicket_gate", "name_zh": "窄门", "key_light": "true_light",
+     "colors": {"sky": "#5c6472", "path": "#4b4e58", "cliff": "#23262f", "gate_wood": "#6e4d32", "gate_light": "#ffd98a", "chapel_cross": "#fff0b8"}},
+    {"chapter_id": "cross_and_tomb", "name_zh": "十架山", "key_light": "true_light",
+     "colors": {"sky_before": "#4e5360", "sky_after": "#d9c88f", "ground": "#78654c", "cross": "#3b2c20", "light": "#fff2b8", "garment": "#e9dfc8"}},
+    {"chapter_id": "interpreter_house", "name_zh": "讲解者之家", "key_light": "true_light",
+     "colors": {"interior": "#3a342c", "lamp": "#ffd98a", "fire": "#ff9a4a", "portrait_gilt": "#c8a85f", "cage_iron": "#33373c", "chapel_cross": "#fff0c0"}},
+    {"chapter_id": "hill_difficulty", "name_zh": "艰难山", "key_light": "true_light",
+     "colors": {"sky": "#a9c0d8", "stone_stair": "#7a7166", "true_path": "#8a7a5e", "bypath_false": "#c9b46a", "spring": "#bfe0e8", "chapel_cross": "#fff0b8"}},
+    {"chapter_id": "palace_beautiful", "name_zh": "美宫与军装厅", "key_light": "true_light",
+     "colors": {"sky": "#d9a85f", "stone": "#c8b99a", "wood": "#6e4d32", "window_light": "#ffd98a", "armour_metal": "#b9c2cc", "chapel_cross": "#fff0b8"}},
+    {"chapter_id": "valley_humiliation", "name_zh": "降卑谷与亚玻伦", "key_light": "darkness",
+     "colors": {"sky": "#6a6f7a", "valley": "#46433c", "burnt_circle": "#241c18", "apollyon_fire": "#d24a2a", "shield_faith": "#cfe0ff", "chapel_cross": "#e6e0c8"}},
+    {"chapter_id": "valley_shadow_death", "name_zh": "死荫谷", "key_light": "darkness",
+     "colors": {"sky": "#08090d", "fog": "#151724", "path": "#1f1f22", "ditch": "#020203", "prayer_light": "#dcecff", "cross_glow": "#edf5ff"}},
+    {"chapter_id": "vanity_fair", "name_zh": "虚华市与殉道", "key_light": "false_glory",
+     "colors": {"sky": "#6b315f", "neon_gold": "#f2b84b", "purple": "#8c3fa5", "red": "#d24a4a", "market_wood": "#7a4a2d", "hidden_chapel": "#b8b29d"}},
+    {"chapter_id": "doubting_castle", "name_zh": "疑惑堡", "key_light": "darkness",
+     "colors": {"sky": "#1b1e29", "storm": "#2a2f3d", "castle_stone": "#33363f", "chain_iron": "#23252b", "promise_key": "#e7c45a", "dawn_cross": "#ffe9b0"}},
+    {"chapter_id": "delectable_mountains", "name_zh": "可喜山", "key_light": "true_light",
+     "colors": {"sky": "#bcd6ea", "pasture": "#7fae5a", "stone": "#9a9486", "celestial_far": "#ffe9a8", "map_parchment": "#e7d8b0", "chapel_cross": "#fff0b8"}},
+    {"chapter_id": "enchanted_ground", "name_zh": "魔睡地", "key_light": "false_glory",
+     "colors": {"sky": "#caa9d6", "dream_light": "#e7d2f0", "sleep_flower": "#c98fd0", "soft_grass": "#88a86a", "awake_stone": "#cfd6c8", "chapel_cross": "#fff0c0"}},
+    {"chapter_id": "river_of_death", "name_zh": "死河", "key_light": "true_light",
+     "colors": {"sky": "#c9b06a", "beulah_gold": "#f0d488", "water_deep": "#3a5566", "water_shallow": "#9fd0e0", "far_light": "#fff6cf", "chapel_cross": "#fff0b8"}},
+    {"chapter_id": "celestial_city", "name_zh": "天城", "key_light": "true_light",
+     "colors": {"sky": "#fff6cf", "gold": "#f5d46b", "white": "#fffdf4", "river": "#b8e8ff", "tree": "#d7f2b1", "glory": "#ffffff"}}
+  ]
+}

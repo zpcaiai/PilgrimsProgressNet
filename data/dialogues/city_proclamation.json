@@ -1,0 +1,50 @@
+{
+  "id": "city_proclamation",
+  "nodes": {
+    "start": {
+      "speaker": "City Proclamation",
+      "text": "A fresh decree is nailed to the board, the wax seal still bright: 'By order of the Magistrates of the City of Destruction — there is no fire, no coming judgment, and no cause for flight. Any who trouble their neighbours with dread shall be silenced. Eat, trade, and be at peace. All is well.'",
+      "text_zh": "板上钉着一张新颁的告示，火漆印还鲜亮：「奉灭亡城众官长之命——并无大火，并无将临的审判，亦无逃离之由。凡以惊惧搅扰邻舍者，必被止住。照常吃喝、买卖、安息罢。万事平安。」",
+      "choices": [
+        {
+          "id": "see_through",
+          "text": "I have read a truer book than this. The seal is bright, but the ink is a lie.",
+          "text_zh": "我读过一本比这更真的书。印是鲜亮的，字却是谎言。",
+          "effects": { "discernment": 8, "watchfulness": 6, "deception": -6 },
+          "flags": { "saw_through_proclamation": true },
+          "next": "end"
+        },
+        {
+          "id": "almost_believe",
+          "text": "It would be so easy to believe it. Everyone else does. Perhaps the dread really is only mine.",
+          "text_zh": "信它该有多容易。别人都信。也许这惊惧，真的只是我一个人的。",
+          "effects": { "deception": 8, "fear": 4 },
+          "flags": { "tempted_by_proclamation": true },
+          "next": "grieve"
+        },
+        {
+          "id": "grieve_now",
+          "text": "Stand a moment and grieve — a whole city signing its own comfort over its own grave.",
+          "text_zh": "站立片刻，为之哀伤——一整座城，在自己的坟墓上签字，画押自己的安逸。",
+          "effects": { "humility": 5, "despair": 3 },
+          "next": "grieve"
+        }
+      ]
+    },
+    "grieve": {
+      "speaker": "City Proclamation",
+      "text": "Below the seal, smaller hands have scratched their own verdicts into the wood: 'liar', 'amen', 'too late'. The board says nothing back. Far off, beyond the eastern gate, a small light keeps burning that no decree can repeal.",
+      "text_zh": "印章下方，几只更小的手把各自的判语刻进木头：「说谎的」「阿们」「太迟了」。告示无言以对。远处，东门之外，一点没有任何法令能废去的微光，仍在燃烧。",
+      "choices": [
+        {
+          "id": "to_the_light",
+          "text": "No decree can repeal that light. I will walk to it.",
+          "text_zh": "没有法令能废去那光。我要朝它走去。",
+          "effects": { "hope": 6, "faith": 4 },
+          "next": "end"
+        }
+      ]
+    },
+    "end": { "speaker": "", "text": "", "end": true }
+  }
+}

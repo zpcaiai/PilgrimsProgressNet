@@ -1,0 +1,68 @@
+{
+  "chapter_id": "enchanted_ground",
+  "order": 14,
+  "title_zh": "魔睡地",
+  "title_en": "The Enchanted Ground",
+  "story_summary_zh": "前面是美丽却催眠的魔睡地，越停留越困倦，有沉睡漂移的危险。天路客与盼望靠彼此交谈——谈十字架、谈忠信、谈前面的天城——与祷告、地图，保持警醒走过。",
+  "story_summary_en": "Ahead lies the beautiful but drowsy Enchanted Ground, where the longer one lingers the sleepier one grows, risking a sleepwalking drift. The pilgrim and Hopeful keep awake by talking together—of the Cross, of Faithful, of the City ahead—and by prayer and the map, passing through watchful.",
+  "spiritual_theme_zh": "终点前的最大危险不是攻击，而是属灵的麻木与安逸沉睡；保持警醒靠的是同行的提醒、祷告与记念。",
+  "spiritual_theme_en": "The greatest danger before the end is not assault but spiritual numbness and comfortable sleep; staying awake comes through fellowship's reminders, prayer, and remembrance.",
+  "bible_references": [
+    {
+      "label_zh": "不要睡觉，总要警醒",
+      "label_en": "Keep awake and sober",
+      "reference_zh": "帖撒罗尼迦前书 5:6",
+      "reference_en": "1 Thessalonians 5:6",
+      "note_zh": "我们不要睡觉，像别人一样，总要警醒谨守。",
+      "note_en": "Let us not sleep, as others do, but let us keep awake and be sober."
+    },
+    {
+      "label_zh": "总要警醒",
+      "label_en": "Watch!",
+      "reference_zh": "马可福音 13:37",
+      "reference_en": "Mark 13:37",
+      "note_zh": "我对你们所说的话，也是对众人说：要警醒！",
+      "note_en": "What I say to you I say to all: Stay awake!"
+    },
+    {
+      "label_zh": "彼此勉励",
+      "label_en": "Encourage one another",
+      "reference_zh": "希伯来书 3:13",
+      "reference_en": "Hebrews 3:13",
+      "note_zh": "总要趁着还有今日，天天彼此相劝，免得……心里就刚硬了。",
+      "note_en": "Encourage one another daily, that none be hardened by sin's deceitfulness."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "魔睡地为什么这么危险？它会怎样让人停下来？",
+      "question_en": "Why is the Enchanted Ground so dangerous—how does it make you stop?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "盼望说『最怕同行的人彼此提醒』。为什么交谈能赶走属灵的困倦？",
+      "question_en": "Hopeful says the ground 'most fears companions reminding each other'. Why does talking drive off spiritual drowsiness?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "什么样的『安逸』最容易让你属灵上打盹？你用什么保持警醒？",
+      "question_en": "What kind of comfort most easily lulls you spiritually—what keeps you awake?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "这里没有怪物，敌人是『舒服』本身——这正是它的隐蔽。",
+    "保持警醒的操练是具体的：交谈、祷告、记念恩典，而非靠意志硬撑。"
+  ],
+  "teacher_notes_en": [
+    "No monster here—the enemy is comfort itself, which is its disguise.",
+    "Staying awake is concrete: conversation, prayer, remembering grace—not sheer willpower."
+  ],
+  "reflection_prompt_zh": "写下：我现在在哪方面属灵上『打盹』？这周我能与谁彼此提醒？",
+  "reflection_prompt_en": "Write down: where am I spiritually dozing—who can I keep mutually awake with this week?",
+  "prayer_prompt_zh": "主啊，求你叫我警醒不沉睡，借着同行者的交谈与祷告，常记念你的恩典与那城。",
+  "prayer_prompt_en": "Lord, keep me awake, not asleep; through fellowship and prayer let me keep remembering your grace and the City."
+}

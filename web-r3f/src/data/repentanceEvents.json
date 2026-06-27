@@ -1,0 +1,40 @@
+{
+  "events": [
+    {
+      "id": "repent_burden_cross", "chapterId": "chapter_04", "sceneId": "calvary_hill", "triggerReason": "chapel_prayer",
+      "titleCN": "十字架前", "promptCN": "你来到十字架下，背上的重担忽然松动。你要如何回应？",
+      "confessionOptions": [
+        { "id": "confess_all", "textCN": "承认自己无力，全然交托", "effects": { "humility": 12, "faith": 10, "pride": -8 } },
+        { "id": "weep", "textCN": "在十架前痛悔流泪", "effects": { "humility": 10, "despair": -8, "burden": -5 } }
+      ],
+      "graceOutcome": { "effects": { "burden": -60, "faith": 15, "hope": 15, "accusation": -10 }, "removeFlags": ["weighed_by_guilt"], "setFlags": ["burden_lifted"], "addItems": ["scroll_of_assurance", "new_garment"], "messageCN": "重担滚落坟墓口，你领受新衣与确据书卷——你已被赦免。" }
+    },
+    {
+      "id": "repent_worldliness_general", "chapterId": "chapter_10", "sceneId": "vanity_fair", "triggerReason": "high_worldliness",
+      "titleCN": "回转离开虚华", "promptCN": "属世之心已经沉重。你愿意丢弃所买的虚荣吗？",
+      "confessionOptions": [
+        { "id": "drop_badge", "textCN": "摘下名声徽章丢在地上", "effects": { "worldliness": -15, "humility": 10, "pride": -10 }, "setFlags": ["dropped_vanity"] },
+        { "id": "renounce_gain", "textCN": "宣告‘我以认识基督为至宝’", "effects": { "worldliness": -12, "witness": 10, "faith": 6 } }
+      ],
+      "graceOutcome": { "effects": { "worldliness": -20, "humility": 8 }, "removeFlags": [], "messageCN": "卸下虚荣，你的脚步重新轻快。" }
+    },
+    {
+      "id": "repent_doubt_castle", "chapterId": "chapter_13", "sceneId": "doubting_castle", "triggerReason": "high_despair",
+      "titleCN": "在牢中回想应许", "promptCN": "绝望几乎吞没你。盼望提醒你祷告与回想神的话。",
+      "confessionOptions": [
+        { "id": "pray_together", "textCN": "与盼望一同跪下祷告", "effects": { "hope": 12, "despair": -12, "faith": 8 }, "setFlags": ["prayed_in_castle"] },
+        { "id": "recall_promise", "textCN": "回想：‘我怀里有应许之钥’", "effects": { "hope": 10, "doubt": -10 }, "setFlags": ["remembered_promise"] }
+      ],
+      "graceOutcome": { "effects": { "despair": -25, "doubt": -20, "hope": 15 }, "removeFlags": ["imprisoned_by_despair"], "setFlags": ["found_key_of_promise"], "addItems": ["key_of_promise"], "messageCN": "你想起一直带着的应许之钥，牢门应声而开。" }
+    },
+    {
+      "id": "repent_chapel_general", "chapterId": "any", "sceneId": "any", "triggerReason": "chapel_prayer",
+      "titleCN": "教堂中的悔改", "promptCN": "在十字架前，你向神敞开心，承认软弱。",
+      "confessionOptions": [
+        { "id": "confess_sin", "textCN": "承认具体的失败", "effects": { "humility": 8, "burden": -6, "accusation": -6 } },
+        { "id": "ask_strength", "textCN": "求神赐下继续前行的力量", "effects": { "faith": 6, "hope": 6, "courage": 5 } }
+      ],
+      "graceOutcome": { "effects": { "faith": 8, "hope": 8, "despair": -8, "burden": -5 }, "messageCN": "恩典临到，你重新得力上路。" }
+    }
+  ]
+}

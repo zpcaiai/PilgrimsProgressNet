@@ -1,0 +1,68 @@
+{
+  "chapter_id": "celestial_city",
+  "order": 16,
+  "title_zh": "天城",
+  "title_en": "The Celestial City",
+  "story_summary_zh": "上了彼岸，发光者迎接天路客，翻开旅程之书，回顾这一路每一步的恩典记号。城门为他敞开，他换上荣耀的白衣进城，全程归回敬拜——他不是凭功劳到达，而是被恩典一路带到天城。",
+  "story_summary_en": "Ashore, a Shining One greets the pilgrim and opens the Book of the Journey, recalling the mark of grace on every step. The gate opens; clothed in glory-white he enters, and the whole road gathers into worship—he arrived not by merit but carried all the way by grace.",
+  "spiritual_theme_zh": "荣耀的终局是恩典的总结，不是功劳的清算；回顾旅程是为记念拯救，进入永恒的安息与敬拜。",
+  "spiritual_theme_en": "The glory of the end is the sum of grace, not a tally of merit; the journey-review remembers salvation, entering eternal rest and worship.",
+  "bible_references": [
+    {
+      "label_zh": "神要擦去一切眼泪",
+      "label_en": "He will wipe away tears",
+      "reference_zh": "启示录 21:3-4",
+      "reference_en": "Revelation 21:3-4",
+      "note_zh": "神要……擦去他们一切的眼泪；不再有死亡，也不再有悲哀、哭号、疼痛。",
+      "note_en": "God will wipe away every tear; death shall be no more, nor mourning nor crying nor pain."
+    },
+    {
+      "label_zh": "生命河与生命树",
+      "label_en": "River and tree of life",
+      "reference_zh": "启示录 22:1-5",
+      "reference_en": "Revelation 22:1-5",
+      "note_zh": "天使又指示我一道生命水的河……河这边与那边有生命树。",
+      "note_en": "He showed me the river of the water of life… and the tree of life on either side."
+    },
+    {
+      "label_zh": "那美好的仗我已打过",
+      "label_en": "I have fought the good fight",
+      "reference_zh": "提摩太后书 4:7-8",
+      "reference_en": "2 Timothy 4:7-8",
+      "note_zh": "那美好的仗我已经打过了，当跑的路我已经跑尽了……有公义的冠冕为我存留。",
+      "note_en": "I have fought the good fight, I have finished the race… the crown of righteousness is laid up for me."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "进天城以前，发光者和天路客一起做了什么？",
+      "question_en": "Before entering the City, what do the Shining One and the pilgrim do together?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "旅程之书回顾的是『恩典的记号』，不是『功劳的分数』。这两者有什么不同？",
+      "question_en": "The Book reviews 'marks of grace', not 'a score of merit'. What's the difference?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "回望你自己的属灵旅程，哪些『记号』最清楚地说明是恩典带你走到今天？",
+      "question_en": "Looking back on your own journey, which 'marks' most clearly show grace brought you here?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "这是恩典的回顾，不是成就清单——避免把终局讲成奖励积分。",
+    "可邀请学员写下自己的『旅程之书』：从灭亡城到今天的恩典记号。"
+  ],
+  "teacher_notes_en": [
+    "This is a grace-review, not an achievement list—avoid framing the end as reward points.",
+    "Invite learners to write their own 'Book of the Journey': marks of grace from the City of Destruction to today."
+  ],
+  "reflection_prompt_zh": "写下我自己的『旅程之书』：从我的『灭亡城』到今天，三个最清楚的恩典记号。",
+  "reflection_prompt_en": "Write your own 'Book of the Journey': three clearest marks of grace from your 'City of Destruction' to today.",
+  "prayer_prompt_zh": "主啊，那美好的仗求你帮助我打到底；我深知不是凭功劳，而是你的恩典一路带我回家。求你保守我直到天城。",
+  "prayer_prompt_en": "Lord, help me fight the good fight to the end; I know it is not by merit but your grace carrying me home—keep me to the Celestial City."
+}

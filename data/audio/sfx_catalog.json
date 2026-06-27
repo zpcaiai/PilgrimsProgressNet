@@ -1,0 +1,34 @@
+{
+  "_comment": "Batch 7 / Skill 52 — catalogue of the REAL sound effects already shipped and registered in scripts/core/AudioManager.gd (the SFX const dict). This is documentation/design data: ids and paths mirror AudioManager.SFX exactly (do not invent files). 'design_aliases' maps the attachment's proposed sfx names onto existing keys, flagging the few that have no asset yet as todo.",
+  "sfx": [
+    {"id": "ui_select", "path": "res://assets/audio/sfx/ui_select.ogg", "category": "ui", "label_zh": "界面选择", "label_en": "UI select", "trigger": "menu / option highlight + confirm"},
+    {"id": "interact", "path": "res://assets/audio/sfx/interact.ogg", "category": "interaction", "label_zh": "交互", "label_en": "Interact", "trigger": "examine / talk / pick-up prompt"},
+    {"id": "quest_complete", "path": "res://assets/audio/sfx/quest_complete.ogg", "category": "quest", "label_zh": "任务完成", "label_en": "Quest complete", "trigger": "a quest is fulfilled"},
+    {"id": "promise", "path": "res://assets/audio/sfx/promise.ogg", "category": "story", "label_zh": "应许", "label_en": "Promise", "trigger": "promise-stone / key of promise remembered + unlocked"},
+    {"id": "burden_fall", "path": "res://assets/audio/sfx/burden_fall.ogg", "category": "story", "label_zh": "重担脱落", "label_en": "Burden falls", "trigger": "the burden's strap breaks at the Cross"},
+    {"id": "cross_grace", "path": "res://assets/audio/sfx/cross_grace.ogg", "category": "story", "label_zh": "十架恩典", "label_en": "Cross grace", "trigger": "burden rolls into the tomb; scroll/seal/garment given"},
+    {"id": "collapse", "path": "res://assets/audio/sfx/collapse.ogg", "category": "combat", "label_zh": "崩溃/倒下", "label_en": "Collapse", "trigger": "spiritual collapse / boss downs the pilgrim (not game over)"},
+    {"id": "victory", "path": "res://assets/audio/sfx/victory.ogg", "category": "combat", "label_zh": "得胜", "label_en": "Victory", "trigger": "Apollyon defeated / a trial overcome"},
+    {"id": "save", "path": "res://assets/audio/sfx/save.ogg", "category": "system", "label_zh": "存档", "label_en": "Save", "trigger": "auto/manual save written"},
+    {"id": "chapel_kneel", "path": "res://assets/audio/sfx/chapel_kneel.ogg", "category": "chapel", "label_zh": "教堂跪拜", "label_en": "Chapel kneel", "trigger": "kneel/pray at a wayside chapel"},
+    {"id": "blessing", "path": "res://assets/audio/sfx/blessing.ogg", "category": "chapel", "label_zh": "祝福", "label_en": "Blessing", "trigger": "worship blessing / grace restoration chime"},
+    {"id": "lantern_word", "path": "res://assets/audio/sfx/lantern_word.ogg", "category": "combat", "label_zh": "圣言之光", "label_en": "Word-lantern", "trigger": "Scripture lantern lit / sword-of-the-Spirit / scripture strike"},
+    {"id": "vanity_buy", "path": "res://assets/audio/sfx/vanity_buy.ogg", "category": "temptation", "label_zh": "虚华购买", "label_en": "Vanity purchase", "trigger": "buying a Vanity-Fair ware (worldliness)"},
+    {"id": "vanity_lay_down", "path": "res://assets/audio/sfx/vanity_lay_down.ogg", "category": "temptation", "label_zh": "放下虚华", "label_en": "Lay down vanity", "trigger": "refusing/laying down a vanity ware"},
+    {"id": "river_cross", "path": "res://assets/audio/sfx/river_cross.ogg", "category": "story", "label_zh": "渡河", "label_en": "River crossing", "trigger": "stepping into / crossing the River of Death"},
+    {"id": "sleep_fail", "path": "res://assets/audio/sfx/sleep_fail.ogg", "category": "temptation", "label_zh": "沉睡漂移", "label_en": "Sleep drift", "trigger": "drowsiness wins on the Enchanted Ground"},
+    {"id": "shadow_snuff", "path": "res://assets/audio/sfx/shadow_snuff.ogg", "category": "hazard", "label_zh": "黑暗熄灭", "label_en": "Shadow snuff", "trigger": "false-voice / fear shade snuffs the light in the Shadow Valley"},
+    {"id": "message_in", "path": "res://assets/audio/sfx/message_in.ogg", "category": "ui", "label_zh": "消息提示", "label_en": "Message in", "trigger": "toast / dialogue notification"},
+    {"id": "mention", "path": "res://assets/audio/sfx/mention.ogg", "category": "ui", "label_zh": "提及", "label_en": "Mention", "trigger": "name / objective callout"},
+    {"id": "sticker_send", "path": "res://assets/audio/sfx/sticker_send.ogg", "category": "ui", "label_zh": "贴纸发送", "label_en": "Sticker send", "trigger": "social/sticker feature"}
+  ],
+  "design_aliases": [
+    {"attachment_name": "chapel_bell_soft", "maps_to": "chapel_kneel", "status": "present"},
+    {"attachment_name": "burden_fall", "maps_to": "burden_fall", "status": "present"},
+    {"attachment_name": "promise_key_unlock", "maps_to": "promise", "status": "present"},
+    {"attachment_name": "scripture_strike", "maps_to": "lantern_word", "status": "present (word-of-the-Spirit cue)"},
+    {"attachment_name": "celestial_gate_open", "maps_to": "blessing", "status": "present (reuse blessing/victory until a dedicated gate cue ships)"},
+    {"attachment_name": "scroll_open", "maps_to": null, "status": "todo — no dedicated asset; use interact as placeholder"},
+    {"attachment_name": "shield_block_fire", "maps_to": null, "status": "todo — combat block cue not yet recorded"}
+  ]
+}

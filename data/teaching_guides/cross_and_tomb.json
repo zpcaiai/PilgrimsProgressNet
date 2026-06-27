@@ -1,0 +1,68 @@
+{
+  "chapter_id": "cross_and_tomb",
+  "order": 5,
+  "title_zh": "十架山",
+  "title_en": "Calvary — Cross and Tomb",
+  "story_summary_zh": "天路客越爬重担越沉，直到来到十字架前；重担的带子断开，滚入空坟。他得着确据的书卷、印记与新衣，从此身份是『蒙赦免的人』。",
+  "story_summary_en": "The higher he climbs the heavier the burden, until he comes to the Cross; the strap breaks and the burden rolls into the empty tomb. He receives a scroll of assurance, a seal, and a new garment—his identity now 'forgiven'.",
+  "spiritual_theme_zh": "人不能靠自己除去罪的重担，唯有在基督十字架前得赦免、称义与确据。重担脱落是恩典临到，不是玩家成就。",
+  "spiritual_theme_en": "No one can remove the burden of sin by himself; only at Christ's cross is there pardon, justification, and assurance. The burden falls as grace arriving, not as the player's achievement.",
+  "bible_references": [
+    {
+      "label_zh": "他担当我们的罪",
+      "label_en": "He bore our sins",
+      "reference_zh": "以赛亚书 53:5-6",
+      "reference_en": "Isaiah 53:5-6",
+      "note_zh": "他为我们的过犯受害……耶和华使我们众人的罪孽都归在他身上。",
+      "note_en": "He was pierced for our transgressions; the LORD laid on him the iniquity of us all."
+    },
+    {
+      "label_zh": "到我这里得安息",
+      "label_en": "Come to me and rest",
+      "reference_zh": "马太福音 11:28",
+      "reference_en": "Matthew 11:28",
+      "note_zh": "凡劳苦担重担的人，可以到我这里来，我就使你们得安息。",
+      "note_en": "Come to me, all who labour and are heavy laden, and I will give you rest."
+    },
+    {
+      "label_zh": "因信称义得平安",
+      "label_en": "Justified, at peace",
+      "reference_zh": "罗马书 5:1",
+      "reference_en": "Romans 5:1",
+      "note_zh": "我们既因信称义，就借着主耶稣基督得与神相和。",
+      "note_en": "Since we have been justified by faith, we have peace with God through our Lord Jesus Christ."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "重担是在哪里掉下来的？是天路客自己解开的吗？",
+      "question_en": "Where does the burden fall off—does the pilgrim untie it himself?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "为什么重担不是在讲解者之家（看见真理）脱落，而是在十字架前？",
+      "question_en": "Why does the burden fall not at the Interpreter's House (seeing truth) but at the Cross?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "你是否曾想靠努力除去罪疚或惧怕？知道真理与被基督释放有什么不同？",
+      "question_en": "Have you tried to remove guilt or fear by effort? What is the difference between knowing truth and being set free by Christ?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "不要把这一章讲成心理释放，要指向基督的代赎。",
+    "强调赦免是领受，不是赚取；重担脱落后身份改变（蒙赦免）。"
+  ],
+  "teacher_notes_en": [
+    "Don't reduce this to psychological release—point to Christ's atonement.",
+    "Stress pardon is received, not earned; after the burden falls, identity changes (forgiven)."
+  ],
+  "reflection_prompt_zh": "写下：我现在最像重担的东西是什么？我是否愿意把它带到十字架前？",
+  "reflection_prompt_en": "Write down: what most feels like a burden to me now—will I bring it to the Cross?",
+  "prayer_prompt_zh": "主啊，我不能自己除去罪与惧怕的重担，求你带我到十字架前，得着赦免与安息。",
+  "prayer_prompt_en": "Lord, I cannot remove the burden of sin and fear myself—bring me to the Cross for pardon and rest."
+}

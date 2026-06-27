@@ -1,0 +1,68 @@
+{
+  "chapter_id": "palace_beautiful",
+  "order": 8,
+  "title_zh": "美宫与神圣军装",
+  "title_en": "House Beautiful & the Armour",
+  "story_summary_zh": "守望者在门口察验天路客；审慎、谨慎、敬虔、仁爱接待他、考问他、与他团契安息。临行前，他在军装厅领受神所赐的全副军装，预备下到降卑谷。",
+  "story_summary_en": "Watchful examines the pilgrim at the gate; Discretion, Prudence, Piety, and Charity welcome, question, and rest with him in fellowship. Before he leaves, he takes up the whole armour of God in the armoury, preparing to descend into the Valley of Humiliation.",
+  "spiritual_theme_zh": "教会的团契、接待与省察是成长所必需；安息之后是装备——穿上属灵军装，预备争战，而非夸耀。",
+  "spiritual_theme_en": "The fellowship, hospitality, and examination of the church are vital to growth; after rest comes equipping—putting on spiritual armour to prepare for battle, not for boasting.",
+  "bible_references": [
+    {
+      "label_zh": "彼此相顾、不可停止聚会",
+      "label_en": "Do not neglect to meet",
+      "reference_zh": "希伯来书 10:24-25",
+      "reference_en": "Hebrews 10:24-25",
+      "note_zh": "彼此相顾，激发爱心，勉励行善，不可停止聚会。",
+      "note_en": "Stir up one another to love and good works, not neglecting to meet together."
+    },
+    {
+      "label_zh": "一味地款待客旅",
+      "label_en": "Practice hospitality",
+      "reference_zh": "罗马书 12:13",
+      "reference_en": "Romans 12:13",
+      "note_zh": "圣徒缺乏要帮补，客要一味地款待。",
+      "note_en": "Contribute to the needs of the saints and seek to show hospitality."
+    },
+    {
+      "label_zh": "穿戴神的全副军装",
+      "label_en": "The whole armour of God",
+      "reference_zh": "以弗所书 6:11-13",
+      "reference_en": "Ephesians 6:11-13",
+      "note_zh": "要穿戴神所赐的全副军装，就能抵挡魔鬼的诡计。",
+      "note_en": "Put on the whole armour of God, that you may stand against the schemes of the devil."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "美宫里有哪些人接待天路客？他们给了他什么？",
+      "question_en": "Who welcomes the pilgrim in the Palace, and what do they give him?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "守望者在门口察验他『你是谁？』——为什么教会要彼此察验？",
+      "question_en": "Watchful examines him at the gate, 'who are you?'—why does the church examine one another?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "保罗列出的六件军装中，你现在最需要操练哪一件？为什么？",
+      "question_en": "Of Paul's six pieces of armour, which do you most need to train in now, and why?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "夸耀（boast）是这里的陷阱：安息之后的骄傲会拆毁人。",
+    "军装是为站立和谦卑争战，不是为炫耀属灵成就。"
+  ],
+  "teacher_notes_en": [
+    "Boasting is the snare here: pride after rest undoes a person.",
+    "The armour is for standing and humble battle, not parading spiritual achievement."
+  ],
+  "reflection_prompt_zh": "写下：我有真实的属灵团契吗？我愿意被弟兄姊妹『察验』吗？",
+  "reflection_prompt_en": "Write down: do I have real spiritual fellowship—am I willing to be examined by others?",
+  "prayer_prompt_zh": "主啊，谢谢你赐下团契与安息；求你给我穿上全副军装的心，谦卑预备前面的争战。",
+  "prayer_prompt_en": "Lord, thank you for fellowship and rest; give me a heart to put on the whole armour and humbly prepare for the battle ahead."
+}

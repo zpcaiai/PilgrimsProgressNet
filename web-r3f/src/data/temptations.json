@@ -1,0 +1,68 @@
+{
+  "temptations": [
+    {
+      "id": "temptation_city_fear", "chapterId": "chapter_01", "sceneId": "city_of_destruction", "type": "fear", "intensity": 2,
+      "titleCN": "留下的恐惧", "descriptionCN": "邻舍的声音说：‘离开是疯狂，留下才安全。’",
+      "instantEffects": { "fear": 6 },
+      "resistedBy": { "stats": { "faith": 25 }, "items": ["scroll_of_warning"], "flags": ["accepted_evangelist_call"] },
+      "onResist": { "messageCN": "你想起书卷上的话，惧怕退去。", "effects": { "fear": -8, "faith": 4 } },
+      "onFail": { "messageCN": "恐惧使你迟疑，重担更沉。", "effects": { "fear": 6, "burden": 4 } }
+    },
+    {
+      "id": "temptation_slough_despair", "chapterId": "chapter_02", "sceneId": "slough_of_despond", "type": "despair", "intensity": 3,
+      "titleCN": "沮丧的泥潭", "descriptionCN": "泥潭低语：‘你永远爬不出去。’",
+      "instantEffects": { "despair": 8 },
+      "resistedBy": { "stats": { "hope": 30 }, "flags": ["called_for_help"] },
+      "onResist": { "messageCN": "盼望让你踏上隐藏的踏脚石。", "effects": { "despair": -10, "hope": 6 } },
+      "onFail": { "messageCN": "你越挣扎越深陷。", "effects": { "despair": 8, "burden": 4 } }
+    },
+    {
+      "id": "temptation_arbor_sleep", "chapterId": "chapter_05", "sceneId": "hill_difficulty_base", "type": "sleepiness", "intensity": 2,
+      "titleCN": "凉亭的沉睡", "descriptionCN": "半山的凉亭很舒适，你想合眼歇一会……",
+      "instantEffects": { "vigilance": -6 },
+      "resistedBy": { "stats": { "vigilance": 25 }, "items": ["scripture_lantern"] },
+      "onResist": { "messageCN": "你警醒起身，没有丢失书卷。", "effects": { "vigilance": 6 } },
+      "onFail": { "messageCN": "你睡着了，醒来发现书卷滑落，必须折返寻找。", "effects": { "vigilance": -8, "doubt": 6 }, "setFlags": ["lost_scroll_at_arbor"] }
+    },
+    {
+      "id": "temptation_vanity_worldliness", "chapterId": "chapter_11", "sceneId": "vanity_fair", "type": "worldliness", "intensity": 3,
+      "titleCN": "虚华的买卖", "descriptionCN": "摊位琳琅满目：名声、地位、享乐，应有尽有。",
+      "instantEffects": { "worldliness": 6 },
+      "resistedBy": { "stats": { "humility": 30, "witness": 20 }, "flags": ["refused_vanity"] },
+      "onResist": { "messageCN": "你只回答：‘我买真理。’", "effects": { "worldliness": -8, "witness": 8 } },
+      "onFail": { "messageCN": "你的目光被货物勾住，属世之心增长。", "effects": { "worldliness": 10, "humility": -5 } }
+    },
+    {
+      "id": "temptation_apollyon_accusation", "chapterId": "chapter_09", "sceneId": "apollyon_arena", "type": "accusation", "intensity": 5,
+      "titleCN": "亚玻伦的控告", "descriptionCN": "牛头鬼怪嘶吼，历数你一路的失败与罪。",
+      "instantEffects": { "accusation": 10, "fear": 6 },
+      "resistedBy": { "stats": { "faith": 40, "courage": 30 }, "items": ["shield_of_faith", "sword_of_spirit", "scroll_of_assurance"] },
+      "onResist": { "messageCN": "你举起信德的盾，用圣灵宝剑回应：‘我虽跌倒，仍要起来。’", "effects": { "accusation": -15, "courage": 10, "faith": 8 } },
+      "onFail": { "messageCN": "控告刺穿没有遮盖的心。", "effects": { "accusation": 12, "despair": 8, "burden": 6 } }
+    },
+    {
+      "id": "temptation_shadow_fear", "chapterId": "chapter_10", "sceneId": "valley_shadow_death", "type": "fear", "intensity": 4,
+      "titleCN": "死荫的幽谷", "descriptionCN": "黑暗中有低语与陷坑，惧怕几乎吞没你。",
+      "instantEffects": { "fear": 10 },
+      "resistedBy": { "stats": { "faith": 35 }, "items": ["scripture_lantern", "helmet_of_salvation"] },
+      "onResist": { "messageCN": "你出声诵念真理，黑暗退散。", "effects": { "fear": -12, "faith": 6 } },
+      "onFail": { "messageCN": "惧怕让你几乎偏离窄路。", "effects": { "fear": 10, "doubt": 8 } }
+    },
+    {
+      "id": "temptation_castle_despair", "chapterId": "chapter_13", "sceneId": "doubting_castle", "type": "despair", "intensity": 5,
+      "titleCN": "绝望巨人的牢狱", "descriptionCN": "巨人威吓你了结自己，疑惑堡的墙不断逼近。",
+      "instantEffects": { "despair": 12, "doubt": 8 },
+      "resistedBy": { "stats": { "hope": 40 }, "items": ["key_of_promise"], "flags": [] },
+      "onResist": { "messageCN": "盼望提醒你：‘我怀里一直有应许之钥！’", "effects": { "despair": -20, "doubt": -15, "hope": 10 }, "setFlags": ["found_key_of_promise"] },
+      "onFail": { "messageCN": "绝望几乎压垮你。", "effects": { "despair": 12, "doubt": 8 } }
+    },
+    {
+      "id": "temptation_enchanted_sleep", "chapterId": "chapter_14", "sceneId": "delectable_mountains", "type": "sleepiness", "intensity": 3,
+      "titleCN": "魔睡地的困倦", "descriptionCN": "空气甜腻，花香醉人，眼皮越来越沉，只想躺下睡一会儿……",
+      "instantEffects": { "vigilance": -6 },
+      "resistedBy": { "stats": { "vigilance": 30 }, "items": ["shepherd_map", "scripture_lantern"], "flags": ["resisted_enchanted_sleep"] },
+      "onResist": { "messageCN": "你与盼望彼此交谈、彼此提醒，没有在魔睡地睡着。", "effects": { "vigilance": 8, "hope": 4 } },
+      "onFail": { "messageCN": "你在花丛中睡着了，醒来时天色已晚，错失了好些路程。", "effects": { "vigilance": -8, "doubt": 6 } }
+    }
+  ]
+}

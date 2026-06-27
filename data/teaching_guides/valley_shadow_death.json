@@ -1,0 +1,68 @@
+{
+  "chapter_id": "valley_shadow_death",
+  "order": 10,
+  "title_zh": "死荫谷",
+  "title_en": "Valley of the Shadow of Death",
+  "story_summary_zh": "亚玻伦之后，天路客独自走进漆黑的死荫谷：极窄的路，左边深坑、右边泥沼，黑暗中满是低语。他凭祷告的微光看清下一步，不偏左右，直到黎明破晓。",
+  "story_summary_en": "After Apollyon, the pilgrim walks alone into the pitch-black valley: an extremely narrow path with a ditch on the left and a quag on the right, the dark full of whispers. By the faint light of prayer he sees the next step, swerving neither way, until dawn breaks.",
+  "spiritual_theme_zh": "黑暗中的持守：当感觉不到神同在时，仍凭祷告与神的话一步步前行；信心是凭信不凭眼见。",
+  "spiritual_theme_en": "Holding fast in the dark: when God's presence cannot be felt, still moving step by step by prayer and the word; faith walks by faith, not by sight.",
+  "bible_references": [
+    {
+      "label_zh": "行过死荫幽谷不怕",
+      "label_en": "Through the valley",
+      "reference_zh": "诗篇 23:4",
+      "reference_en": "Psalm 23:4",
+      "note_zh": "我虽然行过死荫的幽谷，也不怕遭害，因为你与我同在。",
+      "note_en": "Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me."
+    },
+    {
+      "label_zh": "你的话是脚前的灯",
+      "label_en": "A lamp to my feet",
+      "reference_zh": "诗篇 119:105",
+      "reference_en": "Psalm 119:105",
+      "note_zh": "你的话是我脚前的灯，是我路上的光。",
+      "note_en": "Your word is a lamp to my feet and a light to my path."
+    },
+    {
+      "label_zh": "凭信心不凭眼见",
+      "label_en": "By faith, not sight",
+      "reference_zh": "哥林多后书 5:7",
+      "reference_en": "2 Corinthians 5:7",
+      "note_zh": "我们行事为人是凭着信心，不是凭着眼见。",
+      "note_en": "We walk by faith, not by sight."
+    }
+  ],
+  "discussion_questions": [
+    {
+      "id": "q1",
+      "audience": "children",
+      "question_zh": "天路客在黑暗里怎么知道往哪里走？",
+      "question_en": "How does the pilgrim know which way to go in the dark?"
+    },
+    {
+      "id": "q2",
+      "audience": "youth",
+      "question_zh": "黑暗中的『低语』说『没有人听见你的祷告』。你怎么分辨这是谎言？",
+      "question_en": "The whispers say 'no one hears your prayer'. How do you tell this is a lie?"
+    },
+    {
+      "id": "q3",
+      "audience": "adult",
+      "question_zh": "当你感觉不到神同在时，什么帮助你继续走下去？",
+      "question_en": "When you cannot feel God's presence, what helps you keep going?"
+    }
+  ],
+  "teacher_notes_zh": [
+    "死荫谷不是战斗，而是『持守』——重点在祷告与神的话。",
+    "偏左（深坑）与偏右（泥沼）都危险：真理常在两端错误之间的窄路上。"
+  ],
+  "teacher_notes_en": [
+    "The valley is not a fight but a holding fast—focus on prayer and the word.",
+    "Both left (ditch) and right (quag) are dangerous: truth often runs the narrow path between two errors."
+  ],
+  "reflection_prompt_zh": "写下：我现在的『黑暗』是什么？我能为下一步祷告，而不是为整条路焦虑吗？",
+  "reflection_prompt_en": "Write down: what is my present 'darkness'—can I pray for the next step rather than fret over the whole road?",
+  "prayer_prompt_zh": "主啊，我虽行过幽谷也不怕，因你与我同在；求你用你的话作我脚前的灯，照亮我的下一步。",
+  "prayer_prompt_en": "Lord, though I walk through the valley I will not fear, for you are with me; let your word be a lamp to my feet for the next step."
+}
