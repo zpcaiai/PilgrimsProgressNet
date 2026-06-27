@@ -635,6 +635,8 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Diction
 	make_decor(Vector3(3.8, 0.5, 3.8), wall.darkened(0.1), pos + Vector3(0, 3.2, 0))
 	make_decor(Vector3(0.18, 1.0, 0.18), Color(0.7, 0.6, 0.4), pos + Vector3(0, 4.2, 0))
 	make_decor(Vector3(0.7, 0.18, 0.18), Color(0.7, 0.6, 0.4), pos + Vector3(0, 4.35, 0))
+	# Cross atop the chapel roof.
+	PropKit.cross(self, pos + Vector3(0, 4.6, 0), 1.0, Color(0.75, 0.65, 0.45), false)
 	var glow := OmniLight3D.new()
 	glow.position = pos + Vector3(0, 1.6, 0)
 	glow.light_color = Color(1.0, 0.85, 0.55)
@@ -663,8 +665,8 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Diction
 	var pflag := "paused_chapel_" + chapel_id
 	pause.body_entered.connect(func(b):
 		if b is PlayerController:
-			# Every visit to a cross-bearing chapel lifts faith and hope.
-			SpiritualStateManager.apply_effects({"faith": 3, "hope": 3})
+			# Every visit to a cross-bearing chapel lifts faith and hope by 1.
+			SpiritualStateManager.apply_effects({"faith": 1, "hope": 1})
 			if not GameState.has_flag(pflag):
 				GameState.set_flag(pflag, true)
 				SpiritualStateManager.apply_effects({"watchfulness": 2})

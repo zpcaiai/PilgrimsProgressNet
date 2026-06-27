@@ -131,10 +131,10 @@ func _build_family_house(pos: Vector3) -> void:
 	# Chimney smoke (a lived-in home).
 	PropKit.smoke(self, pos + Vector3(size.x * 0.3, size.y + 1.4, -size.z * 0.2), 0.7)
 
-	# Drawing near home eases the heart once.
+	# Drawing near home eases the heart once — and faith rises in a Christian home.
 	var family_solace := func(_b: Node) -> void:
-		SpiritualStateManager.apply_effects({"despair": -5, "weariness": -5})
-	EventBus.toast("家中熟悉的温暖使你稍微站稳：绝望与疲惫减轻了一点。")
+		SpiritualStateManager.apply_effects({"despair": -5, "weariness": -5, "faith": 1})
+	EventBus.toast("家中熟悉的温暖使你稍微站稳：绝望与疲惫减轻了一点，信心加增了。")
 	make_trigger(pos + Vector3(0, 1.0, 2.6), Vector3(8, 3, 7), family_solace)
 
 	# The family at the lit doorway: the pilgrim's WIFE — built to the SAME height
@@ -181,3 +181,5 @@ func _build_house_shell(pos: Vector3, size: Vector3) -> void:
 	add_child(roof)
 	# Brick chimney.
 	make_block(Vector3(0.6, 1.4, 0.6), br, Vector3(pos.x + w * 0.28, h + h * 0.5, pos.z - d * 0.2), 0.0, "brick")
+	# Cross on the roof — the pilgrim's home is a Christian home.
+	PropKit.cross(self, Vector3(pos.x, h + h * 0.7 + 0.8, pos.z), 1.2, Color(0.8, 0.7, 0.5), false)

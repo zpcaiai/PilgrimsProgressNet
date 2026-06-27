@@ -607,6 +607,7 @@ func _pause_to_title() -> void:
 
 func _pause_save() -> void:
 	SaveManager.save_game("slot_1")
+	EventBus.toast("已保存进度 / Progress saved")
 
 
 func _resume_from_pause() -> void:
@@ -661,18 +662,29 @@ func _toggle_route_map() -> void:
 	for raw_chapter_id in ChapterManager.route:
 		var chapter_id: String = String(raw_chapter_id)
 		var data: Dictionary = ChapterManager.load_chapter_data(chapter_id)
-		var label := Label.new()
 		var done: bool = GameState.has_flag(chapter_id + "_completed")
 		var is_current: bool = chapter_id == current
 		var mark: String = "[完成]" if done else ("[当前]" if is_current else "[    ]")
 		var color: Color = Color(0.6, 0.85, 0.6) if done else (Color(1, 0.95, 0.6) if is_current else Color(0.55, 0.55, 0.62))
-		label.text = "%s  %s" % [mark, String(data.get("title", chapter_id))]
-		label.add_theme_font_size_override("font_size", 20)
-		label.add_theme_color_override("font_color", color)
-		vb.add_child(label)
+		var btn := Button.new()
+		btn.text = "%s  %s" % [mark, String(data.get("title", chapter_id))]
+		btn.add_theme_font_size_override("font_size", 20)
+		btn.add_theme_color_override("font_color", color)
+		btn.add_theme_color_override("font_hover_color", color.lightened(0.3))
+		btn.alignment = HORIZONTAL_ALIGNMENT_CENTER
+		btn.flat = true
+		btn.custom_minimum_size = Vector2(0, 36)
+		var subtitle := String(data.get("subtitle", ""))
+		var ctitle := String(data.get("title", chapter_id))
+		btn.tooltip_text = subtitle if subtitle != "" else ctitle
+		btn.pressed.connect(func():
+			if subtitle != "":
+				EventBus.toast("%s — %s" % [ctitle, subtitle])
+		)
+		vb.add_child(btn)
 
 	var hint := Label.new()
-	hint.text = "点「地图」或「暂停」关闭" if DisplayServer.is_touchscreen_available() else "Tab / Esc 关闭"
+	hint.text = "点章节查看简介 · 点「地图」或「暂停」关闭" if DisplayServer.is_touchscreen_available() else "点击章节查看简介 · Tab / Esc 关闭"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
 	vb.add_child(hint)
