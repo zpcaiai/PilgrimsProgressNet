@@ -1,8 +1,10 @@
 {
   "id": "new_garment",
   "display_name": "New Garment",
+  "display_name_zh": "新衣",
   "type": "equipment",
   "description": "Clean raiment given in place of rags.",
+  "description_zh": "以洁净衣袍替换破旧衣衫。",
   "visible_on_player": true,
   "effects": {},
   "special": {}

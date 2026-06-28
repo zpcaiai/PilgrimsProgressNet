@@ -1,9 +1,11 @@
 {
   "id": "valley_humiliation",
   "title": "Stand Against Apollyon",
+  "title_zh": "抵挡亚玻伦",
   "description": "The accuser names your past; answer with the Cross, prayer, and promises.",
+  "description_zh": "控告者提起你的过去；用十字架、祷告和应许回应它。",
   "steps": [
-    { "id": "defeat", "description": "Endure intimidation and accusation until Apollyon's claim breaks.", "required_flag": "defeated_apollyon" }
+    { "id": "defeat", "description": "Endure intimidation and accusation until Apollyon's claim breaks.", "description_zh": "忍受恐吓与控告，直到亚玻伦的辖制破碎。", "required_flag": "defeated_apollyon" }
   ],
   "rewards": {}
 }

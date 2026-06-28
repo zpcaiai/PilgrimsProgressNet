@@ -18,6 +18,8 @@ const GUIDE_DIR := "res://data/teaching_guides/"
 
 var _label: RichTextLabel
 var _root: Control
+var _panel: PanelContainer
+var _close: Button
 var _visible_for: String = ""
 
 
@@ -44,21 +46,16 @@ func _build_ui() -> void:
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	_root.add_child(dim)
 
-	var panel := PanelContainer.new()
-	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(720, 560)
-	panel.offset_left = -360
-	panel.offset_top = -280
-	panel.offset_right = 360
-	panel.offset_bottom = 280
-	_root.add_child(panel)
+	_panel = PanelContainer.new()
+	_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_root.add_child(_panel)
 
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 22)
 	margin.add_theme_constant_override("margin_right", 22)
 	margin.add_theme_constant_override("margin_top", 18)
 	margin.add_theme_constant_override("margin_bottom", 18)
-	panel.add_child(margin)
+	_panel.add_child(margin)
 
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 12)
@@ -77,11 +74,36 @@ func _build_ui() -> void:
 	_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_label)
 
-	var close := Button.new()
-	close.text = "关闭 / Close  (Esc)"
-	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	close.pressed.connect(hide_panel)
-	vbox.add_child(close)
+	_close = Button.new()
+	_close.text = "继续旅程 / Continue"
+	_close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_close.pressed.connect(hide_panel)
+	vbox.add_child(_close)
+	get_viewport().size_changed.connect(_apply_layout)
+	_apply_layout()
+
+
+func _is_mobile_ui() -> bool:
+	var s := get_viewport().get_visible_rect().size
+	return DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var s := get_viewport().get_visible_rect().size
+	var mobile := _is_mobile_ui()
+	var w := minf(s.x - 36.0, 760.0)
+	var h := minf(s.y - 56.0, 600.0)
+	_panel.custom_minimum_size = Vector2(maxf(320.0, w), maxf(360.0, h))
+	_panel.offset_left = -w * 0.5
+	_panel.offset_right = w * 0.5
+	_panel.offset_top = -h * 0.5
+	_panel.offset_bottom = h * 0.5
+	if is_instance_valid(_label):
+		_label.add_theme_font_size_override("normal_font_size", 22 if mobile else 18)
+	if is_instance_valid(_close):
+		_close.add_theme_font_size_override("font_size", 21 if mobile else 18)
 
 
 func _zh() -> bool:
@@ -144,11 +166,15 @@ func open_for(chapter_id: String) -> void:
 	_visible_for = chapter_id
 	_root.visible = true
 	visible = true
+	EventBus.player_control_locked.emit(true)
 
 
 func hide_panel() -> void:
+	var was_visible := _root != null and _root.visible
 	_root.visible = false
 	visible = false
+	if was_visible:
+		EventBus.player_control_locked.emit(false)
 
 
 func _load_guide(chapter_id: String) -> Dictionary:

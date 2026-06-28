@@ -1,6 +1,7 @@
 {
   "id": "shame_accuser",
   "display_name": "Shame Accuser",
+  "display_name_zh": "羞耻控告者",
   "enemy_type": "shame",
   "influence": 70,
   "move_speed": 2.0,

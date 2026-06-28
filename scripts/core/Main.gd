@@ -284,23 +284,20 @@ func _show_controls_hint() -> void:
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 10)
 	panel.add_child(vb)
-	_add_title(vb, "操作指引 · Controls", 28, Color(0.95, 0.9, 0.6))
+	_add_title(vb, "旅程指引 · Journey", 28, Color(0.95, 0.9, 0.6))
 	var lines := [
-		"WASD / 方向键   移动 Move",
-		"空格 Space 跳 Jump      E 互动 Interact",
-		"1–4   对话选择 Dialogue choices",
-		"战斗 Combat:  J 攻击  K 闪避  L 站稳  U 应许  P 祷告",
-		"Tab 路线图 Map      Esc 暂停 / 设置 Pause & Settings",
-		"每章出口有发光传送门;答对该章经文方可通行。",
+		"这不是操作挑战，而是一段学习经文与操练价值观的旅程。",
+		"遇到人物和物件时，停下来读、选择、思想：这一步在塑造什么品格？",
+		"每章出口前会有经文之门；答题不是考试，而是把经文用到处境里。",
+		"祷告、小教堂和心境面板会帮助你回想已经学过的经文。",
+		"需要操作时：移动、互动、继续对话即可；战斗也可以用经文和祷告回应。",
 	]
 	if DisplayServer.is_touchscreen_available():
 		lines = [
-			"左下方向区：按住或滑动来移动。",
-			"「跳跃」：跳过障碍。",
-			"「互动」：与人物/物件互动；没有选项的对话也用它继续。",
-			"对话有选项时，直接点屏幕里的大号选项。",
-			"「心境」：打开/关闭心境与信物面板。",
-			"「地图」：查看路线图；「暂停」：打开暂停/设置菜单。",
+			"移动端重点是读、想、选择，不需要复杂操作。",
+			"点「互动/继续」阅读人物、物件和经文提示；有选项时直接点大号选项。",
+			"点「心境」可以回看已记住的经文与内心状态。",
+			"小教堂、祷告和经文之门会给出短默想，帮助你把经文用到当下处境。",
 			"每章出口有发光传送门；答对该章经文方可通行。",
 		]
 	for s in lines:
@@ -435,6 +432,12 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	cbf.button_pressed = Settings.colorblind
 	cbf.toggled.connect(func(on): Settings.set_colorblind(on))
 	vb.add_child(cbf)
+	var teach := CheckButton.new()
+	teach.text = "章节教学与经文讨论 Learning reflections"
+	teach.add_theme_font_size_override("font_size", 18)
+	teach.button_pressed = Settings.teaching_mode
+	teach.toggled.connect(func(on): Settings.set_teaching_mode(on))
+	vb.add_child(teach)
 
 	var spacer2 := Control.new()
 	spacer2.custom_minimum_size = Vector2(0, 12)

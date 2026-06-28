@@ -1,11 +1,13 @@
 {
   "id": "cross_wilderness",
   "title": "Press On Down the Wilderness Road",
+  "title_zh": "沿旷野之路前行",
   "description": "The city still argues through familiar voices. Answer Obstinate without pride, steady Pliable without flattery, and keep the little light ahead until the ground begins to fail.",
+  "description_zh": "旧城仍借熟悉的声音争辩。回应固执而不骄傲，扶持易迁而不谄媚，并一直望着前方微光，直到地面开始下陷。",
   "steps": [
-    { "id": "answer_obstinate", "description": "Answer Obstinate, and let the burning city go.", "required_flag": "obstinate_left" },
-    { "id": "steady_pliable", "description": "Tell Pliable the truth about the road ahead.", "required_flag": "spoke_with_pliable" },
-    { "id": "fix_eyes", "description": "At the brink of the lowland, fix your eyes on the light.", "required_flag": "fixed_eyes_on_light" }
+    { "id": "answer_obstinate", "description": "Answer Obstinate, and let the burning city go.", "description_zh": "回应固执，并放下那座正在焚烧的城。", "required_flag": "obstinate_left" },
+    { "id": "steady_pliable", "description": "Tell Pliable the truth about the road ahead.", "description_zh": "把前路的真相告诉易迁。", "required_flag": "spoke_with_pliable" },
+    { "id": "fix_eyes", "description": "At the brink of the lowland, fix your eyes on the light.", "description_zh": "站在低地边缘时，把眼睛定在光上。", "required_flag": "fixed_eyes_on_light" }
   ],
   "rewards": { "perseverance": 5, "faith": 3 }
 }

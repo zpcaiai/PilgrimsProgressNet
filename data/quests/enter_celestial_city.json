@@ -1,9 +1,11 @@
 {
   "id": "enter_celestial_city",
   "title": "Enter the Celestial City",
+  "title_zh": "进入天城",
   "description": "Walk the shining road as one carried home by grace from first awakening to final welcome.",
+  "description_zh": "走上发光的道路，像一个从初醒到终点都被恩典带回家的人。",
   "steps": [
-    { "id": "enter", "description": "Pass through the opened gate and be welcomed in.", "required_flag": "entered_city" }
+    { "id": "enter", "description": "Pass through the opened gate and be welcomed in.", "description_zh": "穿过敞开的城门，被迎入城中。", "required_flag": "entered_city" }
   ],
   "rewards": {}
 }

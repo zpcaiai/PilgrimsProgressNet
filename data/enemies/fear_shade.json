@@ -1,6 +1,7 @@
 {
   "id": "fear_shade",
   "display_name": "Fear Shade",
+  "display_name_zh": "惧怕阴影",
   "enemy_type": "fear",
   "influence": 60,
   "move_speed": 2.8,

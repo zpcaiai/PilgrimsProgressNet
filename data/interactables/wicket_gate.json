@@ -1,9 +1,11 @@
 {
   "id": "wicket_gate",
   "display_name": "Wicket Gate",
+  "display_name_zh": "窄门",
   "type": "gate",
   "dialogue_id": "wicket_gate_knock",
   "interaction_prompt": "Knock",
+  "interaction_prompt_zh": "叩门",
   "required_flags": [
     "left_slough"
   ],

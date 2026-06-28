@@ -102,6 +102,23 @@ func bilingual(zh: String, en: String) -> String:
 	return zh_or_mixed(en)
 
 
+func mixed_label(zh: String, en: String) -> String:
+	if zh != "" and en != "" and zh != en:
+		return zh + " " + en
+	if zh != "":
+		return zh
+	return zh_or_mixed(en)
+
+
+func npc_label(name: String) -> String:
+	var e: Variant = _t.get("npc." + name, null)
+	if e is Dictionary:
+		var zh := String(e.get("zh", ""))
+		var en := String(e.get("en", name))
+		return mixed_label(zh, en)
+	return zh_or_mixed(name)
+
+
 ## Translate a key. Fallback chain: current locale -> the other locale -> the
 ## supplied English fallback -> the key itself.
 func t(key: String, fallback: String = "") -> String:

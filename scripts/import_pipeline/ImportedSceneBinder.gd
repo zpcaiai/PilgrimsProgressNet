@@ -15,11 +15,11 @@ const INVALID := Vector3(0, -99999, 0)
 const EVENT_SET_FLAGS := ["burden_fallen", "defeated_apollyon"]
 
 const PROMISE_LINES := {
-	"hope": {"line": "Carved on the stone: 'Mist can hide the road, but it cannot erase it.'",
+	"hope": {"line": "石上刻着：雾会遮住道路，却不能抹去道路。",
 		"effects": {"hope": 8, "despair": -12}, "flag": "used_promise_hope"},
-	"faith": {"line": "Carved on the stone: 'You do not stand because the mud is weak, but because mercy is strong.'",
+	"faith": {"line": "石上刻着：你能站住，不是因为泥浅，而是因为怜悯坚固。",
 		"effects": {"faith": 8, "fear": -6, "despair": -8}, "flag": "used_promise_faith"},
-	"perseverance": {"line": "Carved on the stone: 'One true step is still obedience. Take it.'",
+	"perseverance": {"line": "石上刻着：真实的一步仍是顺服。继续走。",
 		"effects": {"perseverance": 8, "despair": -10}, "flag": "used_promise_perseverance"},
 }
 

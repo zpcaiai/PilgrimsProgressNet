@@ -1,10 +1,12 @@
 {
   "id": "rest_palace",
   "title": "Prepare at Palace Beautiful",
+  "title_zh": "在美宫预备前行",
   "description": "Rest without guilt, hear Watchful, and take up armour before accusation comes.",
+  "description_zh": "无愧地歇息，聆听守望者，并在控告来到前穿戴军装。",
   "steps": [
-    { "id": "take_armour", "description": "Receive the armour and promise for the valley.", "required_flag": "took_armour" },
-    { "id": "leave", "description": "Descend from the palace prepared, not proud.", "required_flag": "left_palace" }
+    { "id": "take_armour", "description": "Receive the armour and promise for the valley.", "description_zh": "领受为山谷预备的军装与应许。", "required_flag": "took_armour" },
+    { "id": "leave", "description": "Descend from the palace prepared, not proud.", "description_zh": "预备好而非骄傲地下山。", "required_flag": "left_palace" }
   ],
   "rewards": { "faith": 5 }
 }

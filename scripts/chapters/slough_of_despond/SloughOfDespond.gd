@@ -5,9 +5,9 @@ class_name SloughOfDespond
 ## pull you out. Reach solid ground on the far side.
 
 const PROMISE_LINES := {
-	"hope": {"line": "Carved on the stone: 'Mist can hide the road, but it cannot erase it.'", "effects": {"hope": 8, "despair": -12}, "flag": "used_promise_hope"},
-	"faith": {"line": "Carved on the stone: 'You do not stand because the mud is weak, but because mercy is strong.'", "effects": {"faith": 8, "fear": -6, "despair": -8}, "flag": "used_promise_faith"},
-	"perseverance": {"line": "Carved on the stone: 'One true step is still obedience. Take it.'", "effects": {"perseverance": 8, "despair": -10}, "flag": "used_promise_perseverance"},
+	"hope": {"line": "石上刻着：雾会遮住道路，却不能抹去道路。", "effects": {"hope": 8, "despair": -12}, "flag": "used_promise_hope"},
+	"faith": {"line": "石上刻着：你能站住，不是因为泥浅，而是因为怜悯坚固。", "effects": {"faith": 8, "fear": -6, "despair": -8}, "flag": "used_promise_faith"},
+	"perseverance": {"line": "石上刻着：真实的一步仍是顺服。继续走。", "effects": {"perseverance": 8, "despair": -10}, "flag": "used_promise_perseverance"},
 }
 
 
@@ -45,12 +45,12 @@ func _build_procedural() -> void:
 	_add_safe_stone(Vector3(-6, 0, -32))
 
 	# Help waits at the deepest point.
-	make_npc("Help", Vector3(0, 0, -38), Color(0.85, 0.85, 0.7), "help_rescue", "Reach for Help")
+	make_npc("Help", Vector3(0, 0, -38), Color(0.85, 0.85, 0.7), "help_rescue", "伸手接受援手 (Reach for Help)")
 
 	# Safe path out.
 	_add_safe_stone(Vector3(0, 0, -46))
 
-	make_wayside_chapel(Vector3(-14, 0, -34), "slough", {"hope": 8, "despair": -10, "faith": 4}, "In the swamp's far corner, a dry chapel: mercy is firmer than the mud. Your heart steadies.")
+	make_wayside_chapel(Vector3(-14, 0, -34), "slough", {"hope": 8, "despair": -10, "faith": 4}, "泥潭远角有一座干燥的小堂：怜悯比淤泥更坚固。你的心安稳下来。")
 
 	spawn_player(Vector3(0, 1, 10))
 

@@ -1,6 +1,7 @@
 {
   "id": "shadow_whisper",
   "display_name": "Shadow Whisper",
+  "display_name_zh": "暗影低语",
   "enemy_type": "deception",
   "influence": 40,
   "move_speed": 2.4,

@@ -201,7 +201,7 @@ func _localize_node(node: Dictionary) -> Dictionary:
 	if spk != "":
 		# Per-node speaker_zh wins; otherwise the central npc.<name> table localizes it.
 		var spk_zh := String(node.get("speaker_zh", ""))
-		copy["speaker"] = spk_zh if spk_zh != "" and LocaleManager.is_zh() else LocaleManager.t("npc." + spk, spk)
+		copy["speaker"] = LocaleManager.mixed_label(spk_zh, spk) if spk_zh != "" and LocaleManager.is_zh() else LocaleManager.npc_label(spk)
 	return copy
 
 

@@ -1,9 +1,11 @@
 {
   "id": "cross_enchanted",
   "title": "Cross the Enchanted Ground Awake",
+  "title_zh": "清醒穿过迷睡之地",
   "description": "Comfort can dull desire for the City. Keep moving and keep Hopeful speaking.",
+  "description_zh": "舒适会磨钝对天城的渴慕。继续前行，也让盼望继续说话。",
   "steps": [
-    { "id": "reach_edge", "description": "Reach the far edge awake, with desire still alive.", "required_flag": "crossed_enchanted" }
+    { "id": "reach_edge", "description": "Reach the far edge awake, with desire still alive.", "description_zh": "保持清醒抵达远端，让渴慕仍然活着。", "required_flag": "crossed_enchanted" }
   ],
   "rewards": { "watchfulness": 10 }
 }

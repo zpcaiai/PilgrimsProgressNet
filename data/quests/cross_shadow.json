@@ -1,9 +1,11 @@
 {
   "id": "cross_shadow",
   "title": "Cross the Valley of the Shadow",
+  "title_zh": "穿越死荫谷",
   "description": "Sight fails here. Keep to the narrow path, read the Word's light, and walk toward dawn.",
+  "description_zh": "在这里，眼见会失效。守住窄路，读话语的光，朝黎明前行。",
   "steps": [
-    { "id": "reach_dawn", "description": "Reach the dawn without believing the whispers.", "required_flag": "crossed_shadow" }
+    { "id": "reach_dawn", "description": "Reach the dawn without believing the whispers.", "description_zh": "不相信黑暗低语，走到黎明。", "required_flag": "crossed_shadow" }
   ],
   "rewards": { "faith": 8 }
 }

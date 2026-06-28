@@ -15,14 +15,15 @@ func setup(p_name: String, p_dialogue: String = "",
 	npc_name = p_name
 	dialogue_id = p_dialogue
 	tint = p_tint
-	prompt = "Talk to " + p_name
+	var label_name := LocaleManager.npc_label(p_name)
+	prompt = "交谈：" + label_name
 
 	# A real in-engine 3D body, tinted by the character's palette (falling back to
 	# `tint` for un-tabled folk). Standing NPCs idle in place (no mover).
 	add_child(HumanoidFigure.make(p_name, 2.0, null, true, tint))
 
 	var label := Label3D.new()
-	label.text = npc_name
+	label.text = label_name
 	label.position = Vector3(0, 2.4, 0)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.pixel_size = 0.009

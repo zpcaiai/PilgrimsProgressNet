@@ -5,5 +5,10 @@
     "hope": "Carved on the stone: 'Mist can hide the road, but it cannot erase it.'",
     "faith": "Carved on the stone: 'You do not stand because the mud is weak, but because mercy is strong.'",
     "perseverance": "Carved on the stone: 'One true step is still obedience. Take it.'"
+  },
+  "lines_zh": {
+    "hope": "石上刻着：雾会遮住道路，却不能抹去道路。",
+    "faith": "石上刻着：你能站住，不是因为泥浅，而是因为怜悯坚固。",
+    "perseverance": "石上刻着：真实的一步仍是顺服。继续走。"
   }
 }

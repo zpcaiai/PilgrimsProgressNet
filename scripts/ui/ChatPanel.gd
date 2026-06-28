@@ -87,6 +87,8 @@ func _ready() -> void:
 		if AuthService.is_online:
 			call_deferred("_refresh_unread")
 			call_deferred("_refresh_mentions")
+		if not AuthService.is_online:
+			_log_panel.visible = false
 	else:
 		_log_panel.visible = false
 	_set_input_open(false)
@@ -99,6 +101,7 @@ func _build() -> void:
 	_log_panel.position = Vector2(20, -320)
 	_log_panel.size = Vector2(440, 230)
 	_log_panel.modulate = Color(1, 1, 1, 0.92)
+	_log_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_log_panel)
 	_log_scroll = ScrollContainer.new()
 	_log_scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -155,6 +158,7 @@ func _build() -> void:
 	_input_row.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	_input_row.position = Vector2(20, -84)
 	_input_row.size = Vector2(720, 48)
+	_input_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_input_row)
 	var hb := HBoxContainer.new()
 	hb.set_anchors_preset(Control.PRESET_FULL_RECT)

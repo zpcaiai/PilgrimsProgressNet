@@ -48,7 +48,7 @@ func _build_procedural() -> void:
 	# Giant Despair prowls the hall beyond the cell.
 	var giant := SymbolicEnemy.new()
 	giant.load_from_data("despair_wraith")
-	giant.display_name = "Giant Despair"
+	giant.display_name = LocaleManager.npc_label("Giant Despair")
 	giant.influence = 9999.0
 	add_child(giant)
 	giant.global_position = Vector3(0, 1, -14)

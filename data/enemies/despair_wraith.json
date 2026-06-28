@@ -1,6 +1,7 @@
 {
   "id": "despair_wraith",
   "display_name": "Despair Wraith",
+  "display_name_zh": "绝望幽影",
   "enemy_type": "despair",
   "influence": 80,
   "move_speed": 1.8,

@@ -1,8 +1,10 @@
 {
   "id": "promise_key",
   "display_name": "Promise Key",
+  "display_name_zh": "应许之钥",
   "type": "story_event",
   "interaction_prompt": "Remember",
+  "interaction_prompt_zh": "记起应许",
   "trigger_spiritual_event": "promise_key_escape",
   "set_flags_on_interact": {
     "found_promise_key": true

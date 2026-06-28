@@ -1,8 +1,10 @@
 {
   "id": "promise_stone",
   "display_name": "Promise Stone",
+  "display_name_zh": "应许石",
   "type": "consumable_interactable",
   "description": "A stone bearing a line of hope; single use.",
+  "description_zh": "刻着盼望话语的石头；只能使用一次。",
   "visible_on_player": false,
   "effects": {},
   "special": {}

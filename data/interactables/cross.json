@@ -1,8 +1,10 @@
 {
   "id": "cross",
   "display_name": "Cross",
+  "display_name_zh": "十字架",
   "type": "story_event",
   "interaction_prompt": "Approach",
+  "interaction_prompt_zh": "靠近",
   "required_flags": [
     "passed_wicket_gate"
   ],

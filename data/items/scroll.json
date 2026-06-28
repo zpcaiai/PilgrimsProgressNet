@@ -1,8 +1,10 @@
 {
   "id": "scroll",
   "display_name": "Scroll",
+  "display_name_zh": "书卷",
   "type": "story_item",
   "description": "Assurance received at the Cross.",
+  "description_zh": "在十字架前领受的确据。",
   "visible_on_player": false,
   "effects": {},
   "special": {}

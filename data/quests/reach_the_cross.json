@@ -1,9 +1,11 @@
 {
   "id": "reach_the_cross",
   "title": "Come to the Cross",
+  "title_zh": "来到十字架前",
   "description": "Bring the whole burden into the light. Grace will do what effort never could.",
+  "description_zh": "把整个重担带到光中。恩典会成就努力永远做不到的事。",
   "steps": [
-    { "id": "burden_falls", "description": "Approach the Cross and let the burden fall.", "required_flag": "burden_fallen" }
+    { "id": "burden_falls", "description": "Approach the Cross and let the burden fall.", "description_zh": "走近十字架，让重担落下。", "required_flag": "burden_fallen" }
   ],
   "rewards": {}
 }

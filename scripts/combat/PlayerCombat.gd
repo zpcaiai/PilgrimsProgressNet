@@ -178,6 +178,15 @@ func pray() -> void:
 				foe.receive_counter("prayer", 6.0)
 	var remembered := ScriptureMemory.recall_current_chapter()
 	EventBus.toast(ScriptureMemory.recall_line(remembered))
+	if not remembered.is_empty():
+		var chapter_id := GameState.current_chapter_id if GameState.current_chapter_id != "" else ChapterManager.current_chapter_id
+		var guard := "prayer_reflection_" + chapter_id
+		if chapter_id != "" and not GameState.has_flag(guard):
+			GameState.set_flag(guard, true)
+			EventBus.learning_moment_requested.emit({
+				"title": "祷告回想：" + String(remembered.get("ref", "")),
+				"body": ScriptureMemory.learning_body(remembered)
+			})
 	emit_signal("stats_changed")
 
 

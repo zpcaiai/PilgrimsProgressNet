@@ -1,9 +1,11 @@
 {
   "id": "climb_hill",
   "title": "Climb the Hill Difficulty",
+  "title_zh": "攀登艰难山",
   "description": "The easy roads promise relief and end in ruin. Choose the steep way because it is true.",
+  "description_zh": "容易的路承诺轻省，却以毁坏为终点。选择陡峭的路，因为它真实。",
   "steps": [
-    { "id": "summit", "description": "Reach the summit without surrendering to the shortcuts.", "required_flag": "reached_summit" }
+    { "id": "summit", "description": "Reach the summit without surrendering to the shortcuts.", "description_zh": "不向捷径投降，抵达山顶。", "required_flag": "reached_summit" }
   ],
   "rewards": { "perseverance": 8 }
 }

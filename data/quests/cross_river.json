@@ -1,9 +1,11 @@
 {
   "id": "cross_river",
   "title": "Cross the River of Death",
+  "title_zh": "渡过死河",
   "description": "There is no bridge for the final crossing. Receive faith, take Hopeful's hand, and step in.",
+  "description_zh": "最后的渡口没有桥。领受信心，牵住盼望的手，踏入水中。",
   "steps": [
-    { "id": "reach_far_bank", "description": "Reach the far bank by mercy, not mastery.", "required_flag": "crossed_river" }
+    { "id": "reach_far_bank", "description": "Reach the far bank by mercy, not mastery.", "description_zh": "靠怜悯而非掌控抵达彼岸。", "required_flag": "crossed_river" }
   ],
   "rewards": { "faith": 12 }
 }

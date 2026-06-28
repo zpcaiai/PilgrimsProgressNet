@@ -1,8 +1,10 @@
 {
   "id": "shepherd_map",
   "display_name": "Shepherd Map",
+  "display_name_zh": "牧人地图",
   "type": "guidance_item",
   "description": "Keeps the pilgrim watchful through sleepy ground.",
+  "description_zh": "帮助朝圣者在迷睡之地保持警醒。",
   "visible_on_player": false,
   "effects": {},
   "special": {}

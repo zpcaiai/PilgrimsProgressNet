@@ -133,9 +133,16 @@ func _build_family_house(pos: Vector3) -> void:
 
 	# Drawing near home eases the heart once — and faith rises in a Christian home.
 	var family_solace := func(_b: Node) -> void:
+		if GameState.has_flag("home_cross_blessing_received"):
+			return
+		GameState.set_flag("home_cross_blessing_received", true)
 		SpiritualStateManager.apply_effects({"despair": -5, "weariness": -5, "faith": 1})
-	EventBus.toast("家中熟悉的温暖使你稍微站稳：绝望与疲惫减轻了一点，信心加增了。")
-	make_trigger(pos + Vector3(0, 1.0, 2.6), Vector3(8, 3, 7), family_solace)
+		EventBus.toast("家门上的十字架提醒你：主仍施怜悯。信心 +1。")
+		EventBus.learning_moment_requested.emit({
+			"title": "家的十字架：熟悉的地方也需要恩典",
+			"body": "[b]价值[/b]  基督信仰不是逃离家庭与责任，而是在最熟悉的地方也听见神的呼召。\n\n[b]想一想[/b]  家的温暖给你安慰，也可能留住你。此刻你需要感谢什么，又需要顺服什么？\n\n[b]祷告[/b]  [i]主啊，求你保守我的家，也赐我勇气走你指示的路。[/i]"
+		})
+	make_trigger(pos + Vector3(0, 1.0, 2.6), Vector3(8, 3, 7), family_solace, false)
 
 	# The family at the lit doorway: the pilgrim's WIFE — built to the SAME height
 	# as him (2.0 m) — with their TWO CHILDREN at her sides, pleading. She reaches
@@ -183,3 +190,6 @@ func _build_house_shell(pos: Vector3, size: Vector3) -> void:
 	make_block(Vector3(0.6, 1.4, 0.6), br, Vector3(pos.x + w * 0.28, h + h * 0.5, pos.z - d * 0.2), 0.0, "brick")
 	# Cross on the roof — the pilgrim's home is a Christian home.
 	PropKit.cross(self, Vector3(pos.x, h + h * 0.7 + 0.8, pos.z), 1.2, Color(0.8, 0.7, 0.5), false)
+	# A smaller front-facing cross above the door keeps the sign visible at ground level.
+	make_block(Vector3(0.16, 0.9, 0.08), Color(0.82, 0.72, 0.48), Vector3(pos.x, h * 0.68, pos.z + d * 0.5 + 0.2), 0.5)
+	make_block(Vector3(0.68, 0.14, 0.08), Color(0.82, 0.72, 0.48), Vector3(pos.x, h * 0.78, pos.z + d * 0.5 + 0.22), 0.5)

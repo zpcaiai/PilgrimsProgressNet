@@ -481,17 +481,18 @@ func spawn_player(pos: Vector3) -> PlayerController:
 func make_npc(npc_name: String, pos: Vector3, color: Color, dialogue_id: String = "",
 		prompt: String = "", on_interact: Callable = Callable()) -> Interactable:
 	_dbg("make_npc " + npc_name)
+	var label_name := LocaleManager.npc_label(npc_name)
 	var area := Interactable.new()
 	area.name = npc_name
 	area.position = pos
-	area.prompt = prompt if prompt != "" else "Talk to " + npc_name
+	area.prompt = prompt if prompt != "" else "交谈：" + label_name
 	# Visual: a real in-engine 3D body, tinted by the character's palette (with
 	# `color` as the fallback garment tint for un-tabled folk). Standing NPCs
 	# idle in place (no mover).
 	area.add_child(HumanoidFigure.make(npc_name, 2.0, null, true, color))
 	# Floating name
 	var label := Label3D.new()
-	label.text = npc_name
+	label.text = label_name
 	label.position = Vector3(0, 2.4, 0)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.pixel_size = 0.009
@@ -665,12 +666,15 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Diction
 	var pflag := "paused_chapel_" + chapel_id
 	pause.body_entered.connect(func(b):
 		if b is PlayerController:
-			# Every visit to a cross-bearing chapel lifts faith and hope by 1.
-			SpiritualStateManager.apply_effects({"faith": 1, "hope": 1})
 			if not GameState.has_flag(pflag):
 				GameState.set_flag(pflag, true)
-				SpiritualStateManager.apply_effects({"watchfulness": 2})
-				EventBus.toast("路旁有一座小堂。你慢下来，重新呼吸。")
+				# Entering a cross-bearing chapel gives a small, readable blessing.
+				SpiritualStateManager.apply_effects({"faith": 1, "hope": 1, "watchfulness": 1})
+				EventBus.toast("你进入十字架下的小堂：信心 +1，盼望 +1，警醒 +1。")
+				EventBus.learning_moment_requested.emit({
+					"title": "小堂默想：在十字架下停一停",
+					"body": "[b]价值[/b]  敬拜不是额外任务，而是让心重新归向神。\n\n[b]想一想[/b]  这一章里，我最需要把哪一种惧怕、疲惫或骄傲交给主？\n\n[b]祷告[/b]  [i]主啊，求你使我在继续前先安静，记得道路属于你。[/i]"
+				})
 	)
 	add_child(pause)
 

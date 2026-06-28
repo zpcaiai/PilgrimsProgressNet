@@ -9,7 +9,7 @@ const PATH := "user://settings.cfg"
 var reduce_motion: bool = false   # disables screen shake + hit-stop
 var colorblind: bool = false      # colour-blind-safe HUD palette (blue/orange)
 var seen_controls: bool = false   # first-run control hint shown?
-var teaching_mode: bool = false   # Sunday-school mode: show the chapter teaching guide on completion (F1 to open anytime)
+var teaching_mode: bool = true    # Learning-first mode: show the chapter teaching guide on completion (F1 to open anytime)
 
 
 func _ready() -> void:

@@ -1,10 +1,12 @@
 {
   "id": "visit_interpreter",
   "title": "Learn in the Interpreter's House",
+  "title_zh": "在释经者之家学习",
   "description": "Grace has welcomed you; now let truth train your sight before the harder road.",
+  "description_zh": "恩典已经接纳你；在更艰难的路前，让真理训练你的眼光。",
   "steps": [
-    { "id": "see_lesson", "description": "Consider a room and let it question your heart.", "required_flag": "saw_interpreter_lesson" },
-    { "id": "leave", "description": "Leave by the far door with clearer sight.", "required_flag": "left_interpreter" }
+    { "id": "see_lesson", "description": "Consider a room and let it question your heart.", "description_zh": "默想一个房间，让它叩问你的心。", "required_flag": "saw_interpreter_lesson" },
+    { "id": "leave", "description": "Leave by the far door with clearer sight.", "description_zh": "带着更清楚的眼光，从远门离开。", "required_flag": "left_interpreter" }
   ],
   "rewards": { "discernment": 5 }
 }

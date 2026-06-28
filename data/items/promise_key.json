@@ -1,8 +1,10 @@
 {
   "id": "promise_key",
   "display_name": "Promise Key",
+  "display_name_zh": "应许之钥",
   "type": "key_item",
   "description": "A remembered promise that opens despair's prison.",
+  "description_zh": "被重新记起的应许，能打开绝望的牢门。",
   "visible_on_player": false,
   "effects": {},
   "special": {}

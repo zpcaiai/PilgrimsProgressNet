@@ -1,8 +1,10 @@
 {
   "id": "burden",
   "display_name": "Burden",
+  "display_name_zh": "重担",
   "type": "story_state",
   "description": "The weight of conviction carried until the Cross.",
+  "description_zh": "直到十字架前都背负的知罪之重。",
   "visible_on_player": true,
   "effects": {},
   "special": {}

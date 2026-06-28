@@ -1,7 +1,9 @@
 {
   "id": "shepherd_map",
   "display_name": "Shepherd Map",
+  "display_name_zh": "牧人地图",
   "type": "equipment",
   "interaction_prompt": "Receive the map",
+  "interaction_prompt_zh": "领受地图",
   "item_id": "shepherd_map"
 }

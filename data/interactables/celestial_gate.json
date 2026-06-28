@@ -1,9 +1,11 @@
 {
   "id": "celestial_gate",
   "display_name": "Celestial Gate",
+  "display_name_zh": "天城之门",
   "type": "gate",
   "dialogue_id": "final_gate_entry",
   "interaction_prompt": "Enter",
+  "interaction_prompt_zh": "进入",
   "required_flags": [
     "crossed_river"
   ]

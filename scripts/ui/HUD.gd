@@ -502,9 +502,9 @@ func _on_chapter_started(chapter_id: String) -> void:
 	_title_bg.texture = art
 	_title_bg.visible = art != null
 	_title_main.text = String(data.get("title", chapter_id))
-	var mech := String(data.get("core_mechanic", ""))
-	if mech != "":
-		get_tree().create_timer(7.5).timeout.connect(func(): EventBus.toast("✦ " + mech.left(140)))
+	var preview := ScriptureMemory.chapter_preview_line(chapter_id)
+	if preview != "":
+		get_tree().create_timer(7.5).timeout.connect(func(): EventBus.toast("✦ " + preview.left(160)))
 	_title_sub.text = String(data.get("subtitle", ""))
 	var tw := create_tween()
 	tw.tween_property(_title_card, "modulate:a", 1.0, 0.6)
@@ -667,6 +667,8 @@ func _refresh_char_panel() -> void:
 	if s.has_new_garment: tokens.append(LocaleManager.t("token.new_garment", "New Garment"))
 	if s.has_promise_key: tokens.append(LocaleManager.t("token.promise_key", "Key of Promise"))
 	t += "  " + (", ".join(PackedStringArray(tokens)) if not tokens.is_empty() else LocaleManager.t("char.none_yet", "none yet")) + "\n\n"
+	t += "[color=#f0d890]经文记忆[/color]\n"
+	t += ScriptureMemory.known_card_summary(5) + "\n\n"
 	t += "[color=#a0f0c0]" + LocaleManager.t("char.companions", "Companions") + "[/color]\n"
 	var comps: Array = GameState.companions.keys()
 	t += "  " + (", ".join(PackedStringArray(comps)) if not comps.is_empty() else LocaleManager.t("char.walking_alone", "walking alone")) + "\n"
@@ -717,23 +719,18 @@ func _refresh_quest() -> void:
 	if ChapterManager.current_chapter_id == "":
 		_quest_label.text = LocaleManager.t("hud.quest_quiet", "这条路一片安静。")
 		return
-	# Always lead with the current chapter (its story line) so every chapter shows
-	# a populated objective/story panel — then the active quest step, or the
-	# chapter's own goal when no quest is running.
+	# Keep the objective panel task-focused. The chapter title card already names
+	# the place; repeating it here costs too much space on mobile.
 	var data: Dictionary = ChapterManager.get_current_chapter_data()
-	var ctitle := String(data.get("title", ""))
-	var header := ""
-	if ctitle != "":
-		header = "[b][color=#ffe6a8]%s[/color][/b]\n" % ctitle
 	var quest := QuestManager.get_primary_active_quest()
 	if quest.is_empty():
 		var sub := String(data.get("subtitle", ""))
 		var goal := sub if sub != "" else LocaleManager.t("hud.quest_quiet", "The road is quiet.")
-		_quest_label.text = header + "[color=#cfcfe0]" + goal + "[/color]"
+		_quest_label.text = "[color=#cfcfe0]" + goal + "[/color]"
 		return
 	var qid := String(quest.get("id", ""))
 	var step := QuestManager.get_next_incomplete_step_text(qid)
-	_quest_label.text = header + "[b]%s[/b]\n[color=#cfcfe0]%s[/color]" % [String(quest.get("title", "")), step]
+	_quest_label.text = "[b]%s[/b]\n[color=#cfcfe0]%s[/color]" % [String(quest.get("title", "")), step]
 
 
 # ---------------------------------------------------------------------------

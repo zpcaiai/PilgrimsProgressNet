@@ -1,8 +1,10 @@
 {
   "id": "final_seal",
   "display_name": "Final Seal",
+  "display_name_zh": "最终印记",
   "type": "story_state",
   "description": "The token of arrival at the Celestial City.",
+  "description_zh": "抵达天城的凭据。",
   "visible_on_player": false,
   "effects": {},
   "special": {}

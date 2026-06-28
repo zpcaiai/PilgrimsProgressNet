@@ -1,8 +1,10 @@
 {
   "id": "promise_stone_hope_01",
   "display_name": "Promise Stone",
+  "display_name_zh": "应许石",
   "type": "promise_stone",
   "interaction_prompt": "Remember",
+  "interaction_prompt_zh": "记念",
   "effects": {
     "hope": 8,
     "despair": -12

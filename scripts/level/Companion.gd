@@ -28,7 +28,7 @@ func setup(display_name: String = "Hopeful", color: Color = Color(0.6, 0.8, 0.7)
 	_fig = HumanoidFigure.make(display_name, 1.9, self, true, color)
 	add_child(_fig)
 	var label := Label3D.new()
-	label.text = companion_name
+	label.text = LocaleManager.npc_label(companion_name)
 	label.position = Vector3(0, 2.1, 0)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.pixel_size = 0.008

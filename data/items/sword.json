@@ -1,8 +1,10 @@
 {
   "id": "sword",
   "display_name": "Sword",
+  "display_name_zh": "宝剑",
   "type": "equipment",
   "description": "The Word, answered against the accuser.",
+  "description_zh": "以神的话回应控告者。",
   "visible_on_player": true,
   "effects": {},
   "special": {}

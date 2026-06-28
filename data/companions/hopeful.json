@@ -1,6 +1,7 @@
 {
   "id": "hopeful",
   "display_name": "Hopeful",
+  "display_name_zh": "盼望",
   "type": "companion",
   "join_flag": "hopeful_joined",
   "leave_flag": "",

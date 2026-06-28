@@ -37,7 +37,7 @@ func _apply_data(d: Dictionary) -> void:
 	enemy_id = String(d.get("id", enemy_id))
 	var name_zh := String(d.get("display_name_zh", ""))
 	var name_en := String(d.get("display_name", display_name))
-	display_name = (name_zh if name_zh != "" else LocaleManager.zh_or_mixed(name_en)) if LocaleManager.is_zh() else LocaleManager.bilingual(name_zh, name_en)
+	display_name = LocaleManager.mixed_label(name_zh, name_en) if LocaleManager.is_zh() else LocaleManager.bilingual(name_zh, name_en)
 	enemy_type = String(d.get("enemy_type", enemy_type))
 	influence = float(d.get("influence", influence))
 	max_influence = influence

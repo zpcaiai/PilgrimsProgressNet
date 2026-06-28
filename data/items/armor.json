@@ -1,8 +1,10 @@
 {
   "id": "armor",
   "display_name": "Armor",
+  "display_name_zh": "军装",
   "type": "equipment",
   "description": "Preparation for accusation, fear, and conflict.",
+  "description_zh": "为面对控告、惧怕和争战而预备。",
   "visible_on_player": true,
   "effects": {},
   "special": {}

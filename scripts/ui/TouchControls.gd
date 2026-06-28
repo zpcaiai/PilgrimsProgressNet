@@ -11,10 +11,10 @@ extends CanvasLayer
 ## Playable in both portrait and landscape: the pad lays out from the viewport size.
 
 const MARGIN := 0.05      # all sizes are fractions of min(viewport w, h)
-const DPAD_R := 0.066
-const ACT_R := 0.085
-const UTIL_R := 0.050
-const CHOICE_R := 0.044
+const DPAD_R := 0.060
+const ACT_R := 0.062
+const UTIL_R := 0.045
+const CHOICE_R := 0.040
 
 # id -> keycode. WASD use physical keys (actions are bound to physical W/A/S/D);
 # the rest are read as event.keycode by the UI handlers.
@@ -153,6 +153,10 @@ func _btn_ids() -> Array:
 	var paused := get_tree().paused
 	var out: Array = []
 	if _dialogue and not paused:
+		out.append("E")
+		if _choices > 0:
+			for i in range(min(_choices, 4)):
+				out.append(str(i + 1))
 		out.append("ESC")
 		return out
 	if not paused and not _locked:
@@ -195,7 +199,7 @@ func _layout() -> Dictionary:
 	out["D"] = {"center": dc + Vector2(g, 0), "radius": dr}
 	# Action buttons, bottom-right
 	out["SPACE"] = {"center": Vector2(s.x - m - ar, s.y - m - ar), "radius": ar}
-	out["E"] = {"center": Vector2(s.x - m - ar * 2.6, s.y - m - ar * 0.45), "radius": ar * 0.86}
+	out["E"] = {"center": Vector2(s.x - m - ar * 3.2, s.y - m - ar * 0.7), "radius": ar * 0.82}
 	var combat_r := ar * 0.58
 	var combat_y := s.y - m - ar * 2.55
 	var combat_x := s.x - m - combat_r
@@ -301,7 +305,15 @@ func _draw_pad(pad: Control) -> void:
 		var b: Dictionary = lay.get(id, {})
 		if b.is_empty():
 			continue
-		_draw_button(pad, b["center"], b["radius"], LABELS.get(id, id), held.has(id))
+		_draw_button(pad, b["center"], b["radius"], _label_for(id), held.has(id))
+
+
+func _label_for(id: String) -> String:
+	if id == "E" and _dialogue:
+		return "继续"
+	if id == "ESC" and _dialogue:
+		return "关闭"
+	return LABELS.get(id, id)
 
 
 func _draw_button(pad: Control, c: Vector2, r: float, label: String, on: bool) -> void:

@@ -20,7 +20,7 @@ func _build_procedural() -> void:
 	# can walk to any of them and choose).
 	make_floating_label("危险小路 Danger →", Vector3(-12, 2.6, -1), Color(0.6, 0.7, 0.95))
 	make_floating_label("艰难正路 Difficulty", Vector3(0, 2.6, -1), Color(0.95, 0.95, 0.8))
-	make_floating_label("← Destruction", Vector3(12, 2.6, -1), Color(0.95, 0.7, 0.5))
+	make_floating_label("← 毁灭 Destruction", Vector3(12, 2.6, -1), Color(0.95, 0.7, 0.5))
 
 	# Dividing walls between the three corridors (only for z < 0, so the base
 	# plaza stays open for the choice).
@@ -52,7 +52,7 @@ func _build_procedural() -> void:
 	make_distant_light(Vector3(0, 7, -44), Color(1.0, 0.95, 0.7))
 	make_floating_label("山顶 The Summit", Vector3(0, 4, -36), Color(1, 0.97, 0.8))
 
-	make_wayside_chapel(Vector3(-3.5, 0, -6), "hill", {"perseverance": 8, "hope": 4, "weariness": -4}, "A true chapel at the climb — not the arbor's false ease. You rise stronger.")
+	make_wayside_chapel(Vector3(-3.5, 0, -6), "hill", {"perseverance": 8, "hope": 4, "weariness": -4}, "山路上有一座真实的小堂，不是凉亭那种虚假的轻省。你重新得力。")
 
 	spawn_player(Vector3(0, 1, 9))
 
@@ -77,7 +77,7 @@ func _decorate_paths() -> void:
 	make_decor(Vector3(11, 0.05, 30), Color(0.12, 0.12, 0.16), Vector3(-12, 0.06, -16))
 	for tz in [-8, -14, -20]:
 		make_decor(Vector3(0.3, 1.6, 0.3), Color(0.08, 0.1, 0.09), Vector3(-12 + randf_range(-2.0, 2.0), 0.8, tz))
-	make_floating_label("(shadow and thorn)", Vector3(-12, 1.8, -16), Color(0.5, 0.55, 0.7))
+	make_floating_label("阴影与荆棘", Vector3(-12, 1.8, -16), Color(0.5, 0.55, 0.7))
 
 	# Right — Destruction: warm, wide, golden — the most appealing path, and false.
 	for lz in [-8, -18]:

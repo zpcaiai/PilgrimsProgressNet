@@ -26,7 +26,7 @@ func _build_procedural() -> void:
 	make_npc("Obstinate", Vector3(2.5, 0, -6), Color(0.45, 0.4, 0.35), "obstinate_road")
 	make_npc("Pliable", Vector3(-2.5, 0, -16), Color(0.6, 0.7, 0.5), "pliable_doubting")
 
-	make_wayside_chapel(Vector3(-4.3, 0, -10), "wilderness", {"perseverance": 6, "fear": -5}, "A wayside chapel on the lonely road steadies your resolve to press on.")
+	make_wayside_chapel(Vector3(-4.3, 0, -10), "wilderness", {"perseverance": 6, "fear": -5}, "孤路旁的小堂使你的心重新安稳，愿意继续向前。")
 
 	spawn_player(Vector3(0, 1, 8))
 

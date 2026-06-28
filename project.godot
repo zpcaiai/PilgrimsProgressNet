@@ -46,6 +46,7 @@ ThemeManager="*res://scripts/ui/ThemeManager.gd"
 Settings="*res://scripts/core/Settings.gd"
 Juice="*res://scripts/fx/Juice.gd"
 TeachingGuidePanel="*res://scripts/ui/TeachingGuidePanel.gd"
+LearningMomentPanel="*res://scripts/ui/LearningMomentPanel.gd"
 
 [debug]
 

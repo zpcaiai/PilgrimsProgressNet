@@ -1,10 +1,12 @@
 {
   "id": "pass_vanity_fair",
   "title": "Pass Through Vanity Fair",
+  "title_zh": "穿过虚华市",
   "description": "The fair sells a shinier self. Refuse its bargains, bear witness, and find Hopeful.",
+  "description_zh": "市集贩卖更闪亮的自我。拒绝它的交易，作见证，并找到盼望。",
   "steps": [
-    { "id": "meet_hopeful", "description": "Meet the companion whose hope rises in the crowd.", "required_flag": "hopeful_joined" },
-    { "id": "leave", "description": "Leave by the far gate without selling peace for applause.", "required_flag": "left_vanity" }
+    { "id": "meet_hopeful", "description": "Meet the companion whose hope rises in the crowd.", "description_zh": "在人群中遇见那位盼望渐起的同伴。", "required_flag": "hopeful_joined" },
+    { "id": "leave", "description": "Leave by the far gate without selling peace for applause.", "description_zh": "从远门离开，不把平安卖给掌声。", "required_flag": "left_vanity" }
   ],
   "rewards": { "discernment": 6 }
 }

@@ -1,8 +1,10 @@
 {
   "id": "shield",
   "display_name": "Shield",
+  "display_name_zh": "盾牌",
   "type": "equipment",
   "description": "Faith that quenches the fiery darts.",
+  "description_zh": "能熄灭火箭的信心。",
   "visible_on_player": true,
   "effects": {},
   "special": {}

@@ -236,6 +236,106 @@
     "en": "Watchful",
     "zh": "守望者"
   },
+  "npc.Shepherd": {
+    "en": "Shepherd",
+    "zh": "牧人"
+  },
+  "npc.Giant Despair": {
+    "en": "Giant Despair",
+    "zh": "绝望巨人"
+  },
+  "npc.Caged Figure": {
+    "en": "Caged Figure",
+    "zh": "笼中人"
+  },
+  "npc.Ignorance": {
+    "en": "Ignorance",
+    "zh": "无知"
+  },
+  "npc.Prudence": {
+    "en": "Prudence",
+    "zh": "谨慎"
+  },
+  "npc.Charity": {
+    "en": "Charity",
+    "zh": "仁爱"
+  },
+  "npc.Piety": {
+    "en": "Piety",
+    "zh": "虔诚"
+  },
+  "npc.Discretion": {
+    "en": "Discretion",
+    "zh": "明慎"
+  },
+  "npc.Watchman": {
+    "en": "Watchman",
+    "zh": "守望人"
+  },
+  "npc.Watchful, the Porter": {
+    "en": "Watchful, the Porter",
+    "zh": "守门者守望"
+  },
+  "npc.Trial Judge": {
+    "en": "Trial Judge",
+    "zh": "审判官"
+  },
+  "npc.Faithful": {
+    "en": "Faithful",
+    "zh": "忠信"
+  },
+  "npc.Gatekeeper": {
+    "en": "Gatekeeper",
+    "zh": "守门者"
+  },
+  "npc.Shining One": {
+    "en": "Shining One",
+    "zh": "发光者"
+  },
+  "npc.A Shining One": {
+    "en": "A Shining One",
+    "zh": "一位发光者"
+  },
+  "npc.City Proclamation": {
+    "en": "City Proclamation",
+    "zh": "城中告示"
+  },
+  "npc.False Voice": {
+    "en": "False Voice",
+    "zh": "虚假的声音"
+  },
+  "npc.A Voice on the Wind": {
+    "en": "A Voice on the Wind",
+    "zh": "风中的声音"
+  },
+  "npc.Prayer Echo": {
+    "en": "Prayer Echo",
+    "zh": "祷告回声"
+  },
+  "npc.Shepherd Knowledge": {
+    "en": "Shepherd Knowledge",
+    "zh": "牧人知识"
+  },
+  "npc.Shepherd Watchful": {
+    "en": "Shepherd Watchful",
+    "zh": "牧人守望"
+  },
+  "npc.Shepherd Experience": {
+    "en": "Shepherd Experience",
+    "zh": "牧人经历"
+  },
+  "npc.Merchant of Applause": {
+    "en": "Merchant of Applause",
+    "zh": "掌声商人"
+  },
+  "npc.Timorous & Mistrust": {
+    "en": "Timorous & Mistrust",
+    "zh": "胆怯与疑惧"
+  },
+  "npc.Your Children": {
+    "en": "Your Children",
+    "zh": "你的孩子"
+  },
   "npc.Your Family": {
     "en": "Your Family",
     "zh": "你的家人"

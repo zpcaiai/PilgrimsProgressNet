@@ -1,6 +1,7 @@
 {
   "id": "faithful",
   "display_name": "Faithful",
+  "display_name_zh": "忠信",
   "type": "companion",
   "join_flag": "faithful_witnessed",
   "leave_flag": "faithful_lost",

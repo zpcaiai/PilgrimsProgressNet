@@ -10,6 +10,8 @@ class_name CombatHUD
 const LOW_PCT := 0.38   # below this, warn and highlight recovery keys
 
 var _resolve_bar: ProgressBar
+var _panel: Panel
+var _resolve_label: Label
 var _fill: StyleBoxFlat
 var _info: RichTextLabel
 var _warn: Label
@@ -24,7 +26,7 @@ var _t := 0.0
 
 func _ready() -> void:
 	layer = 11
-	var panel := Panel.new()
+	_panel = Panel.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.05, 0.05, 0.09, 0.7)
 	sb.set_corner_radius_all(8)
@@ -32,21 +34,18 @@ func _ready() -> void:
 	sb.content_margin_right = 12
 	sb.content_margin_top = 10
 	sb.content_margin_bottom = 10
-	panel.add_theme_stylebox_override("panel", sb)
-	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.position = Vector2(-280, -132)
-	panel.size = Vector2(560, 116)
-	add_child(panel)
+	_panel.add_theme_stylebox_override("panel", sb)
+	add_child(_panel)
 
 	var vb := VBoxContainer.new()
 	vb.set_anchors_preset(Control.PRESET_FULL_RECT)
-	panel.add_child(vb)
+	_panel.add_child(vb)
 
 	var row := HBoxContainer.new()
-	var lbl := Label.new()
-	lbl.text = LocaleManager.t("combat.resolve", "Resolve")
-	lbl.custom_minimum_size = Vector2(80, 0)
-	row.add_child(lbl)
+	_resolve_label = Label.new()
+	_resolve_label.text = LocaleManager.t("combat.resolve", "Resolve")
+	_resolve_label.custom_minimum_size = Vector2(80, 0)
+	row.add_child(_resolve_label)
 	_resolve_bar = ProgressBar.new()
 	_resolve_bar.min_value = 0
 	_resolve_bar.max_value = 100
@@ -123,6 +122,38 @@ func _ready() -> void:
 	_boss_fill.set_corner_radius_all(4)
 	_boss_bar.add_theme_stylebox_override("fill", _boss_fill)
 	bvb.add_child(_boss_bar)
+	get_viewport().size_changed.connect(_apply_layout)
+	_apply_layout()
+
+
+func _is_mobile_ui() -> bool:
+	var s := get_viewport().get_visible_rect().size
+	return DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
+
+
+func _apply_layout() -> void:
+	var s := get_viewport().get_visible_rect().size
+	var mobile := _is_mobile_ui()
+	var panel_w := minf(s.x - 32.0, 620.0) if mobile else 560.0
+	var panel_h := 128.0 if mobile else 116.0
+	if is_instance_valid(_panel):
+		_panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+		_panel.position = Vector2(-panel_w * 0.5, -252.0 if mobile else -132.0)
+		_panel.size = Vector2(panel_w, panel_h)
+	if is_instance_valid(_resolve_label):
+		_resolve_label.add_theme_font_size_override("font_size", 18 if mobile else 14)
+	if is_instance_valid(_resolve_bar):
+		_resolve_bar.custom_minimum_size = Vector2(maxf(180.0, panel_w - 120.0), 24 if mobile else 20)
+	if is_instance_valid(_info):
+		_info.add_theme_font_size_override("normal_font_size", 17 if mobile else 14)
+		_info.custom_minimum_size = Vector2(0, 56 if mobile else 44)
+	if is_instance_valid(_keys):
+		_keys.add_theme_font_size_override("normal_font_size", 17 if mobile else 14)
+	if is_instance_valid(_warn):
+		var warn_w := minf(s.x - 32.0, 760.0)
+		_warn.position = Vector2(-warn_w * 0.5, -392.0 if mobile else -178.0)
+		_warn.size = Vector2(warn_w, 44)
+		_warn.add_theme_font_size_override("font_size", 24 if mobile else 30)
 
 
 func _strongest_foe():

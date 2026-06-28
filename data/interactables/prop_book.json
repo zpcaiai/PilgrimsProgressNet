@@ -1,8 +1,10 @@
 {
   "id": "prop_book",
   "display_name": "Warning Book",
+  "display_name_zh": "警告之书",
   "type": "story_event",
   "interaction_prompt": "Read",
+  "interaction_prompt_zh": "阅读",
   "trigger_spiritual_event": "receive_burden",
   "set_flags_on_interact": {
     "read_book": true

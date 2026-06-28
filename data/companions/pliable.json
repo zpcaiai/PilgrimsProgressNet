@@ -1,6 +1,7 @@
 {
   "id": "pliable",
   "display_name": "Pliable",
+  "display_name_zh": "易迁",
   "type": "companion",
   "join_flag": "pliable_joined",
   "leave_flag": "pliable_left",

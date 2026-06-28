@@ -1,10 +1,12 @@
 {
   "id": "leave_city",
   "title": "Flee the City of Destruction",
+  "title_zh": "逃离灭亡城",
   "description": "Stop pretending the burden is harmless. Receive Evangelist's direction, then leave while mercy still calls.",
+  "description_zh": "不要再假装重担无害。领受传道者的指引，趁怜悯仍在呼唤时离开。",
   "steps": [
-    { "id": "speak_evangelist", "description": "Tell Evangelist the truth about your burden.", "required_flag": "talked_to_evangelist" },
-    { "id": "exit_city", "description": "Leave through the eastern gate without turning back.", "required_flag": "left_city" }
+    { "id": "speak_evangelist", "description": "Tell Evangelist the truth about your burden.", "description_zh": "向传道者诚实说出你的重担。", "required_flag": "talked_to_evangelist" },
+    { "id": "exit_city", "description": "Leave through the eastern gate without turning back.", "description_zh": "从东门离开，不再回头。", "required_flag": "left_city" }
   ],
   "rewards": { "faith": 5, "perseverance": 5 }
 }

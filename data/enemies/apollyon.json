@@ -1,6 +1,7 @@
 {
   "id": "apollyon",
   "display_name": "Apollyon",
+  "display_name_zh": "亚玻伦",
   "enemy_type": "boss",
   "influence": 160,
   "move_speed": 2.4,

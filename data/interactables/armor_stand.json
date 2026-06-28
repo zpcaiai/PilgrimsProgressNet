@@ -1,7 +1,9 @@
 {
   "id": "armor_stand",
   "display_name": "军装架 Armor Stand",
+  "display_name_zh": "军装架",
   "type": "equipment",
   "interaction_prompt": "穿戴军装 (Take up the armor)",
+  "interaction_prompt_zh": "穿戴军装",
   "item_id": "armor"
 }

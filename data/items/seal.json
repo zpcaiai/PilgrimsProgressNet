@@ -1,8 +1,10 @@
 {
   "id": "seal",
   "display_name": "Seal",
+  "display_name_zh": "印记",
   "type": "story_item",
   "description": "A mark of belonging set on the forehead.",
+  "description_zh": "额上表明归属的记号。",
   "visible_on_player": false,
   "effects": {},
   "special": {}

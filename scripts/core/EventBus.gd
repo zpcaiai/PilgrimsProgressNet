@@ -22,6 +22,7 @@ signal spiritual_collapse()
 signal repentance_started()
 signal repentance_completed()
 signal scripture_card_received(card_id: String)
+signal learning_moment_requested(moment: Dictionary)
 
 # --- Quests ---
 signal quest_started(quest_id: String)
