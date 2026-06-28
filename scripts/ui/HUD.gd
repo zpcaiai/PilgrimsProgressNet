@@ -667,12 +667,29 @@ func _refresh_char_panel() -> void:
 	if s.has_new_garment: tokens.append(LocaleManager.t("token.new_garment", "New Garment"))
 	if s.has_promise_key: tokens.append(LocaleManager.t("token.promise_key", "Key of Promise"))
 	t += "  " + (", ".join(PackedStringArray(tokens)) if not tokens.is_empty() else LocaleManager.t("char.none_yet", "none yet")) + "\n\n"
+	t += "[color=#f0d890]学习进度[/color]\n"
+	t += "  " + ScriptureMemory.reflection_progress_summary() + "\n\n"
 	t += "[color=#f0d890]经文记忆[/color]\n"
 	t += ScriptureMemory.known_card_summary(5) + "\n\n"
 	t += "[color=#a0f0c0]" + LocaleManager.t("char.companions", "Companions") + "[/color]\n"
 	var comps: Array = GameState.companions.keys()
-	t += "  " + (", ".join(PackedStringArray(comps)) if not comps.is_empty() else LocaleManager.t("char.walking_alone", "walking alone")) + "\n"
+	var comp_names: Array = []
+	for comp_id in comps:
+		comp_names.append(LocaleManager.npc_label(_companion_display_name(String(comp_id))))
+	t += "  " + (", ".join(PackedStringArray(comp_names)) if not comp_names.is_empty() else LocaleManager.t("char.walking_alone", "walking alone")) + "\n"
 	_char_label.text = t
+
+
+func _companion_display_name(companion_id: String) -> String:
+	match companion_id:
+		"hopeful":
+			return "Hopeful"
+		"pliable":
+			return "Pliable"
+		"faithful":
+			return "Faithful"
+		_:
+			return companion_id.capitalize()
 
 
 # ---------------------------------------------------------------------------

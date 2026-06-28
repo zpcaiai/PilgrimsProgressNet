@@ -3,7 +3,7 @@ class_name Interactable
 ## Base interactable. Built procedurally by chapter scripts.
 ## Lives on collision layer 2 so the player's interactor (mask 2) detects it.
 
-var prompt: String = "Interact"
+var prompt: String = "互动"
 var interact_callback: Callable = Callable()
 var one_shot: bool = false
 var consumed: bool = false

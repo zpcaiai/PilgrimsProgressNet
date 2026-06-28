@@ -120,7 +120,7 @@ func _ready() -> void:
 	var prompt_en := String(_q.get("prompt_en", ""))
 	if prompt_en != "":
 		var pe := Label.new()
-		pe.text = LocaleManager.zh_or_mixed(prompt_en)
+		pe.text = ("英文提示：" + prompt_en) if LocaleManager.is_zh() else prompt_en
 		pe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		pe.custom_minimum_size = Vector2(panel_w, 0)
 		pe.add_theme_font_size_override("font_size", small_font)

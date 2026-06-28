@@ -28,6 +28,8 @@ static func validate_all_data() -> Array:
 	var enemies := DataLoader.load_category("enemies")
 	var items := DataLoader.load_category("items")
 	var companions := DataLoader.load_category("companions")
+	var scripture_gates: Dictionary = _load_dict("res://data/scripture/scripture_gates.json")
+	var verse_cards: Dictionary = _load_dict("res://data/scripture/verse_cards.json")
 
 	errors.append_array(_dup_ids("chapter", chapters))
 	errors.append_array(_dup_ids("quest", quests))
@@ -132,6 +134,25 @@ static func validate_all_data() -> Array:
 		if String(item2.get("id", "")) == "" or String(item2.get("type", "")) == "":
 			errors.append("Item %s missing id/type." % iid2)
 
+	# --- Scripture learning loop ---
+	for cid in chapters:
+		if String(cid).begins_with("__"):
+			continue
+		if not scripture_gates.has(cid):
+			errors.append("Chapter %s missing Scripture Gate." % cid)
+		if not verse_cards.has(cid):
+			errors.append("Chapter %s missing Scripture memory card." % cid)
+			continue
+		var card: Dictionary = verse_cards[cid]
+		if String(card.get("chapter_id", "")) != String(cid):
+			errors.append("Verse card %s chapter_id mismatch: %s" % [cid, String(card.get("chapter_id", ""))])
+		if scripture_gates.has(cid):
+			var gate: Dictionary = scripture_gates[cid]
+			var card_ref := _normalize_ref(String(card.get("ref", "")))
+			var gate_ref := _normalize_ref(String(gate.get("ref", "")).split("·")[0])
+			if card_ref != gate_ref:
+				errors.append("Chapter %s Scripture ref mismatch: card=%s gate=%s" % [cid, String(card.get("ref", "")), String(gate.get("ref", ""))])
+
 	return errors
 
 
@@ -153,6 +174,15 @@ static func _dup_ids(label: String, category_data: Dictionary) -> Array:
 			errors.append("Duplicate %s id: %s" % [label, cid])
 		seen.append(cid)
 	return errors
+
+
+static func _load_dict(path: String) -> Dictionary:
+	var parsed: Variant = DataLoader.load_json(path)
+	return parsed if parsed is Dictionary else {}
+
+
+static func _normalize_ref(ref: String) -> String:
+	return ref.strip_edges().replace(" ", "")
 
 
 static func report() -> String:

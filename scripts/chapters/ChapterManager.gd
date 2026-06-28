@@ -373,7 +373,29 @@ func evaluate_completion_conditions(chapter_id: String) -> bool:
 func complete_chapter(chapter_id: String) -> void:
 	apply_chapter_completion_effects(chapter_id)
 	GameState.set_flag(chapter_id + "_completed", true)
+	_request_completion_reflection(chapter_id)
 	EventBus.chapter_completed.emit(chapter_id)
+
+
+func _request_completion_reflection(chapter_id: String) -> void:
+	var flag := "reflected_" + chapter_id
+	if GameState.has_flag(flag):
+		return
+	var card := ScriptureMemory.get_chapter_card(chapter_id)
+	if card.is_empty():
+		return
+	var data := load_chapter_data(chapter_id)
+	var title := "本章复盘：" + String(data.get("title", CHAPTER_TITLE_ZH.get(chapter_id, chapter_id)))
+	var body := PackedStringArray()
+	body.append("[b]刚走过的路[/b]  %s" % String(data.get("subtitle", "")))
+	body.append(ScriptureMemory.learning_body(card))
+	body.append("[b]带进下一章[/b]  不是急着通关，而是把这节经文带进下一次选择。")
+	EventBus.learning_moment_requested.emit({
+		"title": title,
+		"body": "\n\n".join(body),
+		"flag_on_continue": flag,
+		"effects_on_continue": {"watchfulness": 1, "hope": 1},
+	})
 
 
 func go_to_next_chapter() -> void:

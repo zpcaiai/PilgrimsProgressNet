@@ -146,6 +146,16 @@ func known_card_summary(max_count: int = 5) -> String:
 	return "\n".join(PackedStringArray(lines))
 
 
+func reflection_progress_summary() -> String:
+	var total := 0
+	var reflected := 0
+	for chapter_id in ChapterManager.get_route():
+		total += 1
+		if GameState.has_flag("reflected_" + String(chapter_id)):
+			reflected += 1
+	return "经文卡 %d/%d　章节反思 %d/%d" % [known_cards().size(), total, reflected, total]
+
+
 func use_for_trial(trial_type: String) -> Dictionary:
 	var card := best_card_for_trial(trial_type)
 	if card.is_empty():
