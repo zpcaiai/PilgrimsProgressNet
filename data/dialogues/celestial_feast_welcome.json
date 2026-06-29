@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "A Shining One",
+      "speaker_zh": "闪光者",
       "text": "Welcome, pilgrim, to the supper of the Lamb. Look — these tables were set for you before the road ever began. The redeemed of every chapter are here: the ones Help pulled from the mire, the ones who stood at the trial, the ones the Promise freed from the dungeon. Come and be seated among them.",
       "text_zh": "欢迎你，朝圣者，来赴羔羊的婚筵。看哪——这些席位，早在你上路之前就为你摆好了。历世历代蒙救赎的人都在这里：被「帮助」从泥潭里拉起来的、在受审之地站立的、被「应许」从牢狱中释放的。来，坐在他们中间罢。",
       "choices": [
@@ -25,6 +26,7 @@
     },
     "by_grace": {
       "speaker": "A Shining One",
+      "speaker_zh": "闪光者",
       "text": "Not one at this table came by their own worth — every seat was bought by the Lamb. Eat, rest, and rejoice; but the feast is not the end. When you are ready, walk on to the throne. The King Himself is waiting to welcome you by name.",
       "text_zh": "这席上没有一个人是凭自己的功劳来的——每一个座位都是羔羊用重价买来的。吃罢，安歇罢，欢喜罢；但这筵席还不是终点。你预备好了，就往宝座那里去。君王亲自在那里，要按你的名字迎接你。",
       "choices": [

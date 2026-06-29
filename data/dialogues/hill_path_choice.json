@@ -4,10 +4,12 @@
     "start": {
       "speaker": "",
       "text": "Three roads meet at the hill: one steep, one easy, one wide.",
+      "text_zh": "三条路在山前相会：一条陡峭，一条轻省，一条宽阔。",
       "choices": [
         {
           "id": "difficulty",
           "text": "Take the Difficulty path.",
+          "text_zh": "走艰难之路。",
           "effects": {
             "perseverance": 10,
             "faith": 5,
@@ -21,6 +23,7 @@
         {
           "id": "danger",
           "text": "Take the flatter path marked Danger.",
+          "text_zh": "走那条标着“危险”的平坦小路。",
           "effects": {
             "deception": 10,
             "discernment": -5
@@ -33,6 +36,7 @@
         {
           "id": "destruction",
           "text": "Take the wide path marked Destruction.",
+          "text_zh": "走那条标着“毁灭”的宽路。",
           "effects": {
             "pride": 5,
             "deception": 10
@@ -47,10 +51,12 @@
     "false_path": {
       "speaker": "",
       "text": "The easy road bends away from the light.",
+      "text_zh": "容易的路正弯离光。",
       "choices": [
         {
           "id": "return",
           "text": "Return to the hard path.",
+          "text_zh": "回到艰难的正路。",
           "effects": {
             "humility": 5,
             "deception": -5

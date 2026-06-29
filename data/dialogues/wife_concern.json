@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Your Family",
+      "speaker_zh": "你的家人",
       "text": "Why do you speak as if the whole city were already burning? Come inside. Sit by the table. Surely this dread will pass by morning.",
       "text_zh": "你为何说得好像整座城已经在烧？进屋来。在桌边坐下。这惊惧想必到天亮就过去了。",
       "choices": [
@@ -33,6 +34,7 @@
     },
     "children": {
       "speaker": "Your Family",
+      "speaker_zh": "你的家人",
       "text": "And the little ones asleep upstairs — who tells them their father chased a light in a book and left them to the dark? Is that love, or madness?",
       "text_zh": "还有楼上熟睡的孩子——谁去告诉他们，父亲为了书里的一道光，撇下他们留在黑暗里？这是爱，还是疯了？",
       "choices": [
@@ -55,6 +57,7 @@
     },
     "invite": {
       "speaker": "Your Family",
+      "speaker_zh": "你的家人",
       "text": "You ask me to fear a fire I cannot feel, and to leave all we have built on the strength of your dream. I cannot — not yet. But go, and... I will watch the road you take.",
       "text_zh": "你要我去惧怕一团我感觉不到的火，凭你一个梦撇下我们建立的一切。我不能——还不能。但你去吧，我……我会望着你所走的那条路。",
       "choices": [
@@ -70,6 +73,7 @@
     },
     "plead": {
       "speaker": "Your Family",
+      "speaker_zh": "你的家人",
       "text": "Then go, if you must. But know this: love makes your leaving hurt more, not less.",
       "text_zh": "那就去吧，你若非去不可。但要知道：爱，只会让你的离去更痛，而非更轻。",
       "choices": [

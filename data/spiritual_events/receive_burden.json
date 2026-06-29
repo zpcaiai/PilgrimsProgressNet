@@ -1,6 +1,7 @@
 {
   "id": "receive_burden",
   "title": "The Burden Appears",
+  "title_zh": "重担显现",
   "trigger": "read_book",
   "effects": {
     "despair": 10,

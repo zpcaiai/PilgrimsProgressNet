@@ -1,6 +1,7 @@
 {
   "id": "journey_completed",
   "title": "Journey Completed",
+  "title_zh": "旅程完成",
   "trigger": "enter_celestial_city",
   "effects": {
     "faith": 100,

@@ -1,11 +1,18 @@
 {
   "id": "city_of_destruction",
   "title": "City of Destruction",
+  "title_zh": "灭亡城",
   "subtitle": "Awakening under a burden no home can soothe",
+  "subtitle_zh": "在家也无法卸下的重担中醒来",
   "intro": [
     "You wake before dawn with the book open in your hands and a burden on your back that no sleep can soften.",
     "The city calls this fear, but the words on the page name it truth: judgment is coming, and your heart is not ready.",
     "Those you love ask you to stay and be reasonable. Repentance begins when you stop pretending the house is safe because it is familiar."
+  ],
+  "intro_zh": [
+    "你在黎明前醒来，书仍摊在手中，背上的重担连睡眠也不能减轻。",
+    "这城称它为恐惧，但书页上的话给它命名为真实：审判将临，而你的心还没有预备好。",
+    "你所爱的人请你留下，显得理性一些。悔改开始于你不再因房子熟悉，就假装它安全。"
   ],
   "order": 1,
   "scene_path": "res://scenes/chapters/city_of_destruction/CityOfDestruction.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "wilderness_road",
   "previous_chapter_id": "",
   "spiritual_theme": "Awakening, honest fear, and the first turn toward life",
+  "spiritual_theme_zh": "醒悟、诚实的惧怕，以及第一次转向生命",
   "core_mechanic": "Carry the burden through a familiar city, answer loved ones and mockers, and receive Evangelist's call to flee toward the narrow gate.",
+  "core_mechanic_zh": "背着重担穿过熟悉的城，回应亲人与嘲笑者，领受传道者的呼召。",
   "required_flags": [],
   "entry_effects": {},
   "on_start_flags": {

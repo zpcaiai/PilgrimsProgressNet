@@ -1,11 +1,18 @@
 {
   "id": "river_of_death",
   "title": "The River of Death",
+  "title_zh": "死河",
   "subtitle": "The last surrender before welcome",
+  "subtitle_zh": "被迎接前最后的交托",
   "intro": [
     "At last the road reaches a wide river. No skill, record, companion, or courage can build a bridge over it.",
     "The water rises with fear and falls beneath faith, but even faith here is a receiving, not a conquest.",
     "Hopeful takes your hand and speaks what your heart cannot yet feel: the bottom is good. Step in."
+  ],
+  "intro_zh": [
+    "最后的水横在面前，没有桥，也没有可以掌控的道路。",
+    "惧怕翻涌时，盼望提醒你：这不是被丢弃，而是最后的交托。",
+    "踏入水中，靠怜悯抵达彼岸。"
   ],
   "order": 15,
   "scene_path": "res://scenes/chapters/river_of_death/RiverOfDeath.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "celestial_city",
   "previous_chapter_id": "enchanted_ground",
   "spiritual_theme": "Death, dependence, and faith receiving the final mercy",
+  "spiritual_theme_zh": "在惧怕中交托，靠怜悯抵达彼岸",
   "core_mechanic": "Cross without a bridge; fear slows and deepens the water, while faith and Hopeful's voice steady your footing until the far bank holds.",
+  "core_mechanic_zh": "牵住盼望，进入水中并走向彼岸。",
   "required_flags": [
     "crossed_enchanted"
   ],

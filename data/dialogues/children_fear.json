@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Your Children",
+      "speaker_zh": "你的儿女",
       "text": "Must you go where we cannot follow?",
+      "text_zh": "你一定要去我们不能跟随的地方吗？",
       "choices": [
         {
           "id": "love",
           "text": "I go so that you might one day follow.",
+          "text_zh": "我离开，是盼望有一天你们也能跟随。",
           "effects": {
             "humility": 5,
             "hope": 3
@@ -17,6 +20,7 @@
         {
           "id": "grief",
           "text": "I cannot stay, though it breaks me.",
+          "text_zh": "我不能留下，哪怕这使我心碎。",
           "effects": {
             "despair": 4,
             "perseverance": 3

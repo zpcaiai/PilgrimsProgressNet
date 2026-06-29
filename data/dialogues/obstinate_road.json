@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Obstinate",
+      "speaker_zh": "顽固",
       "text": "So you really left. I came all this way to fetch you back. Look — the city is still in sight. One turn, and you sleep in your own bed tonight.",
       "text_zh": "你当真走了。我大老远追来，就是要把你带回去。瞧——城还在眼前。回个头，今晚你就能睡回自己的床。",
       "choices": [
@@ -30,6 +31,7 @@
     },
     "mock_book": {
       "speaker": "Obstinate",
+      "speaker_zh": "顽固",
       "text": "Your book! A bundle of another man's dreams. I left such fancies behind when I learned to live in the world as it actually is.",
       "text_zh": "你那本书！不过是别人的一堆梦呓。当我学会照着世界本来的样子去活，就把这些幻想都丢下了。",
       "choices": [
@@ -51,6 +53,7 @@
     },
     "press_doubt": {
       "speaker": "Obstinate",
+      "speaker_zh": "顽固",
       "text": "Wishful thinking — exactly. There is nothing out here but mud and strangers' sermons. Come home while you can still laugh about it tomorrow.",
       "text_zh": "一厢情愿——正是。这外头除了泥泞和陌生人的说教，什么都没有。趁你明天还笑得出来，回家吧。",
       "choices": [
@@ -65,6 +68,7 @@
     },
     "gives_up": {
       "speaker": "Obstinate",
+      "speaker_zh": "顽固",
       "text": "Then keep your burden and your little light. I am done chasing a fool toward his sorrow.",
       "text_zh": "那就留着你的重担和你那点微光吧。我不再追着一个傻子奔他的愁苦了。",
       "set_flags": { "obstinate_left": true },

@@ -1,6 +1,7 @@
 {
   "id": "spiritual_collapse_despond",
   "title": "Collapsed in Despond",
+  "title_zh": "在沮丧泥潭中跌倒",
   "trigger": "despair_100",
   "conditions": {
     "despair_min": 100

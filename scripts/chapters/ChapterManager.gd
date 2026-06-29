@@ -11,7 +11,7 @@ const CHAPTER_TITLE_ZH := {
 	"slough_of_despond": "绝望泥潭",
 	"wicket_gate": "窄门",
 	"cross_and_tomb": "十字架与空墓",
-	"interpreter_house": "释经者之家",
+	"interpreter_house": "讲解者之家",
 	"hill_difficulty": "艰难山",
 	"palace_beautiful": "美宫",
 	"valley_humiliation": "谦卑谷",

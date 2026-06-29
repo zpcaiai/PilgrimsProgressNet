@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Pilgrim",
+      "speaker_zh": "朝圣者",
       "text": "The city is near, but the river is between.",
+      "text_zh": "那城已经近了，但河横在中间。",
       "choices": [
         {
           "id": "step",
           "text": "Step into the river.",
+          "text_zh": "踏入河中。",
           "effects": {
             "fear": 10,
             "faith": 5
@@ -20,6 +23,7 @@
         {
           "id": "ask",
           "text": "Ask Hopeful to go with you.",
+          "text_zh": "请盼望与你同去。",
           "effects": {
             "humility": 5,
             "hope": 8
@@ -33,7 +37,9 @@
     },
     "hopeful": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "Be of good courage. I feel the bottom.",
+      "text_zh": "放心壮胆吧。我摸到了河底。",
       "next": "end"
     },
     "end": {

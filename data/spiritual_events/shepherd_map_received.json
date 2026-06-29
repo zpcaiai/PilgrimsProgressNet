@@ -1,6 +1,7 @@
 {
   "id": "shepherd_map_received",
   "title": "The Shepherds' Map",
+  "title_zh": "牧人的地图",
   "trigger": "receive_shepherd_map",
   "effects": {
     "watchfulness": 10,

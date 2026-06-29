@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Pilgrim",
+      "speaker_zh": "朝圣者",
       "text": "The gate is small enough to humble you, and the arrows of the old life are close enough to make shame sound convincing. A voice in you says you have no right to knock.",
       "choices": [
         {
@@ -43,6 +44,7 @@
     },
     "hesitation": {
       "speaker": "Pilgrim",
+      "speaker_zh": "朝圣者",
       "text": "The arrows hiss nearer. The light around the gate waits without panic, as if mercy were not surprised by your trembling.",
       "choices": [
         {
@@ -64,6 +66,7 @@
     },
     "look_back": {
       "speaker": "Pilgrim",
+      "speaker_zh": "朝圣者",
       "text": "The old city is dark and burning at its edges, yet familiar enough to ache. Then the light at the gate touches your face, and the ache loses its authority.",
       "choices": [
         {
@@ -84,6 +87,7 @@
     },
     "opened": {
       "speaker": "Goodwill",
+      "speaker_zh": "善意",
       "text": "Come in, quickly, come in. You knocked, and that is all that was asked of you. The arrows of the old life cannot follow through this gate. You are received by mercy, not by merit.",
       "flags": {
         "goodwill_received_player": true,

@@ -1,11 +1,18 @@
 {
   "id": "slough_of_despond",
   "title": "Slough of Despond",
+  "title_zh": "绝望泥潭",
   "subtitle": "When guilt sinks and pride refuses the hand",
+  "subtitle_zh": "罪疚使人下沉，骄傲拒绝伸来的手",
   "intro": [
     "The path disappears beneath cold mire, and every frightened thought grows heavier than the last.",
     "Here the burden tells you to thrash, hide, blame, and sink. Pride calls that strength; despair calls it truth.",
     "Promise stones stand in the fog, and Help is already reaching down. The question is not whether grace is near, but whether you will take its hand."
+  ],
+  "intro_zh": [
+    "地面开始下陷，重担把每一步都拉得更沉。",
+    "绝望说这就是你真实的样子；应许却在泥中仍然发声。",
+    "你不能靠自救离开这里。谦卑会伸手，恩典会抓住。"
   ],
   "order": 3,
   "scene_path": "res://scenes/chapters/slough_of_despond/SloughOfDespond.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "wicket_gate",
   "previous_chapter_id": "wilderness_road",
   "spiritual_theme": "Contrition, helplessness, and receiving mercy",
+  "spiritual_theme_zh": "在绝望中承认需要，并抓住应许与帮助",
   "core_mechanic": "Mud raises despair and slows every step; promise stones give footing, Pliable turns back, and Help pulls the humble out.",
+  "core_mechanic_zh": "在泥潭中寻找应许石与安全落脚处，并接受援手。",
   "required_flags": [
     "entered_slough"
   ],

@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Apollyon",
+      "speaker_zh": "亚玻伦",
       "text": "You fled the city, but you did not cease to be mine.",
+      "text_zh": "你逃离了那城，但你并没有停止属于我。",
       "choices": [
         {
           "id": "cross",
           "text": "I was burdened, but the burden fell.",
+          "text_zh": "我曾背负重担，但重担已经落下。",
           "effects": {
             "faith": 8,
             "shame": -5
@@ -20,6 +23,7 @@
         {
           "id": "fear",
           "text": "I am afraid of you.",
+          "text_zh": "我害怕你。",
           "effects": {
             "fear": 8,
             "humility": 3
@@ -32,6 +36,7 @@
         {
           "id": "pride",
           "text": "I can defeat you easily.",
+          "text_zh": "我可以轻易胜过你。",
           "effects": {
             "pride": 10,
             "watchfulness": -5
@@ -45,7 +50,9 @@
     },
     "threat": {
       "speaker": "Apollyon",
+      "speaker_zh": "亚玻伦",
       "text": "Then stand, if you can remember what you claim.",
+      "text_zh": "那就站住吧，如果你还能记得自己所宣称的。",
       "special": {
         "start_boss": "apollyon"
       },
@@ -53,7 +60,9 @@
     },
     "mock": {
       "speaker": "Apollyon",
+      "speaker_zh": "亚玻伦",
       "text": "Pride is a loose strap on borrowed armor.",
+      "text_zh": "骄傲就像借来的军装上一条松开的带子。",
       "special": {
         "start_boss": "apollyon"
       },

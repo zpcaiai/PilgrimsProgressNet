@@ -1,6 +1,7 @@
 {
   "id": "enchanted_ground_survived",
   "title": "Stayed Awake",
+  "title_zh": "保持警醒",
   "trigger": "enchanted_ground_exit",
   "effects": {
     "watchfulness": 20,

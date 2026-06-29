@@ -1,6 +1,7 @@
 {
   "id": "vertical_slice_route",
   "title": "Burden Fallen Vertical Slice Route",
+  "title_zh": "重担脱落：垂直切片路线",
   "start_chapter": "city_of_destruction",
   "end_chapter": "valley_shadow_death",
   "completion_flag": "completed_vertical_slice",

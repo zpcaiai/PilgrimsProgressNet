@@ -4,10 +4,12 @@
     "start": {
       "speaker": "",
       "text": "Your burden has fallen. The road continues beyond the hill.",
+      "text_zh": "你的重担已经落下。道路还在山后继续。",
       "choices": [
         {
           "id": "go",
           "text": "Walk on.",
+          "text_zh": "继续前行。",
           "effects": {
             "hope": 5
           },

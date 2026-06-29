@@ -1,6 +1,7 @@
 {
   "id": "river_crossed",
   "title": "The River Crossed",
+  "title_zh": "渡过死河",
   "trigger": "river_exit",
   "effects": {
     "faith": 20,

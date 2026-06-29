@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "False Voice",
+      "speaker_zh": "虚假之声",
       "text": "This way is safer.",
+      "text_zh": "这条路更安全。",
       "choices": [
         {
           "id": "ignore",
           "text": "Ignore the voice and stay on the path.",
+          "text_zh": "不理会这声音，继续留在路上。",
           "effects": {
             "watchfulness": 5,
             "discernment": 5
@@ -20,6 +23,7 @@
         {
           "id": "follow",
           "text": "Step toward the voice.",
+          "text_zh": "朝那声音走去。",
           "effects": {
             "deception": 8,
             "fear": 8
@@ -32,6 +36,7 @@
         {
           "id": "pray",
           "text": "Stop and pray.",
+          "text_zh": "停下祷告。",
           "effects": {
             "hope": 5,
             "fear": -8
@@ -50,6 +55,7 @@
     "return": {
       "speaker": "",
       "text": "The voice fades. The path is behind you, not beside you.",
+      "text_zh": "那声音渐渐退去。路在你身后，不在你旁边。",
       "effects": {
         "humility": 5,
         "deception": -5

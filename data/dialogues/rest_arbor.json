@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "The Arbor",
+      "speaker_zh": "凉亭",
       "text": "The shade is cool and the climb is long. Surely you have earned a moment. Sit. Close your eyes. The summit will still be there...",
       "text_variants": [
         {

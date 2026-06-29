@@ -1,11 +1,18 @@
 {
   "id": "delectable_mountains",
   "title": "The Delectable Mountains",
+  "title_zh": "可悦山",
   "subtitle": "Clear air, wise counsel, and a distant home",
+  "subtitle_zh": "清明空气、智慧劝戒与远方家乡",
   "intro": [
     "The prison air breaks behind you, and the mountains rise green and clean beneath shepherds who know the road.",
     "They do not flatter pilgrims with easy promises. They give warnings, wounds named honestly, and a glass turned toward home.",
     "Look long at the City. Hope is not fantasy here; it is a sight given before the last heaviness comes."
+  ],
+  "intro_zh": [
+    "高山空气清明，牧人的声音使你从疲惫中抬头。",
+    "警戒也是怜悯，因为错误的路常从好看的岔口开始。",
+    "透过望远镜望向天城，让真实的终点重新校正你的脚步。"
   ],
   "order": 13,
   "scene_path": "res://scenes/chapters/delectable_mountains/DelectableMountains.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "enchanted_ground",
   "previous_chapter_id": "doubting_castle",
   "spiritual_theme": "Pastoral counsel, restored hope, and sight fixed on the promised end",
+  "spiritual_theme_zh": "接受牧人的警戒，重新望向天城",
   "core_mechanic": "Rest on the mountains, hear the Shepherds' warnings, look through the glass toward the City, and carry that sight into the last trials.",
+  "core_mechanic_zh": "听牧人劝戒，透过望远镜观看天城。",
   "required_flags": [
     "escaped_castle"
   ],

@@ -1,11 +1,18 @@
 {
   "id": "interpreter_house",
   "title": "The Interpreter's House",
+  "title_zh": "讲解者之家",
   "subtitle": "Rooms that teach the heart how to see",
+  "subtitle_zh": "房间教导人心如何观看",
   "intro": [
     "After the Cross, you are not sent out empty. A quiet house opens, lit by patient lamps.",
     "Every room is a parable with a question hidden inside it: what do you love, what do you trust, what do you excuse?",
     "Do not hurry past instruction. The road ahead will test what the soul refused to learn in safety."
+  ],
+  "intro_zh": [
+    "门内安静而明亮，每个房间都像一面照见心的镜子。",
+    "真理不只是给你方向，也训练你分辨自己为何走路。",
+    "停下来观看，直到图景开始反问你的心。"
   ],
   "order": 6,
   "scene_path": "res://scenes/chapters/interpreter_house/InterpreterHouse.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "hill_difficulty",
   "previous_chapter_id": "cross_and_tomb",
   "spiritual_theme": "Discipleship, discernment, and teachable repentance",
+  "spiritual_theme_zh": "借真理训练眼光，分辨心中的动机",
   "core_mechanic": "Speak with the Interpreter, consider symbolic rooms, and let each lesson sharpen faith, humility, and watchfulness before the climb.",
+  "core_mechanic_zh": "进入不同房间，默想图景背后的属灵问题。",
   "required_flags": [
     "burden_fallen"
   ],

@@ -1,11 +1,18 @@
 {
   "id": "celestial_city",
   "title": "The Celestial City",
+  "title_zh": "天城",
   "subtitle": "The welcome the whole road promised",
+  "subtitle_zh": "整条路所应许的欢迎",
   "intro": [
     "Beyond the river, the road itself seems made of morning, and the gate ahead is not guarded by suspicion.",
     "The burden, the shame, the fear, the false names, the drowsy forgetfulness — all are behind you, unable to cross.",
     "You did not arrive because you were strong. You arrive because grace brought you all the way home. Come in, beloved pilgrim."
+  ],
+  "intro_zh": [
+    "过河之后，道路像清晨本身一样发光，前方的门没有怀疑看守。",
+    "重担、羞耻、惧怕、假名和困倦都留在身后，不能越过河来。",
+    "你不是因自己刚强而抵达；你是被恩典一路带回家。进来吧，蒙爱的朝圣者。"
   ],
   "order": 16,
   "scene_path": "res://scenes/chapters/celestial_city/CelestialCity.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "",
   "previous_chapter_id": "river_of_death",
   "spiritual_theme": "Welcome, completion, and grace remembered from beginning to end",
+  "spiritual_theme_zh": "欢迎、成全，以及从始至终被恩典带领",
   "core_mechanic": "Walk the shining road, pass through the opened gate, and let the final welcome gather every chapter into praise.",
+  "core_mechanic_zh": "走上发光的道路，穿过敞开的门，让旅程归于赞美。",
   "required_flags": [
     "crossed_river"
   ],

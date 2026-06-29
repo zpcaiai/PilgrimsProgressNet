@@ -1,6 +1,7 @@
 {
   "id": "complete_interpreter_house",
   "title": "Rooms Understood",
+  "title_zh": "领悟各房功课",
   "trigger": "all_interpreter_rooms_complete",
   "conditions": {
     "required_flags": [

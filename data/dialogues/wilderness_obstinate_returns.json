@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Obstinate",
+      "speaker_zh": "顽固",
       "text": "Last chance. The city still has a bed for you.",
+      "text_zh": "最后一次机会。城里仍有一张床留给你。",
       "choices": [
         {
           "id": "forward",
           "text": "Forward is frightening, but backward is death.",
+          "text_zh": "向前令人害怕，但退后就是死亡。",
           "effects": {
             "faith": 5,
             "perseverance": 5,
@@ -21,6 +24,7 @@
         {
           "id": "miss",
           "text": "I miss the city already.",
+          "text_zh": "我已经开始想念那座城了。",
           "effects": {
             "despair": 5,
             "fear": 5,

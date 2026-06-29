@@ -1,11 +1,18 @@
 {
   "id": "vanity_fair",
   "title": "Vanity Fair",
+  "title_zh": "虚华市集",
   "subtitle": "A glittering world that prices the soul cheaply",
+  "subtitle_zh": "把灵魂标价太低的闪亮世界",
   "intro": [
     "After darkness, the fair arrives like relief: color, music, laughter, and a thousand stalls promising an easier self.",
     "It sells honor without holiness, pleasure without peace, and a reputation polished enough to hide an unrepentant heart.",
     "Refusal will make you strange here. Refuse anyway, and watch for the friend whose hope is born in the middle of the crowd."
+  ],
+  "intro_zh": [
+    "市集灯火耀眼，每个摊位都承诺更闪亮的自我。",
+    "这里什么都可以买卖，连平安也被包装成掌声。",
+    "作见证会有代价，但盼望也会在人群中醒来。"
   ],
   "order": 11,
   "scene_path": "res://scenes/chapters/vanity_fair/VanityFair.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "doubting_castle",
   "previous_chapter_id": "valley_shadow_death",
   "spiritual_theme": "Discernment, costly witness, and finding fellowship in a hostile fair",
+  "spiritual_theme_zh": "拒绝虚荣交易，并作真实见证",
   "core_mechanic": "Refuse the fair's wares, expose their false shine, meet Hopeful, and leave by the far gate without selling peace for applause.",
+  "core_mechanic_zh": "拒绝市集交易，守住见证，并遇见盼望。",
   "required_flags": [
     "crossed_shadow"
   ],

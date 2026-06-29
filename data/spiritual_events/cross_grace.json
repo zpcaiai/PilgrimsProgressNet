@@ -1,6 +1,7 @@
 {
   "id": "cross_grace",
   "title": "The Burden Falls",
+  "title_zh": "重担脱落",
   "trigger": "approach_cross",
   "effects": {
     "faith": 30,

@@ -1,11 +1,18 @@
 {
   "id": "palace_beautiful",
   "title": "Palace Beautiful",
+  "title_zh": "美宫",
   "subtitle": "Rest that prepares courage",
+  "subtitle_zh": "使勇气重新预备的安息",
   "intro": [
     "At the summit, lamplight spills from a house where pilgrims are not shamed for being tired.",
     "Here rest is not escape. It is obedience to the One who knows what waits in the valley.",
     "Listen to Watchful, read the records, and take up the armour of faith before accusation learns your name again."
+  ],
+  "intro_zh": [
+    "夜色降下，美宫的门为疲惫的旅人打开。",
+    "安息不是离开争战，而是为下一段路重新预备。",
+    "听守望者的话，穿戴军装，因为控告者正在山谷等候。"
   ],
   "order": 8,
   "scene_path": "res://scenes/chapters/palace_beautiful/PalaceBeautiful.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "valley_humiliation",
   "previous_chapter_id": "hill_difficulty",
   "spiritual_theme": "Fellowship, holy rest, and preparation for accusation",
+  "spiritual_theme_zh": "安息、团契与属灵军装",
   "core_mechanic": "Rest, receive Watchful's counsel, read the testimony of former pilgrims, and take up armour before descending into the Valley of Humiliation.",
+  "core_mechanic_zh": "休息、聆听守望者，并穿戴为山谷预备的军装。",
   "required_flags": [
     "reached_summit"
   ],

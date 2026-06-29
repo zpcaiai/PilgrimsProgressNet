@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "This place feels safe. That makes me uneasy.",
+      "text_zh": "这个地方让人觉得安全，这反而使我不安。",
       "choices": [
         {
           "id": "speak",
           "text": "Speak with me. Let us keep one another awake.",
+          "text_zh": "和我说话。让我们彼此保持清醒。",
           "effects": {
             "hope": 8,
             "watchfulness": 8,
@@ -18,6 +21,7 @@
         {
           "id": "sit",
           "text": "Sit down for a moment.",
+          "text_zh": "坐下来歇一会儿。",
           "effects": {
             "weariness": -5,
             "watchfulness": -10,
@@ -28,6 +32,7 @@
         {
           "id": "walk",
           "text": "Keep walking.",
+          "text_zh": "继续走。",
           "effects": {
             "perseverance": 8,
             "weariness": 5
@@ -41,12 +46,16 @@
     },
     "testimony": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "Tell me again where your burden fell.",
+      "text_zh": "再告诉我一次，你的重担在哪里落下。",
       "next": "end"
     },
     "warning": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "A moment can become a chain in this place.",
+      "text_zh": "在这个地方，一小会儿也会变成锁链。",
       "next": "end"
     },
     "end": {

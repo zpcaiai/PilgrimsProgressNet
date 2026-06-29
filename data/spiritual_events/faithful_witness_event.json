@@ -1,6 +1,7 @@
 {
   "id": "faithful_witness_event",
   "title": "Faithful's Witness",
+  "title_zh": "忠信的见证",
   "trigger": "vanity_trial",
   "effects": {
     "faith": 10,

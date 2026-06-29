@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "The Shepherds",
+      "speaker_zh": "众牧人",
       "text": "Welcome to the Delectable Mountains, pilgrims. You have escaped a dark house; breathe the clear air. From here, mercy lets the tired see the City before they reach it.",
       "choices": [
         {
@@ -25,7 +26,7 @@
             "requires_flag": "interpreter_full"
           },
           "text": "You have the look of one who lingered in the Interpreter's house and weighed every room — the lamp, the dust, the patient way. That kind of sight is welcome here. From these mountains, mercy lets the clear-eyed see the City most plainly of all.",
-          "text_zh": "你有那种在释经者之家里逗留、把每一间房都掂量过的眼神——那灯、那尘、那忍耐之道。这样的眼光在此处受欢迎。从这些山上，清眼之人看圣城看得最是分明。"
+          "text_zh": "你有那种在讲解者之家里逗留、把每一间房都掂量过的眼神——那灯、那尘、那忍耐之道。这样的眼光在此处受欢迎。从这些山上，清眼之人看圣城看得最是分明。"
         },
         {
           "conditions": {
@@ -53,6 +54,7 @@
     },
     "warn": {
       "speaker": "The Shepherds",
+      "speaker_zh": "众牧人",
       "text": "Two dangers remain. The Enchanted Ground will not roar; it will soothe you into forgetting. Beyond it runs a river with no bridge; only faith receives the crossing. Keep Hopeful close, and keep the City before you.",
       "choices": [
         {

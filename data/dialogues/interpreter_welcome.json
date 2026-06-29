@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "The Interpreter",
+      "speaker_zh": "讲解者",
       "text": "Welcome, pilgrim. The burden has fallen, but the heart still needs teaching. Walk these rooms slowly; each one names a danger mercy intends to heal.",
       "choices": [
         {
@@ -39,6 +40,7 @@
     },
     "guide": {
       "speaker": "The Interpreter",
+      "speaker_zh": "讲解者",
       "text": "Consider the lamp fed in secret, the dust only water can settle, and patience that waits without envy. What you learn here will meet you again on the road.",
       "choices": [
         {

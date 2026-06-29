@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Apollyon",
+      "speaker_zh": "亚玻伦",
       "text": "Where do you think you are going, deserter? You were born in my city, wore my colors, and served me with more eagerness than you now admit. I know the promises you broke and the sins you once defended.",
       "choices": [
         {
@@ -61,6 +62,7 @@
     },
     "accuse": {
       "speaker": "Apollyon",
+      "speaker_zh": "亚玻伦",
       "text": "A Cross? You think a hill and borrowed words undo what you are? You will fail again. You always do. Come back before your new Master is ashamed of you.",
       "choices": [
         {
@@ -89,6 +91,7 @@
     },
     "rage": {
       "speaker": "Apollyon",
+      "speaker_zh": "亚玻伦",
       "text": "Then stand there and be broken. If I cannot own you, I will drown you in fear and shame.",
       "choices": [
         {

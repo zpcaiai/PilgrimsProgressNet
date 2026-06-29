@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Help",
+      "speaker_zh": "帮助",
       "text": "Steady, friend. I have pulled many from this hollow. Give me your hand; the mire has no bottom for the one determined to be his own savior.",
       "choices": [
         {
@@ -60,6 +61,7 @@
     },
     "warn": {
       "speaker": "Help",
+      "speaker_zh": "帮助",
       "text": "Look at your feet. Every proud push sinks you deeper. Mercy is not insulted when the helpless reach for it; mercy came here for that very reason.",
       "choices": [
         {
@@ -83,6 +85,7 @@
     },
     "explain": {
       "speaker": "Help",
+      "speaker_zh": "帮助",
       "text": "Warnings were given, and stones were laid. But fear and guilt drain into this hollow, and beginners often meet them before they know how to stand. This is not the end of you. It is the beginning learning to receive help.",
       "choices": [
         {
@@ -105,6 +108,7 @@
     },
     "pull": {
       "speaker": "Help",
+      "speaker_zh": "帮助",
       "text": "There. Solid stone under your feet again. Breathe. Remember this: repentance is not proving you can rise alone; it is consenting to be lifted. The gate is ahead. Go on.",
       "flags": {
         "rescued_from_slough": true

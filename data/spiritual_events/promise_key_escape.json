@@ -1,6 +1,7 @@
 {
   "id": "promise_key_escape",
   "title": "Escaped by Promise",
+  "title_zh": "凭应许逃脱",
   "trigger": "use_promise_key",
   "effects": {
     "faith": 10,

@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Pliable",
+      "speaker_zh": "易迁",
       "text": "Well, he's gone back — more fool him! Now, tell me again about the place we're bound for. The crowns, the music, the golden streets. Is it all really ours just for the walking?",
       "text_zh": "好啦，他回去了——真是个傻瓜！来，再跟我讲讲我们要去的那地方吧。那些冠冕、那音乐、那金色的街道。只要走到了，就真的都归我们吗？",
       "choices": [
@@ -32,6 +33,7 @@
     },
     "glory": {
       "speaker": "Pliable",
+      "speaker_zh": "易迁",
       "text": "Oh, this is excellent! My heart could burst. Come, let us mend our pace — I can hardly wait to be there!",
       "text_zh": "哦，这太美妙了！我的心都要炸开了。来，我们加快脚步吧——我都等不及要到那儿了！",
       "choices": [
@@ -54,6 +56,7 @@
     },
     "uneasy": {
       "speaker": "Pliable",
+      "speaker_zh": "易迁",
       "text": "Hard? You did not say hard. Well... then let us hurry through the unpleasant parts, and think only of the good that comes after.",
       "text_zh": "难？你可没说过难。好吧……那我们就快些穿过那些不愉快的部分，单想着随后而来的好处。",
       "set_flags": { "spoke_with_pliable": true },
@@ -68,6 +71,7 @@
     },
     "eager": {
       "speaker": "Pliable",
+      "speaker_zh": "易迁",
       "text": "I think only of the end! Whatever lies between, surely it cannot be much. Lead on — quickly, quickly!",
       "text_zh": "我只想着那结局！无论中间有什么，总不至于太难。带路吧——快些，快些！",
       "set_flags": { "spoke_with_pliable": true, "pliable_shallow": true },

@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Merchant of Applause",
+      "speaker_zh": "喝彩商人",
       "text": "Pilgrim, you would be more useful if people liked you.",
+      "text_zh": "朝圣者，如果人们更喜欢你，你会更有用。",
       "choices": [
         {
           "id": "accept",
           "text": "Accept a small badge of reputation.",
+          "text_zh": "接受一枚小小的名声徽章。",
           "effects": {
             "pride": 8,
             "deception": 6,
@@ -21,6 +24,7 @@
         {
           "id": "refuse",
           "text": "Refuse the badge.",
+          "text_zh": "拒绝这枚徽章。",
           "effects": {
             "humility": 5,
             "discernment": 5,
@@ -34,6 +38,7 @@
         {
           "id": "ask",
           "text": "Ask what the badge costs.",
+          "text_zh": "询问这枚徽章要付什么代价。",
           "effects": {
             "discernment": 8
           },
@@ -43,12 +48,16 @@
     },
     "cost": {
       "speaker": "Merchant of Applause",
+      "speaker_zh": "喝彩商人",
       "text": "Only a little silence when the crowd prefers it.",
+      "text_zh": "只是在群众喜欢沉默时，你也稍微沉默一下。",
       "next": "end"
     },
     "mock": {
       "speaker": "Merchant of Applause",
+      "speaker_zh": "喝彩商人",
       "text": "Then remain strange, if you insist.",
+      "text_zh": "那你就继续显得奇怪吧，既然你坚持。",
       "next": "end"
     },
     "end": {

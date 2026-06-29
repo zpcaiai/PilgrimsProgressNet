@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Shepherd Watchful",
+      "speaker_zh": "牧人·警醒",
       "text": "Sleep will not attack you. It will invite you.",
+      "text_zh": "沉睡不会攻击你，它会邀请你。",
       "choices": [
         {
           "id": "serious",
           "text": "Receive the warning seriously.",
+          "text_zh": "认真领受这个警戒。",
           "effects": {
             "watchfulness": 10,
             "discernment": 5
@@ -24,6 +27,7 @@
         {
           "id": "proud",
           "text": "We have survived worse.",
+          "text_zh": "我们经历过更糟的，也活下来了。",
           "effects": {
             "pride": 8,
             "watchfulness": -5
@@ -41,7 +45,9 @@
     },
     "gentle": {
       "speaker": "Shepherd Experience",
+      "speaker_zh": "牧人·阅历",
       "text": "Past victories cannot keep watch for you.",
+      "text_zh": "过去的胜利不能替你守望。",
       "next": "end"
     },
     "end": {

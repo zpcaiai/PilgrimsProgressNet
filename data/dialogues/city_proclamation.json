@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "City Proclamation",
+      "speaker_zh": "城中布告",
       "text": "A fresh decree is nailed to the board, the wax seal still bright: 'By order of the Magistrates of the City of Destruction — there is no fire, no coming judgment, and no cause for flight. Any who trouble their neighbours with dread shall be silenced. Eat, trade, and be at peace. All is well.'",
       "text_zh": "板上钉着一张新颁的告示，火漆印还鲜亮：「奉灭亡城众官长之命——并无大火，并无将临的审判，亦无逃离之由。凡以惊惧搅扰邻舍者，必被止住。照常吃喝、买卖、安息罢。万事平安。」",
       "choices": [
@@ -33,6 +34,7 @@
     },
     "grieve": {
       "speaker": "City Proclamation",
+      "speaker_zh": "城中布告",
       "text": "Below the seal, smaller hands have scratched their own verdicts into the wood: 'liar', 'amen', 'too late'. The board says nothing back. Far off, beyond the eastern gate, a small light keeps burning that no decree can repeal.",
       "text_zh": "印章下方，几只更小的手把各自的判语刻进木头：「说谎的」「阿们」「太迟了」。告示无言以对。远处，东门之外，一点没有任何法令能废去的微光，仍在燃烧。",
       "choices": [

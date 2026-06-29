@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Pliable",
+      "speaker_zh": "易迁",
       "text": "Mud to my knees, cold in my bones, and no city in sight. If this is the beginning of your promise, you may keep the rest. I am going home.",
       "choices": [
         {

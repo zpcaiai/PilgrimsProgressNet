@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Pliable",
+      "speaker_zh": "易迁",
       "text": "Tell me again of the city ahead. Is it bright?",
+      "text_zh": "再告诉我前面的那座城吧。它明亮吗？",
       "choices": [
         {
           "id": "hard",
           "text": "The promise is great, but the road may be hard.",
+          "text_zh": "应许是大的，但道路也可能艰难。",
           "effects": {
             "discernment": 3,
             "humility": 3
@@ -17,6 +20,7 @@
         {
           "id": "reward",
           "text": "Think only of the reward.",
+          "text_zh": "只想着奖赏就好。",
           "effects": {
             "hope": 3,
             "deception": 3
@@ -27,7 +31,9 @@
     },
     "reward": {
       "speaker": "Pliable",
+      "speaker_zh": "易迁",
       "text": "Then I will think of the reward. That is easier than the road.",
+      "text_zh": "那我就想着奖赏吧。那比想着道路容易。",
       "next": "end"
     },
     "end": {

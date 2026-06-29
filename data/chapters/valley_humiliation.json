@@ -1,11 +1,18 @@
 {
   "id": "valley_humiliation",
   "title": "Valley of Humiliation",
+  "title_zh": "谦卑谷",
   "subtitle": "Where the old master demands you back",
+  "subtitle_zh": "旧主人要求你回去的地方",
   "intro": [
     "The road drops into a bruised valley, low enough for old shame to speak loudly.",
     "Apollyon waits there with a ledger of your failures, hoping you will mistake accusation for truth.",
     "Do not answer him with boasting. Answer him with the Cross, with prayer, and with a trembling stand that refuses to turn back."
+  ],
+  "intro_zh": [
+    "谷地低沉，旧主人的声音从阴影中走出。",
+    "亚玻伦提起你的过去，仿佛恩典从未临到。",
+    "你站立不是因为自己无罪，而是因为十字架已经替你回答。"
   ],
   "order": 9,
   "scene_path": "res://scenes/chapters/valley_humiliation/ValleyHumiliation.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "valley_shadow_death",
   "previous_chapter_id": "palace_beautiful",
   "spiritual_theme": "Humility under accusation and victory through promised grace",
+  "spiritual_theme_zh": "在控告与恐吓前站立在恩典中",
   "core_mechanic": "Face Apollyon's intimidation, shame, and assault; stand firm, pray for light, and answer every lie with promises until his claim breaks.",
+  "core_mechanic_zh": "以祷告、应许和信心回应亚玻伦的控告。",
   "required_flags": [
     "left_palace"
   ],
@@ -83,7 +92,8 @@
         "memory_accusation": "has_sword (scripture strike)",
         "dark_roar": "helmet (hold salvation)"
       },
-      "note": "Accusation recalls past-failure flags; defeat is NOT game over — repent and stand. Must give thanks, not boast, to progress."
+      "note": "Accusation recalls past-failure flags; defeat is NOT game over — repent and stand. Must give thanks, not boast, to progress.",
+      "note_zh": "控告会唤起过往失败的标记；战败并非游戏结束——当悔改、重新站立。须存感恩而非自夸，方能前进。"
     },
     "key_choices": [
       {

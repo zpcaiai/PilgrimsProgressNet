@@ -4,10 +4,12 @@
     "start": {
       "speaker": "",
       "text": "A figure sits behind iron bars. The room grows colder as you look.",
+      "text_zh": "一个身影坐在铁栏之后。你越看，房间越冷。",
       "choices": [
         {
           "id": "look_away",
           "text": "Look away quickly.",
+          "text_zh": "赶快移开目光。",
           "effects": {
             "fear": 5
           },
@@ -16,6 +18,7 @@
         {
           "id": "listen",
           "text": "Stay and listen.",
+          "text_zh": "留下来聆听。",
           "effects": {
             "discernment": 8,
             "watchfulness": 5,
@@ -29,6 +32,7 @@
         {
           "id": "never",
           "text": "This could never happen to me.",
+          "text_zh": "这种事绝不可能发生在我身上。",
           "effects": {
             "pride": 10,
             "deception": 5
@@ -39,7 +43,9 @@
     },
     "warning": {
       "speaker": "Caged Figure",
+      "speaker_zh": "笼中人",
       "text": "Small doors become locked rooms when ignored long enough.",
+      "text_zh": "小小的门若被忽视够久，就会变成锁住人的房间。",
       "next": "end"
     },
     "end": {

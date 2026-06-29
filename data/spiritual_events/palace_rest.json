@@ -1,6 +1,7 @@
 {
   "id": "palace_rest",
   "title": "Rested at Palace Beautiful",
+  "title_zh": "在美宫安歇",
   "trigger": "rest_at_palace",
   "effects": {
     "weariness": -30,

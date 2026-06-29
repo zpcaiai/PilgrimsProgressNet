@@ -1,11 +1,18 @@
 {
   "id": "wilderness_road",
   "title": "Wilderness Road",
+  "title_zh": "旷野之路",
   "subtitle": "Leaving the old life while its voices still follow",
+  "subtitle_zh": "旧生命的声音仍在身后追赶",
   "intro": [
     "The city has fallen behind you, but its arguments have not. They travel in familiar voices and reasonable words.",
     "One companion mocks what he cannot see; another loves the promise only while the road is easy.",
     "You cannot repent for them, and they cannot walk for you. Fix your eyes on the little light and keep moving."
+  ],
+  "intro_zh": [
+    "城门在身后缩小，熟悉的声音却仍追着你，要求你回到旧日的安稳。",
+    "固执嘲笑你的惧怕，易迁喜欢盼望的声音，却还不知道道路会有多深。",
+    "你学习说真话：不是骄傲地争辩，也不是讨好人的心，而是把眼睛定在远方的光上。"
   ],
   "order": 2,
   "scene_path": "res://scenes/chapters/wilderness_road/WildernessRoad.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "slough_of_despond",
   "previous_chapter_id": "city_of_destruction",
   "spiritual_theme": "Resolve, separation, and the cost of beginning",
+  "spiritual_theme_zh": "离开旧生命，并学习诚实回应人的反对与软弱",
   "core_mechanic": "Answer Obstinate without pride, steady Pliable without flattery, and keep the distant light ahead until the ground begins to fail.",
+  "core_mechanic_zh": "与固执、易迁同行或对话，在前方微光中继续前行。",
   "required_flags": [
     "left_city"
   ],

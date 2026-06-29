@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "I watched you refuse what this fair sells, not because it was ugly, but because peace was worth more. Something in me woke when I saw it. Let me walk the rest of the road with you.",
       "choices": [
         {
@@ -41,7 +42,7 @@
             "requires_flag": "interpreter_full"
           },
           "text": "Some pilgrims hurry past the Interpreter's rooms; you stayed and considered them all — I heard it on the road, and I see it now in how you refused this fair. Let me walk the rest of the way with one who learned to look.",
-          "text_zh": "有些朝圣者匆匆掠过释经者的房间；你却留下、把每一间都细细参详——这我在路上听说过，如今从你拒绝这集市的样子也看得出。让我与一个学会了看的人同行。"
+          "text_zh": "有些朝圣者匆匆掠过讲解者的房间；你却留下、把每一间都细细参详——这我在路上听说过，如今从你拒绝这集市的样子也看得出。让我与一个学会了看的人同行。"
         },
         {
           "conditions": {
@@ -62,6 +63,7 @@
     },
     "sure": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "Dark and hard is where hope must become more than a word. I am sure.",
       "choices": [
         {
@@ -82,6 +84,7 @@
     },
     "set_out": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "Lead on. When your courage runs low, I will remember aloud what we have already seen.",
       "choices": [
         {

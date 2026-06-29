@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Merchant",
+      "speaker_zh": "商人",
       "text": "Step closer, pilgrim! Everyone who is anyone owns one. A small price — only a little of your heart. Will you buy?",
       "text_variants": [
         {
@@ -54,6 +55,7 @@
     },
     "bought": {
       "speaker": "Merchant",
+      "speaker_zh": "商人",
       "text": "A wise purchase! Wear it well... it suits the crowd, if not the road.",
       "choices": [
         {
@@ -67,6 +69,7 @@
     },
     "refused": {
       "speaker": "Merchant",
+      "speaker_zh": "商人",
       "text": "Suit yourself. The narrow-eyed never could enjoy a good fair.",
       "choices": [
         {

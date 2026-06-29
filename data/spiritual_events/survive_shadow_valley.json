@@ -1,6 +1,7 @@
 {
   "id": "survive_shadow_valley",
   "title": "Survived the Dark Valley",
+  "title_zh": "走过死荫幽谷",
   "trigger": "shadow_valley_exit",
   "effects": {
     "watchfulness": 15,

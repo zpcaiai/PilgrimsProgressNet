@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Obstinate",
+      "speaker_zh": "顽固",
       "text": "So you would leave your house, your trade, and your name for a rumor of a Celestial City? Come back before shame becomes the only thing you own.",
       "choices": [
         {
@@ -46,6 +47,7 @@
     },
     "tempt": {
       "speaker": "Obstinate",
+      "speaker_zh": "顽固",
       "text": "At last, sense. Put down the book, lose the burden, and become ordinary again.",
       "choices": [
         {
@@ -67,6 +69,7 @@
     },
     "leaves": {
       "speaker": "Obstinate",
+      "speaker_zh": "顽固",
       "text": "Then go your way. I will not chase a man determined to be ruined by hope.",
       "choices": [
         {
@@ -80,6 +83,7 @@
     },
     "leaves_angry": {
       "speaker": "Obstinate",
+      "speaker_zh": "顽固",
       "text": "Proud words from a burdened man. Go, then, and see how long your courage lasts.",
       "choices": [
         {

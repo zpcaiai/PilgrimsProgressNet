@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Watchful",
+      "speaker_zh": "儆醒",
       "text": "You have climbed the hard hill. Come in and rest without apology. Below lies the Valley of Humiliation, where accusation wounds those who enter unarmed.",
       "choices": [
         {
@@ -30,6 +31,7 @@
     },
     "armour": {
       "speaker": "Watchful",
+      "speaker_zh": "儆醒",
       "text": "Take the armour kept for pilgrims: faith for the front of you, promise for the dark around you, and humility for the accusations behind you. Stand, and do not flee.",
       "choices": [
         {

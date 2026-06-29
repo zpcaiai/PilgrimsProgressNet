@@ -1,11 +1,18 @@
 {
   "id": "valley_shadow_death",
   "title": "Valley of the Shadow of Death",
+  "title_zh": "死荫谷",
   "subtitle": "Walking when sight is taken away",
+  "subtitle_zh": "看不见时仍然行走",
   "intro": [
     "Beyond the battle, the road narrows into a valley where the dark presses close enough to breathe.",
     "Here faith is no longer a feeling of brightness. It is one obedient step while the next is still hidden.",
     "The whispers will preach fear as wisdom. Keep to the path; the dawn is not less real because you cannot yet see it."
+  ],
+  "intro_zh": [
+    "光变得稀薄，道路像被黑暗吞没。",
+    "这里眼睛帮不上忙，低语却很会假装成真理。",
+    "抓住话语的灯，继续走；黎明不因你看不见就消失。"
   ],
   "order": 10,
   "scene_path": "res://scenes/chapters/valley_shadow_death/ValleyShadowDeath.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "vanity_fair",
   "previous_chapter_id": "valley_humiliation",
   "spiritual_theme": "Faith without sight, courage under fear, and clinging to the Word",
+  "spiritual_theme_zh": "在黑暗中倚靠话语而非眼见",
   "core_mechanic": "Your lantern shrinks with fear and grows with faith; resist whispers, read lanterns of the Word, and press through fear-shades toward dawn.",
+  "core_mechanic_zh": "在视线受限中跟随灯中话语，拒绝黑暗低语。",
   "required_flags": [
     "defeated_apollyon"
   ],

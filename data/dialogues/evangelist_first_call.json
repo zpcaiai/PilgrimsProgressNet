@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Evangelist",
+      "speaker_zh": "传道者",
       "text": "You stand in the road with a book in your hand, tears on your face, and a weight bending your back. Tell me plainly: what has truth uncovered in you?",
       "choices": [
         {
@@ -58,6 +59,7 @@
     },
     "press": {
       "speaker": "Evangelist",
+      "speaker_zh": "传道者",
       "text": "Do you truly believe that, or is it only easier to say? A man may call smoke a morning mist, but the fire is not persuaded.",
       "choices": [
         {
@@ -76,6 +78,7 @@
     },
     "name_it": {
       "speaker": "Evangelist",
+      "speaker_zh": "传道者",
       "text": "Then you have taken the first true step: you have stopped lying to yourself. The burden is real, but it was never meant to be your master.",
       "choices": [
         {
@@ -102,6 +105,7 @@
     },
     "even_you": {
       "speaker": "Evangelist",
+      "speaker_zh": "传道者",
       "text": "I have never met a true pilgrim who first came worthy. The gate was not built for the clean to admire; it was built for the burdened to enter. Especially you.",
       "choices": [
         {
@@ -120,6 +124,7 @@
     },
     "point_light": {
       "speaker": "Evangelist",
+      "speaker_zh": "传道者",
       "set_flags": { "talked_to_evangelist": true },
       "text": "Look there, beyond the eastern gate. Do you see the small light? Fix your eyes on it. Walk to the Wicket Gate. Knock, and do not argue with mercy before it opens.",
       "choices": [
@@ -150,6 +155,7 @@
     },
     "family_answer": {
       "speaker": "Evangelist",
+      "speaker_zh": "传道者",
       "text": "Love them truly, but do not let their fear chain your feet in a city already falling. Go first; pray they follow. You cannot save them by perishing beside them.",
       "choices": [
         {
@@ -170,6 +176,7 @@
     },
     "blessing": {
       "speaker": "Evangelist",
+      "speaker_zh": "传道者",
       "text": "Then go, and do not turn back. The road will uncover more than you expect, but grace will meet you before every necessary step. Keep the light before your eyes.",
       "choices": [
         {

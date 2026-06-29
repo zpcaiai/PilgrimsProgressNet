@@ -1,6 +1,7 @@
 {
   "id": "accepted_help",
   "title": "Lifted from the Mire",
+  "title_zh": "从泥潭中被拉起",
   "trigger": "accept_help",
   "effects": {
     "humility": 10,

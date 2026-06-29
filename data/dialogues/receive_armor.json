@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Watchman",
+      "speaker_zh": "守望者",
       "text": "The valley below is not empty. Take what is given.",
+      "text_zh": "下面的山谷并不空。领受所赐给你的。",
       "choices": [
         {
           "id": "thanks",
           "text": "Receive the armor with thanks.",
+          "text_zh": "带着感恩领受军装。",
           "effects": {
             "humility": 5,
             "faith": 5
@@ -25,6 +28,7 @@
         {
           "id": "ask",
           "text": "Ask why armor is needed.",
+          "text_zh": "询问为什么需要军装。",
           "effects": {
             "discernment": 5,
             "watchfulness": 5
@@ -43,7 +47,9 @@
     },
     "answer": {
       "speaker": "Watchman",
+      "speaker_zh": "守望者",
       "text": "Because some enemies speak before they strike.",
+      "text_zh": "因为有些敌人在攻击之前，先用话语伤人。",
       "next": "end"
     },
     "end": {

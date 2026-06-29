@@ -1,6 +1,7 @@
 {
   "id": "apollyon_victory",
   "title": "Apollyon Defeated",
+  "title_zh": "击败亚玻伦",
   "trigger": "boss_defeated_apollyon",
   "effects": {
     "faith": 15,

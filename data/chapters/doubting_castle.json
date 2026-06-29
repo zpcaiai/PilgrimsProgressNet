@@ -1,11 +1,18 @@
 {
   "id": "doubting_castle",
   "title": "Doubting Castle",
+  "title_zh": "怀疑城堡",
   "subtitle": "When forgotten promises become the way out",
+  "subtitle_zh": "被遗忘的应许成为出路",
   "intro": [
     "You wake on cold stone with iron before you and Giant Despair pacing like a verdict overhead.",
     "In this place, memory turns against you. The locked door looks final, and every promise feels like something you once imagined.",
     "Search again. The key called Promise was never outside mercy's reach; it has been near your heart all along."
+  ],
+  "intro_zh": [
+    "牢房潮湿，绝望把记忆改写成判决。",
+    "巨人的脚步提醒你：忘记应许时，心会把牢门当成终点。",
+    "重新寻找那把钥匙；它也许一直在你胸前。"
   ],
   "order": 12,
   "scene_path": "res://scenes/chapters/doubting_castle/DoubtingCastle.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "delectable_mountains",
   "previous_chapter_id": "vanity_fair",
   "spiritual_theme": "Remembering grace when despair edits the truth",
+  "spiritual_theme_zh": "以应许反抗绝望，不把牢房当作家",
   "core_mechanic": "Endure Giant Despair's pressure, search the cell or your own breast pocket for Promise, and unlock the door before hopelessness becomes home.",
+  "core_mechanic_zh": "搜寻应许之钥，在绝望巨人的压迫中打开牢门。",
   "required_flags": [
     "left_vanity"
   ],

@@ -1,11 +1,18 @@
 {
   "id": "enchanted_ground",
   "title": "The Enchanted Ground",
+  "title_zh": "迷睡之地",
   "subtitle": "The danger that feels like relief",
+  "subtitle_zh": "像安慰一样靠近的危险",
   "intro": [
     "The air grows warm and kind after so much fear, and your eyelids call it mercy.",
     "Nothing here snarls, accuses, or sells itself loudly. It only asks you to stop caring for a little while.",
     "Keep walking, and keep Hopeful speaking. A sleeping pilgrim does not renounce the City; he simply forgets to desire it."
+  ],
+  "intro_zh": [
+    "草地柔软，空气安静，困意像安慰一样靠近。",
+    "危险不总是咆哮；有时它只是让你不再在意。",
+    "继续说话，继续记念，继续渴慕那座城。"
   ],
   "order": 14,
   "scene_path": "res://scenes/chapters/enchanted_ground/EnchantedGround.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "river_of_death",
   "previous_chapter_id": "delectable_mountains",
   "spiritual_theme": "Watchfulness against comfortable forgetfulness",
+  "spiritual_theme_zh": "在舒适的困倦中保持警醒",
   "core_mechanic": "A heavy drowse drains watchfulness; keep moving, resist soft couches, and let Hopeful's testimony keep desire for the City awake.",
+  "core_mechanic_zh": "抵抗睡意，借对话、祷告与盼望保持清醒。",
   "required_flags": [
     "left_mountains"
   ],

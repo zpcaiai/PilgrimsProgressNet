@@ -3,6 +3,7 @@
   "nodes": {
     "start": {
       "speaker": "Pliable",
+      "speaker_zh": "易迁",
       "text": "A shining city, crowns, and joy without end? I will come too. Surely a road to such a place must be pleasant enough.",
       "choices": [
         {
@@ -35,6 +36,7 @@
     },
     "light": {
       "speaker": "Pliable",
+      "speaker_zh": "易迁",
       "text": "Hard? Perhaps a little. But why dwell on mud when we can speak of gold? Come, let us hurry to the pleasant parts.",
       "choices": [
         {

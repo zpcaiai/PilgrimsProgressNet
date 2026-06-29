@@ -3,11 +3,14 @@
   "nodes": {
     "start": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "We have been foolish, but not forsaken.",
+      "text_zh": "我们曾经愚昧，但并没有被撇下。",
       "choices": [
         {
           "id": "afraid",
           "text": "Tell Hopeful you are afraid.",
+          "text_zh": "告诉盼望你很害怕。",
           "effects": {
             "humility": 8,
             "hope": 5,
@@ -21,6 +24,7 @@
         {
           "id": "search",
           "text": "Search your scroll and memory.",
+          "text_zh": "翻找你的书卷，也翻找记忆。",
           "effects": {
             "faith": 5,
             "hope": 8
@@ -38,12 +42,16 @@
     },
     "remember": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "Search what you carry. We have forgotten something.",
+      "text_zh": "找找你所带着的。我们忘了一样东西。",
       "next": "end"
     },
     "key": {
       "speaker": "Hopeful",
+      "speaker_zh": "盼望",
       "text": "Despair locks doors that Promise can open.",
+      "text_zh": "绝望锁上的门，应许能打开。",
       "next": "end"
     },
     "end": {

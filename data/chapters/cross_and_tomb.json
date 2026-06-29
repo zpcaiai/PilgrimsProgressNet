@@ -1,11 +1,18 @@
 {
   "id": "cross_and_tomb",
   "title": "The Cross and the Tomb",
+  "title_zh": "十字架与空墓",
   "subtitle": "Where guilt is answered by grace",
+  "subtitle_zh": "罪疚在恩典前得到回答",
   "intro": [
     "The road bends upward to a green hill. On it stands the Cross; beside it, an open tomb.",
     "You arrive with no defense left, only the truth: the burden is yours, and you cannot remove it.",
     "Grace does not ask you to lift what crushed you. It asks you to come near and watch the burden fall."
+  ],
+  "intro_zh": [
+    "山路尽头，十字架立在光中；你背负已久的重担开始颤动。",
+    "这里不是你证明自己的地方，而是恩典替你回答罪疚的地方。",
+    "空墓旁的新衣提醒你：你不再由旧名定义。"
   ],
   "order": 5,
   "scene_path": "res://scenes/chapters/cross_and_tomb/CrossAndTomb.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "interpreter_house",
   "previous_chapter_id": "wicket_gate",
   "spiritual_theme": "Atonement, pardon, and the gift that cannot be earned",
+  "spiritual_theme_zh": "恩典卸下重担，赐下新的身份",
   "core_mechanic": "Approach the Cross, let the burden fall without bargaining, and receive the scroll, seal, and new garment for the road ahead.",
+  "core_mechanic_zh": "靠近十字架，让重担落下，并领受新衣与确据。",
   "required_flags": [
     "passed_wicket_gate"
   ],
@@ -58,7 +67,8 @@
       "hook_zh": "这恩典岂是为你存留的？",
       "resisted_by": {
         "faith_min": 1,
-        "note": "answered by kneeling, not by a stat gate"
+        "note": "answered by kneeling, not by a stat gate",
+        "note_zh": "借跪拜回应，而非靠属性门槛达成。"
       }
     },
     "repentance": {

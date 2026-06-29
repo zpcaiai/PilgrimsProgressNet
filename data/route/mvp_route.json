@@ -1,6 +1,7 @@
 {
   "id": "mvp_route",
   "title": "Burden Fallen Demo Route",
+  "title_zh": "重担脱落：试玩路线",
   "start_chapter": "city_of_destruction",
   "end_chapter": "cross_and_tomb",
   "completion_flag": "mvp_completed",

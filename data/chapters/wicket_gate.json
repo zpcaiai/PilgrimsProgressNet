@@ -1,11 +1,18 @@
 {
   "id": "wicket_gate",
   "title": "The Wicket Gate",
+  "title_zh": "窄门",
   "subtitle": "Knocking while accusation flies",
+  "subtitle_zh": "控告飞来时仍然叩门",
   "intro": [
     "The gate is smaller than your fear expected, and brighter than your shame can bear.",
     "Behind you, accusations fly: not clean enough, not sincere enough, not one of the welcomed ones.",
     "A narrow gate does not ask you to become worthy in the road dust. It asks you to knock."
+  ],
+  "intro_zh": [
+    "窄门在前方，控告像箭一样催你退后。",
+    "你没有资格夸口，却仍可以叩门，因为怜悯邀请有重担的人来。",
+    "善意不是奖赏强者，而是把求怜悯的人拉进门内。"
   ],
   "order": 4,
   "scene_path": "res://scenes/chapters/wicket_gate/WicketGate.tscn",
@@ -13,7 +20,9 @@
   "next_chapter_id": "cross_and_tomb",
   "previous_chapter_id": "slough_of_despond",
   "spiritual_theme": "Faith that asks, and grace that receives",
+  "spiritual_theme_zh": "在控告中祈求怜悯，进入窄门",
   "core_mechanic": "Press through arrows of accusation, refuse the urge to look back, and knock until Goodwill draws you safely through.",
+  "core_mechanic_zh": "在箭矢与控告中叩门，让善意把你拉进门内。",
   "required_flags": [
     "left_slough"
   ],

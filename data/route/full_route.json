@@ -1,6 +1,7 @@
 {
   "id": "full_route",
   "title": "Burden Fallen: Full Pilgrim Route",
+  "title_zh": "重担脱落：完整天路",
   "start_chapter": "city_of_destruction",
   "end_chapter": "celestial_city",
   "completion_flag": "journey_completed",
