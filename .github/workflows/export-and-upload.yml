@@ -49,5 +49,5 @@ jobs:
           AWS_DEFAULT_REGION: auto
           AWS_ENDPOINT_URL: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
-          aws s3 cp build/web/index.pck  s3://${{ secrets.R2_BUCKET_NAME }}/pilgrims/index.pck  --no-progress
-          aws s3 cp build/web/index.wasm s3://${{ secrets.R2_BUCKET_NAME }}/pilgrims/index.wasm --no-progress
+          aws s3 cp build/web/index.pck  s3://${{ secrets.R2_BUCKET_NAME }}/sabbath/index.pck  --no-progress
+          aws s3 cp build/web/index.wasm s3://${{ secrets.R2_BUCKET_NAME }}/sabbath/index.wasm --no-progress
