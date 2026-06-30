@@ -193,10 +193,8 @@ static func bind_scene(chapter: Node3D, glb_path: String) -> Vector3:
 	# through (ENV_ already got trimesh collision above; here we cover the composite
 	# visuals and standalone props, skipping decor / doors / pickups).
 	for n in nodes:
-		var snm := String(n.name)
-		if n is MeshInstance3D and (snm.begins_with("VIS_") or snm.begins_with("PROP_")):
-			if _is_solid(snm):
-				_add_box_collision(n as MeshInstance3D)
+		if n is MeshInstance3D and _should_add_box_collision(n as MeshInstance3D):
+			_add_box_collision(n as MeshInstance3D)
 
 	# Wire the Cross grace sequence if both the trigger and burden exist.
 	if cross_trigger != null and burden_node != null:
@@ -248,6 +246,33 @@ static func _is_solid(nm: String) -> bool:
 	return true
 
 
+static func _should_add_box_collision(mi: MeshInstance3D) -> bool:
+	var nm := String(mi.name)
+	if mi.get_meta("solid_collision_added", false):
+		return false
+	if mi.mesh == null:
+		return false
+	if not _is_collision_candidate_name(nm):
+		return false
+	if not _is_solid(nm):
+		return false
+	var aabb := mi.mesh.get_aabb()
+	if aabb.size.x <= 0.0 or aabb.size.y <= 0.0 or aabb.size.z <= 0.0:
+		return false
+	return true
+
+
+static func _is_collision_candidate_name(nm: String) -> bool:
+	if nm.begins_with("VIS_") or nm.begins_with("PROP_"):
+		return true
+	for token in ["Wall", "House", "Building", "Castle", "Gate", "Fence",
+			"Post", "Pillar", "Column", "Rock", "Boulder", "Stall", "Shop",
+			"Cart", "Bench", "Table", "Bed", "Tomb", "Cage", "Tree"]:
+		if token in nm:
+			return true
+	return false
+
+
 ## Add a box StaticBody (layer 1) sized to the mesh, as a child of the mesh so it
 ## inherits the world transform. Cheap, greybox-appropriate solid collision.
 static func _add_box_collision(mi: MeshInstance3D) -> void:
@@ -266,6 +291,7 @@ static func _add_box_collision(mi: MeshInstance3D) -> void:
 	cs.position = aabb.position + aabb.size * 0.5
 	sb.add_child(cs)
 	mi.add_child(sb)
+	mi.set_meta("solid_collision_added", true)
 
 
 static func _make_interactable(chapter: Node3D, pos: Vector3, prompt: String,

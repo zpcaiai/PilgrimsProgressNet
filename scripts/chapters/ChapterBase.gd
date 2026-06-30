@@ -507,6 +507,19 @@ func make_npc(npc_name: String, pos: Vector3, color: Color, dialogue_id: String 
 	col.position = Vector3(0, 0.9, 0)
 	area.add_child(col)
 
+	var body := StaticBody3D.new()
+	body.name = "SolidBody"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	var bcol := CollisionShape3D.new()
+	var bcap := CapsuleShape3D.new()
+	bcap.radius = 0.4
+	bcap.height = 1.6
+	bcol.shape = bcap
+	bcol.position = Vector3(0, 0.9, 0)
+	body.add_child(bcol)
+	area.add_child(body)
+
 	if on_interact.is_valid():
 		area.interact_callback = on_interact
 	elif dialogue_id != "":
