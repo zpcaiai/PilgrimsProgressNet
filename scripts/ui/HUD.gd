@@ -221,7 +221,8 @@ func _apply_responsive_layout() -> void:
 			var dialog_h := clampf(s.y * 0.42, 300.0, 380.0)
 			_set_bottom_wide_rect(_dialogue_panel, 24.0, 64.0, dialog_w, dialog_h)
 		else:
-			_set_bottom_wide_rect(_dialogue_panel, 120.0, 30.0, 1040.0, 230.0)
+			var dw := minf(1040.0, s.x - 240.0)
+			_set_bottom_wide_rect(_dialogue_panel, (s.x - dw) * 0.5, 30.0, dw, 290.0)
 	if is_instance_valid(_dialogue_hbox):
 		_dialogue_hbox.add_theme_constant_override("separation", 10 if mobile else 16)
 	if is_instance_valid(_portrait):
@@ -253,15 +254,12 @@ func _apply_responsive_layout() -> void:
 		_title_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 	if is_instance_valid(_narration_panel):
-		if mobile:
-			var narr_w := maxf(320.0, s.x - 56.0)
-			_narration_panel.position = Vector2(-narr_w * 0.5, 8)
-			_narration_panel.size = Vector2(narr_w, 150)
-		else:
-			_narration_panel.position = Vector2(-420, 40)
-			_narration_panel.size = Vector2(840, 90)
+		var narr_w := minf(maxf(320.0, s.x - 64.0), 760.0)
+		_narration_panel.position = Vector2(-narr_w * 0.5, _narration_panel.position.y)
+		_narration_panel.size = Vector2(narr_w, _narration_panel.size.y)
 	if is_instance_valid(_narration_label):
 		_narration_label.add_theme_font_size_override("normal_font_size", MOBILE_FONT_NARRATION if mobile else 21)
+		_resize_narration_to_content()
 
 	if is_instance_valid(_char_panel):
 		if mobile:
@@ -283,6 +281,10 @@ func _apply_responsive_layout() -> void:
 		_lang_btn.add_theme_font_size_override("font_size", 18 if mobile else 14)
 		_lang_btn.position = Vector2(16 if mobile else 20, -54 if mobile else -40)
 		_lang_btn.custom_minimum_size = Vector2(86, 42) if mobile else Vector2.ZERO
+
+	# Re-flow the auto-sized objective box (and narration) for the new viewport.
+	if is_instance_valid(_quest_label):
+		_refresh_quest()
 
 
 func _build_darkness() -> void:
@@ -442,6 +444,9 @@ func _build_dialogue() -> void:
 	_text_label.scroll_active = false
 	_text_label.custom_minimum_size = Vector2(0, 60)
 	_text_label.add_theme_font_size_override("normal_font_size", FONT_BODY)
+	_text_label.add_theme_color_override("default_color", Color(0.95, 0.95, 0.98))
+	_text_label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	_text_label.add_theme_constant_override("outline_size", 3)
 	vb.add_child(_text_label)
 
 	_choice_box = VBoxContainer.new()
@@ -514,7 +519,7 @@ func _on_chapter_started(chapter_id: String) -> void:
 	var intro: Array = data.get("intro", [])
 	if not intro.is_empty():
 		_pending_intro = intro.duplicate()
-		_intro_delay = 3.4
+		_intro_delay = 4.2
 	# Refresh the objective/story panel so the new chapter's header + goal show at once.
 	_refresh_quest()
 
@@ -554,11 +559,17 @@ var _intro_delay: float = 0.0
 
 func _build_narration() -> void:
 	_narration_panel = Panel.new()
-	var sb := _panel_style(Color(0.03, 0.03, 0.06, 0.0))  # transparent bg, text only
+	# Semi-opaque scrim so the reflective narration stays readable over any scene
+	# (a fully transparent panel let bright scenes wash the text out completely).
+	var sb := _panel_style(Color(0.04, 0.04, 0.08, 0.62))
+	sb.content_margin_left = 24
+	sb.content_margin_right = 24
+	sb.content_margin_top = 14
+	sb.content_margin_bottom = 14
 	_narration_panel.add_theme_stylebox_override("panel", sb)
 	_narration_panel.set_anchors_preset(Control.PRESET_CENTER)
-	_narration_panel.position = Vector2(-420, 40)
-	_narration_panel.size = Vector2(840, 90)
+	_narration_panel.position = Vector2(-360, -45)
+	_narration_panel.size = Vector2(720, 90)
 	_narration_panel.modulate = Color(1, 1, 1, 0)
 	_narration_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_narration_panel)
@@ -566,9 +577,12 @@ func _build_narration() -> void:
 	_narration_label.bbcode_enabled = true
 	_narration_label.fit_content = true
 	_narration_label.scroll_active = false
+	_narration_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_narration_label.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_narration_label.add_theme_font_size_override("normal_font_size", 21)
-	_narration_label.add_theme_color_override("default_color", Color(0.93, 0.91, 0.8))
+	_narration_label.add_theme_color_override("default_color", Color(0.95, 0.93, 0.82))
+	_narration_label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	_narration_label.add_theme_constant_override("outline_size", 4)
 	_narration_panel.add_child(_narration_label)
 
 
@@ -585,6 +599,17 @@ func play_narration(lines: Array) -> void:
 func _show_narration_line() -> void:
 	var line := String(_narration_queue[_narration_index])
 	_narration_label.text = "[center][i]" + line + "[/i][/center]"
+	_resize_narration_to_content()
+
+
+## Grow the narration scrim to fit the current line and keep it centred in the
+## empty mid-screen band (clear of the corner panels and the bottom dialogue).
+func _resize_narration_to_content() -> void:
+	if not is_instance_valid(_narration_panel) or not is_instance_valid(_narration_label):
+		return
+	var h := clampf(_narration_label.get_content_height() + 28.0, 60.0, 280.0)
+	_narration_panel.size = Vector2(_narration_panel.size.x, h)
+	_narration_panel.position = Vector2(_narration_panel.position.x, -h * 0.5)
 
 
 func _process_narration(delta: float) -> void:
@@ -735,6 +760,7 @@ func _refresh_quest() -> void:
 		return
 	if ChapterManager.current_chapter_id == "":
 		_quest_label.text = LocaleManager.t("hud.quest_quiet", "这条路一片安静。")
+		_resize_quest_to_content()
 		return
 	# Keep the objective panel task-focused. The chapter title card already names
 	# the place; repeating it here costs too much space on mobile.
@@ -744,10 +770,20 @@ func _refresh_quest() -> void:
 		var sub := String(data.get("subtitle", ""))
 		var goal := sub if sub != "" else LocaleManager.t("hud.quest_quiet", "The road is quiet.")
 		_quest_label.text = "[color=#cfcfe0]" + goal + "[/color]"
+		_resize_quest_to_content()
 		return
 	var qid := String(quest.get("id", ""))
 	var step := QuestManager.get_next_incomplete_step_text(qid)
 	_quest_label.text = "[b]%s[/b]\n[color=#cfcfe0]%s[/color]" % [String(quest.get("title", "")), step]
+	_resize_quest_to_content()
+
+
+## Grow the objective box to fit its text so long goals never spill out of the
+## panel background (or get clipped by a fixed height).
+func _resize_quest_to_content() -> void:
+	if not is_instance_valid(_quest_panel) or not is_instance_valid(_quest_label):
+		return
+	_quest_panel.size.y = clampf(_quest_label.get_content_height() + 22.0, 52.0, 460.0)
 
 
 # ---------------------------------------------------------------------------

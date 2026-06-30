@@ -197,18 +197,22 @@ func _layout() -> Dictionary:
 	out["A"] = {"center": dc + Vector2(-g, 0), "radius": dr}
 	out["S"] = {"center": dc + Vector2(0, g), "radius": dr}
 	out["D"] = {"center": dc + Vector2(g, 0), "radius": dr}
-	# Action buttons, bottom-right
-	out["SPACE"] = {"center": Vector2(s.x - m - ar, s.y - m - ar), "radius": ar}
-	out["E"] = {"center": Vector2(s.x - m - ar * 3.2, s.y - m - ar * 0.7), "radius": ar * 0.82}
-	var combat_r := ar * 0.58
-	var combat_y := s.y - m - ar * 2.55
-	var combat_x := s.x - m - combat_r
-	var combat_gap := combat_r * 2.22
-	out["P"] = {"center": Vector2(combat_x, combat_y), "radius": combat_r}
-	out["U"] = {"center": Vector2(combat_x - combat_gap, combat_y), "radius": combat_r}
-	out["L"] = {"center": Vector2(combat_x - combat_gap * 2.0, combat_y), "radius": combat_r}
-	out["K"] = {"center": Vector2(combat_x - combat_gap * 3.0, combat_y), "radius": combat_r}
-	out["J"] = {"center": Vector2(combat_x - combat_gap * 4.0, combat_y), "radius": combat_r}
+	# Action buttons, bottom-right: seven buttons, all the SAME size as the combat
+	# row, laid out as a 3-over-4 grid (top row of three, bottom row of four).
+	var br := ar * 0.58
+	var gap := br * 2.22
+	var x_right := s.x - m - br
+	var row_bottom := s.y - m - br
+	var row_top := row_bottom - gap
+	# Bottom row of four (right -> left): Jump, Interact, Pray, Promise.
+	out["SPACE"] = {"center": Vector2(x_right, row_bottom), "radius": br}
+	out["E"] = {"center": Vector2(x_right - gap, row_bottom), "radius": br}
+	out["P"] = {"center": Vector2(x_right - gap * 2.0, row_bottom), "radius": br}
+	out["U"] = {"center": Vector2(x_right - gap * 3.0, row_bottom), "radius": br}
+	# Top row of three, centred over the four: Attack, Dodge, Stand.
+	out["L"] = {"center": Vector2(x_right - gap * 0.5, row_top), "radius": br}
+	out["K"] = {"center": Vector2(x_right - gap * 1.5, row_top), "radius": br}
+	out["J"] = {"center": Vector2(x_right - gap * 2.5, row_top), "radius": br}
 	# Utility, top-right row
 	var ey := m + ur
 	out["ESC"] = {"center": Vector2(s.x - m - ur, ey), "radius": ur}
