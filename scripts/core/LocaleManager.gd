@@ -15,7 +15,7 @@ const TABLE := "res://assets/i18n/ui.json"
 
 var locale: String = "zh"               # "zh" or "en" (defaults to Chinese)
 var _t: Dictionary = {}                  # key -> {"en": ..., "zh": ...}
-const MISSING_ZH_PREFIX := "中文待补："
+const MISSING_ZH_PREFIX := "未译英文："
 
 
 func _ready() -> void:

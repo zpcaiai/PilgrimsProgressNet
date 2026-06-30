@@ -60,6 +60,40 @@ const NPC_DIALOGUE := {
 	"NPC_Ignorance_Optional": "ignorance_optional",
 }
 
+const NPC_DISPLAY_NAME := {
+	"NPC_Evangelist": "Evangelist",
+	"NPC_Wife": "Your Family",
+	"NPC_Children": "Your Children",
+	"NPC_Obstinate": "Obstinate",
+	"NPC_Pliable": "Pliable",
+	"NPC_Help": "Help",
+	"NPC_Goodwill": "Goodwill",
+	"NPC_Interpreter": "The Interpreter",
+	"NPC_Hopeful": "Hopeful",
+	"NPC_Merchant_Applause": "Merchant of Applause",
+	"NPC_Merchant_Comfort": "Merchant",
+	"NPC_Merchant_Influence": "Merchant",
+	"NPC_GiantDespair": "Giant Despair",
+	"NPC_Shepherd_Knowledge": "Shepherd Knowledge",
+	"NPC_Shepherd_Experience": "Shepherd Experience",
+	"NPC_Shepherd_Watchful": "Shepherd Watchful",
+	"NPC_Shepherd_Sincere": "Shepherd",
+	"NPC_ShiningOne_01": "Shining One",
+	"NPC_ShiningOne_02": "Shining One",
+	"NPC_Gatekeeper": "Gatekeeper",
+	"NPC_Watchman": "Watchful, the Porter",
+	"NPC_Discretion": "Discretion",
+	"NPC_Prudence": "Prudence",
+	"NPC_Piety": "Piety",
+	"NPC_Charity": "Charity",
+	"NPC_TrialJudge": "Trial Judge",
+	"NPC_Faithful": "Faithful",
+	"NPC_Timorous": "Timorous & Mistrust",
+	"NPC_Mistrust": "Timorous & Mistrust",
+	"NPC_Diffidence": "Giant Despair",
+	"NPC_Ignorance_Optional": "Ignorance",
+}
+
 # Per-chapter overrides for NPCs that appear in more than one chapter and speak
 # different lines each time (e.g. Obstinate/Pliable: their pursuit in the City
 # vs. their parting on the Wilderness Road). Looked up before NPC_DIALOGUE.
@@ -302,9 +336,7 @@ static func _bind_npc(chapter: Node3D, node: Node) -> void:
 	var overrides: Dictionary = NPC_DIALOGUE_BY_CHAPTER.get(
 		String(ChapterManager.current_chapter_id), {})
 	var dlg := String(overrides.get(nm, NPC_DIALOGUE.get(nm, "")))
-	var disp := nm.substr(4).replace("_", " ")
-	if nm == "NPC_Wife":
-		disp = "Your Family"
+	var disp := String(NPC_DISPLAY_NAME.get(nm, nm.substr(4).replace("_", " ")))
 	var npc := NPCInteractable.new()
 	chapter.add_child(npc)
 	npc.setup(disp, dlg)
@@ -323,23 +355,23 @@ static func _bind_trigger(chapter: Node3D, node: Node, nm: String):
 		# now reached by walking the City: the host, the feast, and the throne.
 		_story(chapter, node, {"hope": 10, "faith": 10, "fear": -20, "despair": -20},
 			{"entered_city": true}, {},
-			"You pass through the gate. Within: light, white robes, the sound of a great multitude, and a feast spread down the length of the City. The welcome has only begun.")
+			"你穿过城门。里面有光、白衣、众人的赞美声，以及沿着天城铺开的筵席。欢迎才刚刚开始。")
 		return null
 	if nm == "TRIGGER_ThroneWorship":
 		# The true finale, before the throne -- only after the City is walked.
 		_story(chapter, node, {"faith": 20, "hope": 20},
 			{"entered_celestial_city": true, "journey_completed": true},
 			{"show_journey_review": true, "show_credits": true},
-			"You come at last before the throne. The crowned Lamb who was slain is seated in glory, and the host falls down in worship. Not by your strength, but by grace, you are home.")
+			"你终于来到宝座前。那曾被杀、如今戴冠的羔羊坐在荣耀里，众圣徒俯伏敬拜。不是靠你的力量，而是靠恩典，你回家了。")
 		return null
 	if nm == "TRIGGER_EndCredits" or nm == "TRIGGER_JourneyReview":
 		_story(chapter, node, {}, {"journey_review_requested": true}, {},
-			"The journey is remembered.")
+			"这段旅程被纪念。")
 		return null
 	if nm == "TRIGGER_ReadBook":
 		_story(chapter, node, {"despair": 10, "fear": 5, "humility": 5},
 			{"read_book": true, "received_burden": true}, {},
-			"You read, and a weight you cannot remove settles on your back.")
+			"你读了书，一个你无法自己卸下的重担落在背上。")
 		return null
 	if nm == "TRIGGER_CrossEvent":
 		var ct := CrossEventTrigger.new()
@@ -368,12 +400,12 @@ static func _bind_trigger(chapter: Node3D, node: Node, nm: String):
 	if nm == "TRIGGER_Capture":
 		_story(chapter, node, {"despair": 10, "fear": 3},
 			{"captured_by_giant_despair": true, "entered_doubting_castle": true}, {},
-			"Giant Despair seizes you. You wake in a cold cell.")
+			"绝望巨人抓住了你。你在冰冷的牢房里醒来。")
 		return null
 	if nm == "TRIGGER_FaithfulLost":
 		_story(chapter, node, {"faith": 10, "perseverance": 8, "fear": 8},
 			{"faithful_witnessed": true, "faithful_lost": true}, {},
-			"Faithful is taken, faithful to the end. His witness burns in you.")
+			"忠信被带走了，却忠信到底。他的见证在你心里燃烧。")
 		return null
 	if nm == "TRIGGER_EnterVanityFair":
 		_story(chapter, node, {}, {"entered_vanity_fair": true}, {}, "")
@@ -384,11 +416,11 @@ static func _bind_trigger(chapter: Node3D, node: Node, nm: String):
 	if nm == "TRIGGER_ByPathChoice":
 		_story(chapter, node, {"deception": 5, "watchfulness": -3},
 			{"entered_doubting_castle": true}, {},
-			"The soft meadow looks kinder than the road.")
+			"柔软的草地看起来比道路更温和。")
 		return null
 	if nm == "TRIGGER_HopefulWake":
 		_story(chapter, node, {"watchfulness": 8, "hope": 5, "weariness": -3},
-			{"resisted_sleep": true}, {}, "Hopeful's voice pulls you back from sleep.")
+			{"resisted_sleep": true}, {}, "盼望的声音把你从睡意中拉回来。")
 		return null
 	if nm == "TRIGGER_BossStart" or nm == "TRIGGER_BossVictory":
 		if node is Node3D:

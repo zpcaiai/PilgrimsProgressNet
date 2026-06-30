@@ -8,7 +8,7 @@ class_name ChapterExitTrigger
 
 var set_flags: Dictionary = {}
 var require_flag: String = ""
-var require_message: String = "You are not ready to leave yet."
+var require_message: String = "你还没有预备好离开。"
 var target_chapter: String = ""
 var quest_id: String = ""
 var toast_line: String = ""

@@ -579,7 +579,7 @@ func make_trigger(pos: Vector3, size: Vector3, on_enter: Callable, once: bool = 
 
 
 func make_exit_trigger(pos: Vector3, size: Vector3, condition: Callable = Callable(),
-		blocked_message: String = "You are not ready to leave yet.") -> Area3D:
+		blocked_message: String = "你还没有预备好离开。") -> Area3D:
 	# Advances to the next chapter when the player enters, if condition passes.
 	var _cb1 := func(_body):
 		if condition.is_valid() and not condition.call():
