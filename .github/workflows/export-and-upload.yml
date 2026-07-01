@@ -51,3 +51,24 @@ jobs:
         run: |
           aws s3 cp build/web/index.pck  s3://${{ secrets.R2_BUCKET_NAME }}/pilgrims/index.pck  --no-progress
           aws s3 cp build/web/index.wasm s3://${{ secrets.R2_BUCKET_NAME }}/pilgrims/index.wasm --no-progress
+
+      # Deploy the freshly exported build/web to the Vercel "pilgrims" project so
+      # every push to main actually updates the live game (previously the CI only
+      # exported + pushed to R2, and the deployed index.html loads the LOCAL
+      # index.pck — so gameplay changes never reached players). Add a repo secret
+      # VERCEL_TOKEN (Vercel → Account → Settings → Tokens) to enable this; without
+      # it the step just skips, so it never breaks the build.
+      - name: Deploy build/web to Vercel
+        continue-on-error: true
+        working-directory: build/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: team_KUAT9DsKKd84CyTKOm2q9Kn8
+          VERCEL_PROJECT_ID: prj_cBBwE72vZOKsfnS7rY4WjJifXbFr
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "No VERCEL_TOKEN secret set — skipping auto-deploy (add it to enable push-to-deploy)."
+            exit 0
+          fi
+          npm i -g vercel@latest
+          vercel deploy --prod --yes --token="$VERCEL_TOKEN"
