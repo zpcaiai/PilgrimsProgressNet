@@ -20,6 +20,7 @@ var _prompt_label: Label
 var _toast_label: Label
 var _toast_timer: float = 0.0
 var _stat_labels: Array = []
+var _stat_value_labels: Array = []
 var _lang_btn: Button
 var _quest_panel: Panel
 var _spiritual_panel: Panel
@@ -195,6 +196,10 @@ func _apply_responsive_layout() -> void:
 		if is_instance_valid(lbl):
 			lbl.custom_minimum_size = Vector2(104 if mobile else 70, 0)
 			lbl.add_theme_font_size_override("font_size", body)
+	for vlbl in _stat_value_labels:
+		if is_instance_valid(vlbl):
+			vlbl.custom_minimum_size = Vector2(42 if mobile else 32, 0)
+			vlbl.add_theme_font_size_override("font_size", body)
 	for bar in [_faith_bar, _hope_bar, _humility_bar, _watchfulness_bar, _despair_bar, _fear_bar, _shame_bar, _weariness_bar]:
 		if is_instance_valid(bar):
 			bar.custom_minimum_size = Vector2(170 if mobile else 120, 20 if mobile else 16)
@@ -375,6 +380,16 @@ func _add_stat_row(parent: VBoxContainer, key: String, fallback: String, color: 
 	bg.corner_radius_bottom_right = 4
 	bar.add_theme_stylebox_override("background", bg)
 	row.add_child(bar)
+	# Numeric readout so a stat is legible without reading the bar length (also
+	# helps colour-blind players who can't rely on the fill colour alone).
+	var val := Label.new()
+	val.add_theme_font_size_override("font_size", FONT_BODY)
+	val.custom_minimum_size = Vector2(32, 0)
+	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	val.modulate = Color(0.82, 0.85, 0.92)
+	row.add_child(val)
+	bar.set_meta("vlabel", val)
+	_stat_value_labels.append(val)
 	parent.add_child(row)
 	return bar
 
@@ -596,9 +611,28 @@ func play_narration(lines: Array) -> void:
 	_show_narration_line()
 
 
+## Let the player move past the chapter-opening narration instead of waiting out
+## each timed line — a tap / click / Enter skips the current line to the next.
+func _unhandled_input(event: InputEvent) -> void:
+	if _narration_phase == 0:
+		return
+	var skip := false
+	if event is InputEventMouseButton and event.pressed and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
+		skip = true
+	elif event is InputEventScreenTouch and (event as InputEventScreenTouch).pressed:
+		skip = true
+	elif event is InputEventKey and event.pressed and not (event as InputEventKey).echo and (event as InputEventKey).keycode in [KEY_ENTER, KEY_KP_ENTER]:
+		skip = true
+	if skip:
+		if _narration_phase == 1 or _narration_phase == 2:
+			_narration_phase = 3
+			_narration_timer = 0.0
+		get_viewport().set_input_as_handled()
+
+
 func _show_narration_line() -> void:
 	var line := String(_narration_queue[_narration_index])
-	_narration_label.text = "[center][i]" + line + "[/i][/center]"
+	_narration_label.text = "[center][i]" + line + "[/i]\n[font_size=13][color=#8b93a6]（点按 / 回车 继续）[/color][/font_size][/center]"
 	_resize_narration_to_content()
 
 
@@ -730,6 +764,9 @@ func _process(delta: float) -> void:
 		_fear_bar.value = SpiritualStateManager.fear
 		_shame_bar.value = SpiritualStateManager.shame
 		_weariness_bar.value = SpiritualStateManager.weariness
+		for _b in [_faith_bar, _hope_bar, _humility_bar, _watchfulness_bar, _despair_bar, _fear_bar, _shame_bar, _weariness_bar]:
+			if is_instance_valid(_b) and _b.has_meta("vlabel"):
+				(_b.get_meta("vlabel") as Label).text = str(int(round(_b.value)))
 		var load_pct := int(round(SpiritualStateManager.get_movement_penalty() * 100.0))
 		_load_label.text = (LocaleManager.t("hud.load_slower", "Load: %d%% slower") % load_pct) if load_pct > 0 else LocaleManager.t("hud.load_light", "Load: light")
 		_load_label.modulate = Color(0.9, 0.6, 0.55) if load_pct >= 25 else Color(0.78, 0.8, 0.88)

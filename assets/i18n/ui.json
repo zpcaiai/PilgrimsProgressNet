@@ -1079,5 +1079,17 @@
   "chat.phrase.稍等我": {
     "en": "Wait for me",
     "zh": "稍等我"
+  },
+  "combat.enemy_press": {
+    "en": " presses in against you.",
+    "zh": " 正在逼近你。"
+  },
+  "combat.enemy_defeated": {
+    "en": " loses its grip on you.",
+    "zh": " 对你的辖制松开了。"
+  },
+  "quest.complete": {
+    "en": "Quest complete: ",
+    "zh": "任务完成："
   }
 }

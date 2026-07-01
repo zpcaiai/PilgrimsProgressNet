@@ -8,9 +8,10 @@ extends Node
 # If you name the Space differently, change the host below to <owner>-<space>.hf.space.
 var base_url: String = "https://stephenzao-pilgrim-api.hf.space/api/v1"
 
-# Master switch. If false, every NetService becomes a no-op and the game
-# behaves exactly like the single-player build.
-var enabled: bool = true
+# Master switch. Keep the public Web build playable even when the backend is
+# sleeping, redeployed, or unavailable. Turn this on only for backend-enabled
+# releases.
+var enabled: bool = false
 
 # How often (seconds) to sample the player position into a ghost trail.
 var ghost_sample_interval: float = 1.0
