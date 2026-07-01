@@ -1091,5 +1091,13 @@
   "quest.complete": {
     "en": "Quest complete: ",
     "zh": "任务完成："
+  },
+  "ach.unlocked": {
+    "en": "Achievement unlocked: ",
+    "zh": "成就解锁："
+  },
+  "menu.achievements": {
+    "en": "Achievements",
+    "zh": "成就"
   }
 }

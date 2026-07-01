@@ -122,6 +122,10 @@ func _attack() -> void:
 	var combats := get_tree().get_nodes_in_group("player_combat")
 	if combats.size() > 0:
 		combats[0].take_hit(attack_effects, enemy_type)
+	# Feedback: the accuser presses in — a red sting + a small jolt.
+	Juice.flash(Color(0.7, 0.1, 0.12, 0.2), 0.25)
+	Juice.shake(0.22)
+	AudioManager.play_sfx("player_hurt")
 	EventBus.toast(display_name + LocaleManager.t("combat.enemy_press", " 正在逼近你 presses in against you."))
 
 
@@ -130,13 +134,25 @@ func get_weakness_multiplier(source_type: String) -> float:
 
 
 func receive_counter(source_type: String, amount: float) -> void:
-	var dealt := amount * get_weakness_multiplier(source_type)
+	var mult := get_weakness_multiplier(source_type)
+	var dealt := amount * mult
 	influence -= dealt
+	# Hit feedback: jolt, brief time-dip, and a rising damage number (cooler/
+	# brighter when the truth used is an especial weakness of this foe).
+	Juice.hitstop(0.05)
+	Juice.shake(0.3)
+	var col := Color(0.6, 0.95, 1.0) if mult > 1.05 else Color(1.0, 0.86, 0.4)
+	FloatingNumbers.spawn(global_position + Vector3.UP * 2.2, "−%d" % int(round(dealt)), col)
+	AudioManager.play_sfx("impact")
 	if influence <= 0.0:
 		on_defeated()
 
 
 func on_defeated() -> void:
 	defeated.emit(enemy_id)
+	Juice.shake(0.55)
+	Juice.flash(Color(1.0, 0.95, 0.7, 0.28), 0.4)
+	FloatingNumbers.spawn(global_position + Vector3.UP * 2.4, "✓", Color(0.72, 0.95, 0.72), 34)
+	AudioManager.play_sfx("enemy_defeat")
 	EventBus.toast(display_name + LocaleManager.t("combat.enemy_defeated", " 对你的辖制松开了 loses its grip on you."))
 	queue_free()

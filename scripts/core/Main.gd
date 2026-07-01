@@ -212,6 +212,7 @@ func _show_title() -> void:
 		var summary := SaveManager.get_save_summary("slot_1")
 		_add_button(vb, LocaleManager.t("menu.continue", "Continue (%s)") % String(summary.get("chapter", "")), continue_game)
 	_add_button(vb, LocaleManager.t("menu.options", "Options"), _options_from_title)
+	_add_button(vb, LocaleManager.t("menu.achievements", "成就 Achievements"), _achievements_from_title)
 	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
 	_add_button(vb, LocaleManager.switch_label(), func(): LocaleManager.toggle(); _show_title())
 	var hint := Label.new()
@@ -438,6 +439,31 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	teach.button_pressed = Settings.teaching_mode
 	teach.toggled.connect(func(on): Settings.set_teaching_mode(on))
 	vb.add_child(teach)
+	var tts := CheckButton.new()
+	tts.text = "朗读旁白与对话 Read aloud (TTS)"
+	tts.add_theme_font_size_override("font_size", 18)
+	tts.button_pressed = Settings.tts
+	tts.toggled.connect(func(on): Settings.set_tts(on))
+	vb.add_child(tts)
+	# Text-size tiers — drive the global UI scale (which scales HUD + menu fonts).
+	var fs_row := HBoxContainer.new()
+	fs_row.add_theme_constant_override("separation", 8)
+	var fs_lbl := Label.new()
+	fs_lbl.text = LocaleManager.zh_or_mixed("字号 Text Size")
+	fs_lbl.custom_minimum_size = Vector2(130, 0)
+	fs_lbl.add_theme_font_size_override("font_size", 18)
+	fs_row.add_child(fs_lbl)
+	for tier in [["小", 0.9], ["标准", 1.05], ["大", 1.2], ["特大", 1.4]]:
+		var b := Button.new()
+		b.text = String(tier[0])
+		b.add_theme_font_size_override("font_size", 18)
+		var sc := float(tier[1])
+		b.pressed.connect(func():
+			_set_input_setting("ui_scale", sc)
+			_apply_ui_scale()
+		)
+		fs_row.add_child(b)
+	vb.add_child(fs_row)
 
 	var spacer2 := Control.new()
 	spacer2.custom_minimum_size = Vector2(0, 12)
@@ -591,8 +617,9 @@ func _open_pause() -> void:
 	_add_title(vb, "暂停 Paused", 36, Color(0.95, 0.9, 0.7))
 	_add_button(vb, "继续 Resume", _resume_from_pause)
 	_add_button(vb, "路线图 Route Map", _pause_to_route)
-	_add_button(vb, "保存 Save", _pause_save)
-	_add_button(vb, "读取 Load", _load_from_pause)
+	_add_button(vb, "成就 Achievements", _pause_to_achievements)
+	_add_button(vb, "保存 Save", func(): _open_save_slots("save"))
+	_add_button(vb, "读取 Load", func(): _open_save_slots("load"))
 	_add_button(vb, "设置 Options", _pause_to_options)
 	_add_button(vb, "返回标题 Return to Title", _pause_to_title)
 	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
@@ -627,6 +654,202 @@ func _load_from_pause() -> void:
 		if chapter == "":
 			chapter = "city_of_destruction"
 		ChapterManager.start_chapter(chapter)
+
+
+# ---------------------------------------------------------------------------
+# Achievements panel
+# ---------------------------------------------------------------------------
+func _clear_layer(layer: CanvasLayer) -> void:
+	for c in layer.get_children():
+		c.queue_free()
+
+
+func _close_overlay(layer: CanvasLayer, on_back: Callable) -> void:
+	_clear_layer(layer)
+	on_back.call()
+
+
+func _pause_to_achievements() -> void:
+	_clear_layer(_pause_layer)
+	_show_achievements(_pause_layer, _open_pause)
+
+
+func _achievements_from_title() -> void:
+	_clear_menu()
+	_show_achievements(_menu_layer, _show_title)
+
+
+func _show_achievements(layer: CanvasLayer, on_back: Callable) -> void:
+	var panel := Control.new()
+	panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var bg := ColorRect.new()
+	bg.color = Color(0.03, 0.03, 0.06, 0.96)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	panel.add_child(bg)
+	layer.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	for m in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+		margin.add_theme_constant_override(m, 34)
+	panel.add_child(margin)
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 10)
+	margin.add_child(vb)
+	var title := Label.new()
+	title.text = "成就 · Achievements   (%d / %d)" % [Achievements.unlocked_count(), Achievements.total()]
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 30)
+	title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.6))
+	vb.add_child(title)
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vb.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 6)
+	scroll.add_child(list)
+	for a in Achievements.all_defs():
+		if a is Dictionary:
+			_add_achievement_row(list, a)
+	_add_button(vb, "返回 Back", func(): _close_overlay(layer, on_back))
+
+
+func _add_achievement_row(list: VBoxContainer, a: Dictionary) -> void:
+	var got: bool = Achievements.is_unlocked(String(a.get("id", "")))
+	var row := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.1, 0.13, 0.17, 0.92) if got else Color(0.06, 0.06, 0.09, 0.7)
+	sb.set_corner_radius_all(8)
+	sb.set_content_margin_all(10)
+	row.add_theme_stylebox_override("panel", sb)
+	list.add_child(row)
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override("separation", 12)
+	row.add_child(hb)
+	var icon := Label.new()
+	icon.text = String(a.get("icon", "•")) if got else "🔒"
+	icon.add_theme_font_size_override("font_size", 26)
+	icon.custom_minimum_size = Vector2(42, 0)
+	hb.add_child(icon)
+	var tvb := VBoxContainer.new()
+	tvb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hb.add_child(tvb)
+	var nm := Label.new()
+	nm.text = Achievements.label(a, "title")
+	nm.add_theme_font_size_override("font_size", 20)
+	nm.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7) if got else Color(0.6, 0.6, 0.66))
+	tvb.add_child(nm)
+	var ds := Label.new()
+	ds.text = Achievements.label(a, "desc")
+	ds.add_theme_font_size_override("font_size", 15)
+	ds.add_theme_color_override("font_color", Color(0.8, 0.82, 0.88) if got else Color(0.5, 0.5, 0.56))
+	ds.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	tvb.add_child(ds)
+
+
+# ---------------------------------------------------------------------------
+# Save / load slots + cloud sync
+# ---------------------------------------------------------------------------
+func _open_save_slots(mode: String) -> void:
+	_clear_layer(_pause_layer)
+	_build_save_slots(_pause_layer, _open_pause, mode)
+
+
+func _build_save_slots(layer: CanvasLayer, on_back: Callable, mode: String) -> void:
+	var panel := Control.new()
+	panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var bg := ColorRect.new()
+	bg.color = Color(0.03, 0.03, 0.06, 0.96)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	panel.add_child(bg)
+	layer.add_child(panel)
+	var vb := _make_centered_box(panel)
+	_add_title(vb, ("保存到存档位 Save" if mode == "save" else "读取存档 Load"), 32, Color(0.95, 0.9, 0.7))
+	for i in range(1, 4):
+		_add_save_slot_row(vb, layer, on_back, mode, i)
+	var spacer := Control.new()
+	spacer.custom_minimum_size = Vector2(0, 10)
+	vb.add_child(spacer)
+	var cloud := HBoxContainer.new()
+	cloud.add_theme_constant_override("separation", 10)
+	var up := Button.new()
+	up.text = "☁ 上传 Upload"
+	up.add_theme_font_size_override("font_size", 18)
+	up.pressed.connect(func(): CloudSaveService.upload("slot_1"))
+	cloud.add_child(up)
+	var down := Button.new()
+	down.text = "☁ 下载 Download"
+	down.add_theme_font_size_override("font_size", 18)
+	down.pressed.connect(func(): CloudSaveService.download("slot_1"))
+	cloud.add_child(down)
+	vb.add_child(cloud)
+	var hint := Label.new()
+	hint.text = "云同步需登录账号；离线时自动忽略。"
+	hint.add_theme_font_size_override("font_size", 13)
+	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
+	vb.add_child(hint)
+	_add_button(vb, "返回 Back", func(): _close_overlay(layer, on_back))
+
+
+func _add_save_slot_row(vb: VBoxContainer, layer: CanvasLayer, on_back: Callable, mode: String, i: int) -> void:
+	var slot := "slot_%d" % i
+	var summary := SaveManager.get_save_summary(slot)
+	var empty: bool = summary.is_empty()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	var info := Label.new()
+	info.custom_minimum_size = Vector2(300, 0)
+	info.add_theme_font_size_override("font_size", 16)
+	if empty:
+		info.text = "存档位 %d · 空 Empty" % i
+		info.add_theme_color_override("font_color", Color(0.6, 0.6, 0.66))
+	else:
+		var ch_id := String(summary.get("chapter", ""))
+		var ch_data := ChapterManager.load_chapter_data(ch_id)
+		info.text = "存档位 %d · %s\n%s" % [i, String(ch_data.get("title", ch_id)), String(summary.get("timestamp", ""))]
+		info.add_theme_color_override("font_color", Color(0.9, 0.92, 0.98))
+	row.add_child(info)
+	var act := Button.new()
+	act.text = "保存 Save" if mode == "save" else "读取 Load"
+	act.add_theme_font_size_override("font_size", 18)
+	act.disabled = (mode == "load" and empty)
+	act.pressed.connect(func(): _on_slot_action(layer, on_back, mode, slot))
+	row.add_child(act)
+	if not empty:
+		var del := Button.new()
+		del.text = "删除 Del"
+		del.add_theme_font_size_override("font_size", 18)
+		del.pressed.connect(func(): _on_slot_delete(layer, on_back, mode, slot))
+		row.add_child(del)
+	vb.add_child(row)
+
+
+func _on_slot_action(layer: CanvasLayer, on_back: Callable, mode: String, slot: String) -> void:
+	if mode == "save":
+		SaveManager.save_game(slot)
+		_clear_layer(layer)
+		_build_save_slots(layer, on_back, mode)
+	else:
+		_do_load_slot(slot)
+
+
+func _on_slot_delete(layer: CanvasLayer, on_back: Callable, mode: String, slot: String) -> void:
+	SaveManager.delete_save(slot)
+	_clear_layer(layer)
+	_build_save_slots(layer, on_back, mode)
+
+
+func _do_load_slot(slot: String) -> void:
+	_clear_layer(_pause_layer)
+	_pause_visible = false
+	if SaveManager.load_game(slot):
+		var chapter := GameState.current_chapter_id
+		if chapter == "":
+			chapter = "city_of_destruction"
+		ChapterManager.start_chapter(chapter)
+	if _in_game and not DialogueManager.is_active():
+		EventBus.player_control_locked.emit(false)
 
 
 # ---------------------------------------------------------------------------

@@ -634,6 +634,7 @@ func _show_narration_line() -> void:
 	var line := String(_narration_queue[_narration_index])
 	_narration_label.text = "[center][i]" + line + "[/i]\n[font_size=13][color=#8b93a6]（点按 / 回车 继续）[/color][/font_size][/center]"
 	_resize_narration_to_content()
+	Settings.speak(line)
 
 
 ## Grow the narration scrim to fit the current line and keep it centred in the
@@ -867,6 +868,7 @@ func _on_dialogue_node(node: Dictionary) -> void:
 		_portrait.visible = false
 	_speaker_label.text = spk
 	_text_label.text = String(node.get("text", ""))
+	Settings.speak(String(node.get("text", "")))
 	_rebuild_choices()
 
 

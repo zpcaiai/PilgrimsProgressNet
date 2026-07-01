@@ -1,0 +1,24 @@
+{
+  "_comment": "Achievement definitions. id must match Achievements.gd hooks. Fields: title_zh/en, desc_zh/en, icon.",
+  "achievements": [
+    { "id": "first_step", "icon": "👣", "title_zh": "踏上旅程", "title_en": "The First Step", "desc_zh": "离开熟悉，向着远处的光起步。", "desc_en": "Leave the familiar and step toward the distant light." },
+    { "id": "left_city", "icon": "🔥", "title_zh": "逃离灭亡城", "title_en": "Out of the City", "desc_zh": "背着重担，走出将倾之城的城门。", "desc_en": "Pass the gate of the doomed city, burden and all." },
+    { "id": "through_gate", "icon": "🚪", "title_zh": "进入窄门", "title_en": "Through the Wicket Gate", "desc_zh": "叩门蒙接纳，踏上真正的窄路。", "desc_en": "Knock, be received, and enter the narrow way." },
+    { "id": "burden_fallen", "icon": "✝", "title_zh": "重担脱落", "title_en": "The Burden Falls", "desc_zh": "在十字架前，重担从背上滚落。", "desc_en": "At the Cross the weight rolls from your back." },
+    { "id": "rooms_understood", "icon": "🕯", "title_zh": "领悟各房功课", "title_en": "Rooms Understood", "desc_zh": "在讲解者之家看懂每一间房的教训。", "desc_en": "Weigh every room in the House of the Interpreter." },
+    { "id": "climbed_hill", "icon": "⛰", "title_zh": "登上艰难山", "title_en": "Up the Hill Difficulty", "desc_zh": "不走旁路捷径，走窄而陡的正路。", "desc_en": "Take the steep true path, not the easy bypath." },
+    { "id": "armed_for_war", "icon": "🛡", "title_zh": "披戴全副军装", "title_en": "Armed for War", "desc_zh": "领受神所赐的全副军装（弗六）。", "desc_en": "Receive the whole armour of God (Eph. 6)." },
+    { "id": "overcame_apollyon", "icon": "⚔", "title_zh": "胜过亚玻伦", "title_en": "Apollyon Overcome", "desc_zh": "以信德的盾与圣灵的剑击退控告者。", "desc_en": "Beat back the accuser with the shield of faith." },
+    { "id": "through_shadow", "icon": "🌑", "title_zh": "走过死荫幽谷", "title_en": "Through the Shadow", "desc_zh": "在黑暗中不偏左右，持守真道前行。", "desc_en": "Keep the path through the Valley of the Shadow." },
+    { "id": "refused_vanity", "icon": "🎭", "title_zh": "不买虚华", "title_en": "Vanity Refused", "desc_zh": "在虚华市不买世界的虚荣，只买真理。", "desc_en": "Buy the truth and none of Vanity Fair's glitter." },
+    { "id": "escaped_despair", "icon": "🗝", "title_zh": "逃出疑惑堡", "title_en": "Out of Doubting Castle", "desc_zh": "想起怀中的应许之钥，胜过绝望巨人。", "desc_en": "Remember the Key of Promise; escape Giant Despair." },
+    { "id": "shepherds_sight", "icon": "🔭", "title_zh": "远望圣城", "title_en": "Sight of the City", "desc_zh": "在可喜山受牧人指引，远远看见圣城。", "desc_en": "From the Delectable Mountains, glimpse the City." },
+    { "id": "crossed_river", "icon": "🌊", "title_zh": "渡过死河", "title_en": "Across the River", "desc_zh": "凭信渡过没有桥的死河，盼望扶持你。", "desc_en": "Cross the bridgeless River of Death by faith." },
+    { "id": "entered_city", "icon": "👑", "title_zh": "进入天城", "title_en": "Into the City", "desc_zh": "众门为你敞开，领受生命的冠冕。", "desc_en": "The gates open; receive the crown of life." },
+    { "id": "turned_back", "icon": "🙏", "title_zh": "回转重站", "title_en": "Turned Back", "desc_zh": "在跌倒处诚实认罪，被恩典重新扶起。", "desc_en": "Confess honestly and be lifted by grace again." },
+    { "id": "word_hidden_1", "icon": "📖", "title_zh": "把话藏在心里", "title_en": "The Word Hidden", "desc_zh": "记住第一节经文。", "desc_en": "Hide your first verse in the heart." },
+    { "id": "word_hidden_5", "icon": "📖", "title_zh": "五节经文", "title_en": "Five Verses", "desc_zh": "记住五节经文。", "desc_en": "Hide five verses in the heart." },
+    { "id": "word_hidden_10", "icon": "📚", "title_zh": "满心藏道", "title_en": "Ten Verses", "desc_zh": "记住十节经文。", "desc_en": "Hide ten verses in the heart." },
+    { "id": "pilgrim_complete", "icon": "🏆", "title_zh": "天路走完", "title_en": "Pilgrim's Progress", "desc_zh": "从初醒到蒙接纳，走完整段天路。", "desc_en": "From first waking to final welcome — the road complete." }
+  ]
+}

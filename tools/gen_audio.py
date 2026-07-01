@@ -490,6 +490,21 @@ def make_sfx():
     items["message_in"] = sfx_blip([720, 920], [0.05, 0.07], 0.4, 20)
     items["mention"] = mix(bell(84, 0.5, 0.3), sfx_blip([988, 1320], [0.06, 0.09], 0.4, 16))
 
+    # --- combat feedback SFX (SymbolicEnemy hit / block / hurt / defeat) ---
+    ni = int(0.28 * SR); ti = np.arange(ni) / SR
+    items["impact"] = mix(
+        bandpass_fft(pink(ni), 800, 4500) * np.exp(-ti * 34) * 0.6,
+        np.sin(2 * np.pi * 180 * ti) * np.exp(-ti * 26) * 0.5,
+        sweep(900, 300, 0.12, 22, 0.35))
+    items["block"] = mix(bell(79, 0.5, 0.34), bell(86, 0.5, 0.2),
+        bandpass_fft(pink(int(0.2 * SR)), 2500, 6500) * np.exp(-np.arange(int(0.2 * SR)) / SR * 24) * 0.22)
+    nh = int(0.35 * SR); th = np.arange(nh) / SR
+    items["player_hurt"] = mix(sweep(300, 90, 0.3, 9, 0.55),
+        bandpass_fft(brown(nh), 60, 400) * np.exp(-th * 10) * 0.4)
+    items["enemy_defeat"] = mix(
+        bandpass_fft(pink(int(0.3 * SR)), 300, 3000) * np.exp(-np.arange(int(0.3 * SR)) / SR * 12) * 0.4,
+        pad_chord(chord_notes(57, "major", 0, (0, 2, 4)), 0.9, .6, .6, "choir", .35))
+
     for name, mono in items.items():
         mono = np.asarray(mono, dtype=float)
         mono = mono / (np.max(np.abs(mono)) + 1e-9) * 0.85

@@ -34,6 +34,10 @@ const SFX := {
 	"message_in": "res://assets/audio/sfx/message_in.ogg",
 	"mention": "res://assets/audio/sfx/mention.ogg",
 	"sticker_send": "res://assets/audio/sfx/sticker_send.ogg",
+	"impact": "res://assets/audio/sfx/impact.ogg",
+	"block": "res://assets/audio/sfx/block.ogg",
+	"player_hurt": "res://assets/audio/sfx/player_hurt.ogg",
+	"enemy_defeat": "res://assets/audio/sfx/enemy_defeat.ogg",
 }
 
 @export var music_volume_db: float = -8.0
@@ -78,6 +82,9 @@ func _ready() -> void:
 	EventBus.spiritual_collapse.connect(func(): play_sfx("collapse"))
 	EventBus.demo_completed.connect(func(): play_sfx("victory"))
 	EventBus.save_completed.connect(func(_slot): play_sfx("save"))
+	# Duck music + ambience under dialogue so speech reads clearly.
+	EventBus.dialogue_started.connect(func(_id): duck(true))
+	EventBus.dialogue_ended.connect(func(_id): duck(false))
 
 
 func _make_player(bus_name: String = "Master") -> AudioStreamPlayer:
@@ -113,6 +120,18 @@ func set_volume(which: String, value: float) -> void:
 func apply_all_volumes() -> void:
 	for k in _vol.keys():
 		_apply_volume(k)
+
+
+## Smoothly dip music + ambience (e.g. during dialogue) and restore afterwards.
+func duck(on: bool) -> void:
+	for which in ["music", "ambient"]:
+		var idx := AudioServer.get_bus_index(String(BUS.get(which, "")))
+		if idx < 0:
+			continue
+		var target := linear_to_db(maxf(float(_vol.get(which, 1.0)), 0.0001)) + (-9.0 if on else 0.0)
+		var tw := create_tween()
+		tw.tween_method(func(v: float): AudioServer.set_bus_volume_db(idx, v),
+			AudioServer.get_bus_volume_db(idx), target, 0.35)
 
 
 func _apply_volume(which: String) -> void:
