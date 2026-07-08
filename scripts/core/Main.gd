@@ -74,6 +74,14 @@ func _ensure_input_actions() -> void:
 		"move_right": [KEY_D, KEY_RIGHT],
 		"jump": [KEY_SPACE],
 		"interact": [KEY_E],
+		"pray": [KEY_Q, KEY_P],
+		"repent": [KEY_R],
+		"open_journal": [KEY_J, KEY_TAB],
+		"dash": [KEY_SHIFT],
+		"combat_attack": [KEY_J],
+		"combat_dodge": [KEY_K],
+		"combat_guard": [KEY_L],
+		"combat_promise": [KEY_U],
 	}
 	for action in defs.keys():
 		if not InputMap.has_action(action):
@@ -216,7 +224,7 @@ func _show_title() -> void:
 	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
 	_add_button(vb, LocaleManager.switch_label(), func(): LocaleManager.toggle(); _show_title())
 	var hint := Label.new()
-	hint.text = LocaleManager.t("menu.hint_touch", "左下方向区移动 · 点「跳跃」跳 · 点「互动」交互/继续对话 · 点「心境」查看/关闭心境 · 点「地图」看路线 · 点「暂停」打开菜单") if DisplayServer.is_touchscreen_available() else LocaleManager.t("menu.hint", "WASD move · Space jump · E interact · 1-4 choose · C heart · Tab map · Esc pause")
+	hint.text = LocaleManager.t("menu.hint_touch", "左侧摇杆移动 · 点「互动/继续」交互与对话 · 点「祷告」「悔改」回应试探 · 点「心境」回看经文 · 点「地图」看路线") if DisplayServer.is_touchscreen_available() else LocaleManager.t("menu.hint", "WASD move · E interact · Q/P pray · R repent · 1-4 choose · C heart · Tab map · Esc pause")
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
 	vb.add_child(hint)
@@ -909,6 +917,8 @@ func _toggle_route_map() -> void:
 # ---------------------------------------------------------------------------
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not (event is InputEventKey and event.pressed and not event.echo):
+		return
+	if not event.shift_pressed and event.keycode in [KEY_F2, KEY_F3, KEY_F4, KEY_F7, KEY_F8]:
 		return
 	match event.keycode:
 		KEY_F2:

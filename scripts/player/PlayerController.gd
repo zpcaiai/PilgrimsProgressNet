@@ -373,14 +373,17 @@ func _physics_process(delta: float) -> void:
 
 	var input_dir := Vector3.ZERO
 	if not control_locked:
-		var x := Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
-		var z := Input.get_action_strength("move_back") - Input.get_action_strength("move_forward")
-		input_dir = Vector3(x, 0, z)
-		if input_dir.length() > 1.0:
-			input_dir = input_dir.normalized()
-		# Make movement relative to where the camera is looking (orbit yaw).
-		if absf(_cam_yaw) > 0.01:
-			input_dir = input_dir.rotated(Vector3.UP, deg_to_rad(_cam_yaw))
+		if InputManager and InputManager.has_method("get_movement_vector_3d"):
+			input_dir = InputManager.get_movement_vector_3d(_cam_yaw)
+		else:
+			var x := Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+			var z := Input.get_action_strength("move_back") - Input.get_action_strength("move_forward")
+			input_dir = Vector3(x, 0, z)
+			if input_dir.length() > 1.0:
+				input_dir = input_dir.normalized()
+			# Make movement relative to where the camera is looking (orbit yaw).
+			if absf(_cam_yaw) > 0.01:
+				input_dir = input_dir.rotated(Vector3.UP, deg_to_rad(_cam_yaw))
 
 		if Input.is_action_just_pressed("jump") and is_on_floor():
 			velocity.y = jump_velocity
@@ -436,7 +439,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseMotion and _looking_mouse:
 		_apply_look(-event.relative.x * mouse_sensitivity, -event.relative.y * mouse_sensitivity)
-	if event.is_action_pressed("interact") and _current_target != null:
+	if event.is_action_pressed("interact") and _current_target != null and (not InputManager or InputManager.can_interact()):
 		_current_target.interact(self)
 
 

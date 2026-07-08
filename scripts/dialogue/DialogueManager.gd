@@ -10,6 +10,10 @@ var _current_dialogue: Dictionary = {}
 var _current_dialogue_id: String = ""
 var _current_node_id: String = ""
 var _active: bool = false
+var _history: Array = []
+var _seen_nodes: Dictionary = {}
+var _made_choices: Dictionary = {}
+var _last_choice_id: String = ""
 
 
 func is_active() -> bool:
@@ -49,6 +53,29 @@ func get_current_node() -> Dictionary:
 	return nodes.get(_current_node_id, {})
 
 
+func has_seen_node(dialogue_id: String, node_id: String) -> bool:
+	return bool(_seen_nodes.get(dialogue_id + ":" + node_id, false))
+
+
+func has_made_choice(dialogue_id: String, choice_id: String) -> bool:
+	return bool(_made_choices.get(dialogue_id + ":" + choice_id, false))
+
+
+func get_history() -> Array:
+	return _history.duplicate(true)
+
+
+func get_history_summary() -> Dictionary:
+	return {
+		"active": _active,
+		"dialogue": _current_dialogue_id,
+		"node": _current_node_id,
+		"last_choice": _last_choice_id,
+		"seen_count": _seen_nodes.size(),
+		"choice_count": _made_choices.size(),
+	}
+
+
 ## Returns choices the player is currently allowed to pick (conditions met).
 func get_available_choices() -> Array:
 	var node := get_current_node()
@@ -77,6 +104,18 @@ func _choice_conditions_met(choice: Dictionary) -> bool:
 				return false
 		elif key == "requires_item":
 			if not GameState.has_inventory_item(String(cond[key])):
+				return false
+		elif key == "not_flag":
+			if GameState.has_flag(String(cond[key])):
+				return false
+		elif key == "seen_node":
+			if not has_seen_node(String(cond.get("dialogue_id", _current_dialogue_id)), String(cond[key])):
+				return false
+		elif key == "not_seen_node":
+			if has_seen_node(String(cond.get("dialogue_id", _current_dialogue_id)), String(cond[key])):
+				return false
+		elif key == "choice_made":
+			if not has_made_choice(String(cond.get("dialogue_id", _current_dialogue_id)), String(cond[key])):
 				return false
 		elif key == "temptation":
 			# {"type":"comfort_shortcut","difficulty":40} — wise choice only if you can resist that temptation.
@@ -111,6 +150,7 @@ func select_choice(choice_id: String) -> void:
 	for choice in node.get("choices", []):
 		if String(choice.get("id", "")) == choice_id:
 			EventBus.choice_selected.emit(choice_id)
+			_mark_choice(choice_id)
 			_apply_choice(choice)
 			var next: String = String(choice.get("next", ""))
 			if next == "" or next == "end":
@@ -145,6 +185,11 @@ func _apply_choice(choice: Dictionary) -> void:
 			GameState.add_inventory_item(String(k), int(choice["items"][k]))
 	if choice.has("special"):
 		SpiritualStateManager._apply_special(choice["special"])
+	for field in ["scriptureHintIds", "scripture_hint_ids", "scripture_cards"]:
+		if choice.has(field):
+			for card_id in choice[field]:
+				if ScriptureMemory and ScriptureMemory.has_method("grant_card"):
+					ScriptureMemory.grant_card(String(card_id))
 	# Quest hooks
 	if choice.has("start_quest"):
 		QuestManager.start_quest(String(choice["start_quest"]))
@@ -160,6 +205,7 @@ func _emit_current_node() -> void:
 	if bool(node.get("end", false)):
 		end_dialogue()
 		return
+	_mark_node_seen(_current_node_id)
 	# Auto-apply node-level on_enter effects (optional).
 	if node.has("on_enter"):
 		SpiritualStateManager.apply_effects(node["on_enter"])
@@ -171,6 +217,32 @@ func _emit_current_node() -> void:
 	node = _resolve_text_variant(node)
 	node = _localize_node(node)
 	EventBus.dialogue_node_changed.emit(node)
+
+
+func _mark_node_seen(node_id: String) -> void:
+	var key := _current_dialogue_id + ":" + node_id
+	_seen_nodes[key] = true
+	_history.append({
+		"dialogue_id": _current_dialogue_id,
+		"node_id": node_id,
+		"chapter_id": GameState.current_chapter_id,
+		"timestamp": Time.get_unix_time_from_system(),
+	})
+	EventBus.dialogue_history_changed.emit()
+
+
+func _mark_choice(choice_id: String) -> void:
+	var key := _current_dialogue_id + ":" + choice_id
+	_made_choices[key] = true
+	_last_choice_id = choice_id
+	_history.append({
+		"dialogue_id": _current_dialogue_id,
+		"node_id": _current_node_id,
+		"choice_id": choice_id,
+		"chapter_id": GameState.current_chapter_id,
+		"timestamp": Time.get_unix_time_from_system(),
+	})
+	EventBus.dialogue_history_changed.emit()
 
 ## NPCs can read the pilgrim's state: a node may carry `text_variants` (each with
 ## `conditions` + `text`); the first whose conditions pass replaces the line.
@@ -223,3 +295,19 @@ func end_dialogue() -> void:
 	_current_node_id = ""
 	EventBus.dialogue_ended.emit(ended_id)
 	EventBus.player_control_locked.emit(false)
+
+
+func to_dict() -> Dictionary:
+	return {
+		"history": _history.duplicate(true),
+		"seen_nodes": _seen_nodes.duplicate(true),
+		"made_choices": _made_choices.duplicate(true),
+		"last_choice_id": _last_choice_id,
+	}
+
+
+func from_dict(data: Dictionary) -> void:
+	_history = data.get("history", []).duplicate(true)
+	_seen_nodes = (data.get("seen_nodes", {}) as Dictionary).duplicate(true)
+	_made_choices = (data.get("made_choices", {}) as Dictionary).duplicate(true)
+	_last_choice_id = String(data.get("last_choice_id", ""))

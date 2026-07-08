@@ -27,6 +27,8 @@ func save_game(slot_id: String = "slot_1", announce: bool = true) -> void:
 		"timestamp": Time.get_datetime_string_from_system(),
 		"game_state": GameState.to_dict(),
 		"spiritual_state": SpiritualStateManager.to_dict(),
+		"dialogue_state": DialogueManager.to_dict(),
+		"journey_journal": JourneyJournal.to_dict(),
 		"quest_state": QuestManager.to_dict(),
 	}
 	var file := FileAccess.open(_slot_path(slot_id), FileAccess.WRITE)
@@ -52,6 +54,8 @@ func load_game(slot_id: String = "slot_1") -> bool:
 	var data: Dictionary = parsed
 	GameState.from_dict(data.get("game_state", {}))
 	SpiritualStateManager.from_dict(data.get("spiritual_state", {}))
+	DialogueManager.from_dict(data.get("dialogue_state", {}))
+	JourneyJournal.from_dict(data.get("journey_journal", {}))
 	QuestManager.from_dict(data.get("quest_state", {}))
 	EventBus.load_completed.emit(slot_id)
 	EventBus.toast("存档已读取。")

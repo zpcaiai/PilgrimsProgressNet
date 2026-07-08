@@ -6,11 +6,12 @@ extends Node
 
 const NUMERIC_STATES := [
 	"faith", "hope", "humility", "discernment", "perseverance", "watchfulness",
-	"despair", "shame", "fear", "pride", "deception", "weariness",
+	"repentance",
+	"despair", "shame", "fear", "pride", "deception", "weariness", "temptation", "doubt",
 ]
 
-const POSITIVE_STATES := ["faith", "hope", "humility", "discernment", "perseverance", "watchfulness"]
-const NEGATIVE_STATES := ["despair", "shame", "fear", "pride", "deception", "weariness"]
+const POSITIVE_STATES := ["faith", "hope", "humility", "discernment", "perseverance", "watchfulness", "repentance"]
+const NEGATIVE_STATES := ["despair", "shame", "fear", "pride", "deception", "weariness", "temptation", "doubt"]
 
 const BOOL_STATES := ["has_burden", "has_scroll", "has_seal", "has_promise_key",
 	"has_new_garment", "has_armor", "has_sword", "has_shield", "has_shepherd_map",
@@ -23,6 +24,7 @@ var humility: int = 10
 var discernment: int = 5
 var perseverance: int = 10
 var watchfulness: int = 5
+var repentance: int = 0
 
 # --- Negative states ---
 var despair: int = 35
@@ -31,6 +33,8 @@ var fear: int = 20
 var pride: int = 10
 var deception: int = 10
 var weariness: int = 5
+var temptation: int = 10
+var doubt: int = 10
 
 # --- Story booleans ---
 var has_burden: bool = true
@@ -46,6 +50,18 @@ var has_shepherd_map: bool = false
 var has_final_seal: bool = false
 
 var _collapsed: bool = false
+var _prayer_cooldown: float = 0.0
+var _repentance_cooldown: float = 0.0
+const PRAYER_COOLDOWN := 7.0
+const REPENTANCE_COOLDOWN := 10.0
+const THRESHOLDS := [25, 50, 75, 100]
+
+
+func _process(delta: float) -> void:
+	if _prayer_cooldown > 0.0:
+		_prayer_cooldown = maxf(0.0, _prayer_cooldown - delta)
+	if _repentance_cooldown > 0.0:
+		_repentance_cooldown = maxf(0.0, _repentance_cooldown - delta)
 
 
 func reset_for_new_game() -> void:
@@ -55,12 +71,15 @@ func reset_for_new_game() -> void:
 	discernment = 5
 	perseverance = 10
 	watchfulness = 5
+	repentance = 0
 	despair = 35
 	shame = 25
 	fear = 20
 	pride = 10
 	deception = 10
 	weariness = 5
+	temptation = 10
+	doubt = 10
 	has_burden = true
 	has_scroll = false
 	has_seal = false
@@ -72,6 +91,8 @@ func reset_for_new_game() -> void:
 	has_shepherd_map = false
 	has_final_seal = false
 	_collapsed = false
+	_prayer_cooldown = 0.0
+	_repentance_cooldown = 0.0
 
 
 # --- Generic getters / setters ---
@@ -93,7 +114,18 @@ func set_state(state_name: String, value: int) -> void:
 	set(state_name, new_value)
 	if new_value != old_value:
 		EventBus.spiritual_state_changed.emit(state_name, old_value, new_value)
+		_emit_thresholds(state_name, old_value, new_value)
 	_check_collapse()
+
+
+func _emit_thresholds(state_name: String, old_value: int, new_value: int) -> void:
+	for t in THRESHOLDS:
+		if old_value < t and new_value >= t:
+			EventBus.spiritual_threshold_crossed.emit(state_name, "above_%d" % t, old_value, new_value)
+			if NEGATIVE_STATES.has(state_name) and t >= 75:
+				EventBus.toast("%s 正在加重；停下来祷告、回想经文，或选择悔改。" % _state_label(state_name))
+		elif old_value >= t and new_value < t:
+			EventBus.spiritual_threshold_crossed.emit(state_name, "below_%d" % t, old_value, new_value)
 
 
 func modify_state(state_name: String, delta: int) -> void:
@@ -104,6 +136,56 @@ func modify_state(state_name: String, delta: int) -> void:
 	if delta > 0 and NEGATIVE_STATES.has(state_name) and GameState.is_child_mode():
 		delta = int(ceil(delta * 0.5))
 	set_state(state_name, int(get(state_name)) + delta)
+
+
+func prayer_cooldown_left() -> float:
+	return _prayer_cooldown
+
+
+func repentance_cooldown_left() -> float:
+	return _repentance_cooldown
+
+
+func pray(source: String = "manual") -> bool:
+	if _prayer_cooldown > 0.0:
+		EventBus.toast("先安静片刻，再祷告。")
+		return false
+	_prayer_cooldown = PRAYER_COOLDOWN
+	apply_effects({"fear": -12, "despair": -10, "doubt": -10, "hope": 6, "faith": 4, "watchfulness": 4})
+	var remembered := ScriptureMemory.recall_current_chapter() if ScriptureMemory else {}
+	if not remembered.is_empty():
+		EventBus.toast(ScriptureMemory.recall_line(remembered))
+	else:
+		EventBus.toast("你停下来祷告：恐惧松动，盼望重新被记起。")
+	if source == "input" and not remembered.is_empty():
+		EventBus.learning_moment_requested.emit({
+			"title": "祷告回想：" + String(remembered.get("ref", "")),
+			"body": ScriptureMemory.learning_body(remembered),
+			"effects_on_continue": {"faith": 2, "watchfulness": 2}
+		})
+	return true
+
+
+func repent(source: String = "manual") -> bool:
+	if _repentance_cooldown > 0.0:
+		EventBus.toast("悔改不是重复按钮；先继续按真实的路走。")
+		return false
+	if not get_repentance_availability():
+		EventBus.toast("先承认真相，谦卑会打开回转的门。")
+		return false
+	_repentance_cooldown = REPENTANCE_COOLDOWN
+	apply_effects({
+		"temptation": -14, "doubt": -10, "deception": -12, "pride": -10,
+		"repentance": 10, "humility": 8, "watchfulness": 5, "hope": 4,
+	})
+	EventBus.toast("你转回真路：悔改不是惩罚，而是回到恩典中。")
+	if source == "input":
+		EventBus.learning_moment_requested.emit({
+			"title": "悔改：转回真路",
+			"body": "当你发现自己被捷径、控告或虚华牵引时，悔改不是重新赚取接纳，而是承认真相，回到应许与恩典中。",
+			"effects_on_continue": {"humility": 2, "repentance": 2}
+		})
+	return true
 
 
 # --- Effects dictionary ---
@@ -290,7 +372,7 @@ func get_temptation_resistance(temptation_type: String) -> int:
 		"shame":
 			return faith + hope + humility - shame
 		"doubt":
-			return faith + discernment + hope - fear - deception
+			return faith + discernment + hope - fear - deception - doubt
 		"sleep":
 			return watchfulness + perseverance + hope - weariness
 		"false_teaching":
@@ -305,6 +387,16 @@ func get_temptation_resistance(temptation_type: String) -> int:
 
 func can_resist_temptation(temptation_type: String, difficulty: int) -> bool:
 	return get_temptation_resistance(temptation_type) >= difficulty
+
+
+func _state_label(state_name: String) -> String:
+	var names := {
+		"faith": "信心", "hope": "盼望", "humility": "谦卑", "discernment": "分辨",
+		"perseverance": "忍耐", "watchfulness": "警醒", "repentance": "悔改",
+		"despair": "绝望", "shame": "羞愧", "fear": "惧怕", "pride": "骄傲",
+		"deception": "迷惑", "weariness": "疲惫", "temptation": "试探", "doubt": "疑惑",
+	}
+	return names.get(state_name, state_name)
 
 
 # --- Collapse ---

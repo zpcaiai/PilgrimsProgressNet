@@ -24,6 +24,9 @@ var _stat_value_labels: Array = []
 var _lang_btn: Button
 var _quest_panel: Panel
 var _spiritual_panel: Panel
+var _debug_panel: Panel
+var _debug_label: RichTextLabel
+var _debug_visible: bool = false
 
 # Dialogue
 var _dialogue_panel: Panel
@@ -80,6 +83,7 @@ func _ready() -> void:
 	_build_char_panel()
 	_build_narration()
 	_build_grace_anim()
+	_build_debug_panel()
 	_connect_signals()
 	_build_lang_toggle()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
@@ -98,6 +102,7 @@ func _connect_signals() -> void:
 	EventBus.quest_completed.connect(func(_id): _refresh_quest())
 	EventBus.notify.connect(_on_toast)
 	EventBus.chapter_started.connect(_on_chapter_started)
+	EventBus.input_open_journal.connect(_on_open_journal)
 	if EventBus.has_signal("cross_grace_applied"):
 		EventBus.cross_grace_applied.connect(_on_cross_grace)
 	EventBus.locale_changed.connect(_on_locale_changed)
@@ -158,6 +163,14 @@ func _set_bottom_wide_rect(control: Control, left: float, bottom: float, width: 
 	control.offset_bottom = -bottom
 
 
+func _apply_inner_rect(control: Control, margin: float) -> void:
+	control.set_anchors_preset(Control.PRESET_FULL_RECT)
+	control.offset_left = margin
+	control.offset_top = margin
+	control.offset_right = -margin
+	control.offset_bottom = -margin
+
+
 func _apply_responsive_layout() -> void:
 	var s := _viewport_size()
 	var mobile := _is_mobile_ui()
@@ -178,6 +191,8 @@ func _apply_responsive_layout() -> void:
 			_quest_panel.size = Vector2(340, 134)
 	if is_instance_valid(_quest_label):
 		_quest_label.add_theme_font_size_override("normal_font_size", body)
+		_quest_label.add_theme_font_size_override("bold_font_size", body)
+		_quest_label.add_theme_constant_override("line_separation", 6 if mobile else 4)
 
 	if is_instance_valid(_spiritual_panel):
 		if mobile and portrait:
@@ -216,9 +231,10 @@ func _apply_responsive_layout() -> void:
 	if is_instance_valid(_toast_label):
 		_toast_label.add_theme_font_size_override("font_size", body)
 		var toast_w := minf(760.0, s.x - 48.0)
-		_toast_label.position = Vector2(-toast_w * 0.5, 116 if mobile else 130)
-		_toast_label.size = Vector2(toast_w, 58 if mobile else 30)
-		_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_toast_label.position = Vector2(-toast_w * 0.5, 132 if mobile else 130)
+		_toast_label.size = Vector2(toast_w, 86 if mobile else 34)
+		_toast_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
+		_toast_label.clip_text = true
 
 	if is_instance_valid(_dialogue_panel):
 		if mobile:
@@ -238,6 +254,8 @@ func _apply_responsive_layout() -> void:
 		_speaker_label.add_theme_font_size_override("font_size", title)
 	if is_instance_valid(_text_label):
 		_text_label.add_theme_font_size_override("normal_font_size", dialogue)
+		_text_label.add_theme_font_size_override("bold_font_size", dialogue)
+		_text_label.add_theme_constant_override("line_separation", 8 if mobile else 4)
 		_text_label.custom_minimum_size = Vector2(0, 120 if mobile else 60)
 	if is_instance_valid(_choice_box):
 		_choice_box.add_theme_constant_override("separation", 8 if mobile else 4)
@@ -287,6 +305,12 @@ func _apply_responsive_layout() -> void:
 		_lang_btn.position = Vector2(16 if mobile else 20, -54 if mobile else -40)
 		_lang_btn.custom_minimum_size = Vector2(86, 42) if mobile else Vector2.ZERO
 
+	if is_instance_valid(_debug_panel):
+		var dw := minf(520.0, s.x - 32.0)
+		_debug_panel.position = Vector2(16, s.y - 214.0)
+		_debug_panel.size = Vector2(dw, 198.0)
+		_debug_label.add_theme_font_size_override("normal_font_size", 15 if not mobile else 18)
+
 	# Re-flow the auto-sized objective box (and narration) for the new viewport.
 	if is_instance_valid(_quest_label):
 		_refresh_quest()
@@ -308,10 +332,13 @@ func _build_quest_tracker() -> void:
 	add_child(_quest_panel)
 	_quest_label = RichTextLabel.new()
 	_quest_label.bbcode_enabled = true
-	_quest_label.fit_content = true
+	_quest_label.fit_content = false
 	_quest_label.scroll_active = false
-	_quest_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_quest_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_apply_inner_rect(_quest_label, 14.0)
 	_quest_label.add_theme_font_size_override("normal_font_size", FONT_BODY)
+	_quest_label.add_theme_font_size_override("bold_font_size", FONT_BODY)
+	_quest_label.add_theme_constant_override("line_separation", 4)
 	_quest_panel.add_child(_quest_label)
 
 
@@ -431,7 +458,7 @@ func _build_dialogue() -> void:
 	add_child(_dialogue_panel)
 
 	_dialogue_hbox = HBoxContainer.new()
-	_dialogue_hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_apply_inner_rect(_dialogue_hbox, 16.0)
 	_dialogue_hbox.add_theme_constant_override("separation", 16)
 	_dialogue_panel.add_child(_dialogue_hbox)
 
@@ -455,8 +482,9 @@ func _build_dialogue() -> void:
 
 	_text_label = RichTextLabel.new()
 	_text_label.bbcode_enabled = true
-	_text_label.fit_content = true
-	_text_label.scroll_active = false
+	_text_label.fit_content = false
+	_text_label.scroll_active = true
+	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text_label.custom_minimum_size = Vector2(0, 60)
 	_text_label.add_theme_font_size_override("normal_font_size", FONT_BODY)
 	_text_label.add_theme_color_override("default_color", Color(0.95, 0.95, 0.98))
@@ -467,6 +495,20 @@ func _build_dialogue() -> void:
 	_choice_box = VBoxContainer.new()
 	_choice_box.add_theme_constant_override("separation", 4)
 	vb.add_child(_choice_box)
+
+
+func _build_debug_panel() -> void:
+	_debug_panel = Panel.new()
+	_debug_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.03, 0.04, 0.07, 0.88)))
+	_debug_panel.visible = false
+	add_child(_debug_panel)
+	_debug_label = RichTextLabel.new()
+	_debug_label.bbcode_enabled = true
+	_debug_label.fit_content = false
+	_debug_label.scroll_active = false
+	_debug_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_apply_inner_rect(_debug_label, 12.0)
+	_debug_panel.add_child(_debug_label)
 
 
 # ---------------------------------------------------------------------------
@@ -524,7 +566,9 @@ func _on_chapter_started(chapter_id: String) -> void:
 	_title_main.text = String(data.get("title", chapter_id))
 	var preview := ScriptureMemory.chapter_preview_line(chapter_id)
 	if preview != "":
-		get_tree().create_timer(7.5).timeout.connect(func(): EventBus.toast("✦ " + preview.left(160)))
+		var limit := 46 if _is_mobile_ui() else 160
+		var short_preview := preview.left(limit) + ("…" if preview.length() > limit else "")
+		get_tree().create_timer(7.5).timeout.connect(func(): EventBus.toast("✦ " + short_preview))
 	_title_sub.text = String(data.get("subtitle", ""))
 	var tw := create_tween()
 	tw.tween_property(_title_card, "modulate:a", 1.0, 0.6)
@@ -632,7 +676,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _show_narration_line() -> void:
 	var line := String(_narration_queue[_narration_index])
-	_narration_label.text = "[center][i]" + line + "[/i]\n[font_size=13][color=#8b93a6]（点按 / 回车 继续）[/color][/font_size][/center]"
+	if _is_mobile_ui():
+		_narration_label.text = "[center][i]" + line + "[/i][/center]"
+	else:
+		_narration_label.text = "[center][i]" + line + "[/i]\n[font_size=13][color=#8b93a6]（点按 / 回车 继续）[/color][/font_size][/center]"
 	_resize_narration_to_content()
 	Settings.speak(line)
 
@@ -707,6 +754,15 @@ func _toggle_char_panel() -> void:
 		_refresh_char_panel()
 
 
+func _on_open_journal() -> void:
+	if _dialogue_panel.visible:
+		return
+	if not _char_visible:
+		_toggle_char_panel()
+	else:
+		_refresh_char_panel()
+
+
 func _refresh_char_panel() -> void:
 	var s := SpiritualStateManager
 	var mode_label := LocaleManager.t("char.mode_child", "Children's Journey") if GameState.is_child_mode() else LocaleManager.t("char.mode_devout", "Devout Journey")
@@ -731,6 +787,8 @@ func _refresh_char_panel() -> void:
 	t += "  " + ScriptureMemory.reflection_progress_summary() + "\n\n"
 	t += "[color=#f0d890]经文记忆[/color]\n"
 	t += ScriptureMemory.known_card_summary(5) + "\n\n"
+	t += "[color=#f0d890]旅程日志[/color]\n"
+	t += JourneyJournal.summary_text(5) + "\n\n"
 	t += "[color=#a0f0c0]" + LocaleManager.t("char.companions", "Companions") + "[/color]\n"
 	var comps: Array = GameState.companions.keys()
 	var comp_names: Array = []
@@ -786,8 +844,36 @@ func _process(delta: float) -> void:
 
 	if _char_visible:
 		_refresh_char_panel()
+	if _debug_visible:
+		_refresh_debug_panel()
 
 	_process_narration(delta)
+
+
+func _refresh_debug_panel() -> void:
+	if not is_instance_valid(_debug_label):
+		return
+	var input := InputManager.debug_snapshot() if InputManager else {}
+	var hist := DialogueManager.get_history_summary() if DialogueManager else {}
+	var target := "无"
+	if get_tree():
+		var players := get_tree().get_nodes_in_group("player")
+		if not players.is_empty() and players[0].has_method("get"):
+			var cur = players[0].get("_current_target")
+			if cur != null:
+				target = String(cur.name)
+	_debug_label.text = "[b]调试 Debug[/b]\n输入上下文：%s  锁定：%s\n移动：%s\n按下：%s\n对话：%s / %s  最近选择：%s\n交互目标：%s\nP/Q 祷告冷却：%.1f  R 悔改冷却：%.1f" % [
+		String(input.get("context", "")),
+		str(input.get("movement_locked", false)),
+		str(input.get("movement", Vector2.ZERO)),
+		", ".join(PackedStringArray(input.get("pressed", []))),
+		String(hist.get("dialogue", "")),
+		String(hist.get("node", "")),
+		String(hist.get("last_choice", "")),
+		target,
+		SpiritualStateManager.prayer_cooldown_left(),
+		SpiritualStateManager.repentance_cooldown_left(),
+	]
 
 
 # ---------------------------------------------------------------------------
@@ -822,6 +908,9 @@ func _resize_quest_to_content() -> void:
 	if not is_instance_valid(_quest_panel) or not is_instance_valid(_quest_label):
 		return
 	_quest_panel.size.y = clampf(_quest_label.get_content_height() + 22.0, 52.0, 460.0)
+	var line_count := max(1, _quest_label.get_parsed_text().split("\n").size())
+	var approx_line_h := float(_body_font() + 8)
+	_quest_panel.size.y = clampf(maxf(_quest_panel.size.y, line_count * approx_line_h + 30.0), 68.0, 460.0)
 
 
 # ---------------------------------------------------------------------------
@@ -918,6 +1007,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_toggle_char_panel()
 			get_viewport().set_input_as_handled()
 			return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_F3, KEY_F4]:
+		_debug_visible = not _debug_visible
+		_debug_panel.visible = _debug_visible
+		get_viewport().set_input_as_handled()
+		return
 	if not _dialogue_panel.visible:
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
