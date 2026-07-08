@@ -4,6 +4,13 @@ class_name WicketGate
 ## press forward. Knock at the gate; Goodwill receives you and pulls you through.
 
 var _arrows: ArrowEmitter = null
+const TRUTH_SHIELD := preload("res://scripts/level/TruthShield.gd")
+var _shield: Node = null
+var _tower_built: bool = false
+
+
+func _after_glb_built() -> void:
+	_install_wicket_gate_pressure()
 
 
 func _build_procedural() -> void:
@@ -36,13 +43,24 @@ func _build_procedural() -> void:
 
 	spawn_player(Vector3(0, 1, 14))
 
-	# Arrows from the old life, behind you.
-	_arrows = ArrowEmitter.new()
-	_arrows.position = Vector3(0, 1.5, 20)
-	add_child(_arrows)
-	_arrows.setup(player)
+	_install_wicket_gate_pressure()
 
-	EventBus.dialogue_ended.connect(_on_dialogue_ended)
+func _install_wicket_gate_pressure() -> void:
+	if not is_instance_valid(player):
+		return
+	if not is_instance_valid(_arrows):
+		_build_beelzebub_tower()
+		# Arrows from the old life, behind you.
+		_arrows = ArrowEmitter.new()
+		_arrows.position = player.global_position + Vector3(0, 1.2, 13)
+		add_child(_arrows)
+		_arrows.setup(player)
+	if not is_instance_valid(_shield):
+		_shield = TRUTH_SHIELD.new()
+		player.add_child(_shield)
+		make_floating_label("点「盾牌」举起真理盾牌；桌面键位 L", player.global_position + Vector3(0, 2.0, -4), Color(1.0, 0.9, 0.45))
+	if EventBus.has_signal("dialogue_ended") and not EventBus.dialogue_ended.is_connected(_on_dialogue_ended):
+		EventBus.dialogue_ended.connect(_on_dialogue_ended)
 
 
 func _on_dialogue_ended(dialogue_id: String) -> void:
@@ -50,5 +68,24 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 		if _arrows != null:
 			_arrows.active = false
 		QuestManager.update_quest_progress("enter_gate")
-		EventBus.toast("善意把你拉进门内；控告停在门槛之外。")
+		if is_instance_valid(player):
+			player.teleport(Vector3(0, 1, -25))
+		make_light_burst(Vector3(0, 1.4, -22), Color(1.0, 0.88, 0.48), 48)
+		EventBus.toast("善意把你拉进门内；火箭停在门槛之外。")
 		_advance_after_delay()
+
+
+func _build_beelzebub_tower() -> void:
+	if _tower_built:
+		return
+	_tower_built = true
+	# Distant oppressive tower, not a boss body: accusation is heard through arrows.
+	make_block(Vector3(3.2, 9.0, 3.2), Color(0.08, 0.06, 0.08), Vector3(0, 4.5, 25))
+	make_block(Vector3(4.8, 1.0, 4.8), Color(0.16, 0.07, 0.05), Vector3(0, 9.4, 25))
+	var eye_light := OmniLight3D.new()
+	eye_light.position = Vector3(0, 8.9, 23.5)
+	eye_light.light_color = Color(1.0, 0.22, 0.08)
+	eye_light.light_energy = 4.5
+	eye_light.omni_range = 15.0
+	add_child(eye_light)
+	make_floating_label("Beelzebub 的远塔", Vector3(0, 10.5, 24), Color(0.95, 0.42, 0.25))

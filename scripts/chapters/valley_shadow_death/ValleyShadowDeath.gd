@@ -9,6 +9,11 @@ var _lantern: PlayerLight = null
 var _shadow_player: PlayerController = null
 var _shadow_accum: float = 0.0
 var _vignette: DarkVignette = null
+var _shadow_discernment_installed: bool = false
+
+
+func _after_glb_built() -> void:
+	_install_shadow_discernment()
 
 
 func _build_procedural() -> void:
@@ -29,6 +34,7 @@ func _build_procedural() -> void:
 	var lantern := PlayerLight.new()
 	player.add_child(lantern)
 	_lantern = lantern
+	_install_shadow_discernment()
 
 	# Combat is optional here: two weak fear-shades haunt the path. Stand firm
 	# (L), pray (P), or simply press on past them to the dawn.
@@ -39,11 +45,6 @@ func _build_procedural() -> void:
 	add_child(CombatHUD.new())
 	_spawn_fear_shade(Vector3(1.5, 1, -4))
 	_spawn_fear_shade(Vector3(-1.5, 1, -22))
-
-	# Whispers from the dark — each raises fear once.
-	_whisper(Vector3(0, 1.5, 2), "有声音嘶嘶说：“黑暗才是真的。你走不到终点。”")
-	_whisper(Vector3(0, 1.5, -10), "黑暗中有东西笑着说：“趁惧怕还像智慧，回头吧。”")
-	_whisper(Vector3(0, 1.5, -26), "低语逼近：“这里没人看见你，也没人保守你。”")
 
 	# Lanterns of the Word — restore your light.
 	_place_lantern(Vector3(-2.5, 0, -6), lantern)
@@ -68,6 +69,32 @@ func _build_procedural() -> void:
 		EventBus.toast("道路渐宽，灰色晨光证明黑暗并非主宰。")
 		_advance_after_delay()
 	make_trigger(Vector3(0, 1.5, -44), Vector3(8, 4, 2), _cb1, false)
+
+
+func _install_shadow_discernment() -> void:
+	if _shadow_discernment_installed:
+		return
+	if not is_instance_valid(player):
+		return
+	_shadow_discernment_installed = true
+	if _lantern == null:
+		var lantern := PlayerLight.new()
+		player.add_child(lantern)
+		_lantern = lantern
+	if EventBus.has_signal("choice_selected") and not EventBus.choice_selected.is_connected(_on_shadow_choice):
+		EventBus.choice_selected.connect(_on_shadow_choice)
+	if EventBus.has_signal("input_pray") and not EventBus.input_pray.is_connected(_on_shadow_pray):
+		EventBus.input_pray.connect(_on_shadow_pray)
+	make_floating_label("死荫谷：分辨声音，不跟随黑暗", Vector3(0, 2.7, 6), Color(0.82, 0.86, 1.0))
+	_discernment_whisper(Vector3(0, 1.5, 2), "w1")
+	_discernment_whisper(Vector3(0, 1.5, -7), "w2")
+	_discernment_whisper(Vector3(0, 1.5, -14), "w3")
+	make_floating_label("枯骨桥 Bone Bridge", Vector3(0, 2.2, -23), Color(0.75, 0.72, 0.68))
+	_discernment_whisper(Vector3(0, 1.5, -23), "w4")
+	_discernment_whisper(Vector3(0, 1.5, -29), "w5")
+	_discernment_whisper(Vector3(2.6, 1.5, -35), "w6")
+	_edge_danger(Vector3(-3.35, 1.5, -19), "左边深沟把恐惧说成智慧。回到窄路中心。")
+	_edge_danger(Vector3(3.35, 1.5, -27), "右边泥坑把绝望说成诚实。回到窄路中心。")
 
 
 func _shadow(pos: Vector3) -> void:
@@ -122,6 +149,44 @@ func _whisper(pos: Vector3, text: String) -> void:
 		SpiritualStateManager.apply_effects({"fear": 12})
 		EventBus.toast(text)
 	make_trigger(pos, Vector3(8, 4, 2), _cb2, true)
+
+
+func _discernment_whisper(pos: Vector3, node_id: String) -> void:
+	var _cb := func(_b):
+		SpiritualStateManager.apply_effects({"fear": 3})
+		DialogueManager.start_dialogue("shadow_whisper_discernment", node_id)
+	make_trigger(pos, Vector3(6, 4, 2), _cb, true)
+
+
+func _edge_danger(pos: Vector3, line: String) -> void:
+	var _cb := func(body):
+		SpiritualStateManager.apply_effects({"fear": 8, "doubt": 4})
+		EventBus.toast(line)
+		if body is PlayerController:
+			body.teleport(Vector3(0, 1, body.global_position.z + 1.2))
+	make_trigger(pos, Vector3(1.8, 4, 26), _cb, false)
+
+
+func _on_shadow_choice(choice_id: String) -> void:
+	if String(ChapterManager.current_chapter_id) != "valley_shadow_death":
+		return
+	if choice_id.begins_with("promise_") or choice_id.begins_with("discern_"):
+		if is_instance_valid(_lantern):
+			_lantern.add_boost(3.5)
+		make_light_burst(player.global_position + Vector3(0, 1.0, -1.2), Color(0.88, 0.9, 1.0), 20)
+		EventBus.toast("你分辨出声音，道路短暂显明。")
+	elif choice_id.begins_with("wrong_"):
+		if is_instance_valid(_lantern):
+			_lantern.apply_snuff(2.0)
+		EventBus.toast("你误认了声音，黑暗更近了一些。停下祷告，重新辨认。")
+
+
+func _on_shadow_pray() -> void:
+	if String(ChapterManager.current_chapter_id) != "valley_shadow_death":
+		return
+	if is_instance_valid(_lantern):
+		_lantern.add_boost(4.5)
+	make_light_burst(player.global_position + Vector3(0, 1.0, -1.0), Color(1.0, 0.95, 0.65), 18)
 
 
 func _place_lantern(pos: Vector3, lantern: PlayerLight) -> void:

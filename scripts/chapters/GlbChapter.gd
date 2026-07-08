@@ -34,6 +34,7 @@ func _build_chapter() -> void:
 	_spawn_position = spawn
 	spawn_player(spawn)
 	_attach_chapter_system()
+	_after_glb_built()
 
 
 ## Per-chapter scratch-meter system (sleepiness / vanity / river depth) for the
@@ -55,6 +56,10 @@ func _attach_chapter_system() -> void:
 ## Override in each chapter with the original procedural geometry. Default no-op
 ## (the GLB carries the scene).
 func _build_procedural() -> void:
+	pass
+
+
+func _after_glb_built() -> void:
 	pass
 
 

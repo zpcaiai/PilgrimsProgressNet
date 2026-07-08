@@ -6,6 +6,11 @@ class_name HillDifficulty
 
 var _arbor_player: PlayerController = null
 var _arbor_prompted: bool = false
+var _lost_scroll_marker: Interactable = null
+
+
+func _after_glb_built() -> void:
+	_ensure_lost_scroll_marker()
 
 
 func _build_procedural() -> void:
@@ -47,6 +52,7 @@ func _build_procedural() -> void:
 	# Middle: the true, steep way — slow going, with a tempting rest arbor.
 	_add_steep_zone(Vector3(0, 1, -14), Vector3(10, 2, 22))
 	_build_rest_arbor(Vector3(0, 0, -22))
+	_ensure_lost_scroll_marker()
 	_decorate_paths()
 
 	make_distant_light(Vector3(0, 7, -44), Color(1.0, 0.95, 0.7))
@@ -57,6 +63,9 @@ func _build_procedural() -> void:
 	spawn_player(Vector3(0, 1, 9))
 
 	var _cb3 := func(_b):
+		if not SpiritualStateManager.has_scroll:
+			EventBus.toast("守望者会问你的书卷。先回到凉亭，找回你因沉睡遗失的凭据。")
+			return
 		GameState.set_flag("reached_summit", true)
 		QuestManager.update_quest_progress("climb_hill")
 		EventBus.toast("你越过山顶，气喘却蒙保守。美宫的光在前方亮起。")
@@ -136,3 +145,40 @@ func _on_arbor_enter(body: Node) -> void:
 func _on_arbor_exit(body: Node) -> void:
 	if body == _arbor_player:
 		_arbor_player = null
+
+
+func _ready() -> void:
+	super._ready()
+	if EventBus.has_signal("dialogue_ended") and not EventBus.dialogue_ended.is_connected(_on_hill_dialogue_ended):
+		EventBus.dialogue_ended.connect(_on_hill_dialogue_ended)
+
+
+func _on_hill_dialogue_ended(dialogue_id: String) -> void:
+	if dialogue_id == "rest_arbor" and GameState.has_flag("lost_scroll_at_arbor") and not GameState.has_flag("recovered_scroll_at_arbor"):
+		_ensure_lost_scroll_marker()
+		EventBus.toast("书卷不见了。回到凉亭长椅旁寻找，而不是带着遗失继续前行。")
+
+
+func _ensure_lost_scroll_marker() -> void:
+	if is_instance_valid(_lost_scroll_marker):
+		return
+	if not GameState.has_flag("lost_scroll_at_arbor") or GameState.has_flag("recovered_scroll_at_arbor"):
+		return
+	var scroll_mesh := CylinderMesh.new()
+	scroll_mesh.top_radius = 0.18
+	scroll_mesh.bottom_radius = 0.18
+	scroll_mesh.height = 0.7
+	_lost_scroll_marker = make_interactable(Vector3(0.9, 0, -22.4), "找回书卷 (Recover Scroll)",
+		func(_p):
+			GameState.set_flag("recovered_scroll_at_arbor", true)
+			GameState.set_flag("lost_scroll_at_arbor", false)
+			SpiritualStateManager.apply_effects({
+				"faith": 8,
+				"humility": 8,
+				"watchfulness": 10,
+				"repentance": 8,
+				"special": {"grant_scroll": true}
+			})
+			make_light_burst(Vector3(0.9, 1.0, -22.4), Color(1.0, 0.9, 0.55), 28)
+			EventBus.toast("你在凉亭落叶旁找回书卷：悔改不是自责，而是回到失落之处。"),
+		scroll_mesh, Color(0.82, 0.68, 0.42), 0.8, 1.6, true)

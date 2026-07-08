@@ -23,7 +23,11 @@
             "watchfulness": -6
           },
           "flags": {
-            "drowsed_on_hill": true
+            "drowsed_on_hill": true,
+            "lost_scroll_at_arbor": true
+          },
+          "special": {
+            "remove_scroll": true
           },
           "next": "rested",
           "text_zh": "躺下歇一会儿。（此刻的安逸。）"
@@ -44,16 +48,16 @@
     },
     "rested": {
       "speaker": "",
-      "text": "You sink into the arbor's cushions. When you stir, the light has shifted and your watchfulness has leaked away.",
+      "text": "You sink into the arbor's cushions. When you stir, the light has shifted, your watchfulness has leaked away, and the scroll is no longer in your keeping.",
       "choices": [
         {
           "id": "wake",
-          "text": "(Wake, a little later than you meant to.)",
+          "text": "(Wake, a little later than you meant to. Search where you slept.)",
           "next": "end",
-          "text_zh": "（醒来，比你原想的晚了些。）"
+          "text_zh": "（醒来，比你原想的晚了些。回到沉睡之处寻找。）"
         }
       ],
-      "text_zh": "你陷进凉亭的软垫里。等你回过神，天光已偏移，警醒也悄悄漏走了。"
+      "text_zh": "你陷进凉亭的软垫里。等你回过神，天光已偏移，警醒悄悄漏走，那卷书也不在怀中了。"
     },
     "rose": {
       "speaker": "",

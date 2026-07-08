@@ -13,6 +13,8 @@ const SUPPORTED_SPECIALS := [
 	"grant_shepherd_map", "grant_final_seal", "activate_prayer_light",
 	"show_journey_review", "show_credits",
 	"remove_burden", "grant_scroll", "grant_seal", "grant_new_garment", "cross_grace",
+	"remove_scroll", "remove_seal", "remove_promise_key", "remove_armor",
+	"remove_sword", "remove_shield", "remove_shepherd_map", "remove_final_seal",
 ]
 
 

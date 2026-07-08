@@ -43,6 +43,9 @@ func _on_enter(body: Node) -> void:
 	if require_flag != "" and not GameState.has_flag(require_flag):
 		EventBus.toast(require_message)
 		return
+	if String(ChapterManager.current_chapter_id) == "hill_difficulty" and not SpiritualStateManager.has_scroll:
+		EventBus.toast("你的书卷不在怀中。回到凉亭拾回凭据，再继续前往美宫。")
+		return
 	# Scripture Gate: the chapter's key verse must be answered before passing on.
 	var cid := String(ChapterManager.current_chapter_id)
 	if not GameState.has_flag("scripture_" + cid) and ScriptureGate.has_question(cid):

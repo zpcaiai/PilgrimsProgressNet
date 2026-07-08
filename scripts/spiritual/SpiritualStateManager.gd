@@ -224,6 +224,8 @@ func _apply_special(special: Dictionary) -> void:
 			"sword", "shield", "shepherd_map", "final_seal"]:
 		if bool(special.get("grant_" + token, false)):
 			_grant(token)
+		if bool(special.get("remove_" + token, false)):
+			_remove(token)
 	if bool(special.get("cross_grace", false)):
 		apply_cross_grace()
 	if special.has("add_companion"):
@@ -250,6 +252,11 @@ func _apply_special(special: Dictionary) -> void:
 func _grant(token: String) -> void:
 	set("has_" + token, true)
 	GameState.set_flag("has_" + token, true)
+
+
+func _remove(token: String) -> void:
+	set("has_" + token, false)
+	GameState.set_flag("has_" + token, false)
 
 
 ## Load and apply a data/spiritual_events/<id>.json (effects + flags + special).

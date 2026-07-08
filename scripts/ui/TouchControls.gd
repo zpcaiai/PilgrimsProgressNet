@@ -393,6 +393,8 @@ func _label_for(id: String) -> String:
 	if id == "P":
 		var cd := SpiritualStateManager.prayer_cooldown_left()
 		return "祷告" if cd <= 0.0 else "%d" % int(ceil(cd))
+	if id == "L" and GameState.current_chapter_id == "wicket_gate":
+		return "盾牌"
 	return LABELS.get(id, id)
 
 

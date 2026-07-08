@@ -23,6 +23,8 @@ SUPPORTED_SPECIALS = {
     "show_journey_review", "show_credits",
     # specials already handled by SpiritualStateManager._apply_special
     "remove_burden", "grant_scroll", "grant_seal", "grant_new_garment", "cross_grace",
+    "remove_scroll", "remove_seal", "remove_promise_key", "remove_armor",
+    "remove_sword", "remove_shield", "remove_shepherd_map", "remove_final_seal",
 }
 
 

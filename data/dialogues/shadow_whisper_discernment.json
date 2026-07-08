@@ -1,0 +1,210 @@
+{
+  "id": "shadow_whisper_discernment",
+  "nodes": {
+    "start": {
+      "speaker": "辨识训练",
+      "speaker_zh": "辨识训练",
+      "text": "Listen carefully before you answer the darkness.",
+      "text_zh": "先听清楚，再回应黑暗。",
+      "choices": [
+        {
+          "id": "begin_discernment",
+          "text": "Begin discernment.",
+          "text_zh": "开始辨识。",
+          "next": "w1"
+        }
+      ]
+    },
+    "w1": {
+      "speaker": "黑暗低语",
+      "speaker_zh": "黑暗低语",
+      "text": "You are cast off. No one hears your prayer.",
+      "text_zh": "你已经被丢弃了。没有人听见你的祷告。",
+      "choices": [
+        {
+          "id": "promise_w1",
+          "text": "Use Promise Card: Psalm 23:4 - He is with me in the valley.",
+          "text_zh": "用应许卡：诗篇23:4——他在谷中与我同在。",
+          "effects": {"faith": 8, "fear": -10, "discernment": 4},
+          "flags": {"discerned_shadow_w1": true},
+          "next": "end"
+        },
+        {
+          "id": "discern_w1",
+          "text": "Name it as accusation, not the voice of grace.",
+          "text_zh": "辨认为控告，不是恩典的声音。",
+          "effects": {"discernment": 7, "fear": -6},
+          "flags": {"discerned_shadow_w1": true},
+          "next": "end"
+        },
+        {
+          "id": "wrong_w1",
+          "text": "Treat it as wisdom and stop walking.",
+          "text_zh": "把它当作智慧，停下来不再前行。",
+          "effects": {"fear": 10, "despair": 8, "faith": -3},
+          "next": "end"
+        }
+      ]
+    },
+    "w2": {
+      "speaker": "柔和低语",
+      "speaker_zh": "柔和低语",
+      "text": "This darkness is harmless. You do not need prayer or watchfulness.",
+      "text_zh": "这点黑暗没什么。你不需要祷告，也不需要警醒。",
+      "choices": [
+        {
+          "id": "promise_w2",
+          "text": "Use Promise Card: Matthew 26:41 - Watch and pray.",
+          "text_zh": "用应许卡：马太26:41——总要警醒祷告。",
+          "effects": {"watchfulness": 10, "temptation": -8, "deception": -6},
+          "flags": {"discerned_shadow_w2": true},
+          "next": "end"
+        },
+        {
+          "id": "discern_w2",
+          "text": "Name it as false comfort.",
+          "text_zh": "辨认为假安慰。",
+          "effects": {"discernment": 7, "watchfulness": 5},
+          "flags": {"discerned_shadow_w2": true},
+          "next": "end"
+        },
+        {
+          "id": "wrong_w2",
+          "text": "Relax and let the road choose for you.",
+          "text_zh": "放松下来，让道路自己带你走。",
+          "effects": {"deception": 9, "watchfulness": -8},
+          "next": "end"
+        }
+      ]
+    },
+    "w3": {
+      "speaker": "恐惧回声",
+      "speaker_zh": "恐惧回声",
+      "text": "Turn back while fear still sounds like prudence.",
+      "text_zh": "趁惧怕还听起来像谨慎，回头吧。",
+      "choices": [
+        {
+          "id": "promise_w3",
+          "text": "Use Promise Card: 2 Corinthians 5:7 - Walk by faith, not sight.",
+          "text_zh": "用应许卡：哥林多后书5:7——凭信心，不凭眼见。",
+          "effects": {"faith": 9, "fear": -8, "perseverance": 5},
+          "flags": {"discerned_shadow_w3": true},
+          "next": "end"
+        },
+        {
+          "id": "discern_w3",
+          "text": "Name it as fear echo.",
+          "text_zh": "辨认为恐惧的回声。",
+          "effects": {"discernment": 6, "fear": -5},
+          "flags": {"discerned_shadow_w3": true},
+          "next": "end"
+        },
+        {
+          "id": "wrong_w3",
+          "text": "Agree that fear is the safest guide.",
+          "text_zh": "同意惧怕才是最安全的向导。",
+          "effects": {"fear": 12, "perseverance": -5},
+          "next": "end"
+        }
+      ]
+    },
+    "w4": {
+      "speaker": "扭曲之声",
+      "speaker_zh": "扭曲之声",
+      "text": "If God were with you, the path would not be this narrow.",
+      "text_zh": "若神与你同在，这路就不会这么窄。",
+      "choices": [
+        {
+          "id": "promise_w4",
+          "text": "Use Promise Card: Matthew 7:14 - The way to life is narrow.",
+          "text_zh": "用应许卡：马太7:14——引到永生的路是窄的。",
+          "effects": {"faith": 8, "discernment": 7, "doubt": -8},
+          "flags": {"discerned_shadow_w4": true},
+          "next": "end"
+        },
+        {
+          "id": "discern_w4",
+          "text": "Name it as a twisted use of difficulty.",
+          "text_zh": "辨认为借艰难扭曲神同在。",
+          "effects": {"discernment": 8, "doubt": -5},
+          "flags": {"discerned_shadow_w4": true},
+          "next": "end"
+        },
+        {
+          "id": "wrong_w4",
+          "text": "Assume narrowness means abandonment.",
+          "text_zh": "认定道路狭窄就表示被丢弃。",
+          "effects": {"doubt": 10, "despair": 6},
+          "next": "end"
+        }
+      ]
+    },
+    "w5": {
+      "speaker": "控告之声",
+      "speaker_zh": "控告之声",
+      "text": "You failed before; the darkness only proves what you are.",
+      "text_zh": "你从前失败过；这黑暗只是在证明你本来如此。",
+      "choices": [
+        {
+          "id": "promise_w5",
+          "text": "Use Promise Card: Romans 8:1 - No condemnation in Christ.",
+          "text_zh": "用应许卡：罗马书8:1——在基督里不定罪了。",
+          "effects": {"shame": -10, "hope": 7, "faith": 6},
+          "flags": {"discerned_shadow_w5": true},
+          "next": "end"
+        },
+        {
+          "id": "discern_w5",
+          "text": "Name it as accusation using a real past.",
+          "text_zh": "辨认为控告借用真实过去。",
+          "effects": {"discernment": 8, "shame": -6},
+          "flags": {"discerned_shadow_w5": true},
+          "next": "end"
+        },
+        {
+          "id": "wrong_w5",
+          "text": "Let the past define the road ahead.",
+          "text_zh": "让过去定义前面的路。",
+          "effects": {"shame": 12, "despair": 8},
+          "next": "end"
+        }
+      ]
+    },
+    "w6": {
+      "speaker": "假光",
+      "speaker_zh": "假光",
+      "text": "There is a softer light off the path. You can leave the narrow way for a moment.",
+      "text_zh": "路旁有更柔和的光。你可以暂时离开窄路。",
+      "choices": [
+        {
+          "id": "promise_w6",
+          "text": "Use Promise Card: Psalm 119:105 - The Word lights my path.",
+          "text_zh": "用应许卡：诗篇119:105——你的话是我路上的光。",
+          "effects": {"discernment": 9, "deception": -8, "watchfulness": 5},
+          "flags": {"discerned_shadow_w6": true},
+          "next": "end"
+        },
+        {
+          "id": "discern_w6",
+          "text": "Name it as false light beside the road.",
+          "text_zh": "辨认为路旁假光。",
+          "effects": {"discernment": 8, "deception": -5},
+          "flags": {"discerned_shadow_w6": true},
+          "next": "end"
+        },
+        {
+          "id": "wrong_w6",
+          "text": "Step toward the softer light.",
+          "text_zh": "朝那更柔和的光走去。",
+          "effects": {"deception": 12, "fear": 5, "watchfulness": -6},
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}
