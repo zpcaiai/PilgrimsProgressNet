@@ -36,6 +36,7 @@ const SCRIPTURE_CHAPTERS := [
 	"valley_humiliation", "valley_shadow_death", "vanity_fair", "doubting_castle",
 	"delectable_mountains", "enchanted_ground", "river_of_death", "celestial_city",
 ]
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _shown: bool = false
 
@@ -71,17 +72,34 @@ func _build() -> void:
 	bg.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(bg)
 
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var safe := ResponsiveLayout.margin(self)
+	for m in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+		margin.add_theme_constant_override(m, int(safe))
+	add_child(margin)
+
+	var scroll := ScrollContainer.new()
+	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	margin.add_child(scroll)
+
 	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
+	var s := get_viewport().get_visible_rect().size
+	center.custom_minimum_size = Vector2(maxf(280.0, s.x - safe * 2.0), maxf(360.0, s.y - safe * 2.0))
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.add_child(center)
 
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 9)
+	box.custom_minimum_size = Vector2(minf(760.0, maxf(280.0, s.x - safe * 2.0)), 0)
 	center.add_child(box)
 
 	var title := Label.new()
 	title.text = "所行之路，蒙了纪念" if zh else "The Journey Received"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.add_theme_font_size_override("font_size", 34)
 	title.add_theme_color_override("font_color", Color(0.95, 0.9, 0.6))
 	box.add_child(title)
@@ -91,6 +109,7 @@ func _build() -> void:
 		if _has_any(beat[0]):
 			var l := Label.new()
 			l.text = "·  " + String(beat[2] if zh else beat[1])
+			l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			l.add_theme_font_size_override("font_size", 20)
 			box.add_child(l)
 
@@ -102,6 +121,7 @@ func _build() -> void:
 	if verses > 0:
 		var sl := Label.new()
 		sl.text = ("·  你在 %d 道经文之门前认出了真道。" % verses) if zh else ("·  You answered the Word rightly at %d Scripture Gates." % verses)
+		sl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		sl.add_theme_font_size_override("font_size", 20)
 		sl.add_theme_color_override("font_color", Color(0.8, 0.86, 0.98))
 		box.add_child(sl)
@@ -117,6 +137,7 @@ func _build() -> void:
 			"；".join(PackedStringArray(remembered)),
 			(" 等 %d 张。" % known_cards.size()) if known_cards.size() > 3 else "。"
 		]
+		vl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		vl.add_theme_font_size_override("font_size", 18)
 		vl.add_theme_color_override("font_color", Color(0.92, 0.86, 0.58))
 		box.add_child(vl)
@@ -125,6 +146,7 @@ func _build() -> void:
 	var coda := Label.new()
 	coda.text = "重担已经卸下。道路已经走完。那欢迎，长存。" if zh else "The burden was gone. The road was finished. The welcome remained."
 	coda.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	coda.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	coda.add_theme_font_size_override("font_size", 18)
 	box.add_child(coda)
 
@@ -132,6 +154,7 @@ func _build() -> void:
 	var btn := Button.new()
 	btn.text = "继续 Continue"
 	btn.add_theme_font_size_override("font_size", 18)
+	ResponsiveLayout.set_button_wrap(btn)
 	btn.pressed.connect(_on_continue)
 	box.add_child(btn)
 

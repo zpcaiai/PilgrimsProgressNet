@@ -6,6 +6,7 @@ extends CanvasLayer
 
 const FONT_TITLE := 22
 const FONT_BODY := 17
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 var BOARD_NAMES := {
 	"fastest_run": LocaleManager.t("lb.board_fastest", "最快通关"), "fewest_falls": LocaleManager.t("lb.board_fewest", "最少倒下"), "devout_score": LocaleManager.t("lb.board_devout", "敬虔之心"),
 }
@@ -21,6 +22,7 @@ var _dim: ColorRect
 var _panel: Panel
 var _list: VBoxContainer
 var _status: Label
+var _scroll: ScrollContainer
 var _open: bool = false
 
 
@@ -28,6 +30,7 @@ func _ready() -> void:
 	layer = 17
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
+	get_viewport().size_changed.connect(_apply_layout)
 	if NetConfig.enabled:
 		LeaderboardService.my_reviews_received.connect(_on_reviews)
 		LeaderboardService.review_appealed.connect(func(_id, _s):
@@ -70,22 +73,34 @@ func _build() -> void:
 	_status = Label.new()
 	_status.add_theme_font_size_override("font_size", FONT_BODY)
 	_status.add_theme_color_override("font_color", Color(0.7, 0.75, 0.85))
+	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vb.add_child(_status)
 
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 360)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	vb.add_child(scroll)
+	_scroll = ScrollContainer.new()
+	_scroll.custom_minimum_size = Vector2(0, 360)
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vb.add_child(_scroll)
 	_list = VBoxContainer.new()
 	_list.add_theme_constant_override("separation", 6)
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(_list)
+	_scroll.add_child(_list)
 
 	var hint := Label.new()
 	hint.text = LocaleManager.t("review.hint", "R 关闭　·　仅被拒绝的成绩可申诉")
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_font_size_override("font_size", 13)
 	hint.add_theme_color_override("font_color", Color(0.55, 0.6, 0.7))
 	vb.add_child(hint)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var mobile := ResponsiveLayout.is_mobile(self)
+	var panel_size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(700, 560), Vector2(300, 360))
+	if is_instance_valid(_scroll):
+		_scroll.custom_minimum_size = Vector2(0, maxf(180.0, panel_size.y - (130.0 if mobile else 120.0)))
 
 
 func _refresh() -> void:
@@ -134,6 +149,7 @@ func _add_row(r: Dictionary) -> void:
 	info.bbcode_enabled = true
 	info.fit_content = true
 	info.scroll_active = false
+	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info.add_theme_font_size_override("normal_font_size", FONT_BODY)
 	var board_name: String = BOARD_NAMES.get(String(r.get("board", "")), String(r.get("board", "")))
@@ -150,6 +166,7 @@ func _add_row(r: Dictionary) -> void:
 		btn.text = LocaleManager.t("review.appeal", "申诉")
 		btn.add_theme_font_size_override("font_size", FONT_BODY)
 		btn.custom_minimum_size = Vector2(90, 40)
+		ResponsiveLayout.set_button_wrap(btn)
 		var rid := String(r.get("id", ""))
 		btn.pressed.connect(func(): LeaderboardService.appeal_review(rid, LocaleManager.t("review.request", "请求人工复核")))
 		hb.add_child(btn)

@@ -1,0 +1,50 @@
+extends RefCounted
+class_name ResponsiveLayout
+
+
+static func viewport_size(node: Node) -> Vector2:
+	if node == null or node.get_viewport() == null:
+		return Vector2(1280, 720)
+	return node.get_viewport().get_visible_rect().size
+
+
+static func is_mobile(node: Node) -> bool:
+	var s := viewport_size(node)
+	return DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
+
+
+static func margin(node: Node) -> float:
+	return 24.0 if is_mobile(node) else 32.0
+
+
+static func fit_center_panel(panel: Control, host: Node, max_size: Vector2,
+		min_size: Vector2 = Vector2(280, 240)) -> Vector2:
+	if panel == null:
+		return Vector2.ZERO
+	var s := viewport_size(host)
+	var m := margin(host)
+	var w := clampf(minf(max_size.x, s.x - m * 2.0), min_size.x, maxf(min_size.x, s.x - m * 2.0))
+	var h := clampf(minf(max_size.y, s.y - m * 2.0), min_size.y, maxf(min_size.y, s.y - m * 2.0))
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.position = Vector2(-w * 0.5, -h * 0.5)
+	panel.size = Vector2(w, h)
+	return panel.size
+
+
+static func apply_text_wrap(label: Control, arbitrary: bool = false) -> void:
+	if label == null:
+		return
+	var mode := TextServer.AUTOWRAP_ARBITRARY if arbitrary else TextServer.AUTOWRAP_WORD_SMART
+	if label is Label:
+		(label as Label).autowrap_mode = mode
+		(label as Label).clip_text = false
+	elif label is RichTextLabel:
+		(label as RichTextLabel).autowrap_mode = mode
+		(label as RichTextLabel).scroll_active = false
+
+
+static func set_button_wrap(button: Button) -> void:
+	if button == null:
+		return
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING

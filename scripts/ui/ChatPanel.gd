@@ -8,6 +8,7 @@ extends CanvasLayer
 
 const FONT_BODY := 16
 const MAX_ROWS := 80
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _log_panel: Panel
 var _log_scroll: ScrollContainer
@@ -72,6 +73,7 @@ func _ready() -> void:
 	layer = 12
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
+	get_viewport().size_changed.connect(_apply_layout)
 	_mention_re = RegEx.new()
 	_mention_re.compile("@([^\\s@：:，,。.!！?？]+)")
 	if NetConfig.enabled and NetConfig.realtime:
@@ -302,6 +304,7 @@ func _build() -> void:
 		var pb := Button.new()
 		pb.text = LocaleManager.t("chat.phrase." + String(p), String(p))
 		pb.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		ResponsiveLayout.set_button_wrap(pb)
 		var pc := String(p)
 		pb.pressed.connect(func(): _insert_text(pc); _hide_emoji())
 		ev.add_child(pb)
@@ -385,6 +388,7 @@ func _build() -> void:
 		var b := Button.new()
 		b.text = String(spec[0])
 		b.add_theme_font_size_override("font_size", FONT_BODY)
+		ResponsiveLayout.set_button_wrap(b)
 		b.pressed.connect(spec[1])
 		bar.add_child(b)
 
@@ -397,6 +401,39 @@ func _build() -> void:
 	_save_dialog.process_mode = Node.PROCESS_MODE_ALWAYS
 	_save_dialog.file_selected.connect(_on_save_path)
 	add_child(_save_dialog)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	var s := get_viewport().get_visible_rect().size
+	var mobile := ResponsiveLayout.is_mobile(self)
+	var margin := ResponsiveLayout.margin(self)
+	var input_w := minf(s.x - margin * 2.0, 760.0)
+	if is_instance_valid(_input_row):
+		_input_row.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		_input_row.position = Vector2(margin, -84.0)
+		_input_row.size = Vector2(maxf(280.0, input_w), 56.0 if mobile else 48.0)
+	if is_instance_valid(_reply_bar):
+		_reply_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		_reply_bar.position = Vector2(margin, -126.0 if mobile else -120.0)
+		_reply_bar.size = Vector2(maxf(280.0, input_w), 38.0 if mobile else 30.0)
+	if is_instance_valid(_log_panel):
+		var log_w := minf(s.x - margin * 2.0, 480.0)
+		var log_h := clampf(s.y * 0.28, 150.0, 240.0)
+		_log_panel.position = Vector2(margin, -log_h - (156.0 if mobile else 142.0))
+		_log_panel.size = Vector2(maxf(280.0, log_w), log_h)
+	if is_instance_valid(_members_popup):
+		_members_popup.position = Vector2(margin + minf(340.0, input_w * 0.45), -300.0 if mobile else -260.0)
+	if is_instance_valid(_ac_popup):
+		_ac_popup.position = Vector2(margin + 96.0, -172.0 if mobile else -130.0)
+	if is_instance_valid(_emoji_popup):
+		_emoji_popup.position = Vector2(margin + minf(340.0, input_w * 0.45), -220.0 if mobile else -150.0)
+	if is_instance_valid(_viewer_rect):
+		var viewer_margin := 28.0 if mobile else 60.0
+		_viewer_rect.offset_left = viewer_margin
+		_viewer_rect.offset_top = 72.0 if mobile else 80.0
+		_viewer_rect.offset_right = -viewer_margin
+		_viewer_rect.offset_bottom = -viewer_margin
 
 
 func _bg(color: Color, radius: int) -> StyleBoxFlat:
@@ -475,6 +512,7 @@ func _render_members(members: Array) -> void:
 	var title := Label.new()
 	var label := _room_name if _room_name != "" else _current_room
 	title.text = LocaleManager.t("chat.room_title", "群聊「%s」 · %d 人") % [label, members.size()]
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.add_theme_font_size_override("font_size", 14)
 	title.add_theme_color_override("font_color", Color(0.95, 0.9, 0.6))
 	_members_box.add_child(title)
@@ -497,6 +535,7 @@ func _render_members(members: Array) -> void:
 			if String(mm.get("id", "")) == AuthService.player_id:
 				nm += LocaleManager.t("chat.you", "（你）")
 			l.text = nm
+			l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			l.add_theme_font_size_override("font_size", 13)
 			l.add_theme_color_override("font_color", Color(0.8, 0.85, 0.95))
 			mrow.add_child(l)
@@ -1016,6 +1055,7 @@ func _system(text: String) -> void:
 	lbl.bbcode_enabled = true
 	lbl.fit_content = true
 	lbl.scroll_active = false
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.add_theme_font_size_override("normal_font_size", 13)
 	lbl.text = "[color=#d0a050][i]%s[/i][/color]" % _bbsafe(text)
 	_append(lbl)
@@ -1045,6 +1085,7 @@ func _add_row(msg: Dictionary, _live: bool) -> void:
 	lbl.bbcode_enabled = true
 	lbl.fit_content = true
 	lbl.scroll_active = false
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.add_theme_font_size_override("normal_font_size", 14)
 	lbl.text = "[color=#7c93b8]%s[/color][color=%s]%s[/color]：%s" % [
 		tag, name_col, _bbsafe(String(msg.get("name", LocaleManager.t("lb.pilgrim", "朝圣者")))), _highlight_mentions(text)]
@@ -1081,6 +1122,7 @@ func _add_row(msg: Dictionary, _live: bool) -> void:
 		var q := Button.new()
 		q.text = LocaleManager.t("chat.quote_btn", "引")
 		q.tooltip_text = LocaleManager.t("chat.quote_reply", "引用回复")
+		ResponsiveLayout.set_button_wrap(q)
 		q.add_theme_color_override("font_color", Color(0.6, 0.78, 0.95))
 		var preview := text if text != "" else LocaleManager.t("chat.image_tag", "[图片]")
 		q.pressed.connect(func(): _set_reply(mid, who, preview))
@@ -1089,6 +1131,7 @@ func _add_row(msg: Dictionary, _live: bool) -> void:
 		var x := Button.new()
 		x.text = "×"
 		x.tooltip_text = LocaleManager.t("chat.recall", "撤回")
+		ResponsiveLayout.set_button_wrap(x)
 		x.add_theme_color_override("font_color", Color(0.85, 0.5, 0.5))
 		x.pressed.connect(func(): RealtimeService.recall(mid))
 		_seticon(x, "recall", "×")
@@ -1107,6 +1150,7 @@ func _add_row(msg: Dictionary, _live: bool) -> void:
 		quote.add_theme_color_override("font_color", Color(0.42, 0.47, 0.56))
 		quote.text = "┃ " + rp
 		quote.tooltip_text = LocaleManager.t("chat.jump_orig", "点击跳转原消息")
+		ResponsiveLayout.set_button_wrap(quote)
 		var ref := String(msg.get("reply_to", ""))
 		quote.pressed.connect(func(): _jump_to(ref))
 		vb.add_child(quote)
@@ -1157,6 +1201,7 @@ func _make_placeholder() -> RichTextLabel:
 	lbl.bbcode_enabled = true
 	lbl.fit_content = true
 	lbl.scroll_active = false
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.add_theme_font_size_override("normal_font_size", 13)
 	lbl.text = LocaleManager.t("chat.recalled", "[color=#7a8090][i]此消息已撤回[/i][/color]")
 	return lbl

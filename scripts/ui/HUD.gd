@@ -146,6 +146,10 @@ func _dialogue_font() -> int:
 	return MOBILE_FONT_DIALOGUE if _is_mobile_ui() else FONT_BODY
 
 
+func _safe_margin() -> float:
+	return 24.0 if _is_mobile_ui() else 20.0
+
+
 func _choice_font() -> int:
 	return MOBILE_FONT_CHOICE if _is_mobile_ui() else FONT_BODY
 
@@ -157,8 +161,9 @@ func _show_dialogue_portrait() -> bool:
 
 func _set_bottom_wide_rect(control: Control, left: float, bottom: float, width: float, height: float) -> void:
 	var s := _viewport_size()
+	control.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	control.offset_left = left
-	control.offset_right = left + width - s.x
+	control.offset_right = left + width
 	control.offset_top = -bottom - height
 	control.offset_bottom = -bottom
 
@@ -178,34 +183,39 @@ func _apply_responsive_layout() -> void:
 	var body := _body_font()
 	var title := _title_font()
 	var dialogue := _dialogue_font()
+	var margin := _safe_margin()
 
 	if is_instance_valid(_quest_panel):
 		if mobile and portrait:
-			_quest_panel.position = Vector2(16, 16)
-			_quest_panel.size = Vector2(maxf(320.0, s.x - 32.0), 156)
+			_quest_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+			_quest_panel.position = Vector2(margin, margin)
+			_quest_panel.size = Vector2(maxf(280.0, s.x - margin * 2.0), 156)
 		elif mobile:
-			_quest_panel.position = Vector2(16, 16)
-			_quest_panel.size = Vector2(minf(460.0, s.x * 0.45), 156)
+			_quest_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+			_quest_panel.position = Vector2(margin, margin)
+			_quest_panel.size = Vector2(minf(520.0, maxf(360.0, s.x * 0.34)), 156)
 		else:
-			_quest_panel.position = Vector2(20, 20)
+			_quest_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+			_quest_panel.position = Vector2(margin, margin)
 			_quest_panel.size = Vector2(340, 134)
 	if is_instance_valid(_quest_label):
 		_quest_label.add_theme_font_size_override("normal_font_size", body)
 		_quest_label.add_theme_font_size_override("bold_font_size", body)
 		_quest_label.add_theme_constant_override("line_separation", 6 if mobile else 4)
+		_quest_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
 
 	if is_instance_valid(_spiritual_panel):
 		if mobile and portrait:
 			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
-			_spiritual_panel.position = Vector2(16, 184)
-			_spiritual_panel.size = Vector2(maxf(320.0, s.x - 32.0), 330)
+			_spiritual_panel.position = Vector2(margin, _quest_panel.position.y + _quest_panel.size.y + 12.0)
+			_spiritual_panel.size = Vector2(maxf(280.0, s.x - margin * 2.0), 330)
 		elif mobile:
 			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-			_spiritual_panel.position = Vector2(-346, 76)
+			_spiritual_panel.position = Vector2(-346, margin)
 			_spiritual_panel.size = Vector2(330, 330)
 		else:
 			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-			_spiritual_panel.position = Vector2(-272, 20)
+			_spiritual_panel.position = Vector2(-272, margin)
 			_spiritual_panel.size = Vector2(252, 270)
 	for lbl in _stat_labels:
 		if is_instance_valid(lbl):
@@ -226,21 +236,25 @@ func _apply_responsive_layout() -> void:
 	if is_instance_valid(_prompt_label):
 		_prompt_label.add_theme_font_size_override("font_size", title)
 		var prompt_w := minf(520.0, s.x - 48.0)
-		_prompt_label.position = Vector2(-prompt_w * 0.5, -210 if mobile else -180)
+		_prompt_label.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		_prompt_label.position = Vector2((s.x - prompt_w) * 0.5, -210 if mobile else -180)
 		_prompt_label.size = Vector2(prompt_w, 54 if mobile else 40)
+		_prompt_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_prompt_label.clip_text = false
 	if is_instance_valid(_toast_label):
 		_toast_label.add_theme_font_size_override("font_size", body)
 		var toast_w := minf(760.0, s.x - 48.0)
-		_toast_label.position = Vector2(-toast_w * 0.5, 132 if mobile else 130)
+		_toast_label.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		_toast_label.position = Vector2((s.x - toast_w) * 0.5, 132 if mobile else 130)
 		_toast_label.size = Vector2(toast_w, 86 if mobile else 34)
 		_toast_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
-		_toast_label.clip_text = true
+		_toast_label.clip_text = false
 
 	if is_instance_valid(_dialogue_panel):
 		if mobile:
-			var dialog_w := maxf(320.0, s.x - 48.0)
+			var dialog_w := maxf(280.0, s.x - margin * 2.0)
 			var dialog_h := clampf(s.y * 0.42, 300.0, 380.0)
-			_set_bottom_wide_rect(_dialogue_panel, 24.0, 64.0, dialog_w, dialog_h)
+			_set_bottom_wide_rect(_dialogue_panel, margin, 64.0, dialog_w, dialog_h)
 		else:
 			var dw := minf(1040.0, s.x - 240.0)
 			_set_bottom_wide_rect(_dialogue_panel, (s.x - dw) * 0.5, 30.0, dw, 290.0)
@@ -278,7 +292,8 @@ func _apply_responsive_layout() -> void:
 
 	if is_instance_valid(_narration_panel):
 		var narr_w := minf(maxf(320.0, s.x - 64.0), 760.0)
-		_narration_panel.position = Vector2(-narr_w * 0.5, _narration_panel.position.y)
+		_narration_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		_narration_panel.position = Vector2((s.x - narr_w) * 0.5, _narration_panel.position.y)
 		_narration_panel.size = Vector2(narr_w, _narration_panel.size.y)
 	if is_instance_valid(_narration_label):
 		_narration_label.add_theme_font_size_override("normal_font_size", MOBILE_FONT_NARRATION if mobile else 21)
@@ -327,6 +342,7 @@ func _build_darkness() -> void:
 func _build_quest_tracker() -> void:
 	_quest_panel = Panel.new()
 	_quest_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.05, 0.05, 0.09, 0.65)))
+	_quest_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	_quest_panel.position = Vector2(20, 20)
 	_quest_panel.size = Vector2(340, 134)
 	add_child(_quest_panel)
@@ -334,7 +350,7 @@ func _build_quest_tracker() -> void:
 	_quest_label.bbcode_enabled = true
 	_quest_label.fit_content = false
 	_quest_label.scroll_active = false
-	_quest_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_quest_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
 	_apply_inner_rect(_quest_label, 14.0)
 	_quest_label.add_theme_font_size_override("normal_font_size", FONT_BODY)
 	_quest_label.add_theme_font_size_override("bold_font_size", FONT_BODY)
@@ -689,9 +705,11 @@ func _show_narration_line() -> void:
 func _resize_narration_to_content() -> void:
 	if not is_instance_valid(_narration_panel) or not is_instance_valid(_narration_label):
 		return
+	var s := _viewport_size()
 	var h := clampf(_narration_label.get_content_height() + 28.0, 60.0, 280.0)
 	_narration_panel.size = Vector2(_narration_panel.size.x, h)
-	_narration_panel.position = Vector2(_narration_panel.position.x, -h * 0.5)
+	_narration_panel.position = Vector2((s.x - _narration_panel.size.x) * 0.5,
+		clampf(s.y * 0.36 - h * 0.5, 92.0, maxf(92.0, s.y - h - 260.0)))
 
 
 func _process_narration(delta: float) -> void:
@@ -907,10 +925,14 @@ func _refresh_quest() -> void:
 func _resize_quest_to_content() -> void:
 	if not is_instance_valid(_quest_panel) or not is_instance_valid(_quest_label):
 		return
-	_quest_panel.size.y = clampf(_quest_label.get_content_height() + 22.0, 52.0, 460.0)
+	var s := _viewport_size()
+	var mobile := _is_mobile_ui()
+	var max_h := clampf(s.y * (0.28 if mobile else 0.34), 118.0, 260.0)
+	_quest_panel.size.y = clampf(_quest_label.get_content_height() + 30.0, 68.0, max_h)
 	var line_count := max(1, _quest_label.get_parsed_text().split("\n").size())
 	var approx_line_h := float(_body_font() + 8)
-	_quest_panel.size.y = clampf(maxf(_quest_panel.size.y, line_count * approx_line_h + 30.0), 68.0, 460.0)
+	_quest_panel.size.y = clampf(maxf(_quest_panel.size.y, line_count * approx_line_h + 34.0), 68.0, max_h)
+	_quest_label.scroll_active = _quest_label.get_content_height() + 30.0 > max_h
 
 
 # ---------------------------------------------------------------------------

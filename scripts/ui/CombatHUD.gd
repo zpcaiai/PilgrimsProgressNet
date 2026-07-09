@@ -62,6 +62,7 @@ func _ready() -> void:
 	_info.bbcode_enabled = true
 	_info.fit_content = true
 	_info.scroll_active = false
+	_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_info.custom_minimum_size = Vector2(0, 44)
 	vb.add_child(_info)
 
@@ -70,6 +71,7 @@ func _ready() -> void:
 	_keys.bbcode_enabled = true
 	_keys.fit_content = true
 	_keys.scroll_active = false
+	_keys.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_keys.custom_minimum_size = Vector2(0, 24)
 	vb.add_child(_keys)
 
@@ -80,6 +82,7 @@ func _ready() -> void:
 	_warn.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.0))
 	_warn.add_theme_constant_override("outline_size", 6)
 	_warn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_warn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_warn.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	_warn.position = Vector2(-320, -178)
 	_warn.size = Vector2(640, 40)
@@ -110,6 +113,7 @@ func _ready() -> void:
 	_boss_panel.add_child(bvb)
 	_boss_lbl = Label.new()
 	_boss_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_boss_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_boss_lbl.add_theme_color_override("font_color", Color(0.95, 0.8, 0.78))
 	bvb.add_child(_boss_lbl)
 	_boss_bar = ProgressBar.new()
@@ -137,8 +141,8 @@ func _apply_layout() -> void:
 	var panel_w := minf(s.x - 32.0, 620.0) if mobile else 560.0
 	var panel_h := 128.0 if mobile else 116.0
 	if is_instance_valid(_panel):
-		_panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-		_panel.position = Vector2(-panel_w * 0.5, -252.0 if mobile else -132.0)
+		_panel.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		_panel.position = Vector2((s.x - panel_w) * 0.5, -252.0 if mobile else -132.0)
 		_panel.size = Vector2(panel_w, panel_h)
 	if is_instance_valid(_resolve_label):
 		_resolve_label.add_theme_font_size_override("font_size", 18 if mobile else 14)
@@ -151,9 +155,17 @@ func _apply_layout() -> void:
 		_keys.add_theme_font_size_override("normal_font_size", 17 if mobile else 14)
 	if is_instance_valid(_warn):
 		var warn_w := minf(s.x - 32.0, 760.0)
-		_warn.position = Vector2(-warn_w * 0.5, -392.0 if mobile else -178.0)
+		_warn.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+		_warn.position = Vector2((s.x - warn_w) * 0.5, -392.0 if mobile else -178.0)
 		_warn.size = Vector2(warn_w, 44)
 		_warn.add_theme_font_size_override("font_size", 24 if mobile else 30)
+	if is_instance_valid(_boss_panel):
+		var boss_w := minf(s.x - 32.0, 520.0)
+		_boss_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		_boss_panel.position = Vector2((s.x - boss_w) * 0.5, 18.0)
+		_boss_panel.size = Vector2(boss_w, 58.0)
+	if is_instance_valid(_boss_bar):
+		_boss_bar.custom_minimum_size = Vector2(maxf(180.0, (_boss_panel.size.x if is_instance_valid(_boss_panel) else 520.0) - 28.0), 16)
 
 
 func _strongest_foe():

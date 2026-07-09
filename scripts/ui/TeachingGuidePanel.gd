@@ -93,9 +93,10 @@ func _apply_layout() -> void:
 		return
 	var s := get_viewport().get_visible_rect().size
 	var mobile := _is_mobile_ui()
-	var w := minf(s.x - 36.0, 760.0)
-	var h := minf(s.y - 56.0, 600.0)
-	_panel.custom_minimum_size = Vector2(maxf(320.0, w), maxf(360.0, h))
+	var margin := 24.0 if mobile else 36.0
+	var w := minf(s.x - margin * 2.0, 760.0)
+	var h := minf(s.y - margin * 2.0, 600.0)
+	_panel.custom_minimum_size = Vector2(maxf(280.0, w), maxf(320.0, h))
 	_panel.offset_left = -w * 0.5
 	_panel.offset_right = w * 0.5
 	_panel.offset_top = -h * 0.5

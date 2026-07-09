@@ -7,6 +7,7 @@ const HUD_SCRIPT := preload("res://scripts/ui/HUD.gd")
 const DATA_VALIDATOR := preload("res://scripts/core/DataValidator.gd")
 const NET_UI := preload("res://scenes/ui/NetUI.tscn")
 const TOUCH_CONTROLS := preload("res://scripts/ui/TouchControls.gd")
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _world_root: Node3D
 var _hud: CanvasLayer
@@ -154,12 +155,25 @@ func _make_fullscreen_panel(bg: Color) -> Control:
 
 
 func _make_centered_box(parent: Control) -> VBoxContainer:
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var safe := ResponsiveLayout.margin(self)
+	for m in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+		margin.add_theme_constant_override(m, int(safe))
+	parent.add_child(margin)
+	var scroll := ScrollContainer.new()
+	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	margin.add_child(scroll)
 	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	parent.add_child(center)
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var s := get_viewport().get_visible_rect().size
+	center.custom_minimum_size = Vector2(maxf(280.0, s.x - safe * 2.0), maxf(360.0, s.y - safe * 2.0))
+	scroll.add_child(center)
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 18)
-	vb.custom_minimum_size = Vector2(520, 0)
+	vb.custom_minimum_size = Vector2(minf(560.0, maxf(280.0, s.x - safe * 2.0)), 0)
 	center.add_child(vb)
 	return vb
 
@@ -168,6 +182,7 @@ func _add_title(vb: VBoxContainer, text: String, size: int, color: Color) -> voi
 	var lbl := Label.new()
 	lbl.text = LocaleManager.zh_or_mixed(text)
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.add_theme_font_size_override("font_size", size)
 	lbl.add_theme_color_override("font_color", color)
 	vb.add_child(lbl)
@@ -178,6 +193,7 @@ func _add_button(vb: VBoxContainer, text: String, cb: Callable) -> Button:
 	btn.text = LocaleManager.zh_or_mixed(text)
 	btn.custom_minimum_size = Vector2(0, 46)
 	btn.add_theme_font_size_override("font_size", 20)
+	ResponsiveLayout.set_button_wrap(btn)
 	btn.pressed.connect(cb)
 	vb.add_child(btn)
 	return btn
@@ -313,6 +329,7 @@ func _show_controls_hint() -> void:
 	for s in lines:
 		var l := Label.new()
 		l.text = s
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.add_theme_font_size_override("font_size", 18)
 		vb.add_child(l)
 	_add_button(vb, "知道了 Got it", func(): cl.queue_free())
@@ -419,6 +436,7 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	_add_range_slider(vb, "手柄视角 Controller Look", "controller_look_sensitivity", 60.0, 360.0, 10.0, 150.0, false)
 	var inv := CheckButton.new()
 	inv.text = "反转纵向视角 Invert Look Y"
+	ResponsiveLayout.set_button_wrap(inv)
 	inv.add_theme_font_size_override("font_size", 18)
 	inv.button_pressed = bool(_get_input_setting("invert_look_y", false))
 	inv.toggled.connect(func(on): _set_input_setting("invert_look_y", on))
@@ -432,40 +450,46 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	_add_title(vb, "Accessibility · 无障碍", 20, Color(0.75, 0.8, 0.92))
 	var rm := CheckButton.new()
 	rm.text = "减少震动 Reduce Motion (shake / hit-stop)"
+	ResponsiveLayout.set_button_wrap(rm)
 	rm.add_theme_font_size_override("font_size", 18)
 	rm.button_pressed = Settings.reduce_motion
 	rm.toggled.connect(func(on): Settings.set_reduce_motion(on))
 	vb.add_child(rm)
 	var cbf := CheckButton.new()
 	cbf.text = "色盲友好配色 Colour-blind safe"
+	ResponsiveLayout.set_button_wrap(cbf)
 	cbf.add_theme_font_size_override("font_size", 18)
 	cbf.button_pressed = Settings.colorblind
 	cbf.toggled.connect(func(on): Settings.set_colorblind(on))
 	vb.add_child(cbf)
 	var teach := CheckButton.new()
 	teach.text = "章节教学与经文讨论 Learning reflections"
+	ResponsiveLayout.set_button_wrap(teach)
 	teach.add_theme_font_size_override("font_size", 18)
 	teach.button_pressed = Settings.teaching_mode
 	teach.toggled.connect(func(on): Settings.set_teaching_mode(on))
 	vb.add_child(teach)
 	var tts := CheckButton.new()
 	tts.text = "朗读旁白与对话 Read aloud (TTS)"
+	ResponsiveLayout.set_button_wrap(tts)
 	tts.add_theme_font_size_override("font_size", 18)
 	tts.button_pressed = Settings.tts
 	tts.toggled.connect(func(on): Settings.set_tts(on))
 	vb.add_child(tts)
 	# Text-size tiers — drive the global UI scale (which scales HUD + menu fonts).
-	var fs_row := HBoxContainer.new()
+	var fs_row := HFlowContainer.new()
 	fs_row.add_theme_constant_override("separation", 8)
 	var fs_lbl := Label.new()
 	fs_lbl.text = LocaleManager.zh_or_mixed("字号 Text Size")
-	fs_lbl.custom_minimum_size = Vector2(130, 0)
+	fs_lbl.custom_minimum_size = Vector2(110, 0)
+	fs_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	fs_lbl.add_theme_font_size_override("font_size", 18)
 	fs_row.add_child(fs_lbl)
 	for tier in [["小", 0.9], ["标准", 1.05], ["大", 1.2], ["特大", 1.4]]:
 		var b := Button.new()
 		b.text = String(tier[0])
 		b.add_theme_font_size_override("font_size", 18)
+		ResponsiveLayout.set_button_wrap(b)
 		var sc := float(tier[1])
 		b.pressed.connect(func():
 			_set_input_setting("ui_scale", sc)
@@ -480,6 +504,7 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 
 	var cb := CheckButton.new()
 	cb.text = "全屏 Fullscreen"
+	ResponsiveLayout.set_button_wrap(cb)
 	cb.button_pressed = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
 	cb.add_theme_font_size_override("font_size", 18)
 	cb.toggled.connect(func(on):
@@ -500,7 +525,8 @@ func _add_volume_slider(vb: VBoxContainer, label_text: String, key: String) -> v
 	row.add_theme_constant_override("separation", 12)
 	var lbl := Label.new()
 	lbl.text = LocaleManager.zh_or_mixed(label_text)
-	lbl.custom_minimum_size = Vector2(130, 0)
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lbl.custom_minimum_size = Vector2(92 if ResponsiveLayout.is_mobile(self) else 130, 0)
 	lbl.add_theme_font_size_override("font_size", 18)
 	row.add_child(lbl)
 	var slider := HSlider.new()
@@ -508,7 +534,9 @@ func _add_volume_slider(vb: VBoxContainer, label_text: String, key: String) -> v
 	slider.max_value = 1.0
 	slider.step = 0.01
 	slider.value = AudioManager.get_volume(key)
-	slider.custom_minimum_size = Vector2(260, 24)
+	var available := maxf(120.0, get_viewport().get_visible_rect().size.x - ResponsiveLayout.margin(self) * 2.0 - 180.0)
+	slider.custom_minimum_size = Vector2(minf(260.0, available), 24)
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(slider)
 	var val := Label.new()
@@ -563,7 +591,8 @@ func _add_range_slider(vb: VBoxContainer, label_text: String, key: String,
 	row.add_theme_constant_override("separation", 12)
 	var lbl := Label.new()
 	lbl.text = LocaleManager.zh_or_mixed(label_text)
-	lbl.custom_minimum_size = Vector2(130, 0)
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lbl.custom_minimum_size = Vector2(92 if ResponsiveLayout.is_mobile(self) else 130, 0)
 	lbl.add_theme_font_size_override("font_size", 18)
 	row.add_child(lbl)
 	var slider := HSlider.new()
@@ -571,7 +600,9 @@ func _add_range_slider(vb: VBoxContainer, label_text: String, key: String,
 	slider.max_value = mx
 	slider.step = step
 	slider.value = float(_get_input_setting(key, default))
-	slider.custom_minimum_size = Vector2(260, 24)
+	var available := maxf(120.0, get_viewport().get_visible_rect().size.x - ResponsiveLayout.margin(self) * 2.0 - 180.0)
+	slider.custom_minimum_size = Vector2(minf(260.0, available), 24)
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(slider)
 	var val := Label.new()
@@ -707,6 +738,7 @@ func _show_achievements(layer: CanvasLayer, on_back: Callable) -> void:
 	var title := Label.new()
 	title.text = "成就 · Achievements   (%d / %d)" % [Achievements.unlocked_count(), Achievements.total()]
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.add_theme_font_size_override("font_size", 30)
 	title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.6))
 	vb.add_child(title)
@@ -746,6 +778,7 @@ func _add_achievement_row(list: VBoxContainer, a: Dictionary) -> void:
 	hb.add_child(tvb)
 	var nm := Label.new()
 	nm.text = Achievements.label(a, "title")
+	nm.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	nm.add_theme_font_size_override("font_size", 20)
 	nm.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7) if got else Color(0.6, 0.6, 0.66))
 	tvb.add_child(nm)
@@ -780,21 +813,24 @@ func _build_save_slots(layer: CanvasLayer, on_back: Callable, mode: String) -> v
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 10)
 	vb.add_child(spacer)
-	var cloud := HBoxContainer.new()
+	var cloud := HFlowContainer.new()
 	cloud.add_theme_constant_override("separation", 10)
 	var up := Button.new()
 	up.text = "☁ 上传 Upload"
 	up.add_theme_font_size_override("font_size", 18)
+	ResponsiveLayout.set_button_wrap(up)
 	up.pressed.connect(func(): CloudSaveService.upload("slot_1"))
 	cloud.add_child(up)
 	var down := Button.new()
 	down.text = "☁ 下载 Download"
 	down.add_theme_font_size_override("font_size", 18)
+	ResponsiveLayout.set_button_wrap(down)
 	down.pressed.connect(func(): CloudSaveService.download("slot_1"))
 	cloud.add_child(down)
 	vb.add_child(cloud)
 	var hint := Label.new()
 	hint.text = "云同步需登录账号；离线时自动忽略。"
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_font_size_override("font_size", 13)
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
 	vb.add_child(hint)
@@ -805,10 +841,11 @@ func _add_save_slot_row(vb: VBoxContainer, layer: CanvasLayer, on_back: Callable
 	var slot := "slot_%d" % i
 	var summary := SaveManager.get_save_summary(slot)
 	var empty: bool = summary.is_empty()
-	var row := HBoxContainer.new()
+	var row := HFlowContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	var info := Label.new()
-	info.custom_minimum_size = Vector2(300, 0)
+	info.custom_minimum_size = Vector2(minf(300.0, get_viewport().get_visible_rect().size.x - ResponsiveLayout.margin(self) * 2.0), 0)
+	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_theme_font_size_override("font_size", 16)
 	if empty:
 		info.text = "存档位 %d · 空 Empty" % i
@@ -822,6 +859,7 @@ func _add_save_slot_row(vb: VBoxContainer, layer: CanvasLayer, on_back: Callable
 	var act := Button.new()
 	act.text = "保存 Save" if mode == "save" else "读取 Load"
 	act.add_theme_font_size_override("font_size", 18)
+	ResponsiveLayout.set_button_wrap(act)
 	act.disabled = (mode == "load" and empty)
 	act.pressed.connect(func(): _on_slot_action(layer, on_back, mode, slot))
 	row.add_child(act)
@@ -829,6 +867,7 @@ func _add_save_slot_row(vb: VBoxContainer, layer: CanvasLayer, on_back: Callable
 		var del := Button.new()
 		del.text = "删除 Del"
 		del.add_theme_font_size_override("font_size", 18)
+		ResponsiveLayout.set_button_wrap(del)
 		del.pressed.connect(func(): _on_slot_delete(layer, on_back, mode, slot))
 		row.add_child(del)
 	vb.add_child(row)
@@ -878,16 +917,13 @@ func _toggle_route_map() -> void:
 	panel.add_child(bg)
 	_route_layer.add_child(panel)
 
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	panel.add_child(center)
-	var vb := VBoxContainer.new()
+	var vb := _make_centered_box(panel)
 	vb.add_theme_constant_override("separation", 8)
-	center.add_child(vb)
 
 	var title := Label.new()
 	title.text = "天路历程 THE PILGRIM'S ROAD"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.add_theme_font_size_override("font_size", 30)
 	title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.6))
 	vb.add_child(title)
@@ -902,6 +938,7 @@ func _toggle_route_map() -> void:
 		var mark: String = "[完成]" if done else ("[当前]" if is_current else "[    ]")
 		var color: Color = Color(0.6, 0.85, 0.6) if done else (Color(1, 0.95, 0.6) if is_current else Color(0.55, 0.55, 0.62))
 		label.text = "%s  %s" % [mark, String(data.get("title", chapter_id))]
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.add_theme_font_size_override("font_size", 20)
 		label.add_theme_color_override("font_color", color)
 		vb.add_child(label)
@@ -909,6 +946,7 @@ func _toggle_route_map() -> void:
 	var hint := Label.new()
 	hint.text = "点「地图」或「暂停」关闭" if DisplayServer.is_touchscreen_available() else "Tab / Esc 关闭"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
 	vb.add_child(hint)
 

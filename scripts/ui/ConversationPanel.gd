@@ -7,12 +7,15 @@ extends CanvasLayer
 ## No-op / offline notice when networking is off.
 
 const FONT_BODY := 16
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _dim: ColorRect
 var _panel: Panel
 var _thread_list: VBoxContainer
 var _history_box: VBoxContainer
 var _history_scroll: ScrollContainer
+var _thread_scroll: ScrollContainer
+var _left_col: VBoxContainer
 var _title: Label
 var _reply: LineEdit
 var _search: LineEdit
@@ -29,6 +32,7 @@ func _ready() -> void:
 	layer = 16
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
+	get_viewport().size_changed.connect(_apply_layout)
 	if NetConfig.enabled and NetConfig.realtime:
 		RealtimeService.chat_received.connect(_on_chat)
 		RealtimeService.chat_deleted.connect(_on_chat_deleted)
@@ -55,18 +59,19 @@ func _build() -> void:
 	_panel.add_child(root)
 
 	# Left: thread list
-	var left := VBoxContainer.new()
-	left.custom_minimum_size = Vector2(280, 0)
-	left.add_theme_constant_override("separation", 6)
-	root.add_child(left)
+	_left_col = VBoxContainer.new()
+	_left_col.custom_minimum_size = Vector2(280, 0)
+	_left_col.add_theme_constant_override("separation", 6)
+	root.add_child(_left_col)
 	var lh := Label.new()
 	lh.text = LocaleManager.t("conv.title", "私聊会话")
+	lh.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lh.add_theme_font_size_override("font_size", 20)
 	lh.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7))
-	left.add_child(lh)
+	_left_col.add_child(lh)
 	var srow := HBoxContainer.new()
 	srow.add_theme_constant_override("separation", 4)
-	left.add_child(srow)
+	_left_col.add_child(srow)
 	var sicon := TextureRect.new()
 	var stex: Texture2D = AssetLib.ui("search")
 	if stex != null:
@@ -81,14 +86,14 @@ func _build() -> void:
 	_search.add_theme_font_size_override("font_size", 14)
 	_search.text_changed.connect(func(_t): _render_threads())
 	srow.add_child(_search)
-	var lscroll := ScrollContainer.new()
-	lscroll.custom_minimum_size = Vector2(0, 430)
-	lscroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	left.add_child(lscroll)
+	_thread_scroll = ScrollContainer.new()
+	_thread_scroll.custom_minimum_size = Vector2(0, 430)
+	_thread_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_left_col.add_child(_thread_scroll)
 	_thread_list = VBoxContainer.new()
 	_thread_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_thread_list.add_theme_constant_override("separation", 4)
-	lscroll.add_child(_thread_list)
+	_thread_scroll.add_child(_thread_list)
 
 	# Right: history + reply
 	var right := VBoxContainer.new()
@@ -97,6 +102,7 @@ func _build() -> void:
 	root.add_child(right)
 	_title = Label.new()
 	_title.text = LocaleManager.t("conv.select", "选择左侧的会话")
+	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_title.add_theme_font_size_override("font_size", 18)
 	_title.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 	right.add_child(_title)
@@ -129,9 +135,26 @@ func _build() -> void:
 	var close := Button.new()
 	close.text = LocaleManager.t("conv.close_y", "关闭 (Y)")
 	close.tooltip_text = LocaleManager.t("conv.close_y", "关闭 (Y)")
+	ResponsiveLayout.set_button_wrap(close)
 	close.pressed.connect(func(): _set_open(false))
 	_seticon(close, "close", LocaleManager.t("conv.close_y", "关闭 (Y)"))
 	rrow.add_child(close)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var mobile := ResponsiveLayout.is_mobile(self)
+	var s := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(920, 620), Vector2(320, 420))
+	if is_instance_valid(_left_col):
+		_left_col.custom_minimum_size = Vector2(clampf(s.x * (0.34 if mobile else 0.32), 150.0, 280.0), 0)
+	if is_instance_valid(_thread_scroll):
+		_thread_scroll.custom_minimum_size = Vector2(0, maxf(180.0, s.y - 84.0))
+	if is_instance_valid(_history_scroll):
+		_history_scroll.custom_minimum_size = Vector2(0, maxf(180.0, s.y - 106.0))
+	if is_instance_valid(_title):
+		_title.add_theme_font_size_override("font_size", 20 if mobile else 18)
 
 
 func _bg(color: Color) -> StyleBoxFlat:
@@ -173,6 +196,7 @@ func _render_threads() -> void:
 	if shown == 0:
 		var none := Label.new()
 		none.text = LocaleManager.t("conv.no_match", "没有匹配的会话。") if q != "" else LocaleManager.t("conv.none", "还没有私聊会话。")
+		none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		none.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75))
 		_thread_list.add_child(none)
 
@@ -189,6 +213,7 @@ func _add_thread_button(t: Dictionary) -> void:
 	pin.text = "★" if pinned else "☆"
 	pin.tooltip_text = LocaleManager.t("conv.unpin", "取消置顶") if pinned else LocaleManager.t("conv.pin", "置顶")
 	pin.custom_minimum_size = Vector2(34, 48)
+	ResponsiveLayout.set_button_wrap(pin)
 	_seticon(pin, "pin", pin.text)
 	pin.modulate = Color(1, 0.85, 0.3) if pinned else Color(0.6, 0.6, 0.68)
 	pin.add_theme_color_override("font_color", Color(0.95, 0.8, 0.4) if pinned else Color(0.6, 0.62, 0.7))
@@ -199,6 +224,7 @@ func _add_thread_button(t: Dictionary) -> void:
 	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	btn.custom_minimum_size = Vector2(0, 48)
 	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ResponsiveLayout.set_button_wrap(btn)
 	var unread := int(t.get("unread", 0))
 	var badge := "  [%d]" % unread if unread > 0 else ""
 	btn.text = "%s%s\n%s" % [pname, badge, String(t.get("last_text", "")).left(20)]
@@ -256,6 +282,7 @@ func _add_history_line(m: Dictionary) -> void:
 	lbl.bbcode_enabled = true
 	lbl.fit_content = true
 	lbl.scroll_active = false
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lbl.add_theme_font_size_override("normal_font_size", 14)
 	if bool(m.get("deleted", false)):
 		lbl.text = LocaleManager.t("chat.recalled", "[color=#7a8090][i]此消息已撤回[/i][/color]")

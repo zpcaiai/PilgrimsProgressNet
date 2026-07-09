@@ -65,7 +65,9 @@ func _ready() -> void:
 	get_tree().paused = true
 	var mobile := _is_mobile_ui()
 	var s := _viewport_size()
-	var panel_w := maxf(320.0, minf(740.0, s.x - 48.0)) if mobile else 740.0
+	var margin := 24.0 if mobile else 36.0
+	var panel_w := maxf(280.0, minf(740.0, s.x - margin * 2.0)) if mobile else minf(740.0, s.x - margin * 2.0)
+	var panel_h := maxf(320.0, minf(680.0, s.y - margin * 2.0))
 	var body_font := 23 if mobile else 20
 	var prompt_font := 25 if mobile else 22
 	var title_font := 30 if mobile else 26
@@ -91,10 +93,16 @@ func _ready() -> void:
 	panel.add_theme_stylebox_override("panel", sb)
 	center.add_child(panel)
 
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(panel_w, panel_h)
+	panel.add_child(scroll)
+
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 12)
 	vb.custom_minimum_size = Vector2(panel_w, 0)
-	panel.add_child(vb)
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(vb)
 
 	var title := Label.new()
 	title.text = "✝  经文之门 · Scripture Gate"
@@ -138,6 +146,8 @@ func _ready() -> void:
 		b.text = "   " + LocaleManager.zh_or_mixed(String(opts[oi]))
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size = Vector2(panel_w, 56 if mobile else 46)
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 		b.add_theme_font_size_override("font_size", body_font)
 		var ans := int(oi)
 		var btn := b

@@ -7,6 +7,7 @@ extends CanvasLayer
 
 const FONT_TITLE := 22
 const FONT_BODY := 18
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _dim: ColorRect
 var _panel: Panel
@@ -18,6 +19,7 @@ var _server_version: int = 0
 func _ready() -> void:
 	layer = 20
 	_build()
+	get_viewport().size_changed.connect(_apply_layout)
 	_set_visible(false)
 	if NetConfig.enabled:
 		CloudSaveService.cloud_conflict.connect(_on_conflict)
@@ -61,6 +63,7 @@ func _build() -> void:
 	_body.bbcode_enabled = true
 	_body.fit_content = true
 	_body.scroll_active = false
+	_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_body.custom_minimum_size = Vector2(0, 110)
 	_body.add_theme_font_size_override("normal_font_size", FONT_BODY)
 	_body.add_theme_color_override("default_color", Color(0.86, 0.89, 0.96))
@@ -75,6 +78,7 @@ func _build() -> void:
 	take_cloud.text = LocaleManager.t("cloud.download", "下载云端存档")
 	take_cloud.add_theme_font_size_override("font_size", FONT_BODY)
 	take_cloud.custom_minimum_size = Vector2(220, 44)
+	ResponsiveLayout.set_button_wrap(take_cloud)
 	take_cloud.pressed.connect(_take_cloud)
 	row.add_child(take_cloud)
 
@@ -82,8 +86,20 @@ func _build() -> void:
 	keep_local.text = LocaleManager.t("cloud.keep_local", "保留本地（覆盖云端）")
 	keep_local.add_theme_font_size_override("font_size", FONT_BODY)
 	keep_local.custom_minimum_size = Vector2(220, 44)
+	ResponsiveLayout.set_button_wrap(keep_local)
 	keep_local.pressed.connect(_keep_local)
 	row.add_child(keep_local)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var mobile := ResponsiveLayout.is_mobile(self)
+	ResponsiveLayout.fit_center_panel(_panel, self, Vector2(560, 340), Vector2(300, 260))
+	if is_instance_valid(_body):
+		_body.add_theme_font_size_override("normal_font_size", 20 if mobile else FONT_BODY)
+		_body.custom_minimum_size = Vector2(0, 140 if mobile else 110)
 
 
 func _on_conflict(slot_id: String, server_version: int) -> void:

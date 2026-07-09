@@ -15,10 +15,12 @@ var BOARDS := [
 ]
 const FONT_TITLE := 24
 const FONT_BODY := 18
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _panel: Panel
-var _tabs: HBoxContainer
-var _season_tabs: HBoxContainer
+var _tabs: Container
+var _season_tabs: Container
+var _scroll: ScrollContainer
 var _list: VBoxContainer
 var _status: Label
 var _visible: bool = false
@@ -30,6 +32,7 @@ var _season_label: String = ""
 func _ready() -> void:
 	layer = 11
 	_build()
+	get_viewport().size_changed.connect(_apply_layout)
 	if NetConfig.enabled:
 		LeaderboardService.board_received.connect(_on_board_received)
 		LeaderboardService.season_received.connect(_on_season_received)
@@ -55,18 +58,19 @@ func _build() -> void:
 	header.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7))
 	vb.add_child(header)
 
-	_tabs = HBoxContainer.new()
+	_tabs = HFlowContainer.new()
 	_tabs.add_theme_constant_override("separation", 8)
 	vb.add_child(_tabs)
 	for b in BOARDS:
 		var btn := Button.new()
 		btn.text = String(b.title)
 		btn.add_theme_font_size_override("font_size", FONT_BODY)
+		ResponsiveLayout.set_button_wrap(btn)
 		var bid := String(b.id)
 		btn.pressed.connect(func(): _select(bid))
 		_tabs.add_child(btn)
 
-	_season_tabs = HBoxContainer.new()
+	_season_tabs = HFlowContainer.new()
 	_season_tabs.add_theme_constant_override("separation", 8)
 	vb.add_child(_season_tabs)
 	for s in [{"id": "current", "title": LocaleManager.t("lb.this_season", "本赛季")}, {"id": "all", "title": LocaleManager.t("lb.alltime", "历史总榜")}]:
@@ -75,6 +79,7 @@ func _build() -> void:
 		sbtn.toggle_mode = true
 		sbtn.button_pressed = (String(s.id) == _active_season)
 		sbtn.add_theme_font_size_override("font_size", FONT_BODY)
+		ResponsiveLayout.set_button_wrap(sbtn)
 		var sid := String(s.id)
 		sbtn.pressed.connect(func(): _select_season(sid))
 		_season_tabs.add_child(sbtn)
@@ -82,22 +87,38 @@ func _build() -> void:
 	_status = Label.new()
 	_status.add_theme_font_size_override("font_size", FONT_BODY)
 	_status.add_theme_color_override("font_color", Color(0.7, 0.75, 0.85))
+	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vb.add_child(_status)
 
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 360)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	vb.add_child(scroll)
+	_scroll = ScrollContainer.new()
+	_scroll.custom_minimum_size = Vector2(0, 360)
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vb.add_child(_scroll)
 	_list = VBoxContainer.new()
 	_list.add_theme_constant_override("separation", 4)
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(_list)
+	_scroll.add_child(_list)
 
 	var hint := Label.new()
 	hint.text = LocaleManager.t("lb.close_b", "B 关闭")
 	hint.add_theme_font_size_override("font_size", 14)
 	hint.add_theme_color_override("font_color", Color(0.55, 0.6, 0.7))
 	vb.add_child(hint)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var mobile := ResponsiveLayout.is_mobile(self)
+	var panel_size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(680, 560), Vector2(300, 360))
+	if is_instance_valid(_scroll):
+		_scroll.custom_minimum_size = Vector2(0, maxf(180.0, panel_size.y - (190.0 if mobile else 170.0)))
+	for tabset in [_tabs, _season_tabs]:
+		if is_instance_valid(tabset):
+			for child in tabset.get_children():
+				if child is Button:
+					(child as Button).custom_minimum_size = Vector2(112 if mobile else 96, 44 if mobile else 38)
 
 
 func _select(board: String) -> void:
@@ -177,6 +198,7 @@ func _add_row(rank: int, name: String, score: int, mine: bool, avatar_url: Strin
 	var name_lbl := Label.new()
 	name_lbl.text = name
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	name_lbl.add_theme_font_size_override("font_size", FONT_BODY)
 	var score_lbl := Label.new()
 	score_lbl.text = str(score)

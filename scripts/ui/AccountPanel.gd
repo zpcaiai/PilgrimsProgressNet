@@ -10,6 +10,7 @@ extends CanvasLayer
 
 const FONT_TITLE := 22
 const FONT_BODY := 18
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _dim: ColorRect
 var _panel: Panel
@@ -35,6 +36,7 @@ func _ready() -> void:
 	layer = 18
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
+	get_viewport().size_changed.connect(_apply_layout)
 	if NetConfig.enabled:
 		AuthService.authenticated.connect(func(_id, _n): _refresh_identity())
 		AuthService.email_code_sent.connect(_on_code_sent)
@@ -136,6 +138,7 @@ func _build() -> void:
 	_who.bbcode_enabled = true
 	_who.fit_content = true
 	_who.scroll_active = false
+	_who.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_who.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_who.custom_minimum_size = Vector2(0, 64)
 	_who.add_theme_font_size_override("normal_font_size", FONT_BODY)
@@ -153,6 +156,7 @@ func _build() -> void:
 	_rewards.bbcode_enabled = true
 	_rewards.fit_content = true
 	_rewards.scroll_active = false
+	_rewards.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_rewards.custom_minimum_size = Vector2(0, 40)
 	_rewards.add_theme_font_size_override("normal_font_size", 16)
 	vb.add_child(_rewards)
@@ -167,6 +171,7 @@ func _build() -> void:
 		btn.toggle_mode = true
 		btn.button_pressed = (String(m.id) == _mode)
 		btn.add_theme_font_size_override("font_size", FONT_BODY)
+		ResponsiveLayout.set_button_wrap(btn)
 		var mid := String(m.id)
 		btn.pressed.connect(func(): _set_mode(mid))
 		modes.add_child(btn)
@@ -192,6 +197,7 @@ func _build() -> void:
 	send_btn.text = LocaleManager.t("account.send_code", "发送验证码")
 	send_btn.add_theme_font_size_override("font_size", FONT_BODY)
 	send_btn.custom_minimum_size = Vector2(160, 42)
+	ResponsiveLayout.set_button_wrap(send_btn)
 	send_btn.pressed.connect(_send_code)
 	code_row.add_child(send_btn)
 
@@ -203,12 +209,14 @@ func _build() -> void:
 	confirm.text = LocaleManager.t("common.confirm", "确认")
 	confirm.add_theme_font_size_override("font_size", FONT_BODY)
 	confirm.custom_minimum_size = Vector2(200, 44)
+	ResponsiveLayout.set_button_wrap(confirm)
 	confirm.pressed.connect(_confirm)
 	act_row.add_child(confirm)
 	var close := Button.new()
 	close.text = LocaleManager.t("account.close_n", "关闭 (N)")
 	close.add_theme_font_size_override("font_size", FONT_BODY)
 	close.custom_minimum_size = Vector2(140, 44)
+	ResponsiveLayout.set_button_wrap(close)
 	close.pressed.connect(func(): _set_open(false))
 	act_row.add_child(close)
 
@@ -218,6 +226,25 @@ func _build() -> void:
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_hint.custom_minimum_size = Vector2(0, 40)
 	vb.add_child(_hint)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var mobile := ResponsiveLayout.is_mobile(self)
+	var panel_size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(640, 500), Vector2(300, 360))
+	if is_instance_valid(_who):
+		_who.add_theme_font_size_override("normal_font_size", 20 if mobile else FONT_BODY)
+		_who.custom_minimum_size = Vector2(0, 78 if mobile else 64)
+	if is_instance_valid(_rewards):
+		_rewards.add_theme_font_size_override("normal_font_size", 18 if mobile else 16)
+		_rewards.custom_minimum_size = Vector2(0, 64 if mobile else 40)
+	if is_instance_valid(_code_edit):
+		_code_edit.custom_minimum_size = Vector2(maxf(120.0, panel_size.x * 0.34), 46 if mobile else 42)
+	for btn in _mode_btns:
+		if btn is Button:
+			(btn as Button).custom_minimum_size = Vector2(0, 46 if mobile else 40)
 
 
 func _set_mode(mode: String) -> void:

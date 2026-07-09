@@ -7,6 +7,7 @@ extends CanvasLayer
 ## Listens to GhostService signals. No-op and hidden when offline.
 
 const FONT_BODY := 16
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _panel: Panel
 var _presence_label: Label
@@ -18,6 +19,7 @@ var _online: int = 0
 func _ready() -> void:
 	layer = 9
 	_build()
+	get_viewport().size_changed.connect(_apply_layout)
 	if NetConfig.enabled:
 		GhostService.presence_updated.connect(_on_presence)
 		GhostService.ghosts_received.connect(_on_ghosts)
@@ -48,11 +50,13 @@ func _build() -> void:
 	_panel.add_child(vb)
 
 	_presence_label = Label.new()
+	_presence_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_presence_label.add_theme_font_size_override("font_size", FONT_BODY)
 	_presence_label.add_theme_color_override("font_color", Color(0.7, 0.95, 0.8))
 	vb.add_child(_presence_label)
 
 	_net_label = Label.new()
+	_net_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_net_label.add_theme_font_size_override("font_size", 13)
 	_net_label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8))
 	_net_label.visible = false
@@ -62,9 +66,21 @@ func _build() -> void:
 	_ghost_label.bbcode_enabled = true
 	_ghost_label.fit_content = true
 	_ghost_label.scroll_active = false
+	_ghost_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_ghost_label.custom_minimum_size = Vector2(0, 56)
 	_ghost_label.add_theme_font_size_override("normal_font_size", 14)
 	vb.add_child(_ghost_label)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var s := get_viewport().get_visible_rect().size
+	var mobile := ResponsiveLayout.is_mobile(self)
+	var m := ResponsiveLayout.margin(self)
+	_panel.position = Vector2(m, 172.0 if mobile else 122.0)
+	_panel.size = Vector2(minf(330.0, maxf(280.0, s.x - m * 2.0)), 108.0 if mobile else 96.0)
 
 
 func _on_presence(chapter_id: String, online: int) -> void:

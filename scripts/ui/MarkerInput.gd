@@ -7,6 +7,7 @@ extends CanvasLayer
 const FONT_TITLE := 20
 const FONT_BODY := 18
 const MAX_LEN := 80
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _dim: ColorRect
 var _panel: Panel
@@ -19,6 +20,7 @@ func _ready() -> void:
 	layer = 19
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
+	get_viewport().size_changed.connect(_apply_layout)
 	_set_open(false)
 
 
@@ -50,6 +52,7 @@ func _build() -> void:
 
 	var title := Label.new()
 	title.text = LocaleManager.t("marker.prompt", "在此留一句话，赠予后来的同行者")
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.add_theme_font_size_override("font_size", FONT_TITLE)
 	title.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7))
 	vb.add_child(title)
@@ -71,6 +74,7 @@ func _build() -> void:
 	send.text = LocaleManager.t("marker.leave", "留下路标 (Enter)")
 	send.add_theme_font_size_override("font_size", FONT_BODY)
 	send.custom_minimum_size = Vector2(220, 42)
+	ResponsiveLayout.set_button_wrap(send)
 	send.pressed.connect(_submit)
 	row.add_child(send)
 
@@ -78,13 +82,27 @@ func _build() -> void:
 	cancel.text = LocaleManager.t("marker.cancel", "取消 (Esc)")
 	cancel.add_theme_font_size_override("font_size", FONT_BODY)
 	cancel.custom_minimum_size = Vector2(150, 42)
+	ResponsiveLayout.set_button_wrap(cancel)
 	cancel.pressed.connect(func(): _set_open(false))
 	row.add_child(cancel)
 
 	_hint = Label.new()
 	_hint.add_theme_font_size_override("font_size", 14)
 	_hint.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75))
+	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vb.add_child(_hint)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var mobile := ResponsiveLayout.is_mobile(self)
+	ResponsiveLayout.fit_center_panel(_panel, self, Vector2(600, 260), Vector2(300, 220))
+	if is_instance_valid(_edit):
+		_edit.add_theme_font_size_override("font_size", 20 if mobile else FONT_BODY)
+	if is_instance_valid(_hint):
+		_hint.add_theme_font_size_override("font_size", 16 if mobile else 14)
 
 
 func _can_use() -> bool:

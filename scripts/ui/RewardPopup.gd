@@ -4,6 +4,8 @@ extends CanvasLayer
 ## celebratory popup, then acknowledges them so they won't show again.
 ## No-op when offline.
 
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
+
 var TOKEN_NAMES := {
 	"crown_of_life": LocaleManager.t("reward.crown", "生命冠冕"),
 	"palm_branch": LocaleManager.t("reward.palm", "棕榈枝"),
@@ -24,6 +26,7 @@ func _ready() -> void:
 	layer = 21
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
+	get_viewport().size_changed.connect(_apply_layout)
 	_set_visible(false)
 	if NetConfig.enabled:
 		AuthService.authenticated.connect(func(_id, _n): _check())
@@ -72,6 +75,7 @@ func _build() -> void:
 	var title := Label.new()
 	title.text = LocaleManager.t("reward.title", "赛季嘉奖")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.add_theme_font_size_override("font_size", 30)
 	title.add_theme_color_override("font_color", Color(0.98, 0.9, 0.55))
 	vb.add_child(title)
@@ -80,6 +84,7 @@ func _build() -> void:
 	_body.bbcode_enabled = true
 	_body.fit_content = true
 	_body.scroll_active = false
+	_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_body.custom_minimum_size = Vector2(0, 200)
 	_body.add_theme_font_size_override("normal_font_size", 19)
 	vb.add_child(_body)
@@ -88,8 +93,20 @@ func _build() -> void:
 	btn.text = LocaleManager.t("reward.accept", "感谢，收下")
 	btn.add_theme_font_size_override("font_size", 18)
 	btn.custom_minimum_size = Vector2(0, 46)
+	ResponsiveLayout.set_button_wrap(btn)
 	btn.pressed.connect(_dismiss)
 	vb.add_child(btn)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var mobile := ResponsiveLayout.is_mobile(self)
+	ResponsiveLayout.fit_center_panel(_panel, self, Vector2(600, 420), Vector2(300, 300))
+	if is_instance_valid(_body):
+		_body.add_theme_font_size_override("normal_font_size", 21 if mobile else 19)
+		_body.custom_minimum_size = Vector2(0, 240 if mobile else 200)
 
 
 func _on_unseen(rewards: Array) -> void:
