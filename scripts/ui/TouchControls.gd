@@ -4,7 +4,7 @@ extends CanvasLayer
 ## buttons. Buttons still inject matching InputEventKey events so legacy handlers
 ## keep working, while the joystick writes into InputManager's virtual vector.
 ##   Joystick = move_* actions · E = interact / advance dialogue
-##   J/K/L/U/P = combat actions · 1-4 = dialogue choices · C = heart · Tab = map · Esc = pause.
+##   J/K/L/U/P = combat actions · 1-4 = dialogue choices · C = heart · Tab = map · H = recenter · Esc = pause.
 ## Labels use player-facing touch words; the keyboard events are an internal bridge.
 ## Self-building, responsive (lays out from the viewport size), full multitouch
 ## (hold a direction + tap an action). Only active when a touchscreen is present.
@@ -23,13 +23,13 @@ const KEYS := {
 	"W": KEY_W, "A": KEY_A, "S": KEY_S, "D": KEY_D,
 	"SPACE": KEY_SPACE, "E": KEY_E,
 	"J": KEY_J, "K": KEY_K, "L": KEY_L, "U": KEY_U, "P": KEY_P, "R": KEY_R,
-	"C": KEY_C, "TAB": KEY_TAB, "ESC": KEY_ESCAPE,
+	"C": KEY_C, "TAB": KEY_TAB, "H": KEY_H, "ESC": KEY_ESCAPE,
 	"1": KEY_1, "2": KEY_2, "3": KEY_3, "4": KEY_4,
 }
 const LABELS := {
 	"SPACE": "跳跃", "E": "互动",
 	"J": "攻击", "K": "闪避", "L": "站稳", "U": "应许", "P": "祷告", "R": "悔改",
-	"C": "心境", "TAB": "地图", "ESC": "暂停",
+	"C": "心境", "TAB": "地图", "H": "归位", "ESC": "暂停",
 	"1": "1", "2": "2", "3": "3", "4": "4",
 }
 
@@ -173,7 +173,7 @@ func _btn_ids() -> Array:
 		out.append("E")               # E also advances dialogue
 		if not _locked:
 			out.append_array(["J", "K", "L", "U", "P", "R"])
-		out.append_array(["C", "TAB"])
+		out.append_array(["C", "TAB", "H"])
 		if _dialogue and _choices > 0:
 			for i in range(min(_choices, 4)):
 				out.append(str(i + 1))
@@ -219,6 +219,7 @@ func _layout() -> Dictionary:
 	out["ESC"] = {"center": Vector2(s.x - m - ur, ey), "radius": ur}
 	out["TAB"] = {"center": Vector2(s.x - m - ur - ur * 2.3, ey), "radius": ur}
 	out["C"] = {"center": Vector2(s.x - m - ur - ur * 4.6, ey), "radius": ur}
+	out["H"] = {"center": Vector2(s.x - m - ur - ur * 6.9, ey), "radius": ur}
 	# Dialogue choices 1-4, bottom-center row
 	var n: int = max(_choices, 1)
 	var start := s.x * 0.5 - (n - 1) * cr * 1.2

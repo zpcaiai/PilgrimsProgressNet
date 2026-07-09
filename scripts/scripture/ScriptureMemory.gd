@@ -132,6 +132,44 @@ func learning_body(card: Dictionary) -> String:
 	return "\n\n".join(lines)
 
 
+func chapter_reflection_moment(chapter_id: String) -> Dictionary:
+	var card := get_chapter_card(chapter_id)
+	var chapter := ChapterManager.load_chapter_data(chapter_id) if ChapterManager else {}
+	var title := String(chapter.get("title", chapter_id))
+	var flag := "reflected_" + chapter_id
+	var body := PackedStringArray()
+	body.append("[b]本章[/b]  %s" % title)
+	if not card.is_empty():
+		body.append("[b]经文[/b]  %s｜%s" % [String(card.get("ref", "")), _card_theme(card)])
+		body.append("[b]记在心里[/b]  %s" % String(card.get("memory_zh", card.get("memory_en", ""))))
+		body.append("[b]价值操练[/b]  %s" % _value_line(card))
+		body.append("[b]离开前想一想[/b]  %s" % _reflection_question(card))
+		body.append("[b]下一章带着它走[/b]  %s" % _practice_line(card))
+		body.append("[b]一句祷告[/b]  [i]%s[/i]" % _prayer_line(card))
+	else:
+		var theme := String(chapter.get("spiritual_theme", "信心、悔改与继续前行"))
+		var mechanic := String(chapter.get("core_mechanic", "把所学的真理带进下一步。"))
+		body.append("[b]属灵主题[/b]  %s" % theme)
+		body.append("[b]下一步[/b]  %s" % mechanic)
+		body.append("[b]一句祷告[/b]  [i]主啊，使这一章不只成为经过的场景，也成为我学习顺服的一步。[/i]")
+	return {
+		"title": "离开前反思：把经文带进下一步",
+		"body": "\n\n".join(body),
+		"flag_on_continue": flag,
+		"effects_on_continue": _reflection_effects(card),
+	}
+
+
+func mark_reflected(chapter_id: String) -> void:
+	var moment := chapter_reflection_moment(chapter_id)
+	var flag := String(moment.get("flag_on_continue", ""))
+	if flag != "" and not GameState.has_flag(flag):
+		GameState.set_flag(flag, true)
+		var effects: Dictionary = moment.get("effects_on_continue", {})
+		if not effects.is_empty():
+			SpiritualStateManager.apply_effects(effects)
+
+
 func known_card_summary(max_count: int = 5) -> String:
 	var cards := known_cards()
 	if cards.is_empty():
@@ -154,6 +192,23 @@ func reflection_progress_summary() -> String:
 		if GameState.has_flag("reflected_" + String(chapter_id)):
 			reflected += 1
 	return "经文卡 %d/%d　章节反思 %d/%d" % [known_cards().size(), total, reflected, total]
+
+
+func _reflection_effects(card: Dictionary) -> Dictionary:
+	if card.is_empty():
+		return {"discernment": 2, "perseverance": 2}
+	var tags: Array = card.get("tags", [])
+	if tags.has("fear") or tags.has("presence"):
+		return {"faith": 2, "fear": -2, "discernment": 1}
+	if tags.has("despair") or tags.has("hope"):
+		return {"hope": 2, "despair": -2, "perseverance": 1}
+	if tags.has("deception") or tags.has("discernment"):
+		return {"discernment": 3, "watchfulness": 1}
+	if tags.has("pride") or tags.has("humility"):
+		return {"humility": 3, "pride": -2}
+	if tags.has("weariness") or tags.has("perseverance") or tags.has("watchfulness"):
+		return {"perseverance": 2, "watchfulness": 2, "weariness": -1}
+	return {"faith": 2, "discernment": 1, "perseverance": 1}
 
 
 func use_for_trial(trial_type: String) -> Dictionary:

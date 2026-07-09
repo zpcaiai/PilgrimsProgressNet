@@ -33,6 +33,8 @@ func _dbg(msg: String) -> void:
 
 func _ready() -> void:
 	_dbg("=== ready_start " + ChapterManager.current_chapter_id + " ===")
+	if EventBus.has_signal("input_recenter") and not EventBus.input_recenter.is_connected(_on_recenter_requested):
+		EventBus.input_recenter.connect(_on_recenter_requested)
 	# Ease every chapter in from black so transitions between scenes of very
 	# different brightness never hard-cut.
 	_fade_in()
@@ -67,6 +69,16 @@ func _ready() -> void:
 	# Optional multiplayer layer: render other pilgrims' async ghosts in this
 	# chapter. Fully inert (and skipped) if the net layer isn't installed.
 	_attach_ghost_layer()
+
+
+func _on_recenter_requested() -> void:
+	if not is_instance_valid(player):
+		return
+	if DialogueManager and DialogueManager.is_active():
+		return
+	player.teleport(_spawn_position)
+	make_light_burst(_spawn_position + Vector3(0, 1.0, 0), Color(0.85, 0.92, 1.0), 18)
+	EventBus.toast("已回到本章安全点。若被卡住，可点「归位」继续学习。")
 
 
 func _attach_ghost_layer() -> void:

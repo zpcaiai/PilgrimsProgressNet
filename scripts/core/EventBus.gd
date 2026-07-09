@@ -42,6 +42,7 @@ signal input_unlocked(reason: String)
 signal input_pray()
 signal input_repent()
 signal input_open_journal()
+signal input_recenter()
 
 # --- Flow control ---
 signal player_control_locked(locked: bool)

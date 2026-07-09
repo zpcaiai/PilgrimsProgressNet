@@ -13,6 +13,7 @@ var _current: Dictionary = {}
 func _ready() -> void:
 	layer = 155
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	add_to_group("learning_moment_panel")
 	_build_ui()
 	_root.visible = false
 	EventBus.learning_moment_requested.connect(_on_learning_moment)

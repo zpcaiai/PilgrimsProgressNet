@@ -55,6 +55,15 @@ static func validate_all_data() -> Array:
 		var nxt := String(c.get("next_chapter_id", ""))
 		if nxt != "" and not chapters.has(nxt):
 			errors.append("Chapter %s next_chapter_id missing: %s" % [cid, nxt])
+		if String(c.get("title_zh", "")) == "":
+			errors.append("Chapter %s missing title_zh." % cid)
+		for field in ["subtitle", "spiritual_theme", "core_mechanic"]:
+			if String(c.get(field, "")) != "" and String(c.get(field + "_zh", "")) == "":
+				errors.append("Chapter %s missing %s_zh." % [cid, field])
+		var intro: Array = c.get("intro", [])
+		var intro_zh: Array = c.get("intro_zh", [])
+		if not intro.is_empty() and intro_zh.size() < intro.size():
+			errors.append("Chapter %s intro_zh has %d lines, expected %d." % [cid, intro_zh.size(), intro.size()])
 		for q in c.get("quests", []):
 			if not quests.has(String(q)):
 				errors.append("Chapter %s references missing quest: %s" % [cid, String(q)])
@@ -69,12 +78,17 @@ static func validate_all_data() -> Array:
 	# --- Quests ---
 	for qid in quests:
 		var q: Dictionary = quests[qid]
+		for field in ["title", "description"]:
+			if String(q.get(field, "")) != "" and String(q.get(field + "_zh", "")) == "":
+				errors.append("Quest %s missing %s_zh." % [qid, field])
 		var steps: Array = q.get("steps", [])
 		if steps.is_empty():
 			errors.append("Quest %s has no steps." % qid)
 		for step in steps:
 			if not (step.has("required_flag") or step.has("required_any_flag")):
 				errors.append("Quest %s step '%s' has no required flag." % [qid, String(step.get("id", "?"))])
+			if String(step.get("description", "")) != "" and String(step.get("description_zh", "")) == "":
+				errors.append("Quest %s step '%s' missing description_zh." % [qid, String(step.get("id", "?"))])
 
 	# --- Dialogues ---
 	for did in dialogues:
@@ -86,11 +100,17 @@ static func validate_all_data() -> Array:
 			errors.append("Dialogue %s has no 'start' node." % did)
 		for node_id in nodes.keys():
 			var node: Dictionary = nodes[node_id]
+			if String(node.get("speaker", "")) != "" and String(node.get("speaker_zh", "")) == "":
+				errors.append("Dialogue %s node '%s' missing speaker_zh." % [did, String(node_id)])
+			if String(node.get("text", "")) != "" and String(node.get("text_zh", "")) == "":
+				errors.append("Dialogue %s node '%s' missing text_zh." % [did, String(node_id)])
 			errors.append_array(_check_specials(node.get("special", {}), did, String(node_id)))
 			var nx := String(node.get("next", ""))
 			if nx != "" and nx != "end" and not nodes.has(nx):
 				errors.append("Dialogue %s node '%s' next missing: %s" % [did, String(node_id), nx])
 			for choice in node.get("choices", []):
+				if String(choice.get("text", "")) != "" and String(choice.get("text_zh", "")) == "":
+					errors.append("Dialogue %s choice '%s' missing text_zh." % [did, String(choice.get("id", "?"))])
 				var cnx := String(choice.get("next", ""))
 				if cnx != "" and cnx != "end" and not nodes.has(cnx):
 					errors.append("Dialogue %s choice '%s' points to missing node '%s'." % [did, String(choice.get("id", "?")), cnx])
@@ -150,10 +170,19 @@ static func validate_all_data() -> Array:
 			errors.append("Verse card %s chapter_id mismatch: %s" % [cid, String(card.get("chapter_id", ""))])
 		if scripture_gates.has(cid):
 			var gate: Dictionary = scripture_gates[cid]
+			for field in ["ref", "prompt", "correct", "wrong"]:
+				if String(gate.get(field, "")) != "" and not _has_cjk(String(gate.get(field, ""))):
+					errors.append("Chapter %s Scripture Gate field %s has no Chinese." % [cid, field])
+			for opt in gate.get("options", []):
+				if not _has_cjk(String(opt)):
+					errors.append("Chapter %s Scripture Gate option has no Chinese: %s" % [cid, String(opt)])
 			var card_ref := _normalize_ref(String(card.get("ref", "")))
 			var gate_ref := _normalize_ref(String(gate.get("ref", "")).split("·")[0])
 			if card_ref != gate_ref:
 				errors.append("Chapter %s Scripture ref mismatch: card=%s gate=%s" % [cid, String(card.get("ref", "")), String(gate.get("ref", ""))])
+		for field in ["theme_zh", "memory_zh"]:
+			if String(card.get(field, "")) == "":
+				errors.append("Chapter %s verse card missing %s." % [cid, field])
 
 	return errors
 
@@ -185,6 +214,14 @@ static func _load_dict(path: String) -> Dictionary:
 
 static func _normalize_ref(ref: String) -> String:
 	return ref.strip_edges().replace(" ", "")
+
+
+static func _has_cjk(text: String) -> bool:
+	for i in range(text.length()):
+		var code := text.unicode_at(i)
+		if (code >= 0x3400 and code <= 0x9FFF) or (code >= 0xF900 and code <= 0xFAFF):
+			return true
+	return false
 
 
 static func report() -> String:

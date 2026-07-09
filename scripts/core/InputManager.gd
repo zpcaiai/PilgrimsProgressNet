@@ -21,6 +21,7 @@ const ACTION_PRAY := "pray"
 const ACTION_REPENT := "repent"
 const ACTION_MENU := "open_menu"
 const ACTION_JOURNAL := "open_journal"
+const ACTION_RECENTER := "recenter_player"
 const ACTION_DASH := "dash"
 const ACTION_ATTACK := "combat_attack"
 const ACTION_GUARD := "combat_guard"
@@ -73,6 +74,7 @@ func _ensure_actions() -> void:
 		ACTION_REPENT: [KEY_R],
 		ACTION_MENU: [KEY_ESCAPE],
 		ACTION_JOURNAL: [KEY_J, KEY_TAB],
+		ACTION_RECENTER: [KEY_H],
 		ACTION_DASH: [KEY_SHIFT],
 		ACTION_ATTACK: [KEY_J],
 		ACTION_GUARD: [KEY_L],
@@ -168,7 +170,7 @@ func debug_snapshot() -> Dictionary:
 	var pressed: Array = []
 	for a in [ACTION_MOVE_UP, ACTION_MOVE_DOWN, ACTION_MOVE_LEFT, ACTION_MOVE_RIGHT,
 			ACTION_INTERACT, ACTION_PRAY, ACTION_REPENT, ACTION_ATTACK, ACTION_DODGE,
-			ACTION_GUARD, ACTION_PROMISE, ACTION_MENU, ACTION_JOURNAL]:
+			ACTION_GUARD, ACTION_PROMISE, ACTION_MENU, ACTION_JOURNAL, ACTION_RECENTER]:
 		if InputMap.has_action(a) and Input.is_action_pressed(a):
 			pressed.append(a)
 	return {
@@ -194,6 +196,8 @@ func _handle_global_actions() -> void:
 			SpiritualStateManager.repent("input")
 	if context == CTX_GAMEPLAY and Input.is_action_just_pressed(ACTION_JOURNAL):
 		EventBus.input_open_journal.emit()
+	if context == CTX_GAMEPLAY and Input.is_action_just_pressed(ACTION_RECENTER):
+		EventBus.input_recenter.emit()
 
 
 func _should_handle_noncombat_spiritual_action() -> bool:

@@ -77,6 +77,7 @@ func _ensure_input_actions() -> void:
 		"pray": [KEY_Q, KEY_P],
 		"repent": [KEY_R],
 		"open_journal": [KEY_J, KEY_TAB],
+		"recenter_player": [KEY_H],
 		"dash": [KEY_SHIFT],
 		"combat_attack": [KEY_J],
 		"combat_dodge": [KEY_K],

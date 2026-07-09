@@ -28,6 +28,10 @@ SUPPORTED_SPECIALS = {
 }
 
 
+def _has_cjk(text):
+    return any(0x3400 <= ord(ch) <= 0x9FFF or 0xF900 <= ord(ch) <= 0xFAFF for ch in str(text))
+
+
 def _load_category(category):
     out = {}
     d = os.path.join(DATA, category)
@@ -92,6 +96,15 @@ def validate():
         for field in ("id", "title", "scene_path", "imported_scene_path"):
             if not c.get(field):
                 errors.append("[chapter:%s] missing required field '%s'" % (cid, field))
+        if not c.get("title_zh"):
+            errors.append("[chapter:%s] missing title_zh" % cid)
+        for field in ("subtitle", "spiritual_theme", "core_mechanic"):
+            if c.get(field) and not c.get(field + "_zh"):
+                errors.append("[chapter:%s] missing %s_zh" % (cid, field))
+        intro = c.get("intro", [])
+        intro_zh = c.get("intro_zh", [])
+        if intro and len(intro_zh) < len(intro):
+            errors.append("[chapter:%s] intro_zh has %d lines, expected %d" % (cid, len(intro_zh), len(intro)))
         nxt = c.get("next_chapter_id", "")
         if nxt and nxt not in chapters:
             errors.append("[chapter:%s] next_chapter_id '%s' does not exist" % (cid, nxt))
@@ -104,12 +117,17 @@ def validate():
 
     # --- quests ---
     for qid, q in quests.items():
+        for field in ("title", "description"):
+            if q.get(field) and not q.get(field + "_zh"):
+                errors.append("[quest:%s] missing %s_zh" % (qid, field))
         steps = q.get("steps", [])
         if not steps:
             errors.append("[quest:%s] has no steps" % qid)
         for i, step in enumerate(steps):
             if not step.get("required_flag") and not step.get("required_any_flag"):
                 errors.append("[quest:%s] step %d lacks required_flag/required_any_flag" % (qid, i))
+            if step.get("description") and not step.get("description_zh"):
+                errors.append("[quest:%s] step %d missing description_zh" % (qid, i))
 
     # --- dialogues ---
     for did, d in dialogues.items():
@@ -122,6 +140,10 @@ def validate():
             errors.append("[dialogue:%s] has no 'start' node" % did)
         valid_targets = set(nodes.keys()) | {"", "end"}
         for nid, node in nodes.items():
+            if node.get("speaker") and not node.get("speaker_zh"):
+                errors.append("[dialogue:%s] node '%s' missing speaker_zh" % (did, nid))
+            if node.get("text") and not node.get("text_zh"):
+                errors.append("[dialogue:%s] node '%s' missing text_zh" % (did, nid))
             nx = node.get("next", "")
             if nx and nx not in valid_targets:
                 errors.append("[dialogue:%s] node '%s' next '%s' missing" % (did, nid, nx))
@@ -129,6 +151,8 @@ def validate():
                 if sp not in SUPPORTED_SPECIALS:
                     errors.append("[dialogue:%s] node '%s' unsupported special '%s'" % (did, nid, sp))
             for ch in node.get("choices", []):
+                if ch.get("text") and not ch.get("text_zh"):
+                    errors.append("[dialogue:%s] choice '%s' missing text_zh" % (did, ch.get("id", "?")))
                 cnx = ch.get("next", "")
                 if cnx and cnx not in valid_targets:
                     errors.append("[dialogue:%s] choice '%s' next '%s' missing" % (did, ch.get("id", "?"), cnx))
@@ -166,6 +190,30 @@ def validate():
             did = iv.get("dialogue_id")
             if did and did not in dialogues:
                 errors.append("[companion:%s] intervention dialogue '%s' missing" % (cid, did))
+
+    # --- Chinese-first runtime learning content ---
+    scripture_gates_path = os.path.join(DATA, "scripture", "scripture_gates.json")
+    verse_cards_path = os.path.join(DATA, "scripture", "verse_cards.json")
+    scripture_gates = json.load(open(scripture_gates_path, "r", encoding="utf-8")) if os.path.exists(scripture_gates_path) else {}
+    verse_cards = json.load(open(verse_cards_path, "r", encoding="utf-8")) if os.path.exists(verse_cards_path) else {}
+    for cid in chapters.keys():
+        gate = scripture_gates.get(cid)
+        if not isinstance(gate, dict):
+            errors.append("[scripture_gate:%s] missing Scripture Gate" % cid)
+        else:
+            for field in ("ref", "prompt", "correct", "wrong"):
+                if gate.get(field) and not _has_cjk(gate[field]):
+                    errors.append("[scripture_gate:%s] field '%s' has no Chinese" % (cid, field))
+            for i, opt in enumerate(gate.get("options", [])):
+                if not _has_cjk(opt):
+                    errors.append("[scripture_gate:%s] option %d has no Chinese" % (cid, i))
+        card = verse_cards.get(cid)
+        if not isinstance(card, dict):
+            errors.append("[verse_card:%s] missing verse card" % cid)
+        else:
+            for field in ("theme_zh", "memory_zh"):
+                if not card.get(field):
+                    errors.append("[verse_card:%s] missing %s" % (cid, field))
 
     counts = {
         "route": len(routes), "chapters": len(chapters), "quests": len(quests),

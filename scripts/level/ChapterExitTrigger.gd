@@ -65,6 +65,8 @@ func _advance() -> void:
 	if _fired:
 		return
 	_fired = true
+	var cid := String(ChapterManager.current_chapter_id)
+	await _ensure_exit_reflection(cid)
 	for k in set_flags.keys():
 		GameState.set_flag(String(k), set_flags[k])
 	if quest_id != "":
@@ -77,3 +79,17 @@ func _advance() -> void:
 		ChapterManager.start_chapter(target_chapter)
 	else:
 		ChapterManager.go_to_next_chapter()
+
+
+func _ensure_exit_reflection(chapter_id: String) -> void:
+	if chapter_id == "" or GameState.has_flag("reflected_" + chapter_id):
+		return
+	if ScriptureMemory.get_chapter_card(chapter_id).is_empty():
+		return
+	var moment := ScriptureMemory.chapter_reflection_moment(chapter_id)
+	if get_tree().get_nodes_in_group("learning_moment_panel").is_empty():
+		ScriptureMemory.mark_reflected(chapter_id)
+		return
+	EventBus.learning_moment_requested.emit(moment)
+	while is_instance_valid(self) and not GameState.has_flag("reflected_" + chapter_id):
+		await get_tree().process_frame
