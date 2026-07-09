@@ -455,7 +455,8 @@ static func _bind_trigger(chapter: Node3D, node: Node, nm: String):
 	if TRIGGER_DIALOGUE.has(nm):
 		var dt := DialogueTrigger.new()
 		chapter.add_child(dt)
-		dt.setup(size, String(TRIGGER_DIALOGUE[nm]))
+		var reusable := nm == "TRIGGER_GateKnock"
+		dt.setup(size, String(TRIGGER_DIALOGUE[nm]), not reusable)
 		dt.global_position = node.global_position
 		if node is Node3D:
 			(node as Node3D).visible = false
@@ -477,10 +478,16 @@ static func _bind_exit(chapter: Node3D, node: Node) -> void:
 			set_flags[key] = cond.get("value", true)
 	if String(ChapterManager.current_chapter_id) == "city_of_destruction":
 		require = "talked_to_evangelist"
+	var message := "你还没有预备好离开。"
+	match String(ChapterManager.current_chapter_id):
+		"city_of_destruction":
+			message = "先与传道者交谈，领受当行的路。 (Speak with Evangelist first — he sets you on the way.)"
+		"wicket_gate":
+			if require == "passed_wicket_gate":
+				message = "先在窄门前叩门：移动端点「互动」或直接走到门前；桌面按 E。门为叩门的人打开。"
 	var ex := ChapterExitTrigger.new()
 	chapter.add_child(ex)
-	ex.setup(_box_size(node), set_flags, require,
-		"先与传道者交谈，领受当行的路。 (Speak with Evangelist first — he sets you on the way.)")
+	ex.setup(_box_size(node), set_flags, require, message)
 	ex.global_position = node.global_position
 	_spawn_exit_portal(chapter, node.global_position)
 	if node is Node3D:
