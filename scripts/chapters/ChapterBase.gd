@@ -130,13 +130,16 @@ func _attach_backdrop() -> void:
 func _fade_in() -> void:
 	var cl := CanvasLayer.new()
 	cl.layer = 200
+	cl.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(cl)
 	var rect := ColorRect.new()
 	rect.color = Color(0, 0, 0, 1)
 	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rect.process_mode = Node.PROCESS_MODE_ALWAYS
 	cl.add_child(rect)
 	var tw := create_tween()
+	tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tw.tween_interval(0.12)
 	tw.tween_property(rect, "color:a", 0.0, 0.7)
 	tw.tween_callback(cl.queue_free)

@@ -16,6 +16,10 @@ var _q: Dictionary = {}
 var _chapter_id: String = ""
 var _on_pass: Callable = Callable()
 var _on_leave: Callable = Callable()
+var _root: Control
+var _panel: PanelContainer
+var _scroll: ScrollContainer
+var _content: VBoxContainer
 var _feedback: Label
 var _buttons: Array = []
 var _answered := false
@@ -61,81 +65,80 @@ static func open(host: Node, chapter_id: String, on_pass: Callable, on_leave: Ca
 
 
 func _ready() -> void:
-	layer = 60
+	layer = 230
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = true
 	var mobile := _is_mobile_ui()
-	var safe := ResponsiveLayout.safe_size(self)
-	var panel_w := maxf(220.0, minf(740.0, safe.x))
-	var panel_h := maxf(260.0, minf(680.0, safe.y))
 	var body_font := 23 if mobile else 20
 	var prompt_font := 25 if mobile else 22
 	var title_font := 30 if mobile else 26
 	var small_font := 18 if mobile else 15
 	var feedback_font := 20 if mobile else 17
 
+	_root = Control.new()
+	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.mouse_filter = Control.MOUSE_FILTER_STOP
+	_root.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_root)
+
 	var dim := ColorRect.new()
-	dim.color = Color(0.0, 0.0, 0.0, 0.74)
+	dim.color = Color(0.0, 0.0, 0.0, 0.56)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(dim)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_root.add_child(dim)
 
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-
-	var panel := PanelContainer.new()
+	_panel = PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.07, 0.08, 0.13, 0.98)
 	sb.set_corner_radius_all(14)
 	sb.set_content_margin_all(18 if mobile else 24)
 	sb.border_color = Color(0.85, 0.74, 0.4, 0.7)
 	sb.set_border_width_all(2)
-	panel.add_theme_stylebox_override("panel", sb)
-	center.add_child(panel)
+	_panel.add_theme_stylebox_override("panel", sb)
+	_root.add_child(_panel)
 
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size = Vector2(panel_w, panel_h)
-	panel.add_child(scroll)
+	_scroll = ScrollContainer.new()
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_panel.add_child(_scroll)
 
-	var vb := VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 12)
-	vb.custom_minimum_size = Vector2(panel_w, 0)
-	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(vb)
+	_content = VBoxContainer.new()
+	_content.add_theme_constant_override("separation", 12)
+	_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_scroll.add_child(_content)
 
 	var title := Label.new()
 	title.text = "✝  经文之门 · Scripture Gate"
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.add_theme_font_size_override("font_size", title_font)
 	title.add_theme_color_override("font_color", Color(0.95, 0.85, 0.5))
-	vb.add_child(title)
+	_content.add_child(title)
 
 	var refl := Label.new()
 	refl.text = LocaleManager.zh_or_mixed(String(_q.get("ref", "")))
 	refl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	refl.add_theme_font_size_override("font_size", feedback_font)
 	refl.add_theme_color_override("font_color", Color(0.7, 0.78, 0.95))
-	vb.add_child(refl)
+	_content.add_child(refl)
 
 	var prompt := Label.new()
 	prompt.text = LocaleManager.zh_or_mixed(String(_q.get("prompt", "")))
 	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	prompt.custom_minimum_size = Vector2(panel_w, 0)
 	prompt.add_theme_font_size_override("font_size", prompt_font)
-	vb.add_child(prompt)
+	_content.add_child(prompt)
 
 	var prompt_en := String(_q.get("prompt_en", ""))
 	if prompt_en != "":
 		var pe := Label.new()
 		pe.text = ("英文提示：" + prompt_en) if LocaleManager.is_zh() else prompt_en
 		pe.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		pe.custom_minimum_size = Vector2(panel_w, 0)
 		pe.add_theme_font_size_override("font_size", small_font)
 		pe.add_theme_color_override("font_color", Color(0.62, 0.64, 0.7))
-		vb.add_child(pe)
+		_content.add_child(pe)
 
-	vb.add_child(HSeparator.new())
+	_content.add_child(HSeparator.new())
 
 	# Shuffle option order so the correct answer isn't always in the same slot.
 	var opts: Array = _q.get("options", [])
@@ -145,30 +148,50 @@ func _ready() -> void:
 		var b := Button.new()
 		b.text = "   " + LocaleManager.zh_or_mixed(String(opts[oi]))
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.custom_minimum_size = Vector2(panel_w, 56 if mobile else 46)
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.custom_minimum_size = Vector2(0, 64 if mobile else 50)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
 		b.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 		b.add_theme_font_size_override("font_size", body_font)
 		var ans := int(oi)
 		var btn := b
 		b.pressed.connect(func(): _choose(ans, btn))
-		vb.add_child(b)
+		_content.add_child(b)
 		_buttons.append(b)
 
 	_feedback = Label.new()
 	_feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_feedback.custom_minimum_size = Vector2(panel_w, 0)
 	_feedback.add_theme_font_size_override("font_size", feedback_font)
-	vb.add_child(_feedback)
+	_content.add_child(_feedback)
 
 	var leave := Button.new()
 	leave.text = "稍后再来 (Leave)"
 	leave.custom_minimum_size = Vector2(0, 50 if mobile else 0)
+	leave.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	leave.add_theme_font_size_override("font_size", 19 if mobile else 16)
 	ResponsiveLayout.set_button_wrap(leave)
 	leave.pressed.connect(_leave)
-	vb.add_child(leave)
-	ResponsiveLayout.normalize_tree(panel, mobile)
+	_content.add_child(leave)
+	get_viewport().size_changed.connect(_apply_layout)
+	_apply_layout()
+
+
+func _apply_layout() -> void:
+	if not is_instance_valid(_panel):
+		return
+	var mobile := _is_mobile_ui()
+	var size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(760.0, 620.0), Vector2(260.0, 320.0))
+	var content_w := maxf(220.0, size.x - (44.0 if mobile else 56.0))
+	var scroll_h := maxf(220.0, size.y - (40.0 if mobile else 52.0))
+	if is_instance_valid(_scroll):
+		_scroll.custom_minimum_size = Vector2(content_w, scroll_h)
+	if is_instance_valid(_content):
+		_content.custom_minimum_size = Vector2(content_w, 0)
+	ResponsiveLayout.normalize_tree(_panel, mobile)
+	for b in _buttons:
+		if is_instance_valid(b):
+			(b as Button).autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
+			(b as Button).custom_minimum_size = Vector2(0, 66 if mobile else 52)
 
 
 func _choose(orig_idx: int, btn: Button) -> void:
