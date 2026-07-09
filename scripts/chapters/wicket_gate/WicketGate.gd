@@ -70,15 +70,17 @@ func _install_knock_access() -> void:
 	if _knock_access_built:
 		return
 	_knock_access_built = true
-	var gate_pos := Vector3(0, 1.2, -8) if _used_glb else Vector3(0, 1.2, -21)
-	var interact_pos := Vector3(0, 0, -8) if _used_glb else Vector3(0, 0, -21)
+	var gate_pos := Vector3(0, 1.2, -5.8) if _used_glb else Vector3(0, 1.2, -19.0)
+	var interact_pos := Vector3(0, 0, -5.8) if _used_glb else Vector3(0, 0, -19.0)
+	var trigger_size := Vector3(7.2, 3.4, 5.2) if _used_glb else Vector3(5.2, 3.4, 5.0)
+	var interact_radius := 3.8 if _used_glb else 3.0
 	var knock_cb := func(_body):
 		_start_knock_dialogue()
-	make_trigger(gate_pos, Vector3(4.6, 3.0, 3.2), knock_cb, false)
-	make_interactable(interact_pos, "叩门进入：点「互动」 (Knock)",
+	make_trigger(gate_pos, trigger_size, knock_cb, false)
+	make_interactable(interact_pos, "叩门进入：向前走或点「互动」",
 		func(_p): _start_knock_dialogue(),
-		null, Color(0.85, 0.72, 0.42), 0.25, 2.4)
-	make_floating_label("到窄门前会自动叩门；移动端也可点「互动」",
+		null, Color(0.85, 0.72, 0.42), 0.25, interact_radius)
+	make_floating_label("继续向前会自动叩门；也可点「互动」",
 		gate_pos + Vector3(0, 1.8, 0), Color(1.0, 0.92, 0.55))
 
 
