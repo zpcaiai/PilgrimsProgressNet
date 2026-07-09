@@ -99,6 +99,7 @@ func _apply_layout() -> void:
 		return
 	var mobile := ResponsiveLayout.is_mobile(self)
 	var panel_size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(700, 560), Vector2(300, 360))
+	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_scroll):
 		_scroll.custom_minimum_size = Vector2(0, maxf(180.0, panel_size.y - (130.0 if mobile else 120.0)))
 

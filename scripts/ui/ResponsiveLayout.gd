@@ -14,17 +14,27 @@ static func is_mobile(node: Node) -> bool:
 
 
 static func margin(node: Node) -> float:
+	var s := viewport_size(node)
+	if minf(s.x, s.y) <= 380.0:
+		return 14.0
 	return 24.0 if is_mobile(node) else 32.0
+
+
+static func safe_size(node: Node) -> Vector2:
+	var s := viewport_size(node)
+	var m := margin(node)
+	return Vector2(maxf(160.0, s.x - m * 2.0), maxf(160.0, s.y - m * 2.0))
 
 
 static func fit_center_panel(panel: Control, host: Node, max_size: Vector2,
 		min_size: Vector2 = Vector2(280, 240)) -> Vector2:
 	if panel == null:
 		return Vector2.ZERO
-	var s := viewport_size(host)
-	var m := margin(host)
-	var w := clampf(minf(max_size.x, s.x - m * 2.0), min_size.x, maxf(min_size.x, s.x - m * 2.0))
-	var h := clampf(minf(max_size.y, s.y - m * 2.0), min_size.y, maxf(min_size.y, s.y - m * 2.0))
+	var avail := safe_size(host)
+	var min_w := minf(min_size.x, avail.x)
+	var min_h := minf(min_size.y, avail.y)
+	var w := clampf(minf(max_size.x, avail.x), min_w, avail.x)
+	var h := clampf(minf(max_size.y, avail.y), min_h, avail.y)
 	panel.set_anchors_preset(Control.PRESET_CENTER)
 	panel.position = Vector2(-w * 0.5, -h * 0.5)
 	panel.size = Vector2(w, h)
@@ -38,9 +48,9 @@ static func apply_text_wrap(label: Control, arbitrary: bool = false) -> void:
 	if label is Label:
 		(label as Label).autowrap_mode = mode
 		(label as Label).clip_text = false
+		(label as Label).text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	elif label is RichTextLabel:
 		(label as RichTextLabel).autowrap_mode = mode
-		(label as RichTextLabel).scroll_active = false
 
 
 static func set_button_wrap(button: Button) -> void:
@@ -48,3 +58,15 @@ static func set_button_wrap(button: Button) -> void:
 		return
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	button.clip_text = false
+
+
+static func normalize_tree(root: Node, arbitrary: bool = false) -> void:
+	if root == null:
+		return
+	if root is Label or root is RichTextLabel:
+		apply_text_wrap(root as Control, arbitrary)
+	elif root is Button:
+		set_button_wrap(root as Button)
+	for child in root.get_children():
+		normalize_tree(child, arbitrary)

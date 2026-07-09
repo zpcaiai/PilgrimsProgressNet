@@ -65,9 +65,9 @@ func _build() -> void:
 	_edit.text_submitted.connect(func(_t): _submit())
 	vb.add_child(_edit)
 
-	var row := HBoxContainer.new()
+	var row := HFlowContainer.new()
 	row.add_theme_constant_override("separation", 12)
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.alignment = FlowContainer.ALIGNMENT_CENTER
 	vb.add_child(row)
 
 	var send := Button.new()
@@ -99,6 +99,7 @@ func _apply_layout() -> void:
 		return
 	var mobile := ResponsiveLayout.is_mobile(self)
 	ResponsiveLayout.fit_center_panel(_panel, self, Vector2(600, 260), Vector2(300, 220))
+	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_edit):
 		_edit.add_theme_font_size_override("font_size", 20 if mobile else FONT_BODY)
 	if is_instance_valid(_hint):

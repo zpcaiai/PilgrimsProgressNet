@@ -2,6 +2,8 @@ extends CanvasLayer
 ## Short, flow-integrated learning moments. They are intentionally low-friction:
 ## one Scripture/value thought, one reflection, one prayer, one continue button.
 
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
+
 var _root: Control
 var _panel: PanelContainer
 var _scroll: ScrollContainer
@@ -87,17 +89,17 @@ func _build_ui() -> void:
 func _apply_layout() -> void:
 	if not is_instance_valid(_body):
 		return
-	var s := get_viewport().get_visible_rect().size
-	var mobile := DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
-	var margin := 24.0 if mobile else 36.0
-	var w := minf(s.x - margin * 2.0, 720.0)
-	var h := minf(s.y - margin * 2.0, 520.0)
+	var mobile := ResponsiveLayout.is_mobile(self)
+	var safe := ResponsiveLayout.safe_size(self)
+	var w := minf(safe.x, 720.0)
+	var h := minf(safe.y, 520.0)
 	if is_instance_valid(_panel):
-		_panel.custom_minimum_size = Vector2(maxf(280.0, w), maxf(320.0, h))
+		_panel.custom_minimum_size = Vector2(maxf(240.0, w), maxf(260.0, h))
 	if is_instance_valid(_scroll):
-		_scroll.custom_minimum_size = Vector2(maxf(280.0, w), maxf(280.0, h - 12.0))
+		_scroll.custom_minimum_size = Vector2(maxf(240.0, w), maxf(220.0, h - 12.0))
 	if is_instance_valid(_content):
-		_content.custom_minimum_size = Vector2(maxf(260.0, w - 40.0), 0)
+		_content.custom_minimum_size = Vector2(maxf(220.0, w - 40.0), 0)
+	ResponsiveLayout.normalize_tree(_panel, mobile)
 	_title.add_theme_font_size_override("font_size", 28 if not mobile else 26)
 	_body.custom_minimum_size = Vector2(0, maxf(220.0, h - 150.0))
 	_body.add_theme_font_size_override("normal_font_size", 21 if not mobile else 23)

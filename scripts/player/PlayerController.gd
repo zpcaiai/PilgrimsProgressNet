@@ -15,6 +15,8 @@ var terrain_multiplier: float = 1.0  # set by hazards (mud, etc.)
 var _mesh_root: Node3D
 var _body_mesh: MeshInstance3D
 var _burden_root: Node3D
+var _battle_gear_root: Node3D
+var _battle_gear_nodes: Array[Node3D] = []
 var _is_greybox: bool = false
 var _fig: Node3D
 var _vanity_root: Node3D
@@ -71,6 +73,8 @@ func _ensure_inputs() -> void:
 				InputMap.action_add_event(action, ev)
 	EventBus.player_control_locked.connect(_on_control_locked)
 	EventBus.burden_removed.connect(_on_burden_removed)
+	if EventBus.has_signal("chapter_started"):
+		EventBus.chapter_started.connect(_on_chapter_started)
 	_update_burden_visual()
 	_load_input_settings()
 	if EventBus.has_signal("settings_changed"):
@@ -124,6 +128,9 @@ func _build() -> void:
 		_body_node.add_child(beard)
 	else:
 		_fig.add_child(beard)
+	_battle_gear_root = _build_battle_gear()
+	_battle_gear_root.visible = false
+	_fig.add_child(_battle_gear_root)
 
 	# Burden: a real backpack on his back that he visibly drops at the Cross.
 	# The 3D body faces +Z (the travel direction), so the pack is flipped to sit
@@ -167,6 +174,7 @@ func _build() -> void:
 	add_child(_interactor)
 
 	_build_dust()
+	_update_battle_gear_visual()
 
 
 ## Rebuild the hanging trinkets to match how much vanity you bought.
@@ -317,9 +325,178 @@ func _on_burden_removed() -> void:
 	_update_burden_visual()
 
 
+func _on_chapter_started(_chapter_id: String) -> void:
+	_update_battle_gear_visual()
+
+
 func _update_burden_visual() -> void:
 	if is_instance_valid(_burden_root):
 		_burden_root.visible = _is_greybox and SpiritualStateManager.has_burden
+
+
+func _update_battle_gear_visual() -> void:
+	var show := _should_show_battle_gear()
+	if is_instance_valid(_battle_gear_root):
+		_battle_gear_root.visible = show
+	for node in _battle_gear_nodes:
+		if is_instance_valid(node):
+			node.visible = show
+
+
+func _should_show_battle_gear() -> bool:
+	var cid := String(ChapterManager.current_chapter_id)
+	var start_idx := ChapterManager.get_chapter_index("valley_humiliation")
+	var cur_idx := ChapterManager.get_chapter_index(cid)
+	return start_idx >= 0 and cur_idx >= start_idx
+
+
+func _build_battle_gear() -> Node3D:
+	var root := Node3D.new()
+	root.name = "BattleGear"
+	var body := _fig.get_node_or_null("Body") as Node3D
+	if body == null:
+		return root
+
+	var steel := _make_material(Color(0.56, 0.58, 0.61))
+	steel.metallic = 0.55
+	steel.roughness = 0.36
+	var dark_steel := _make_material(Color(0.28, 0.31, 0.34))
+	dark_steel.metallic = 0.45
+	dark_steel.roughness = 0.42
+	var gold := _make_material(Color(0.96, 0.72, 0.28))
+	gold.metallic = 0.5
+	gold.roughness = 0.38
+	var crimson := _make_material(Color(0.62, 0.08, 0.06))
+	var leather := _make_material(Color(0.22, 0.13, 0.07))
+
+	var chest := MeshInstance3D.new()
+	var chest_mesh := BoxMesh.new()
+	chest_mesh.size = Vector3(0.5, 0.62, 0.1)
+	chest.mesh = chest_mesh
+	chest.position = Vector3(0, 1.26, 0.08)
+	chest.material_override = steel
+	body.add_child(chest)
+	_register_battle_gear_node(chest)
+
+	var back := MeshInstance3D.new()
+	var back_mesh := BoxMesh.new()
+	back_mesh.size = Vector3(0.48, 0.56, 0.08)
+	back.mesh = back_mesh
+	back.position = Vector3(0, 1.26, -0.12)
+	back.material_override = dark_steel
+	body.add_child(back)
+	_register_battle_gear_node(back)
+
+	for x in [-0.31, 0.31]:
+		var shoulder := MeshInstance3D.new()
+		var shoulder_mesh := SphereMesh.new()
+		shoulder_mesh.radius = 0.15
+		shoulder_mesh.height = 0.18
+		shoulder.mesh = shoulder_mesh
+		shoulder.scale = Vector3(1.35, 0.42, 0.9)
+		shoulder.position = Vector3(x, 1.56, 0.02)
+		shoulder.material_override = steel
+		body.add_child(shoulder)
+		_register_battle_gear_node(shoulder)
+
+	var belt := MeshInstance3D.new()
+	var belt_mesh := CylinderMesh.new()
+	belt_mesh.top_radius = 0.25
+	belt_mesh.bottom_radius = 0.25
+	belt_mesh.height = 0.08
+	belt.mesh = belt_mesh
+	belt.position = Vector3(0, 1.02, 0.0)
+	belt.material_override = gold
+	body.add_child(belt)
+	_register_battle_gear_node(belt)
+
+	var skirt := MeshInstance3D.new()
+	var skirt_mesh := CylinderMesh.new()
+	skirt_mesh.top_radius = 0.28
+	skirt_mesh.bottom_radius = 0.34
+	skirt_mesh.height = 0.28
+	skirt.mesh = skirt_mesh
+	skirt.position = Vector3(0, 0.84, 0.0)
+	skirt.material_override = dark_steel
+	body.add_child(skirt)
+	_register_battle_gear_node(skirt)
+
+	var helm := MeshInstance3D.new()
+	var helm_mesh := SphereMesh.new()
+	helm_mesh.radius = 0.19
+	helm_mesh.height = 0.22
+	helm.mesh = helm_mesh
+	helm.scale = Vector3(1.05, 0.55, 1.0)
+	helm.position = Vector3(0, 1.94, -0.01)
+	helm.material_override = steel
+	body.add_child(helm)
+	_register_battle_gear_node(helm)
+
+	var crest := MeshInstance3D.new()
+	var crest_mesh := BoxMesh.new()
+	crest_mesh.size = Vector3(0.08, 0.26, 0.24)
+	crest.mesh = crest_mesh
+	crest.position = Vector3(0, 2.08, -0.03)
+	crest.material_override = crimson
+	body.add_child(crest)
+	_register_battle_gear_node(crest)
+
+	var right_arm := body.get_node_or_null("ArmR") as Node3D
+	if right_arm != null:
+		var sword := _build_sword(steel, gold, leather)
+		right_arm.add_child(sword)
+		_register_battle_gear_node(sword)
+
+	return root
+
+
+func _register_battle_gear_node(node: Node3D) -> void:
+	node.visible = false
+	_battle_gear_nodes.append(node)
+
+
+func _build_sword(blade_m: StandardMaterial3D, guard_m: StandardMaterial3D,
+		grip_m: StandardMaterial3D) -> Node3D:
+	var sword := Node3D.new()
+	sword.name = "Sword"
+	sword.position = Vector3(0.02, -0.72, 0.06)
+	sword.rotation_degrees = Vector3(-10, 0, 0)
+
+	var grip := MeshInstance3D.new()
+	var grip_mesh := CylinderMesh.new()
+	grip_mesh.top_radius = 0.035
+	grip_mesh.bottom_radius = 0.035
+	grip_mesh.height = 0.24
+	grip.mesh = grip_mesh
+	grip.position = Vector3(0, -0.08, 0)
+	grip.material_override = grip_m
+	sword.add_child(grip)
+
+	var guard := MeshInstance3D.new()
+	var guard_mesh := BoxMesh.new()
+	guard_mesh.size = Vector3(0.32, 0.04, 0.06)
+	guard.mesh = guard_mesh
+	guard.position = Vector3(0, -0.22, 0)
+	guard.material_override = guard_m
+	sword.add_child(guard)
+
+	var blade := MeshInstance3D.new()
+	var blade_mesh := BoxMesh.new()
+	blade_mesh.size = Vector3(0.055, 0.78, 0.035)
+	blade.mesh = blade_mesh
+	blade.position = Vector3(0, -0.63, 0)
+	blade.material_override = blade_m
+	sword.add_child(blade)
+
+	var tip := MeshInstance3D.new()
+	var tip_mesh := PrismMesh.new()
+	tip_mesh.size = Vector3(0.07, 0.16, 0.04)
+	tip.mesh = tip_mesh
+	tip.rotation_degrees = Vector3(0, 0, 180)
+	tip.position = Vector3(0, -1.1, 0)
+	tip.material_override = blade_m
+	sword.add_child(tip)
+	return sword
 
 
 ## A pilgrim's backpack (rounded sack + flap + bedroll + shoulder straps) for the

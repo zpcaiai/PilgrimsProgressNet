@@ -168,12 +168,12 @@ func _make_centered_box(parent: Control) -> VBoxContainer:
 	var center := CenterContainer.new()
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var s := get_viewport().get_visible_rect().size
-	center.custom_minimum_size = Vector2(maxf(280.0, s.x - safe * 2.0), maxf(360.0, s.y - safe * 2.0))
+	var safe_size := ResponsiveLayout.safe_size(self)
+	center.custom_minimum_size = Vector2(maxf(240.0, safe_size.x), maxf(260.0, safe_size.y))
 	scroll.add_child(center)
 	var vb := VBoxContainer.new()
 	vb.add_theme_constant_override("separation", 18)
-	vb.custom_minimum_size = Vector2(minf(560.0, maxf(280.0, s.x - safe * 2.0)), 0)
+	vb.custom_minimum_size = Vector2(minf(560.0, maxf(240.0, safe_size.x)), 0)
 	center.add_child(vb)
 	return vb
 
@@ -521,7 +521,7 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 
 
 func _add_volume_slider(vb: VBoxContainer, label_text: String, key: String) -> void:
-	var row := HBoxContainer.new()
+	var row := HFlowContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	var lbl := Label.new()
 	lbl.text = LocaleManager.zh_or_mixed(label_text)
@@ -587,7 +587,7 @@ func _apply_ui_scale() -> void:
 
 func _add_range_slider(vb: VBoxContainer, label_text: String, key: String,
 		mn: float, mx: float, step: float, default: float, as_percent: bool) -> void:
-	var row := HBoxContainer.new()
+	var row := HFlowContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	var lbl := Label.new()
 	lbl.text = LocaleManager.zh_or_mixed(label_text)

@@ -245,6 +245,8 @@ func choice_feedback(effects: Dictionary) -> String:
 		return "价值回应：你用信心回应惧怕，继续向前。"
 	if int(effects.get("hope", 0)) > 0 or int(effects.get("despair", 0)) < 0:
 		return "价值回应：你让盼望胜过绝望。"
+	if int(effects.get("love", 0)) > 0:
+		return "价值回应：你选择在爱中回应，而不是让心变冷。"
 	if int(effects.get("perseverance", 0)) > 0 or int(effects.get("weariness", 0)) < 0:
 		return "价值回应：你选择忍耐，不让疲乏决定方向。"
 	if int(effects.get("pride", 0)) > 0:

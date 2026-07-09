@@ -9,6 +9,7 @@ class_name ScriptureGate
 ## rolled out chapter by chapter without breaking flow.
 
 const DATA_PATH := "res://data/scripture/scripture_gates.json"
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 static var _data: Dictionary = {}
 
 var _q: Dictionary = {}
@@ -64,10 +65,9 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = true
 	var mobile := _is_mobile_ui()
-	var s := _viewport_size()
-	var margin := 24.0 if mobile else 36.0
-	var panel_w := maxf(280.0, minf(740.0, s.x - margin * 2.0)) if mobile else minf(740.0, s.x - margin * 2.0)
-	var panel_h := maxf(320.0, minf(680.0, s.y - margin * 2.0))
+	var safe := ResponsiveLayout.safe_size(self)
+	var panel_w := maxf(220.0, minf(740.0, safe.x))
+	var panel_h := maxf(260.0, minf(680.0, safe.y))
 	var body_font := 23 if mobile else 20
 	var prompt_font := 25 if mobile else 22
 	var title_font := 30 if mobile else 26
@@ -165,8 +165,10 @@ func _ready() -> void:
 	leave.text = "稍后再来 (Leave)"
 	leave.custom_minimum_size = Vector2(0, 50 if mobile else 0)
 	leave.add_theme_font_size_override("font_size", 19 if mobile else 16)
+	ResponsiveLayout.set_button_wrap(leave)
 	leave.pressed.connect(_leave)
 	vb.add_child(leave)
+	ResponsiveLayout.normalize_tree(panel, mobile)
 
 
 func _choose(orig_idx: int, btn: Button) -> void:

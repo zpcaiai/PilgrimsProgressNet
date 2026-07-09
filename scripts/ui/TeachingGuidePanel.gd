@@ -15,10 +15,13 @@ extends CanvasLayer
 ## TranslationServer (zh / en).
 
 const GUIDE_DIR := "res://data/teaching_guides/"
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _label: RichTextLabel
 var _root: Control
 var _panel: PanelContainer
+var _scroll: ScrollContainer
+var _content: VBoxContainer
 var _close: Button
 var _visible_for: String = ""
 
@@ -61,10 +64,14 @@ func _build_ui() -> void:
 	vbox.add_theme_constant_override("separation", 12)
 	margin.add_child(vbox)
 
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	vbox.add_child(scroll)
+	_scroll = ScrollContainer.new()
+	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	vbox.add_child(_scroll)
+
+	_content = VBoxContainer.new()
+	_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_scroll.add_child(_content)
 
 	_label = RichTextLabel.new()
 	_label.bbcode_enabled = true
@@ -72,11 +79,13 @@ func _build_ui() -> void:
 	_label.scroll_active = false
 	_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(_label)
+	ResponsiveLayout.apply_text_wrap(_label)
+	_content.add_child(_label)
 
 	_close = Button.new()
 	_close.text = "继续旅程 / Continue"
 	_close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	ResponsiveLayout.set_button_wrap(_close)
 	_close.pressed.connect(hide_panel)
 	vbox.add_child(_close)
 	get_viewport().size_changed.connect(_apply_layout)
@@ -93,16 +102,15 @@ func _apply_layout() -> void:
 		return
 	var s := get_viewport().get_visible_rect().size
 	var mobile := _is_mobile_ui()
-	var margin := 24.0 if mobile else 36.0
-	var w := minf(s.x - margin * 2.0, 760.0)
-	var h := minf(s.y - margin * 2.0, 600.0)
-	_panel.custom_minimum_size = Vector2(maxf(280.0, w), maxf(320.0, h))
-	_panel.offset_left = -w * 0.5
-	_panel.offset_right = w * 0.5
-	_panel.offset_top = -h * 0.5
-	_panel.offset_bottom = h * 0.5
+	var size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(760, 600), Vector2(280, 300))
+	ResponsiveLayout.normalize_tree(_panel, mobile)
+	if is_instance_valid(_scroll):
+		_scroll.custom_minimum_size = Vector2(maxf(240.0, size.x - 48.0), maxf(220.0, size.y - 92.0))
+	if is_instance_valid(_content):
+		_content.custom_minimum_size = Vector2(maxf(220.0, size.x - 56.0), 0)
 	if is_instance_valid(_label):
 		_label.add_theme_font_size_override("normal_font_size", 22 if mobile else 18)
+		_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
 	if is_instance_valid(_close):
 		_close.add_theme_font_size_override("font_size", 21 if mobile else 18)
 

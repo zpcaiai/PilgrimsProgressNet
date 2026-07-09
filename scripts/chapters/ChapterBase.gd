@@ -6,6 +6,7 @@ class_name ChapterBase
 var player: PlayerController = null
 var _spawn_position: Vector3 = Vector3(0, 1.0, 0)
 var _advancing: bool = false
+var _chapels_built: int = 0
 
 
 var companion: Companion = null
@@ -49,6 +50,7 @@ func _ready() -> void:
 		_sample_palette()
 	_dbg("build_start")
 	_build_chapter()
+	_ensure_chapter_chapel()
 	_dbg("build_end")
 	if RenderConfig.is_realistic():
 		_attach_realistic_backdrop()
@@ -649,11 +651,44 @@ func make_distant_light(pos: Vector3, color: Color = Color(1.0, 0.95, 0.7)) -> v
 
 
 # ---------------------------------------------------------------------------
-# Wayside chapel — an optional, secluded shrine. Pausing near it gives a small
-# blessing; kneeling inside gives a one-time grace and lights its candle.
+# Wayside chapel — a cross-bearing place of worship. Every chapter gets one:
+# hand-built chapters may place it themselves; the base class adds a fallback.
 # ---------------------------------------------------------------------------
-func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Dictionary, kneel_text: String) -> void:
+func _ensure_chapter_chapel() -> void:
+	if _chapels_built > 0:
+		return
+	var cid := ChapterManager.current_chapter_id
+	if cid == "":
+		return
+	make_wayside_chapel(_default_chapel_position(cid), cid, {},
+		"你在十字架下停留礼拜：信心 +1，盼望 +1，爱心 +1。")
+
+
+func _default_chapel_position(chapter_id: String) -> Vector3:
+	match chapter_id:
+		"city_of_destruction":
+			return Vector3(-13.0, 0, -14.0)
+		"wicket_gate":
+			return Vector3(4.0, 0, -12.0)
+		"cross_and_tomb":
+			return Vector3(-8.0, 0, -15.0)
+		"interpreter_house":
+			return Vector3(-7.5, 0, -18.0)
+		"palace_beautiful":
+			return Vector3(7.0, 0, -4.0)
+		"valley_humiliation":
+			return Vector3(-8.0, 0, 3.0)
+		"doubting_castle":
+			return Vector3(-9.0, 0, -10.0)
+		"celestial_city":
+			return Vector3(-8.0, 0, -14.0)
+		_:
+			return Vector3(-8.0, 0, -12.0)
+
+
+func make_wayside_chapel(pos: Vector3, chapel_id: String, _kneel_effects: Dictionary, kneel_text: String) -> void:
 	_dbg("make_wayside_chapel " + chapel_id)
+	_chapels_built += 1
 	var wall := Color(0.5, 0.48, 0.44)
 	make_block(Vector3(3.4, 3.0, 0.4), wall, pos + Vector3(0, 1.5, -1.6))
 	make_block(Vector3(0.4, 3.0, 3.2), wall, pos + Vector3(-1.5, 1.5, 0))
@@ -677,7 +712,7 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Diction
 	candle.material_override = make_material(Color(0.4, 0.38, 0.3))
 	add_child(candle)
 
-	# Pausing near the chapel is itself a small blessing (once).
+	# Pausing inside the chapel counts as worship once per chapter.
 	var pause := Area3D.new()
 	pause.collision_layer = 0
 	pause.collision_mask = 1
@@ -688,41 +723,43 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, kneel_effects: Diction
 	pcol.shape = pbox
 	pause.add_child(pcol)
 	pause.position = pos + Vector3(0, 1, 1.5)
-	var pflag := "paused_chapel_" + chapel_id
 	pause.body_entered.connect(func(b):
 		if b is PlayerController:
-			if not GameState.has_flag(pflag):
-				GameState.set_flag(pflag, true)
-				# Entering a cross-bearing chapel gives a small, readable blessing.
-				SpiritualStateManager.apply_effects({"faith": 1, "hope": 1, "watchfulness": 1})
-				EventBus.toast("你进入十字架下的小堂：信心 +1，盼望 +1，警醒 +1。")
-				EventBus.learning_moment_requested.emit({
-					"title": "小堂默想：在十字架下停一停",
-					"body": "[b]价值[/b]  敬拜不是额外任务，而是让心重新归向神。\n\n[b]想一想[/b]  这一章里，我最需要把哪一种惧怕、疲惫或骄傲交给主？\n\n[b]祷告[/b]  [i]主啊，求你使我在继续前先安静，记得道路属于你。[/i]"
-				})
+			_grant_chapel_worship(chapel_id, kneel_text, candle, pos)
 	)
 	add_child(pause)
 
-	# Kneeling gives a one-time grace and lights the candle.
 	make_floating_label("路旁小堂 Wayside Chapel", pos + Vector3(0, 2.7, 1.5), Color(0.85, 0.82, 0.7))
 	var _cb2 := func(_p):
-		if GameState.has_flag("found_chapel_" + chapel_id):
-			return
-		GameState.set_flag("found_chapel_" + chapel_id, true)
-		SpiritualStateManager.apply_effects(kneel_effects)
-		GameState.add_inventory_item("chapels_found", 1)
-		var lit := make_material(Color(1.0, 0.9, 0.6))
-		lit.emission_enabled = true
-		lit.emission = Color(1.0, 0.85, 0.5)
-		lit.emission_energy_multiplier = 3.0
-		if is_instance_valid(candle):
-			candle.material_override = lit
-		make_light_burst(pos + Vector3(0, 1.0, -1.0), Color(1.0, 0.9, 0.6), 26)
-		EventBus.toast(kneel_text)
-		AudioManager.play_sfx("chapel_kneel")
-		_check_chapel_meta()
-	make_interactable(pos + Vector3(0, 0, 1.0), "跪下片刻 (Kneel)",
+		_grant_chapel_worship(chapel_id, kneel_text, candle, pos)
+	make_interactable(pos + Vector3(0, 0, 1.0), "停留礼拜：信望爱 +1",
 		_cb2, null, Color(0.7, 0.65, 0.5), 0.6, 1.4, true)
+
+
+func _grant_chapel_worship(chapel_id: String, worship_text: String, candle: MeshInstance3D, chapel_pos: Vector3) -> void:
+	var flag := "found_chapel_" + chapel_id
+	if GameState.has_flag(flag):
+		return
+	GameState.set_flag(flag, true)
+	GameState.set_flag("paused_chapel_" + chapel_id, true)
+	GameState.set_flag("worshipped_at_chapel_" + chapel_id, true)
+	GameState.set_flag("worshipped_at_chapel", true)
+	SpiritualStateManager.apply_effects({"faith": 1, "hope": 1, "love": 1})
+	GameState.add_inventory_item("chapels_found", 1)
+	var lit := make_material(Color(1.0, 0.9, 0.6))
+	lit.emission_enabled = true
+	lit.emission = Color(1.0, 0.85, 0.5)
+	lit.emission_energy_multiplier = 3.0
+	if is_instance_valid(candle):
+		candle.material_override = lit
+	make_light_burst(chapel_pos + Vector3(0, 1.0, -1.0), Color(1.0, 0.9, 0.6), 26)
+	EventBus.toast(worship_text if worship_text != "" else "你在十字架下停留礼拜：信心 +1，盼望 +1，爱心 +1。")
+	EventBus.learning_moment_requested.emit({
+		"title": "小堂礼拜：信、望、爱",
+		"body": "[b]价值[/b]  礼拜不是额外任务，而是让心重新归向神。\n\n[b]想一想[/b]  这一章里，我最需要把哪一种惧怕、疲惫或骄傲交给主？\n\n[b]祷告[/b]  [i]主啊，求你使我在继续前先安静，在信、望、爱中走下一步。[/i]"
+	})
+	AudioManager.play_sfx("chapel_kneel")
+	_check_chapel_meta()
 
 
 func _check_chapel_meta() -> void:

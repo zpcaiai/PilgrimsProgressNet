@@ -69,9 +69,9 @@ func _build() -> void:
 	_body.add_theme_color_override("default_color", Color(0.86, 0.89, 0.96))
 	vb.add_child(_body)
 
-	var row := HBoxContainer.new()
+	var row := HFlowContainer.new()
 	row.add_theme_constant_override("separation", 12)
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.alignment = FlowContainer.ALIGNMENT_CENTER
 	vb.add_child(row)
 
 	var take_cloud := Button.new()
@@ -97,6 +97,7 @@ func _apply_layout() -> void:
 		return
 	var mobile := ResponsiveLayout.is_mobile(self)
 	ResponsiveLayout.fit_center_panel(_panel, self, Vector2(560, 340), Vector2(300, 260))
+	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_body):
 		_body.add_theme_font_size_override("normal_font_size", 20 if mobile else FONT_BODY)
 		_body.custom_minimum_size = Vector2(0, 140 if mobile else 110)

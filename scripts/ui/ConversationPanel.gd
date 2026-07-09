@@ -16,6 +16,7 @@ var _history_box: VBoxContainer
 var _history_scroll: ScrollContainer
 var _thread_scroll: ScrollContainer
 var _left_col: VBoxContainer
+var _right_col: VBoxContainer
 var _title: Label
 var _reply: LineEdit
 var _search: LineEdit
@@ -96,20 +97,20 @@ func _build() -> void:
 	_thread_scroll.add_child(_thread_list)
 
 	# Right: history + reply
-	var right := VBoxContainer.new()
-	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right.add_theme_constant_override("separation", 8)
-	root.add_child(right)
+	_right_col = VBoxContainer.new()
+	_right_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_right_col.add_theme_constant_override("separation", 8)
+	root.add_child(_right_col)
 	_title = Label.new()
 	_title.text = LocaleManager.t("conv.select", "选择左侧的会话")
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_title.add_theme_font_size_override("font_size", 18)
 	_title.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
-	right.add_child(_title)
+	_right_col.add_child(_title)
 	_history_scroll = ScrollContainer.new()
 	_history_scroll.custom_minimum_size = Vector2(0, 400)
 	_history_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	right.add_child(_history_scroll)
+	_right_col.add_child(_history_scroll)
 	_history_box = VBoxContainer.new()
 	_history_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_history_box.add_theme_constant_override("separation", 3)
@@ -120,11 +121,11 @@ func _build() -> void:
 	_read_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_read_label.add_theme_font_size_override("font_size", 12)
 	_read_label.add_theme_color_override("font_color", Color(0.55, 0.75, 0.6))
-	right.add_child(_read_label)
+	_right_col.add_child(_read_label)
 
 	var rrow := HBoxContainer.new()
 	rrow.add_theme_constant_override("separation", 8)
-	right.add_child(rrow)
+	_right_col.add_child(rrow)
 	_reply = LineEdit.new()
 	_reply.max_length = 200
 	_reply.placeholder_text = LocaleManager.t("conv.reply_ph", "回复…（Enter 发送）")
@@ -147,8 +148,11 @@ func _apply_layout() -> void:
 		return
 	var mobile := ResponsiveLayout.is_mobile(self)
 	var s := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(920, 620), Vector2(320, 420))
+	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_left_col):
-		_left_col.custom_minimum_size = Vector2(clampf(s.x * (0.34 if mobile else 0.32), 150.0, 280.0), 0)
+		_left_col.custom_minimum_size = Vector2(clampf(s.x * (0.36 if mobile else 0.32), 132.0, 280.0), 0)
+	if is_instance_valid(_right_col):
+		_right_col.custom_minimum_size = Vector2(maxf(150.0, s.x - _left_col.custom_minimum_size.x - 34.0), 0)
 	if is_instance_valid(_thread_scroll):
 		_thread_scroll.custom_minimum_size = Vector2(0, maxf(180.0, s.y - 84.0))
 	if is_instance_valid(_history_scroll):

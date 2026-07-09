@@ -104,6 +104,7 @@ func _apply_layout() -> void:
 		return
 	var mobile := ResponsiveLayout.is_mobile(self)
 	ResponsiveLayout.fit_center_panel(_panel, self, Vector2(600, 420), Vector2(300, 300))
+	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_body):
 		_body.add_theme_font_size_override("normal_font_size", 21 if mobile else 19)
 		_body.custom_minimum_size = Vector2(0, 240 if mobile else 200)

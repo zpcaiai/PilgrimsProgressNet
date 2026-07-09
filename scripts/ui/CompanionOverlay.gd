@@ -80,7 +80,8 @@ func _apply_layout() -> void:
 	var mobile := ResponsiveLayout.is_mobile(self)
 	var m := ResponsiveLayout.margin(self)
 	_panel.position = Vector2(m, 172.0 if mobile else 122.0)
-	_panel.size = Vector2(minf(330.0, maxf(280.0, s.x - m * 2.0)), 108.0 if mobile else 96.0)
+	_panel.size = Vector2(minf(330.0, maxf(220.0, s.x - m * 2.0)), 108.0 if mobile else 96.0)
+	ResponsiveLayout.normalize_tree(_panel, mobile)
 
 
 func _on_presence(chapter_id: String, online: int) -> void:

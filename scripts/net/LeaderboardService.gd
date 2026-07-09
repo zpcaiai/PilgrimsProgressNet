@@ -53,7 +53,7 @@ func _devout_score() -> int:
 	var s := SpiritualStateManager.to_dict() if SpiritualStateManager.has_method("to_dict") else {}
 	var base := 1000
 	if s is Dictionary:
-		base += int(s.get("faith", 0)) + int(s.get("hope", 0)) + int(s.get("humility", 0))
+		base += int(s.get("faith", 0)) + int(s.get("hope", 0)) + int(s.get("love", 0)) + int(s.get("humility", 0))
 	return max(0, base - _falls * 50)
 
 

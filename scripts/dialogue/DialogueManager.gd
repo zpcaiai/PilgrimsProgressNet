@@ -135,7 +135,7 @@ func get_choice_effect_hint(choice: Dictionary) -> String:
 		for k in (choice["effects"] as Dictionary).keys():
 			if SpiritualStateManager.NUMERIC_STATES.has(k):
 				eff[k] = int(eff.get(k, 0)) + int(choice["effects"][k])
-	var names := {"faith":"信","hope":"望","humility":"谦","discernment":"辨","perseverance":"毅","watchfulness":"警","despair":"绝","shame":"羞","fear":"惧","pride":"傲","deception":"欺","weariness":"乏"}
+	var names := {"faith":"信","hope":"望","love":"爱","humility":"谦","discernment":"辨","perseverance":"毅","watchfulness":"警","despair":"绝","shame":"羞","fear":"惧","pride":"傲","deception":"欺","weariness":"乏"}
 	var parts: Array = []
 	for k in eff.keys():
 		var v := int(eff[k])

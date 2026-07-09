@@ -85,15 +85,15 @@ func _build() -> void:
 	margin.add_child(scroll)
 
 	var center := CenterContainer.new()
-	var s := get_viewport().get_visible_rect().size
-	center.custom_minimum_size = Vector2(maxf(280.0, s.x - safe * 2.0), maxf(360.0, s.y - safe * 2.0))
+	var safe_size := ResponsiveLayout.safe_size(self)
+	center.custom_minimum_size = Vector2(maxf(240.0, safe_size.x), maxf(260.0, safe_size.y))
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.add_child(center)
 
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 9)
-	box.custom_minimum_size = Vector2(minf(760.0, maxf(280.0, s.x - safe * 2.0)), 0)
+	box.custom_minimum_size = Vector2(minf(760.0, maxf(240.0, safe_size.x)), 0)
 	center.add_child(box)
 
 	var title := Label.new()

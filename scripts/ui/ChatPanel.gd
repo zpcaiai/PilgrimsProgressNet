@@ -24,7 +24,7 @@ var _channel: String = "chapter"
 var _peers: Dictionary = {}   # peer_id -> name (for DM targets)
 var _img_http: HTTPRequest
 var _room_edit: LineEdit
-var _room_box: HBoxContainer
+var _room_box: Container
 var _current_room: String = ""
 var _room_name: String = ""
 var _members_popup: PanelContainer
@@ -162,7 +162,7 @@ func _build() -> void:
 	_input_row.size = Vector2(720, 48)
 	_input_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_input_row)
-	var hb := HBoxContainer.new()
+	var hb := HFlowContainer.new()
 	hb.set_anchors_preset(Control.PRESET_FULL_RECT)
 	hb.add_theme_constant_override("separation", 8)
 	_input_row.add_child(hb)
@@ -181,7 +181,7 @@ func _build() -> void:
 	hb.add_child(_dm_btn)
 
 	# Group-room controls (visible when channel == "room").
-	_room_box = HBoxContainer.new()
+	_room_box = HFlowContainer.new()
 	_room_box.add_theme_constant_override("separation", 4)
 	_room_box.visible = false
 	hb.add_child(_room_box)
@@ -409,19 +409,20 @@ func _apply_layout() -> void:
 	var mobile := ResponsiveLayout.is_mobile(self)
 	var margin := ResponsiveLayout.margin(self)
 	var input_w := minf(s.x - margin * 2.0, 760.0)
+	var input_h := 112.0 if mobile else 48.0
 	if is_instance_valid(_input_row):
 		_input_row.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-		_input_row.position = Vector2(margin, -84.0)
-		_input_row.size = Vector2(maxf(280.0, input_w), 56.0 if mobile else 48.0)
+		_input_row.position = Vector2(margin, -input_h - 28.0)
+		_input_row.size = Vector2(maxf(220.0, input_w), input_h)
 	if is_instance_valid(_reply_bar):
 		_reply_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-		_reply_bar.position = Vector2(margin, -126.0 if mobile else -120.0)
-		_reply_bar.size = Vector2(maxf(280.0, input_w), 38.0 if mobile else 30.0)
+		_reply_bar.position = Vector2(margin, -input_h - (70.0 if mobile else 72.0))
+		_reply_bar.size = Vector2(maxf(220.0, input_w), 38.0 if mobile else 30.0)
 	if is_instance_valid(_log_panel):
 		var log_w := minf(s.x - margin * 2.0, 480.0)
 		var log_h := clampf(s.y * 0.28, 150.0, 240.0)
-		_log_panel.position = Vector2(margin, -log_h - (156.0 if mobile else 142.0))
-		_log_panel.size = Vector2(maxf(280.0, log_w), log_h)
+		_log_panel.position = Vector2(margin, -log_h - input_h - (94.0 if mobile else 94.0))
+		_log_panel.size = Vector2(maxf(220.0, log_w), log_h)
 	if is_instance_valid(_members_popup):
 		_members_popup.position = Vector2(margin + minf(340.0, input_w * 0.45), -300.0 if mobile else -260.0)
 	if is_instance_valid(_ac_popup):
@@ -434,6 +435,14 @@ func _apply_layout() -> void:
 		_viewer_rect.offset_top = 72.0 if mobile else 80.0
 		_viewer_rect.offset_right = -viewer_margin
 		_viewer_rect.offset_bottom = -viewer_margin
+	if is_instance_valid(_input_row):
+		ResponsiveLayout.normalize_tree(_input_row, mobile)
+	if is_instance_valid(_log_panel):
+		ResponsiveLayout.normalize_tree(_log_panel, mobile)
+	if is_instance_valid(_members_popup):
+		ResponsiveLayout.normalize_tree(_members_popup, mobile)
+	if is_instance_valid(_emoji_popup):
+		ResponsiveLayout.normalize_tree(_emoji_popup, mobile)
 
 
 func _bg(color: Color, radius: int) -> StyleBoxFlat:

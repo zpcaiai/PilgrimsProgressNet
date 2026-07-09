@@ -5,12 +5,12 @@ extends Node
 ## Autoloaded as "SpiritualStateManager".
 
 const NUMERIC_STATES := [
-	"faith", "hope", "humility", "discernment", "perseverance", "watchfulness",
+	"faith", "hope", "love", "humility", "discernment", "perseverance", "watchfulness",
 	"repentance",
 	"despair", "shame", "fear", "pride", "deception", "weariness", "temptation", "doubt",
 ]
 
-const POSITIVE_STATES := ["faith", "hope", "humility", "discernment", "perseverance", "watchfulness", "repentance"]
+const POSITIVE_STATES := ["faith", "hope", "love", "humility", "discernment", "perseverance", "watchfulness", "repentance"]
 const NEGATIVE_STATES := ["despair", "shame", "fear", "pride", "deception", "weariness", "temptation", "doubt"]
 
 const BOOL_STATES := ["has_burden", "has_scroll", "has_seal", "has_promise_key",
@@ -20,6 +20,7 @@ const BOOL_STATES := ["has_burden", "has_scroll", "has_seal", "has_promise_key",
 # --- Positive states ---
 var faith: int = 5
 var hope: int = 5
+var love: int = 5
 var humility: int = 10
 var discernment: int = 5
 var perseverance: int = 10
@@ -67,6 +68,7 @@ func _process(delta: float) -> void:
 func reset_for_new_game() -> void:
 	faith = 5
 	hope = 5
+	love = 5
 	humility = 10
 	discernment = 5
 	perseverance = 10
@@ -297,6 +299,7 @@ func apply_cross_grace() -> void:
 	modify_state("fear", -60)
 	modify_state("faith", 30)
 	modify_state("hope", 30)
+	modify_state("love", 20)
 	modify_state("humility", 10)
 	_collapsed = false
 	EventBus.burden_removed.emit()
@@ -398,7 +401,7 @@ func can_resist_temptation(temptation_type: String, difficulty: int) -> bool:
 
 func _state_label(state_name: String) -> String:
 	var names := {
-		"faith": "信心", "hope": "盼望", "humility": "谦卑", "discernment": "分辨",
+		"faith": "信心", "hope": "盼望", "love": "爱心", "humility": "谦卑", "discernment": "分辨",
 		"perseverance": "忍耐", "watchfulness": "警醒", "repentance": "悔改",
 		"despair": "绝望", "shame": "羞愧", "fear": "惧怕", "pride": "骄傲",
 		"deception": "迷惑", "weariness": "疲惫", "temptation": "试探", "doubt": "疑惑",

@@ -162,7 +162,7 @@ func _build() -> void:
 	vb.add_child(_rewards)
 
 	# Mode switch: bind vs recover
-	var modes := HBoxContainer.new()
+	var modes := HFlowContainer.new()
 	modes.add_theme_constant_override("separation", 8)
 	vb.add_child(modes)
 	for m in [{"id": "bind", "title": LocaleManager.t("account.bind", "绑定邮箱")}, {"id": "recover", "title": LocaleManager.t("account.recover", "找回账号")}]:
@@ -184,7 +184,7 @@ func _build() -> void:
 	_email_edit.add_theme_font_size_override("font_size", FONT_BODY)
 	vb.add_child(_email_edit)
 
-	var code_row := HBoxContainer.new()
+	var code_row := HFlowContainer.new()
 	code_row.add_theme_constant_override("separation", 8)
 	vb.add_child(code_row)
 	_code_edit = LineEdit.new()
@@ -201,9 +201,9 @@ func _build() -> void:
 	send_btn.pressed.connect(_send_code)
 	code_row.add_child(send_btn)
 
-	var act_row := HBoxContainer.new()
+	var act_row := HFlowContainer.new()
 	act_row.add_theme_constant_override("separation", 12)
-	act_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	act_row.alignment = FlowContainer.ALIGNMENT_CENTER
 	vb.add_child(act_row)
 	var confirm := Button.new()
 	confirm.text = LocaleManager.t("common.confirm", "确认")
@@ -234,6 +234,7 @@ func _apply_layout() -> void:
 		return
 	var mobile := ResponsiveLayout.is_mobile(self)
 	var panel_size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(640, 500), Vector2(300, 360))
+	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_who):
 		_who.add_theme_font_size_override("normal_font_size", 20 if mobile else FONT_BODY)
 		_who.custom_minimum_size = Vector2(0, 78 if mobile else 64)

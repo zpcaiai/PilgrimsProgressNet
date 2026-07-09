@@ -8,6 +8,7 @@ var _darkness_overlay: ColorRect
 var _quest_label: RichTextLabel
 var _faith_bar: ProgressBar
 var _hope_bar: ProgressBar
+var _love_bar: ProgressBar
 var _despair_bar: ProgressBar
 var _weariness_bar: ProgressBar
 var _humility_bar: ProgressBar
@@ -47,6 +48,7 @@ const MOBILE_FONT_BODY := 24
 const MOBILE_FONT_DIALOGUE := 28
 const MOBILE_FONT_CHOICE := 25
 const MOBILE_FONT_NARRATION := 26
+const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 # Title card
 var _title_card: Control
@@ -189,7 +191,7 @@ func _apply_responsive_layout() -> void:
 		if mobile and portrait:
 			_quest_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 			_quest_panel.position = Vector2(margin, margin)
-			_quest_panel.size = Vector2(maxf(280.0, s.x - margin * 2.0), 156)
+			_quest_panel.size = Vector2(maxf(220.0, s.x - margin * 2.0), 156)
 		elif mobile:
 			_quest_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 			_quest_panel.position = Vector2(margin, margin)
@@ -208,30 +210,33 @@ func _apply_responsive_layout() -> void:
 		if mobile and portrait:
 			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 			_spiritual_panel.position = Vector2(margin, _quest_panel.position.y + _quest_panel.size.y + 12.0)
-			_spiritual_panel.size = Vector2(maxf(280.0, s.x - margin * 2.0), 330)
+			_spiritual_panel.size = Vector2(maxf(220.0, s.x - margin * 2.0), 370)
 		elif mobile:
 			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 			_spiritual_panel.position = Vector2(-346, margin)
-			_spiritual_panel.size = Vector2(330, 330)
+			_spiritual_panel.size = Vector2(330, 370)
 		else:
 			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 			_spiritual_panel.position = Vector2(-272, margin)
-			_spiritual_panel.size = Vector2(252, 270)
+			_spiritual_panel.size = Vector2(252, 305)
 	for lbl in _stat_labels:
 		if is_instance_valid(lbl):
 			lbl.custom_minimum_size = Vector2(104 if mobile else 70, 0)
 			lbl.add_theme_font_size_override("font_size", body)
+			ResponsiveLayout.apply_text_wrap(lbl, mobile)
 	for vlbl in _stat_value_labels:
 		if is_instance_valid(vlbl):
 			vlbl.custom_minimum_size = Vector2(42 if mobile else 32, 0)
 			vlbl.add_theme_font_size_override("font_size", body)
-	for bar in [_faith_bar, _hope_bar, _humility_bar, _watchfulness_bar, _despair_bar, _fear_bar, _shame_bar, _weariness_bar]:
+	for bar in [_faith_bar, _hope_bar, _love_bar, _humility_bar, _watchfulness_bar, _despair_bar, _fear_bar, _shame_bar, _weariness_bar]:
 		if is_instance_valid(bar):
 			bar.custom_minimum_size = Vector2(170 if mobile else 120, 20 if mobile else 16)
 	if is_instance_valid(_burden_label):
 		_burden_label.add_theme_font_size_override("font_size", body)
+		ResponsiveLayout.apply_text_wrap(_burden_label, mobile)
 	if is_instance_valid(_load_label):
 		_load_label.add_theme_font_size_override("font_size", body)
+		ResponsiveLayout.apply_text_wrap(_load_label, mobile)
 
 	if is_instance_valid(_prompt_label):
 		_prompt_label.add_theme_font_size_override("font_size", title)
@@ -252,7 +257,7 @@ func _apply_responsive_layout() -> void:
 
 	if is_instance_valid(_dialogue_panel):
 		if mobile:
-			var dialog_w := maxf(280.0, s.x - margin * 2.0)
+			var dialog_w := maxf(220.0, s.x - margin * 2.0)
 			var dialog_h := clampf(s.y * 0.42, 300.0, 380.0)
 			_set_bottom_wide_rect(_dialogue_panel, margin, 64.0, dialog_w, dialog_h)
 		else:
@@ -266,17 +271,20 @@ func _apply_responsive_layout() -> void:
 			_portrait.visible = false
 	if is_instance_valid(_speaker_label):
 		_speaker_label.add_theme_font_size_override("font_size", title)
+		ResponsiveLayout.apply_text_wrap(_speaker_label, mobile)
 	if is_instance_valid(_text_label):
 		_text_label.add_theme_font_size_override("normal_font_size", dialogue)
 		_text_label.add_theme_font_size_override("bold_font_size", dialogue)
 		_text_label.add_theme_constant_override("line_separation", 8 if mobile else 4)
-		_text_label.custom_minimum_size = Vector2(0, 120 if mobile else 60)
+		_text_label.custom_minimum_size = Vector2(0, 126 if mobile else 68)
+		_text_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
 	if is_instance_valid(_choice_box):
 		_choice_box.add_theme_constant_override("separation", 8 if mobile else 4)
 		for child in _choice_box.get_children():
 			if child is Button:
 				(child as Button).add_theme_font_size_override("font_size", _choice_font())
-				(child as Button).custom_minimum_size = Vector2(0, 48 if mobile else 0)
+				(child as Button).custom_minimum_size = Vector2(0, 56 if mobile else 44)
+				ResponsiveLayout.set_button_wrap(child as Button)
 
 	if is_instance_valid(_title_center):
 		var title_w := minf(s.x - 48.0, 760.0) if mobile else 600.0
@@ -291,7 +299,7 @@ func _apply_responsive_layout() -> void:
 		_title_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 	if is_instance_valid(_narration_panel):
-		var narr_w := minf(maxf(320.0, s.x - 64.0), 760.0)
+		var narr_w := minf(maxf(240.0, s.x - 64.0), 760.0)
 		_narration_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		_narration_panel.position = Vector2((s.x - narr_w) * 0.5, _narration_panel.position.y)
 		_narration_panel.size = Vector2(narr_w, _narration_panel.size.y)
@@ -314,6 +322,7 @@ func _apply_responsive_layout() -> void:
 			_char_label.scroll_active = false
 	if is_instance_valid(_char_label):
 		_char_label.add_theme_font_size_override("normal_font_size", body)
+		_char_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
 
 	if is_instance_valid(_lang_btn):
 		_lang_btn.add_theme_font_size_override("font_size", 18 if mobile else 14)
@@ -361,7 +370,7 @@ func _build_quest_tracker() -> void:
 func _build_spiritual_panel() -> void:
 	_spiritual_panel = Panel.new()
 	_spiritual_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.05, 0.05, 0.09, 0.65)))
-	_spiritual_panel.size = Vector2(252, 270)
+	_spiritual_panel.size = Vector2(252, 305)
 	_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	_spiritual_panel.position = Vector2(-272, 20)
 	add_child(_spiritual_panel)
@@ -373,6 +382,7 @@ func _build_spiritual_panel() -> void:
 
 	_faith_bar = _add_stat_row(vb, "hud.faith", "信心 Faith", Color(0.95, 0.85, 0.4))
 	_hope_bar = _add_stat_row(vb, "hud.hope", "盼望 Hope", Color(0.45, 0.8, 0.95))
+	_love_bar = _add_stat_row(vb, "hud.love", "爱心 Love", Color(0.95, 0.58, 0.58))
 	_humility_bar = _add_stat_row(vb, "hud.humility", "谦卑 Humility", Color(0.55, 0.8, 0.5))
 	_watchfulness_bar = _add_stat_row(vb, "hud.watchfulness", "警醒 Vigilance", Color(0.5, 0.7, 0.95))
 	_despair_bar = _add_stat_row(vb, "hud.despair", "绝望 Despair", Color(0.6, 0.35, 0.62))
@@ -384,11 +394,13 @@ func _build_spiritual_panel() -> void:
 	_burden_label.add_theme_font_size_override("font_size", FONT_BODY)
 	_burden_label.text = LocaleManager.t("hud.burden_carried", "Burden: carried")
 	_burden_label.modulate = Color(0.85, 0.7, 0.6)
+	ResponsiveLayout.apply_text_wrap(_burden_label)
 	vb.add_child(_burden_label)
 
 	_load_label = Label.new()
 	_load_label.add_theme_font_size_override("font_size", FONT_BODY)
 	_load_label.modulate = Color(0.8, 0.8, 0.88)
+	ResponsiveLayout.apply_text_wrap(_load_label)
 	vb.add_child(_load_label)
 
 
@@ -402,6 +414,7 @@ func _add_stat_row(parent: VBoxContainer, key: String, fallback: String, color: 
 	_stat_labels.append(lbl)
 	lbl.custom_minimum_size = Vector2(70, 0)
 	lbl.add_theme_font_size_override("font_size", FONT_BODY)
+	ResponsiveLayout.apply_text_wrap(lbl)
 	row.add_child(lbl)
 	var bar := ProgressBar.new()
 	bar.min_value = 0
@@ -447,6 +460,7 @@ func _build_prompt() -> void:
 	_prompt_label.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	_prompt_label.position = Vector2(-200, -180)
 	_prompt_label.size = Vector2(400, 40)
+	ResponsiveLayout.apply_text_wrap(_prompt_label)
 	_prompt_label.visible = false
 	add_child(_prompt_label)
 
@@ -461,6 +475,7 @@ func _build_toast() -> void:
 	_toast_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	_toast_label.position = Vector2(-300, 130)
 	_toast_label.size = Vector2(600, 30)
+	ResponsiveLayout.apply_text_wrap(_toast_label)
 	_toast_label.visible = false
 	add_child(_toast_label)
 
@@ -494,6 +509,7 @@ func _build_dialogue() -> void:
 	_speaker_label = Label.new()
 	_speaker_label.add_theme_font_size_override("font_size", FONT_TITLE)
 	_speaker_label.add_theme_color_override("font_color", Color(1, 0.9, 0.6))
+	ResponsiveLayout.apply_text_wrap(_speaker_label)
 	vb.add_child(_speaker_label)
 
 	_text_label = RichTextLabel.new()
@@ -564,6 +580,7 @@ func _build_title_card() -> void:
 	_title_main.add_theme_color_override("font_color", Color(0.97, 0.92, 0.7))
 	_title_main.add_theme_color_override("font_outline_color", Color(0, 0, 0))
 	_title_main.add_theme_constant_override("outline_size", 8)
+	ResponsiveLayout.apply_text_wrap(_title_main)
 	vb.add_child(_title_main)
 	_title_sub = Label.new()
 	_title_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -571,6 +588,7 @@ func _build_title_card() -> void:
 	_title_sub.add_theme_color_override("font_color", Color(0.8, 0.82, 0.9))
 	_title_sub.add_theme_color_override("font_outline_color", Color(0, 0, 0))
 	_title_sub.add_theme_constant_override("outline_size", 6)
+	ResponsiveLayout.apply_text_wrap(_title_sub)
 	vb.add_child(_title_sub)
 
 
@@ -760,6 +778,7 @@ func _build_char_panel() -> void:
 	_char_label.bbcode_enabled = true
 	_char_label.fit_content = true
 	_char_label.scroll_active = false
+	_char_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_char_label.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_char_label.add_theme_font_size_override("normal_font_size", FONT_BODY)
 	_char_panel.add_child(_char_label)
@@ -788,8 +807,9 @@ func _refresh_char_panel() -> void:
 	var t := "[b]" + LocaleManager.t("char.title", "The Pilgrim's Heart") + "[/b]   [color=#888888]" + close_hint + "[/color]\n"
 	t += "[color=#9aa6c0]" + mode_label + "[/color]\n\n"
 	t += "[color=#f0e0a0]" + LocaleManager.t("char.graces", "Graces") + "[/color]\n"
-	t += "  %s %d   %s %d   %s %d\n" % [LocaleManager.t("hud.faith","Faith"), s.faith, LocaleManager.t("hud.hope","Hope"), s.hope, LocaleManager.t("hud.humility","Humility"), s.humility]
-	t += "  %s %d   %s %d   %s %d\n\n" % [LocaleManager.t("hud.discernment","Discernment"), s.discernment, LocaleManager.t("hud.perseverance","Perseverance"), s.perseverance, LocaleManager.t("hud.watchfulness","Watchfulness"), s.watchfulness]
+	t += "  %s %d   %s %d   %s %d\n" % [LocaleManager.t("hud.faith","Faith"), s.faith, LocaleManager.t("hud.hope","Hope"), s.hope, LocaleManager.t("hud.love","Love"), s.love]
+	t += "  %s %d   %s %d   %s %d\n" % [LocaleManager.t("hud.humility","Humility"), s.humility, LocaleManager.t("hud.discernment","Discernment"), s.discernment, LocaleManager.t("hud.perseverance","Perseverance"), s.perseverance]
+	t += "  %s %d\n\n" % [LocaleManager.t("hud.watchfulness","Watchfulness"), s.watchfulness]
 	t += "[color=#d0a0c0]" + LocaleManager.t("char.burdens", "Burdens") + "[/color]\n"
 	t += "  %s %d   %s %d   %s %d\n" % [LocaleManager.t("hud.despair","Despair"), s.despair, LocaleManager.t("hud.shame","Shame"), s.shame, LocaleManager.t("hud.fear","Fear"), s.fear]
 	t += "  %s %d   %s %d   %s %d\n\n" % [LocaleManager.t("hud.pride","Pride"), s.pride, LocaleManager.t("hud.deception","Deception"), s.deception, LocaleManager.t("hud.weariness","Weariness"), s.weariness]
@@ -835,13 +855,14 @@ func _process(delta: float) -> void:
 	if is_instance_valid(_faith_bar):
 		_faith_bar.value = SpiritualStateManager.faith
 		_hope_bar.value = SpiritualStateManager.hope
+		_love_bar.value = SpiritualStateManager.love
 		_humility_bar.value = SpiritualStateManager.humility
 		_watchfulness_bar.value = SpiritualStateManager.watchfulness
 		_despair_bar.value = SpiritualStateManager.despair
 		_fear_bar.value = SpiritualStateManager.fear
 		_shame_bar.value = SpiritualStateManager.shame
 		_weariness_bar.value = SpiritualStateManager.weariness
-		for _b in [_faith_bar, _hope_bar, _humility_bar, _watchfulness_bar, _despair_bar, _fear_bar, _shame_bar, _weariness_bar]:
+		for _b in [_faith_bar, _hope_bar, _love_bar, _humility_bar, _watchfulness_bar, _despair_bar, _fear_bar, _shame_bar, _weariness_bar]:
 			if is_instance_valid(_b) and _b.has_meta("vlabel"):
 				(_b.get_meta("vlabel") as Label).text = str(int(round(_b.value)))
 		var load_pct := int(round(SpiritualStateManager.get_movement_penalty() * 100.0))
@@ -994,8 +1015,9 @@ func _rebuild_choices() -> void:
 		btn.text = "%d.  %s%s" % [idx, String(choice.get("text", "")), ("    〔" + hint + "〕" if hint != "" else "")]
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.add_theme_font_size_override("font_size", _choice_font())
+		ResponsiveLayout.set_button_wrap(btn)
 		if _is_mobile_ui():
-			btn.custom_minimum_size = Vector2(0, 48)
+			btn.custom_minimum_size = Vector2(0, 56)
 		var cid := String(choice.get("id", ""))
 		btn.pressed.connect(func(): _pick_choice(cid))
 		_choice_box.add_child(btn)
@@ -1005,8 +1027,9 @@ func _rebuild_choices() -> void:
 		var btn := Button.new()
 		btn.text = LocaleManager.t("hud.continue", "(Continue)")
 		btn.add_theme_font_size_override("font_size", _choice_font())
+		ResponsiveLayout.set_button_wrap(btn)
 		if _is_mobile_ui():
-			btn.custom_minimum_size = Vector2(0, 48)
+			btn.custom_minimum_size = Vector2(0, 56)
 		btn.pressed.connect(func(): DialogueManager.end_dialogue())
 		_choice_box.add_child(btn)
 
