@@ -147,6 +147,7 @@ func _apply_layout() -> void:
 	if not is_instance_valid(_panel):
 		return
 	var mobile := ResponsiveLayout.is_mobile(self)
+	ResponsiveLayout.fit_fullscreen(_dim, self)
 	var s := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(920, 620), Vector2(320, 420))
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_left_col):

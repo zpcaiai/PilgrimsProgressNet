@@ -93,21 +93,20 @@ func _build_ui() -> void:
 
 
 func _is_mobile_ui() -> bool:
-	var s := ResponsiveLayout.viewport_size(self)
-	return DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
+	return ResponsiveLayout.is_mobile(self)
 
 
 func _apply_layout() -> void:
 	if not is_instance_valid(_panel):
 		return
-	var s := ResponsiveLayout.viewport_size(self)
 	var mobile := _is_mobile_ui()
+	ResponsiveLayout.fit_fullscreen(_root, self)
 	var size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(760, 600), Vector2(280, 300))
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_scroll):
-		_scroll.custom_minimum_size = Vector2.ZERO if mobile else Vector2(maxf(240.0, size.x - 48.0), maxf(220.0, size.y - 92.0))
+		_scroll.custom_minimum_size = Vector2(maxf(220.0, size.x - 48.0), maxf(180.0, size.y - 92.0))
 	if is_instance_valid(_content):
-		_content.custom_minimum_size = Vector2.ZERO if mobile else Vector2(maxf(220.0, size.x - 56.0), 0)
+		_content.custom_minimum_size = Vector2(maxf(220.0, size.x - 56.0), 0)
 	if is_instance_valid(_label):
 		_label.add_theme_font_size_override("normal_font_size", 22 if mobile else 18)
 		_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART

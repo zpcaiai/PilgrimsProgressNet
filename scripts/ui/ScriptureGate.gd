@@ -30,8 +30,7 @@ func _viewport_size() -> Vector2:
 
 
 func _is_mobile_ui() -> bool:
-	var s := _viewport_size()
-	return DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
+	return ResponsiveLayout.is_mobile(self)
 
 
 static func _all() -> Dictionary:
@@ -180,13 +179,14 @@ func _apply_layout() -> void:
 	if not is_instance_valid(_panel):
 		return
 	var mobile := _is_mobile_ui()
+	ResponsiveLayout.fit_fullscreen(_root, self)
 	var size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(760.0, 620.0), Vector2(260.0, 320.0))
 	var content_w := maxf(220.0, size.x - (44.0 if mobile else 56.0))
 	var scroll_h := maxf(220.0, size.y - (40.0 if mobile else 52.0))
 	if is_instance_valid(_scroll):
-		_scroll.custom_minimum_size = Vector2.ZERO if mobile else Vector2(content_w, scroll_h)
+		_scroll.custom_minimum_size = Vector2(content_w, scroll_h)
 	if is_instance_valid(_content):
-		_content.custom_minimum_size = Vector2.ZERO if mobile else Vector2(content_w, 0)
+		_content.custom_minimum_size = Vector2(content_w, 0)
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	for b in _buttons:
 		if is_instance_valid(b):

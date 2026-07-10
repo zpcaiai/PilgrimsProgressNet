@@ -150,6 +150,7 @@ func _make_fullscreen_panel(bg: Color) -> Control:
 	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	ctrl.add_child(rect)
 	_menu_layer.add_child(ctrl)
+	ResponsiveLayout.fit_fullscreen(ctrl, self)
 	_menu_root = ctrl
 	return ctrl
 
@@ -356,10 +357,11 @@ func _show_controls_hint() -> void:
 	)
 	var apply_layout := func():
 		var mobile := ResponsiveLayout.is_mobile(cl)
+		ResponsiveLayout.fit_fullscreen(root, cl)
 		var size := ResponsiveLayout.fit_center_panel(panel, cl, Vector2(720, 560), Vector2(280, 320))
 		if mobile:
-			scroll.custom_minimum_size = Vector2.ZERO
-			vb.custom_minimum_size = Vector2.ZERO
+			scroll.custom_minimum_size = Vector2(maxf(220.0, size.x - 48.0), maxf(220.0, size.y - 48.0))
+			vb.custom_minimum_size = Vector2(maxf(200.0, size.x - 72.0), 0)
 		else:
 			scroll.custom_minimum_size = Vector2(maxf(240.0, size.x - 48.0), maxf(240.0, size.y - 48.0))
 			vb.custom_minimum_size = Vector2(maxf(220.0, size.x - 72.0), 0)

@@ -8,13 +8,20 @@ static func viewport_size(node: Node) -> Vector2:
 	return node.get_viewport().get_visible_rect().size
 
 
+static func window_size(node: Node) -> Vector2:
+	var size := Vector2(DisplayServer.window_get_size())
+	if size.x <= 0.0 or size.y <= 0.0:
+		return viewport_size(node)
+	return size
+
+
 static func is_mobile(node: Node) -> bool:
-	var s := viewport_size(node)
-	return DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
+	var s := window_size(node)
+	return minf(s.x, s.y) <= 700.0
 
 
 static func margin(node: Node) -> float:
-	var s := viewport_size(node)
+	var s := window_size(node)
 	if minf(s.x, s.y) <= 380.0:
 		return 14.0
 	return 24.0 if is_mobile(node) else 32.0
@@ -26,25 +33,32 @@ static func safe_size(node: Node) -> Vector2:
 	return Vector2(maxf(160.0, s.x - m * 2.0), maxf(160.0, s.y - m * 2.0))
 
 
+static func fit_fullscreen(control: Control, host: Node) -> Vector2:
+	if control == null:
+		return Vector2.ZERO
+	var size := viewport_size(host)
+	control.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	control.position = Vector2.ZERO
+	control.size = size
+	return size
+
+
 static func fit_center_panel(panel: Control, host: Node, max_size: Vector2,
-		min_size: Vector2 = Vector2(280, 240)) -> Vector2:
+			min_size: Vector2 = Vector2(280, 240)) -> Vector2:
 	if panel == null:
 		return Vector2.ZERO
+	var viewport := viewport_size(host)
 	var avail := safe_size(host)
-	if is_mobile(host):
-		var m := margin(host)
-		panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		panel.offset_left = m
-		panel.offset_top = m
-		panel.offset_right = -m
-		panel.offset_bottom = -m
-		return avail
+	var mobile := is_mobile(host)
 	var min_w := minf(min_size.x, avail.x)
 	var min_h := minf(min_size.y, avail.y)
-	var w := clampf(minf(max_size.x, avail.x), min_w, avail.x)
-	var h := clampf(minf(max_size.y, avail.y), min_h, avail.y)
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.position = Vector2(-w * 0.5, -h * 0.5)
+	var w := avail.x if mobile else clampf(minf(max_size.x, avail.x), min_w, avail.x)
+	var h := avail.y if mobile else clampf(minf(max_size.y, avail.y), min_h, avail.y)
+	panel.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	panel.position = Vector2(
+		floor((viewport.x - w) * 0.5),
+		floor((viewport.y - h) * 0.5)
+	)
 	panel.size = Vector2(w, h)
 	return panel.size
 

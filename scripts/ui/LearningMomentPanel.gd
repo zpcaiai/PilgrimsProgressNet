@@ -90,18 +90,17 @@ func _apply_layout() -> void:
 	if not is_instance_valid(_body):
 		return
 	var mobile := ResponsiveLayout.is_mobile(self)
-	var safe := ResponsiveLayout.safe_size(self)
-	var w := minf(safe.x, 720.0)
-	var h := minf(safe.y, 520.0)
-	if is_instance_valid(_panel):
-		_panel.custom_minimum_size = Vector2.ZERO if mobile else Vector2(maxf(240.0, w), maxf(260.0, h))
+	ResponsiveLayout.fit_fullscreen(_root, self)
+	var size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(720.0, 520.0), Vector2(260.0, 300.0))
+	var content_w := maxf(220.0, size.x - (40.0 if mobile else 48.0))
+	var content_h := maxf(220.0, size.y - (40.0 if mobile else 48.0))
 	if is_instance_valid(_scroll):
-		_scroll.custom_minimum_size = Vector2.ZERO if mobile else Vector2(maxf(240.0, w), maxf(220.0, h - 12.0))
+		_scroll.custom_minimum_size = Vector2(content_w, content_h)
 	if is_instance_valid(_content):
-		_content.custom_minimum_size = Vector2.ZERO if mobile else Vector2(maxf(220.0, w - 40.0), 0)
+		_content.custom_minimum_size = Vector2(content_w, 0)
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	_title.add_theme_font_size_override("font_size", 28 if not mobile else 26)
-	_body.custom_minimum_size = Vector2(0, maxf(220.0, h - 150.0))
+	_body.custom_minimum_size = Vector2(0, maxf(180.0, content_h - 110.0))
 	_body.add_theme_font_size_override("normal_font_size", 21 if not mobile else 23)
 	_body.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
 	_body.scroll_active = false

@@ -133,8 +133,7 @@ func _viewport_size() -> Vector2:
 
 
 func _is_mobile_ui() -> bool:
-	var s := _viewport_size()
-	return DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
+	return ResponsiveLayout.is_mobile(self)
 
 
 func _body_font() -> int:
