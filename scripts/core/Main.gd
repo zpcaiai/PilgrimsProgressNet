@@ -183,7 +183,8 @@ func _add_title(vb: VBoxContainer, text: String, size: int, color: Color) -> voi
 	lbl.text = LocaleManager.zh_or_mixed(text)
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	lbl.add_theme_font_size_override("font_size", size)
+	var mobile_size := int(round(float(size) * 1.25)) if ResponsiveLayout.is_mobile(self) else size
+	lbl.add_theme_font_size_override("font_size", mobile_size)
 	lbl.add_theme_color_override("font_color", color)
 	vb.add_child(lbl)
 
@@ -191,8 +192,9 @@ func _add_title(vb: VBoxContainer, text: String, size: int, color: Color) -> voi
 func _add_button(vb: VBoxContainer, text: String, cb: Callable) -> Button:
 	var btn := Button.new()
 	btn.text = LocaleManager.zh_or_mixed(text)
-	btn.custom_minimum_size = Vector2(0, 46)
-	btn.add_theme_font_size_override("font_size", 20)
+	var mobile := ResponsiveLayout.is_mobile(self)
+	btn.custom_minimum_size = Vector2(0, 62 if mobile else 46)
+	btn.add_theme_font_size_override("font_size", 28 if mobile else 20)
 	ResponsiveLayout.set_button_wrap(btn)
 	btn.pressed.connect(cb)
 	vb.add_child(btn)
@@ -243,6 +245,8 @@ func _show_title() -> void:
 	var hint := Label.new()
 	hint.text = LocaleManager.t("menu.hint_touch", "左侧摇杆移动 · 点「互动/继续」交互与对话 · 点「祷告」「悔改」回应试探 · 点「心境」回看经文 · 点「地图」看路线") if DisplayServer.is_touchscreen_available() else LocaleManager.t("menu.hint", "WASD move · E interact · Q/P pray · R repent · 1-4 choose · C heart · Tab map · Esc pause")
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if ResponsiveLayout.is_mobile(self) else TextServer.AUTOWRAP_WORD_SMART
+	hint.add_theme_font_size_override("font_size", 22 if ResponsiveLayout.is_mobile(self) else 16)
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
 	vb.add_child(hint)
 
@@ -256,6 +260,7 @@ func _start_child() -> void:
 
 
 func start_new_game(mode: String = "standard") -> void:
+	EventBus.clear_player_locks()
 	GameState.reset_for_new_game()
 	SpiritualStateManager.reset_for_new_game()
 	QuestManager.reset_for_new_game()
@@ -273,6 +278,7 @@ func start_new_game(mode: String = "standard") -> void:
 
 
 func continue_game() -> void:
+	EventBus.clear_player_locks()
 	if not SaveManager.load_game("slot_1"):
 		return
 	_clear_menu()
@@ -294,10 +300,18 @@ func _show_controls_hint() -> void:
 	Settings.mark_controls_seen()
 	var cl := CanvasLayer.new()
 	cl.layer = 30
+	cl.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(cl)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	cl.add_child(center)
+	EventBus.lock_player("controls_hint")
+	var root := Control.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.mouse_filter = Control.MOUSE_FILTER_STOP
+	cl.add_child(root)
+	var dim := ColorRect.new()
+	dim.color = Color(0.02, 0.025, 0.05, 0.76)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	root.add_child(dim)
 	var panel := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.06, 0.07, 0.12, 0.96)
@@ -306,10 +320,14 @@ func _show_controls_hint() -> void:
 	sb.border_color = Color(0.85, 0.74, 0.4, 0.6)
 	sb.set_border_width_all(2)
 	panel.add_theme_stylebox_override("panel", sb)
-	center.add_child(panel)
+	root.add_child(panel)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(scroll)
 	var vb := VBoxContainer.new()
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_theme_constant_override("separation", 10)
-	panel.add_child(vb)
+	scroll.add_child(vb)
 	_add_title(vb, "旅程指引 · Journey", 28, Color(0.95, 0.9, 0.6))
 	var lines := [
 		"这不是操作挑战，而是一段学习经文与操练价值观的旅程。",
@@ -329,10 +347,25 @@ func _show_controls_hint() -> void:
 	for s in lines:
 		var l := Label.new()
 		l.text = s
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.add_theme_font_size_override("font_size", 18)
+		l.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if ResponsiveLayout.is_mobile(self) else TextServer.AUTOWRAP_WORD_SMART
+		l.add_theme_font_size_override("font_size", 24 if ResponsiveLayout.is_mobile(self) else 18)
 		vb.add_child(l)
-	_add_button(vb, "知道了 Got it", func(): cl.queue_free())
+	_add_button(vb, "知道了 Got it", func():
+		EventBus.unlock_player("controls_hint")
+		cl.queue_free()
+	)
+	var apply_layout := func():
+		var mobile := ResponsiveLayout.is_mobile(cl)
+		var size := ResponsiveLayout.fit_center_panel(panel, cl, Vector2(720, 560), Vector2(280, 320))
+		if mobile:
+			scroll.custom_minimum_size = Vector2.ZERO
+			vb.custom_minimum_size = Vector2.ZERO
+		else:
+			scroll.custom_minimum_size = Vector2(maxf(240.0, size.x - 48.0), maxf(240.0, size.y - 48.0))
+			vb.custom_minimum_size = Vector2(maxf(220.0, size.x - 72.0), 0)
+		ResponsiveLayout.normalize_tree(panel, mobile)
+	get_viewport().size_changed.connect(apply_layout)
+	apply_layout.call()
 
 
 # ---------------------------------------------------------------------------
@@ -362,7 +395,7 @@ func _on_demo_completed() -> void:
 func _on_collapse() -> void:
 	if not _in_game:
 		return
-	EventBus.player_control_locked.emit(true)
+	EventBus.lock_player("repentance")
 	EventBus.repentance_started.emit()
 	_clear_menu()
 	var panel := _make_fullscreen_panel(Color(0.02, 0.0, 0.04, 0.86))
@@ -391,7 +424,7 @@ func _confess(effects: Dictionary) -> void:
 	SpiritualStateManager.apply_effects({"despair": -25, "hope": 18, "humility": 10, "shame": -18})
 	SpiritualStateManager.clear_collapse()
 	_clear_menu()
-	EventBus.player_control_locked.emit(false)
+	EventBus.unlock_player("repentance")
 	EventBus.repentance_completed.emit()
 	EventBus.toast(LocaleManager.t("toast.lifted", "You are lifted by grace, not by self-rescue. Walk on."))
 
@@ -442,7 +475,9 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	inv.toggled.connect(func(on): _set_input_setting("invert_look_y", on))
 	vb.add_child(inv)
 	_add_range_slider(vb, "触屏按钮大小 Touch Button Size", "touch_button_scale", 0.6, 1.4, 0.05, 1.0, true)
-	_add_range_slider(vb, "界面缩放 UI Scale", "ui_scale", 0.8, 1.6, 0.05, _ui_scale_default(), true)
+	var mobile_ui := DisplayServer.is_touchscreen_available()
+	_add_range_slider(vb, "界面缩放 UI Scale", "ui_scale",
+		1.6 if mobile_ui else 0.8, 2.6 if mobile_ui else 1.6, 0.05, _ui_scale_default(), true)
 
 	var spacerA := Control.new()
 	spacerA.custom_minimum_size = Vector2(0, 12)
@@ -485,7 +520,8 @@ func _build_options(layer: CanvasLayer, on_back: Callable) -> void:
 	fs_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	fs_lbl.add_theme_font_size_override("font_size", 18)
 	fs_row.add_child(fs_lbl)
-	for tier in [["小", 0.9], ["标准", 1.05], ["大", 1.2], ["特大", 1.4]]:
+	var text_tiers := [["小", 1.6], ["标准", 2.0], ["大", 2.3], ["特大", 2.6]] if mobile_ui else [["小", 0.9], ["标准", 1.05], ["大", 1.2], ["特大", 1.4]]
+	for tier in text_tiers:
 		var b := Button.new()
 		b.text = String(tier[0])
 		b.add_theme_font_size_override("font_size", 18)
@@ -534,7 +570,7 @@ func _add_volume_slider(vb: VBoxContainer, label_text: String, key: String) -> v
 	slider.max_value = 1.0
 	slider.step = 0.01
 	slider.value = AudioManager.get_volume(key)
-	var available := maxf(120.0, get_viewport().get_visible_rect().size.x - ResponsiveLayout.margin(self) * 2.0 - 180.0)
+	var available := maxf(120.0, ResponsiveLayout.viewport_size(self).x - ResponsiveLayout.margin(self) * 2.0 - 180.0)
 	slider.custom_minimum_size = Vector2(minf(260.0, available), 24)
 	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -571,8 +607,9 @@ func _set_input_setting(key: String, value) -> void:
 
 
 func _ui_scale_default() -> float:
-	# Phones/tablets start a bit larger so menu text & HUD numbers are readable.
-	return 1.15 if DisplayServer.is_touchscreen_available() else 1.0
+	# Web/mobile renders the 1280-wide logical canvas into a much narrower CSS
+	# viewport. This default yields readable physical text and 44px touch targets.
+	return 2.2 if DisplayServer.is_touchscreen_available() else 1.0
 
 
 func _apply_ui_scale() -> void:
@@ -582,7 +619,12 @@ func _apply_ui_scale() -> void:
 	var w := get_window()
 	if w == null:
 		return
-	w.content_scale_factor = clampf(float(_get_input_setting("ui_scale", _ui_scale_default())), 0.7, 2.0)
+	var value := float(_get_input_setting("ui_scale", _ui_scale_default()))
+	# Migrate legacy mobile saves from the old 0.8-1.6 range into the new readable
+	# range. Desktop values and deliberately larger mobile values are unchanged.
+	if DisplayServer.is_touchscreen_available() and value < 1.6:
+		value = 2.0
+	w.content_scale_factor = clampf(value, 1.6, 2.6) if DisplayServer.is_touchscreen_available() else clampf(value, 0.7, 2.0)
 
 
 func _add_range_slider(vb: VBoxContainer, label_text: String, key: String,
@@ -600,7 +642,7 @@ func _add_range_slider(vb: VBoxContainer, label_text: String, key: String,
 	slider.max_value = mx
 	slider.step = step
 	slider.value = float(_get_input_setting(key, default))
-	var available := maxf(120.0, get_viewport().get_visible_rect().size.x - ResponsiveLayout.margin(self) * 2.0 - 180.0)
+	var available := maxf(120.0, ResponsiveLayout.viewport_size(self).x - ResponsiveLayout.margin(self) * 2.0 - 180.0)
 	slider.custom_minimum_size = Vector2(minf(260.0, available), 24)
 	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -643,7 +685,7 @@ func _open_pause() -> void:
 	if DialogueManager.is_active():
 		return
 	_pause_visible = true
-	EventBus.player_control_locked.emit(true)
+	EventBus.lock_player("pause_menu")
 	for c in _pause_layer.get_children():
 		c.queue_free()
 	var panel := Control.new()
@@ -684,7 +726,7 @@ func _resume_from_pause() -> void:
 	for c in _pause_layer.get_children():
 		c.queue_free()
 	if _in_game and not DialogueManager.is_active():
-		EventBus.player_control_locked.emit(false)
+		EventBus.unlock_player("pause_menu")
 
 
 func _load_from_pause() -> void:
@@ -844,7 +886,7 @@ func _add_save_slot_row(vb: VBoxContainer, layer: CanvasLayer, on_back: Callable
 	var row := HFlowContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	var info := Label.new()
-	info.custom_minimum_size = Vector2(minf(300.0, get_viewport().get_visible_rect().size.x - ResponsiveLayout.margin(self) * 2.0), 0)
+	info.custom_minimum_size = Vector2(minf(300.0, ResponsiveLayout.viewport_size(self).x - ResponsiveLayout.margin(self) * 2.0), 0)
 	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	info.add_theme_font_size_override("font_size", 16)
 	if empty:
@@ -897,7 +939,7 @@ func _do_load_slot(slot: String) -> void:
 			chapter = "city_of_destruction"
 		ChapterManager.start_chapter(chapter)
 	if _in_game and not DialogueManager.is_active():
-		EventBus.player_control_locked.emit(false)
+		EventBus.unlock_player("pause_menu")
 
 
 # ---------------------------------------------------------------------------

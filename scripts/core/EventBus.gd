@@ -62,6 +62,39 @@ signal settings_changed()
 ## Language switched (zh/en). UIs rebuild their text in the new locale.
 signal locale_changed(locale: String)
 
+## Emitted whenever a persistent story flag changes. Quest/UI systems listen to
+## this instead of waiting for an unrelated spiritual-stat update.
+signal game_flag_changed(flag_name: String, old_value: Variant, new_value: Variant)
+
+var _player_lock_reasons: Dictionary = {}
+
 
 func toast(message: String) -> void:
 	emit_signal("notify", message)
+
+
+func lock_player(reason: String) -> void:
+	var key := reason if reason != "" else "unspecified"
+	var was_locked := not _player_lock_reasons.is_empty()
+	_player_lock_reasons[key] = true
+	if not was_locked:
+		player_control_locked.emit(true)
+
+
+func unlock_player(reason: String) -> void:
+	var key := reason if reason != "" else "unspecified"
+	var was_locked := not _player_lock_reasons.is_empty()
+	_player_lock_reasons.erase(key)
+	if was_locked and _player_lock_reasons.is_empty():
+		player_control_locked.emit(false)
+
+
+func clear_player_locks() -> void:
+	var was_locked := not _player_lock_reasons.is_empty()
+	_player_lock_reasons.clear()
+	if was_locked:
+		player_control_locked.emit(false)
+
+
+func is_player_locked() -> bool:
+	return not _player_lock_reasons.is_empty()

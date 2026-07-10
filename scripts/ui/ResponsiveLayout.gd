@@ -31,6 +31,14 @@ static func fit_center_panel(panel: Control, host: Node, max_size: Vector2,
 	if panel == null:
 		return Vector2.ZERO
 	var avail := safe_size(host)
+	if is_mobile(host):
+		var m := margin(host)
+		panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		panel.offset_left = m
+		panel.offset_top = m
+		panel.offset_right = -m
+		panel.offset_bottom = -m
+		return avail
 	var min_w := minf(min_size.x, avail.x)
 	var min_h := minf(min_size.y, avail.y)
 	var w := clampf(minf(max_size.x, avail.x), min_w, avail.x)
@@ -61,12 +69,15 @@ static func set_button_wrap(button: Button) -> void:
 	button.clip_text = false
 
 
-static func normalize_tree(root: Node, arbitrary: bool = false) -> void:
+static func normalize_tree(root: Node, mobile: bool = false) -> void:
 	if root == null:
 		return
 	if root is Label or root is RichTextLabel:
-		apply_text_wrap(root as Control, arbitrary)
+		apply_text_wrap(root as Control, mobile)
 	elif root is Button:
-		set_button_wrap(root as Button)
+		var button := root as Button
+		set_button_wrap(button)
+		if mobile:
+			button.custom_minimum_size.y = maxf(44.0, button.custom_minimum_size.y)
 	for child in root.get_children():
-		normalize_tree(child, arbitrary)
+		normalize_tree(child, mobile)

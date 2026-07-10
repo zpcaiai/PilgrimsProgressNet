@@ -50,6 +50,8 @@ func _process(_delta: float) -> void:
 	if _shown:
 		return
 	if GameState.has_flag("journey_review_requested") or GameState.has_flag("journey_completed"):
+		if DialogueManager.is_active() or EventBus.is_player_locked():
+			return
 		_shown = true
 		_build()
 
@@ -63,7 +65,7 @@ func _has_any(flags: Array) -> bool:
 
 func _build() -> void:
 	visible = true
-	EventBus.player_control_locked.emit(true)
+	EventBus.lock_player("journey_review")
 	var zh := LocaleManager.is_zh()
 
 	var bg := ColorRect.new()
@@ -169,7 +171,8 @@ func _spacer(h: int) -> Control:
 
 
 func _on_continue() -> void:
-	EventBus.player_control_locked.emit(false)
-	if EventBus.has_signal("ending_started"):
-		EventBus.emit_signal("ending_started")
+	EventBus.unlock_player("journey_review")
+	if GameState.has_flag("journey_completed") and not GameState.has_flag("ending_screen_opened"):
+		GameState.set_flag("ending_screen_opened", true)
+		EventBus.demo_completed.emit()
 	queue_free()

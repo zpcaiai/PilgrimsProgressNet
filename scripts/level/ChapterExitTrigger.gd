@@ -43,11 +43,15 @@ func _on_enter(body: Node) -> void:
 	if require_flag != "" and not GameState.has_flag(require_flag):
 		EventBus.toast(require_message)
 		return
+	var cid := String(ChapterManager.current_chapter_id)
+	var learning_step := _next_required_learning_step(cid)
+	if learning_step != "":
+		EventBus.toast("离开前，请先完成本章要学习的一步：" + learning_step)
+		return
 	if String(ChapterManager.current_chapter_id) == "hill_difficulty" and not SpiritualStateManager.has_scroll:
 		EventBus.toast("你的书卷不在怀中。回到凉亭拾回凭据，再继续前往美宫。")
 		return
 	# Scripture Gate: the chapter's key verse must be answered before passing on.
-	var cid := String(ChapterManager.current_chapter_id)
 	if not GameState.has_flag("scripture_" + cid) and ScriptureGate.has_question(cid):
 		_gate_open = true
 		var on_pass := func() -> void:
@@ -59,6 +63,27 @@ func _on_enter(body: Node) -> void:
 		ScriptureGate.open(self, cid, on_pass, on_leave)
 		return
 	_advance()
+
+
+func _next_required_learning_step(chapter_id: String) -> String:
+	var data := ChapterManager.load_chapter_data(chapter_id)
+	for qid in data.get("quests", []):
+		var quest := QuestManager.get_definition(String(qid))
+		for step in quest.get("steps", []):
+			var flag := String(step.get("required_flag", ""))
+			if flag != "" and not set_flags.has(flag) and not GameState.has_flag(flag):
+				return String(step.get("description", ""))
+			var any_flags: Array = step.get("required_any_flag", [])
+			if not any_flags.is_empty():
+				var any_done := false
+				for candidate in any_flags:
+					var key := String(candidate)
+					if set_flags.has(key) or GameState.has_flag(key):
+						any_done = true
+						break
+				if not any_done:
+					return String(step.get("description", ""))
+	return ""
 
 
 func _advance() -> void:

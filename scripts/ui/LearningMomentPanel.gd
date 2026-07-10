@@ -94,11 +94,11 @@ func _apply_layout() -> void:
 	var w := minf(safe.x, 720.0)
 	var h := minf(safe.y, 520.0)
 	if is_instance_valid(_panel):
-		_panel.custom_minimum_size = Vector2(maxf(240.0, w), maxf(260.0, h))
+		_panel.custom_minimum_size = Vector2.ZERO if mobile else Vector2(maxf(240.0, w), maxf(260.0, h))
 	if is_instance_valid(_scroll):
-		_scroll.custom_minimum_size = Vector2(maxf(240.0, w), maxf(220.0, h - 12.0))
+		_scroll.custom_minimum_size = Vector2.ZERO if mobile else Vector2(maxf(240.0, w), maxf(220.0, h - 12.0))
 	if is_instance_valid(_content):
-		_content.custom_minimum_size = Vector2(maxf(220.0, w - 40.0), 0)
+		_content.custom_minimum_size = Vector2.ZERO if mobile else Vector2(maxf(220.0, w - 40.0), 0)
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	_title.add_theme_font_size_override("font_size", 28 if not mobile else 26)
 	_body.custom_minimum_size = Vector2(0, maxf(220.0, h - 150.0))
@@ -115,6 +115,8 @@ func _process(_delta: float) -> void:
 	if get_tree().paused:
 		return
 	if DialogueManager.is_active():
+		return
+	if EventBus.is_player_locked():
 		return
 	_show(_queue.pop_front())
 
@@ -150,7 +152,7 @@ func _show(moment: Dictionary) -> void:
 	_body.text = String(moment.get("body", ""))
 	_root.visible = true
 	visible = true
-	EventBus.player_control_locked.emit(true)
+	EventBus.lock_player("learning_moment")
 
 
 func _hide_current() -> void:
@@ -164,4 +166,4 @@ func _hide_current() -> void:
 	_current = {}
 	_root.visible = false
 	visible = false
-	EventBus.player_control_locked.emit(false)
+	EventBus.unlock_player("learning_moment")

@@ -405,7 +405,7 @@ func _build() -> void:
 
 
 func _apply_layout() -> void:
-	var s := get_viewport().get_visible_rect().size
+	var s := ResponsiveLayout.viewport_size(self)
 	var mobile := ResponsiveLayout.is_mobile(self)
 	var margin := ResponsiveLayout.margin(self)
 	var input_w := minf(s.x - margin * 2.0, 760.0)

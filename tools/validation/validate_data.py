@@ -10,10 +10,12 @@ and duplicate-id checks. Exit code is non-zero if any error is found.
 
 import json
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.normpath(os.path.join(HERE, "..", "..", "data"))
+ROOT = os.path.normpath(os.path.join(DATA, ".."))
 
 SUPPORTED_SPECIALS = {
     # Batch 4 dialogue specials
@@ -63,6 +65,58 @@ def _dup_id_errors(category, items):
     return errs
 
 
+def _resource_exists(path):
+    if not str(path).startswith("res://"):
+        return False
+    return os.path.exists(os.path.join(ROOT, str(path)[6:]))
+
+
+def _dialogue_can_terminate(nodes, node_id, visiting=None):
+    if node_id in ("", "end"):
+        return True
+    if node_id not in nodes:
+        return False
+    visiting = set() if visiting is None else set(visiting)
+    if node_id in visiting:
+        return False
+    visiting.add(node_id)
+    node = nodes[node_id]
+    if node.get("end", False):
+        return True
+    targets = []
+    if node.get("next", ""):
+        targets.append(node["next"])
+    targets += [choice.get("next", "") for choice in node.get("choices", [])]
+    # Nodes without an explicit branch are closed by the UI's Continue button.
+    if not targets:
+        return True
+    return all(_dialogue_can_terminate(nodes, target, visiting) for target in targets)
+
+
+def _produced_flags(chapters, dialogues):
+    flags = set()
+    for chapter in chapters.values():
+        flags.update(chapter.get("on_start_flags", {}).keys())
+        flags.update(chapter.get("on_complete_flags", {}).keys())
+        for condition in chapter.get("completion_conditions", []):
+            if condition.get("type", "flag") == "flag":
+                flags.add(condition.get("key", ""))
+    for dialogue in dialogues.values():
+        for node in (dialogue.get("nodes") or {}).values():
+            flags.update(node.get("set_flags", {}).keys())
+            flags.update(node.get("flags", {}).keys())
+            for choice in node.get("choices", []):
+                flags.update(choice.get("flags", {}).keys())
+    scripts_dir = os.path.join(ROOT, "scripts")
+    for base, _dirs, names in os.walk(scripts_dir):
+        for name in names:
+            if not name.endswith(".gd"):
+                continue
+            text = open(os.path.join(base, name), "r", encoding="utf-8").read()
+            flags.update(re.findall(r'["\']([a-z][a-z0-9_]+)["\']', text))
+    return flags
+
+
 def validate():
     errors = []
     routes = _load_category("route")
@@ -91,11 +145,27 @@ def validate():
             if r.get(key) and r[key] not in chapters:
                 errors.append("[route:%s] %s '%s' is not a chapter" % (rid, key, r.get(key)))
 
+    full_route = routes.get("full_route", {}).get("chapters", [])
+    if len(full_route) != len(chapters) or len(set(full_route)) != len(chapters):
+        errors.append("[route:full_route] must contain every chapter exactly once")
+    for i, cid in enumerate(full_route):
+        if cid not in chapters:
+            continue
+        expected_prev = full_route[i - 1] if i > 0 else ""
+        expected_next = full_route[i + 1] if i + 1 < len(full_route) else ""
+        if chapters[cid].get("previous_chapter_id", "") != expected_prev:
+            errors.append("[chapter:%s] previous_chapter_id does not match full_route" % cid)
+        if chapters[cid].get("next_chapter_id", "") != expected_next:
+            errors.append("[chapter:%s] next_chapter_id does not match full_route" % cid)
+
     # --- chapters ---
     for cid, c in chapters.items():
         for field in ("id", "title", "scene_path", "imported_scene_path"):
             if not c.get(field):
                 errors.append("[chapter:%s] missing required field '%s'" % (cid, field))
+        for field in ("scene_path", "imported_scene_path"):
+            if c.get(field) and not _resource_exists(c[field]):
+                errors.append("[chapter:%s] %s does not exist: %s" % (cid, field, c[field]))
         if not c.get("title_zh"):
             errors.append("[chapter:%s] missing title_zh" % cid)
         for field in ("subtitle", "spiritual_theme", "core_mechanic"):
@@ -114,6 +184,11 @@ def validate():
         for q in c.get("quests", []):
             if q not in quests:
                 errors.append("[chapter:%s] references missing quest '%s'" % (cid, q))
+        guide_path = os.path.join(DATA, "teaching_guides", cid + ".json")
+        if not os.path.exists(guide_path):
+            errors.append("[chapter:%s] missing teaching guide" % cid)
+
+    produced_flags = _produced_flags(chapters, dialogues)
 
     # --- quests ---
     for qid, q in quests.items():
@@ -128,6 +203,10 @@ def validate():
                 errors.append("[quest:%s] step %d lacks required_flag/required_any_flag" % (qid, i))
             if step.get("description") and not step.get("description_zh"):
                 errors.append("[quest:%s] step %d missing description_zh" % (qid, i))
+            required = [step.get("required_flag", "")] + list(step.get("required_any_flag", []))
+            for flag in [f for f in required if f]:
+                if flag not in produced_flags:
+                    errors.append("[quest:%s] step %d flag '%s' is never produced" % (qid, i, flag))
 
     # --- dialogues ---
     for did, d in dialogues.items():
@@ -138,6 +217,9 @@ def validate():
             continue
         if "start" not in nodes:
             errors.append("[dialogue:%s] has no 'start' node" % did)
+        for nid in sorted(nodes.keys()):
+            if not _dialogue_can_terminate(nodes, nid):
+                errors.append("[dialogue:%s] node '%s' has no terminating path" % (did, nid))
         valid_targets = set(nodes.keys()) | {"", "end"}
         for nid, node in nodes.items():
             if node.get("speaker") and not node.get("speaker_zh"):

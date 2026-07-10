@@ -76,7 +76,7 @@ func _build() -> void:
 func _apply_layout() -> void:
 	if not is_instance_valid(_panel):
 		return
-	var s := get_viewport().get_visible_rect().size
+	var s := ResponsiveLayout.viewport_size(self)
 	var mobile := ResponsiveLayout.is_mobile(self)
 	var m := ResponsiveLayout.margin(self)
 	_panel.position = Vector2(m, 172.0 if mobile else 122.0)

@@ -14,6 +14,7 @@ var _used_glb: bool = false
 func _build_chapter() -> void:
 	if _prefer_procedural():
 		_build_procedural()
+		_attach_chapter_system()
 		return
 	var data := ChapterManager.get_current_chapter_data()
 	var glb_path := String(data.get("imported_scene_path", ""))
@@ -25,6 +26,7 @@ func _build_chapter() -> void:
 		EventBus.toast("[占位] %s：GLB 未导入，回退到程序化场景"
 			% ChapterManager.current_chapter_id)
 		_build_procedural()
+		_attach_chapter_system()
 		return
 	_used_glb = true
 	push_warning("[GlbChapter] %s: GLB loaded, spawn=%s"

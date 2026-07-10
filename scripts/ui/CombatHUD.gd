@@ -131,12 +131,12 @@ func _ready() -> void:
 
 
 func _is_mobile_ui() -> bool:
-	var s := get_viewport().get_visible_rect().size
+	var s := ResponsiveLayout.viewport_size(self)
 	return DisplayServer.is_touchscreen_available() or minf(s.x, s.y) <= 640.0
 
 
 func _apply_layout() -> void:
-	var s := get_viewport().get_visible_rect().size
+	var s := ResponsiveLayout.viewport_size(self)
 	var mobile := _is_mobile_ui()
 	var panel_w := minf(s.x - 32.0, 620.0) if mobile else 560.0
 	var panel_h := 128.0 if mobile else 116.0

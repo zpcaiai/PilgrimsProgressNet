@@ -41,6 +41,10 @@ func fire() -> void:
 		GameState.set_flag(String(k), flags[k])
 	if not special.is_empty():
 		SpiritualStateManager._apply_special(special)
+	for quest_id in QuestManager.get_active_quests().duplicate():
+		QuestManager.update_quest_progress(String(quest_id))
+	if bool(flags.get("journey_completed", false)):
+		ChapterManager.finalize_journey()
 	if toast_line != "":
 		EventBus.toast(toast_line)
 

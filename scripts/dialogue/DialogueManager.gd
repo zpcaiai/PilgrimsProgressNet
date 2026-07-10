@@ -43,7 +43,7 @@ func start_dialogue(dialogue_id: String, start_node: String = "start") -> void:
 	_current_dialogue_id = dialogue_id
 	_current_node_id = start_node
 	_active = true
-	EventBus.player_control_locked.emit(true)
+	EventBus.lock_player("dialogue")
 	EventBus.dialogue_started.emit(dialogue_id)
 	_emit_current_node()
 
@@ -185,6 +185,8 @@ func _apply_choice(choice: Dictionary) -> void:
 			GameState.add_inventory_item(String(k), int(choice["items"][k]))
 	if choice.has("special"):
 		SpiritualStateManager._apply_special(choice["special"])
+	if GameState.has_flag("journey_completed") and GameState.current_chapter_id == "celestial_city":
+		ChapterManager.finalize_journey()
 	for field in ["scriptureHintIds", "scripture_hint_ids", "scripture_cards"]:
 		if choice.has(field):
 			for card_id in choice[field]:
@@ -294,7 +296,7 @@ func end_dialogue() -> void:
 	_current_dialogue_id = ""
 	_current_node_id = ""
 	EventBus.dialogue_ended.emit(ended_id)
-	EventBus.player_control_locked.emit(false)
+	EventBus.unlock_player("dialogue")
 
 
 func to_dict() -> Dictionary:

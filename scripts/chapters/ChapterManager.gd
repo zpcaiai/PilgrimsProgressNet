@@ -371,10 +371,24 @@ func evaluate_completion_conditions(chapter_id: String) -> bool:
 
 
 func complete_chapter(chapter_id: String) -> void:
+	if chapter_id == "" or GameState.has_flag(chapter_id + "_completed"):
+		return
 	apply_chapter_completion_effects(chapter_id)
 	GameState.set_flag(chapter_id + "_completed", true)
-	_request_completion_reflection(chapter_id)
+	# The Celestial City has its own full journey review; stacking the ordinary
+	# chapter reflection over it creates two competing modal layers.
+	if chapter_id != "celestial_city":
+		_request_completion_reflection(chapter_id)
 	EventBus.chapter_completed.emit(chapter_id)
+	SaveManager.save_game("slot_1", false)
+
+
+func finalize_journey() -> void:
+	GameState.set_flag("entered_city", true)
+	GameState.set_flag("entered_celestial_city", true)
+	GameState.set_flag("journey_completed", true)
+	QuestManager.update_quest_progress("enter_celestial_city")
+	complete_chapter("celestial_city")
 
 
 func _request_completion_reflection(chapter_id: String) -> void:

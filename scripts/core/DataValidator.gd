@@ -67,6 +67,9 @@ static func validate_all_data() -> Array:
 		for q in c.get("quests", []):
 			if not quests.has(String(q)):
 				errors.append("Chapter %s references missing quest: %s" % [cid, String(q)])
+		var guide_path := "res://data/teaching_guides/%s.json" % String(cid)
+		if not FileAccess.file_exists(guide_path):
+			errors.append("Chapter %s missing teaching guide." % cid)
 
 	# --- Routes ---
 	for rid in routes:
@@ -74,6 +77,23 @@ static func validate_all_data() -> Array:
 		for rc in r.get("chapters", []):
 			if not chapters.has(String(rc)):
 				errors.append("Route %s references missing chapter: %s" % [rid, String(rc)])
+	var full_route: Array = (routes.get("full_route", {}) as Dictionary).get("chapters", [])
+	var unique_route: Dictionary = {}
+	for cid in full_route:
+		unique_route[String(cid)] = true
+	if full_route.size() != chapters.size() or unique_route.size() != chapters.size():
+		errors.append("Full route must contain every chapter exactly once.")
+	for i in range(full_route.size()):
+		var cid := String(full_route[i])
+		if not chapters.has(cid):
+			continue
+		var chapter: Dictionary = chapters[cid]
+		var expected_prev := String(full_route[i - 1]) if i > 0 else ""
+		var expected_next := String(full_route[i + 1]) if i + 1 < full_route.size() else ""
+		if String(chapter.get("previous_chapter_id", "")) != expected_prev:
+			errors.append("Chapter %s previous_chapter_id does not match full route." % cid)
+		if String(chapter.get("next_chapter_id", "")) != expected_next:
+			errors.append("Chapter %s next_chapter_id does not match full route." % cid)
 
 	# --- Quests ---
 	for qid in quests:

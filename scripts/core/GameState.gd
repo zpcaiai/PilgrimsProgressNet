@@ -47,7 +47,12 @@ func reset_for_new_game() -> void:
 
 # --- Flags ---
 func set_flag(key: String, value: Variant = true) -> void:
+	var old_value: Variant = flags.get(key, null)
+	if old_value == value:
+		return
 	flags[key] = value
+	if EventBus and EventBus.has_signal("game_flag_changed"):
+		EventBus.game_flag_changed.emit(key, old_value, value)
 
 
 func get_flag(key: String, default_value: Variant = false) -> Variant:

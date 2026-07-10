@@ -2,6 +2,7 @@
   "id": "caged_man_vision",
   "nodes": {
     "start": {
+	  "set_flags": { "saw_interpreter_lesson": true },
       "speaker": "",
       "text": "A figure sits behind iron bars. The room grows colder as you look.",
       "text_zh": "一个身影坐在铁栏之后。你越看，房间越冷。",

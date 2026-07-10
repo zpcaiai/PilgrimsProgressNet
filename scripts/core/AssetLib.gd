@@ -71,14 +71,14 @@ static func pbr(surface: String, channel: String) -> Texture2D:
 
 
 static func scene_art(chapter_id: String) -> Texture2D:
-	# A hand-placed .jpg wins over the generated .png/.webp (drop scene backdrops
-	# as assets/scenes/<chapter>.jpg). Children's-journey "<chapter>_child.*" is
-	# preferred in child mode, falling back to the standard art.
+	# The imported PNG is the release-safe source. Some legacy JPG sidecars have
+	# invalid Godot import maps, so they remain a fallback instead of producing a
+	# Web console error before the valid PNG is tried.
 	if _is_child_mode():
-		var child := _first_tex([SCENE_DIR + chapter_id + "_child.jpg", SCENE_DIR + chapter_id + "_child.png", SCENE_DIR + chapter_id + "_child.webp"])
+		var child := _first_tex([SCENE_DIR + chapter_id + "_child.png", SCENE_DIR + chapter_id + "_child.webp", SCENE_DIR + chapter_id + "_child.jpg"])
 		if child != null:
 			return child
-	return _first_tex([SCENE_DIR + chapter_id + ".jpg", SCENE_DIR + chapter_id + ".png", SCENE_DIR + chapter_id + ".webp"])
+	return _first_tex([SCENE_DIR + chapter_id + ".png", SCENE_DIR + chapter_id + ".webp", SCENE_DIR + chapter_id + ".jpg"])
 
 
 static func particle(particle_name: String) -> Texture2D:

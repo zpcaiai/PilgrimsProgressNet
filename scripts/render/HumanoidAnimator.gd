@@ -67,7 +67,10 @@ func _spawn_shadow() -> void:
 		return
 	var shadow := CharacterBillboard.make_ground_shadow(maxf(0.4, shadow_width))
 	shadow.position = Vector3(0, 0.035, 0)
-	root.add_child(shadow)
+	# Animators are often created while their figure root is still inside its own
+	# _ready/build pass. Defer the sibling insertion so Godot never rejects it as
+	# "parent busy setting up children".
+	root.add_child.call_deferred(shadow)
 
 
 ## A short upward "perk" used as an acknowledging nod when talked to.

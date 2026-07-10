@@ -26,7 +26,7 @@ var _answered := false
 
 
 func _viewport_size() -> Vector2:
-	return get_viewport().get_visible_rect().size
+	return ResponsiveLayout.viewport_size(self)
 
 
 func _is_mobile_ui() -> bool:
@@ -184,9 +184,9 @@ func _apply_layout() -> void:
 	var content_w := maxf(220.0, size.x - (44.0 if mobile else 56.0))
 	var scroll_h := maxf(220.0, size.y - (40.0 if mobile else 52.0))
 	if is_instance_valid(_scroll):
-		_scroll.custom_minimum_size = Vector2(content_w, scroll_h)
+		_scroll.custom_minimum_size = Vector2.ZERO if mobile else Vector2(content_w, scroll_h)
 	if is_instance_valid(_content):
-		_content.custom_minimum_size = Vector2(content_w, 0)
+		_content.custom_minimum_size = Vector2.ZERO if mobile else Vector2(content_w, 0)
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	for b in _buttons:
 		if is_instance_valid(b):

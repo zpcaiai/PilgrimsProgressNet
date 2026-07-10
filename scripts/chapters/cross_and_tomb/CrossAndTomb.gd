@@ -46,7 +46,7 @@ func _begin_cross_event() -> void:
 	if _triggered:
 		return
 	_triggered = true
-	EventBus.player_control_locked.emit(true)
+	EventBus.lock_player("cross_grace")
 
 	# Spawn a burden that rolls from the pilgrim down into the tomb.
 	var burden := MeshInstance3D.new()
@@ -93,4 +93,5 @@ func _begin_cross_event() -> void:
 	await get_tree().create_timer(2.5).timeout
 	EventBus.toast("十字架不是道路的终点；它是使道路成为可能的怜悯。")
 	await get_tree().create_timer(1.5).timeout
+	EventBus.unlock_player("cross_grace")
 	ChapterManager.go_to_next_chapter()

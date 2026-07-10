@@ -452,6 +452,15 @@ static func _bind_trigger(chapter: Node3D, node: Node, nm: String):
 		if node is Node3D:
 			(node as Node3D).visible = false
 		return null
+	if nm in ["TRIGGER_DustRoomStart", "TRIGGER_FireRoomStart", "TRIGGER_NarrowRoomStart"]:
+		var lesson_lines := {
+			"TRIGGER_DustRoomStart": "水使尘埃安静：真理不是扬起更多控告，而是显明并洁净。",
+			"TRIGGER_FireRoomStart": "墙后的油不断供应火焰：恩典在看不见处托住信心。",
+			"TRIGGER_NarrowRoomStart": "窄小的房间提醒你：光照进来时，心才看见真正的出口。",
+		}
+		_story(chapter, node, {"discernment": 6, "watchfulness": 4},
+			{"saw_interpreter_lesson": true}, {}, String(lesson_lines[nm]))
+		return null
 	if TRIGGER_DIALOGUE.has(nm):
 		var dt := DialogueTrigger.new()
 		chapter.add_child(dt)
@@ -487,7 +496,9 @@ static func _bind_exit(chapter: Node3D, node: Node) -> void:
 				message = "先在窄门前叩门：移动端点「互动」或直接走到门前；桌面按 E。门为叩门的人打开。"
 	var ex := ChapterExitTrigger.new()
 	chapter.add_child(ex)
-	ex.setup(_box_size(node), set_flags, require, message)
+	var quests: Array = data.get("quests", [])
+	var quest_id := String(quests[0]) if not quests.is_empty() else ""
+	ex.setup(_box_size(node), set_flags, require, message, "", quest_id)
 	ex.global_position = node.global_position
 	_spawn_exit_portal(chapter, node.global_position)
 	if node is Node3D:
@@ -627,6 +638,8 @@ static func _bind_prop(chapter: Node3D, node: Node, nm: String):
 			func(_p):
 				GameState.set_flag("met_shepherds", true)
 				GameState.set_flag(vf, true)
+				if nm == "PROP_Viewpoint_CelestialCity":
+					GameState.set_flag("saw_celestial_city", true)
 				SpiritualStateManager.apply_effects({"hope": 8, "watchfulness": 3})
 				EventBus.toast("你久久观看，道路渐渐清晰。"))
 	elif nm.begins_with("PROP_TestimonyMarker_"):

@@ -32,6 +32,7 @@ var _debug_visible: bool = false
 # Dialogue
 var _dialogue_panel: Panel
 var _dialogue_hbox: HBoxContainer
+var _dialogue_scroll: ScrollContainer
 var _portrait: TextureRect
 var _speaker_label: Label
 var _text_label: RichTextLabel
@@ -128,7 +129,7 @@ func _panel_style(bg: Color) -> StyleBoxFlat:
 
 
 func _viewport_size() -> Vector2:
-	return get_viewport().get_visible_rect().size
+	return ResponsiveLayout.viewport_size(self)
 
 
 func _is_mobile_ui() -> bool:
@@ -210,11 +211,11 @@ func _apply_responsive_layout() -> void:
 		if mobile and portrait:
 			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 			_spiritual_panel.position = Vector2(margin, _quest_panel.position.y + _quest_panel.size.y + 12.0)
-			_spiritual_panel.size = Vector2(maxf(220.0, s.x - margin * 2.0), 370)
+			_spiritual_panel.size = Vector2(maxf(220.0, s.x - margin * 2.0), 150)
 		elif mobile:
 			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 			_spiritual_panel.position = Vector2(-346, margin)
-			_spiritual_panel.size = Vector2(330, 370)
+			_spiritual_panel.size = Vector2(330, 150)
 		else:
 			_spiritual_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 			_spiritual_panel.position = Vector2(-272, margin)
@@ -231,10 +232,13 @@ func _apply_responsive_layout() -> void:
 	for bar in [_faith_bar, _hope_bar, _love_bar, _humility_bar, _watchfulness_bar, _despair_bar, _fear_bar, _shame_bar, _weariness_bar]:
 		if is_instance_valid(bar):
 			bar.custom_minimum_size = Vector2(170 if mobile else 120, 20 if mobile else 16)
+			bar.get_parent().visible = not mobile or bar in [_faith_bar, _hope_bar, _love_bar]
 	if is_instance_valid(_burden_label):
+		_burden_label.visible = not mobile
 		_burden_label.add_theme_font_size_override("font_size", body)
 		ResponsiveLayout.apply_text_wrap(_burden_label, mobile)
 	if is_instance_valid(_load_label):
+		_load_label.visible = not mobile
 		_load_label.add_theme_font_size_override("font_size", body)
 		ResponsiveLayout.apply_text_wrap(_load_label, mobile)
 
@@ -250,7 +254,10 @@ func _apply_responsive_layout() -> void:
 		_toast_label.add_theme_font_size_override("font_size", body)
 		var toast_w := minf(760.0, s.x - 48.0)
 		_toast_label.set_anchors_preset(Control.PRESET_TOP_LEFT)
-		_toast_label.position = Vector2((s.x - toast_w) * 0.5, 132 if mobile else 130)
+		var toast_y := 130.0
+		if mobile:
+			toast_y = (_spiritual_panel.position.y + _spiritual_panel.size.y + 10.0) if portrait else (_quest_panel.position.y + _quest_panel.size.y + 10.0)
+		_toast_label.position = Vector2((s.x - toast_w) * 0.5, toast_y)
 		_toast_label.size = Vector2(toast_w, 86 if mobile else 34)
 		_toast_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
 		_toast_label.clip_text = false
@@ -265,6 +272,9 @@ func _apply_responsive_layout() -> void:
 			_set_bottom_wide_rect(_dialogue_panel, (s.x - dw) * 0.5, 30.0, dw, 290.0)
 	if is_instance_valid(_dialogue_hbox):
 		_dialogue_hbox.add_theme_constant_override("separation", 10 if mobile else 16)
+	if is_instance_valid(_dialogue_scroll):
+		_dialogue_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_dialogue_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	if is_instance_valid(_portrait):
 		_portrait.custom_minimum_size = Vector2(128, 128) if mobile else Vector2(168, 168)
 		if not _show_dialogue_portrait():
@@ -336,6 +346,7 @@ func _apply_responsive_layout() -> void:
 		_debug_label.add_theme_font_size_override("normal_font_size", 15 if not mobile else 18)
 
 	# Re-flow the auto-sized objective box (and narration) for the new viewport.
+	_refresh_mobile_hud_chrome()
 	if is_instance_valid(_quest_label):
 		_refresh_quest()
 
@@ -501,10 +512,17 @@ func _build_dialogue() -> void:
 	_portrait.visible = false
 	_dialogue_hbox.add_child(_portrait)
 
+	_dialogue_scroll = ScrollContainer.new()
+	_dialogue_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_dialogue_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_dialogue_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_dialogue_scroll.follow_focus = true
+	_dialogue_hbox.add_child(_dialogue_scroll)
+
 	var vb := VBoxContainer.new()
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_theme_constant_override("separation", 8)
-	_dialogue_hbox.add_child(vb)
+	_dialogue_scroll.add_child(vb)
 
 	_speaker_label = Label.new()
 	_speaker_label.add_theme_font_size_override("font_size", FONT_TITLE)
@@ -637,7 +655,7 @@ func _build_grace_anim() -> void:
 func _on_cross_grace() -> void:
 	if _grace_anim == null:
 		return
-	_grace_anim.position = get_viewport().get_visible_rect().size * 0.5
+	_grace_anim.position = ResponsiveLayout.viewport_size(self) * 0.5
 	_grace_anim.visible = true
 	_grace_anim.frame = 0
 	_grace_anim.play("default")
@@ -686,6 +704,7 @@ func play_narration(lines: Array) -> void:
 	_narration_index = 0
 	_narration_phase = 1
 	_narration_timer = 0.0
+	_refresh_mobile_hud_chrome()
 	_show_narration_line()
 
 
@@ -761,6 +780,15 @@ func _process_narration(delta: float) -> void:
 				else:
 					_narration_phase = 0
 					_narration_index = -1
+					_refresh_mobile_hud_chrome()
+
+
+func _refresh_mobile_hud_chrome() -> void:
+	if not is_instance_valid(_quest_panel) or not is_instance_valid(_spiritual_panel):
+		return
+	var show_chrome := not _is_mobile_ui() or (_narration_phase == 0 and not _dialogue_panel.visible)
+	_quest_panel.visible = show_chrome
+	_spiritual_panel.visible = show_chrome
 
 
 # ---------------------------------------------------------------------------
@@ -990,6 +1018,7 @@ func _on_toast(message: String) -> void:
 # ---------------------------------------------------------------------------
 func _on_dialogue_node(node: Dictionary) -> void:
 	_dialogue_panel.visible = true
+	_refresh_mobile_hud_chrome()
 	_hide_prompt()
 	var spk := String(node.get("speaker", ""))
 	var pic := AssetLib.portrait(spk)
@@ -1040,6 +1069,7 @@ func _pick_choice(choice_id: String) -> void:
 
 func _on_dialogue_ended(_id: String) -> void:
 	_dialogue_panel.visible = false
+	_refresh_mobile_hud_chrome()
 	for c in _choice_box.get_children():
 		c.queue_free()
 	_current_choices = []

@@ -49,11 +49,11 @@ func _arrive() -> void:
 	if _done:
 		return
 	_done = true
-	EventBus.player_control_locked.emit(true)
+	EventBus.lock_player("celestial_arrival")
 	make_light_burst(Vector3(0, 2, -28), Color(1.0, 0.97, 0.82), 90)
 	GameState.set_flag("entered_city", true)
 	QuestManager.update_quest_progress("enter_celestial_city")
-	ChapterManager.complete_chapter("celestial_city")
+	ChapterManager.finalize_journey()
 	EventBus.toast("城门打开，曾与你同行的人转身欢迎你回家。")
 	await get_tree().create_timer(2.6).timeout
 	if GameState.has_flag("interpreter_full"):
@@ -66,4 +66,4 @@ func _arrive() -> void:
 	await get_tree().create_timer(3.0).timeout
 	EventBus.toast("重担早已远去。旅程已经完成。进入安息吧。")
 	await get_tree().create_timer(2.8).timeout
-	EventBus.demo_completed.emit()
+	EventBus.unlock_player("celestial_arrival")

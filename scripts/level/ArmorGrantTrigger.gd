@@ -11,7 +11,7 @@ static func grant_full_armor() -> void:
 	if GameState.has_flag("received_armor"):
 		return
 	for f in ["has_armor", "has_sword", "has_shield", "received_armor",
-			"combat_unlocked"]:
+			"took_armour", "combat_unlocked"]:
 		GameState.set_flag(f, true)
 	for it in ["armor", "sword", "shield"]:
 		GameState.add_inventory_item(it, 1)

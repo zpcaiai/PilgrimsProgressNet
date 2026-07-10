@@ -158,6 +158,10 @@ func _btn_ids() -> Array:
 	# Which buttons are currently live, given game state.
 	if not _in_game:
 		return []
+	# Modal overlays own the whole screen. Keep dialogue controls (handled below),
+	# but do not draw utility buttons over onboarding, teaching, or reflections.
+	if _locked and not _dialogue:
+		return []
 	var paused := get_tree().paused
 	var out: Array = []
 	if _dialogue and not paused:

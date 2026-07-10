@@ -14,10 +14,17 @@ func _ready() -> void:
 	_load_all_definitions()
 	# React to flag changes by re-evaluating quests.
 	EventBus.spiritual_state_changed.connect(_on_state_changed)
+	if EventBus.has_signal("game_flag_changed"):
+		EventBus.game_flag_changed.connect(_on_flag_changed)
 
 
 func _on_state_changed(_n: String, _o: int, _v: int) -> void:
 	# Flags often change alongside effects; cheap to re-check active quests.
+	for q in active_quests.duplicate():
+		update_quest_progress(q)
+
+
+func _on_flag_changed(_flag_name: String, _old_value: Variant, _new_value: Variant) -> void:
 	for q in active_quests.duplicate():
 		update_quest_progress(q)
 
@@ -95,6 +102,16 @@ func update_quest_progress(quest_id: String) -> void:
 		if flag != "" and not GameState.has_flag(flag):
 			all_done = false
 			break
+		var any_flags: Array = step.get("required_any_flag", [])
+		if not any_flags.is_empty():
+			var any_done := false
+			for candidate in any_flags:
+				if GameState.has_flag(String(candidate)):
+					any_done = true
+					break
+			if not any_done:
+				all_done = false
+				break
 	EventBus.quest_updated.emit(quest_id)
 	if all_done and not steps.is_empty():
 		complete_quest(quest_id)
@@ -139,6 +156,15 @@ func get_next_incomplete_step_text(quest_id: String) -> String:
 		var flag: String = String(step.get("required_flag", ""))
 		if flag != "" and not GameState.has_flag(flag):
 			return String(step.get("description", ""))
+		var any_flags: Array = step.get("required_any_flag", [])
+		if not any_flags.is_empty():
+			var any_done := false
+			for candidate in any_flags:
+				if GameState.has_flag(String(candidate)):
+					any_done = true
+					break
+			if not any_done:
+				return String(step.get("description", ""))
 	return ""
 
 
