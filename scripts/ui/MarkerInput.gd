@@ -75,6 +75,7 @@ func _build() -> void:
 	send.add_theme_font_size_override("font_size", FONT_BODY)
 	send.custom_minimum_size = Vector2(220, 42)
 	ResponsiveLayout.set_button_wrap(send)
+	ResponsiveLayout.set_modal_action(send, 42.0)
 	send.pressed.connect(_submit)
 	row.add_child(send)
 
@@ -83,6 +84,7 @@ func _build() -> void:
 	cancel.add_theme_font_size_override("font_size", FONT_BODY)
 	cancel.custom_minimum_size = Vector2(150, 42)
 	ResponsiveLayout.set_button_wrap(cancel)
+	ResponsiveLayout.set_modal_action(cancel, 42.0)
 	cancel.pressed.connect(func(): _set_open(false))
 	row.add_child(cancel)
 

@@ -83,11 +83,10 @@ func _build_ui() -> void:
 	_content.add_child(_label)
 
 	_close = Button.new()
-	_close.text = "继续旅程 / Continue"
-	_close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	ResponsiveLayout.set_button_wrap(_close)
+	_close.text = "确认并继续 / Confirm & Continue"
+	ResponsiveLayout.set_modal_action(_close, 48.0)
 	_close.pressed.connect(hide_panel)
-	vbox.add_child(_close)
+	_root.add_child(_close)
 	get_viewport().size_changed.connect(_apply_layout)
 	_apply_layout()
 
@@ -104,7 +103,7 @@ func _apply_layout() -> void:
 	var size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(760, 600), Vector2(280, 300))
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_scroll):
-		_scroll.custom_minimum_size = Vector2(maxf(220.0, size.x - 48.0), maxf(180.0, size.y - 92.0))
+		_scroll.custom_minimum_size = Vector2(maxf(220.0, size.x - 48.0), maxf(160.0, size.y - (116.0 if mobile else 108.0)))
 	if is_instance_valid(_content):
 		_content.custom_minimum_size = Vector2(maxf(220.0, size.x - 56.0), 0)
 	if is_instance_valid(_label):
@@ -112,6 +111,12 @@ func _apply_layout() -> void:
 		_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
 	if is_instance_valid(_close):
 		_close.add_theme_font_size_override("font_size", 21 if mobile else 18)
+		var action_h := 54.0 if mobile else 48.0
+		_close.custom_minimum_size.y = action_h
+		if mobile:
+			ResponsiveLayout.place_viewport_action(_close, self, action_h, 18.0)
+		else:
+			ResponsiveLayout.place_panel_action(_close, _panel, action_h, 22.0)
 
 
 func _zh() -> bool:
@@ -175,6 +180,16 @@ func open_for(chapter_id: String) -> void:
 	_root.visible = true
 	visible = true
 	EventBus.lock_player("teaching_guide")
+	_refresh_open_layout()
+
+
+func _refresh_open_layout() -> void:
+	await get_tree().process_frame
+	if not is_instance_valid(_root) or not _root.visible:
+		return
+	_apply_layout()
+	if is_instance_valid(_scroll):
+		_scroll.scroll_vertical = 0
 
 
 func hide_panel() -> void:

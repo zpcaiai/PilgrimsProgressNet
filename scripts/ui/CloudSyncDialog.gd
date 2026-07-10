@@ -79,6 +79,7 @@ func _build() -> void:
 	take_cloud.add_theme_font_size_override("font_size", FONT_BODY)
 	take_cloud.custom_minimum_size = Vector2(220, 44)
 	ResponsiveLayout.set_button_wrap(take_cloud)
+	ResponsiveLayout.set_modal_action(take_cloud, 44.0)
 	take_cloud.pressed.connect(_take_cloud)
 	row.add_child(take_cloud)
 
@@ -87,6 +88,7 @@ func _build() -> void:
 	keep_local.add_theme_font_size_override("font_size", FONT_BODY)
 	keep_local.custom_minimum_size = Vector2(220, 44)
 	ResponsiveLayout.set_button_wrap(keep_local)
+	ResponsiveLayout.set_modal_action(keep_local, 44.0)
 	keep_local.pressed.connect(_keep_local)
 	row.add_child(keep_local)
 	_apply_layout()

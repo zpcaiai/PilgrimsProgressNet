@@ -18,9 +18,11 @@ var _on_pass: Callable = Callable()
 var _on_leave: Callable = Callable()
 var _root: Control
 var _panel: PanelContainer
+var _frame: VBoxContainer
 var _scroll: ScrollContainer
 var _content: VBoxContainer
 var _feedback: Label
+var _leave_button: Button
 var _buttons: Array = []
 var _answered := false
 
@@ -96,12 +98,18 @@ func _ready() -> void:
 	_panel.add_theme_stylebox_override("panel", sb)
 	_root.add_child(_panel)
 
+	_frame = VBoxContainer.new()
+	_frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_frame.add_theme_constant_override("separation", 10)
+	_panel.add_child(_frame)
+
 	_scroll = ScrollContainer.new()
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_panel.add_child(_scroll)
+	_frame.add_child(_scroll)
 
 	_content = VBoxContainer.new()
 	_content.add_theme_constant_override("separation", 12)
@@ -163,14 +171,13 @@ func _ready() -> void:
 	_feedback.add_theme_font_size_override("font_size", feedback_font)
 	_content.add_child(_feedback)
 
-	var leave := Button.new()
-	leave.text = "稍后再来 (Leave)"
-	leave.custom_minimum_size = Vector2(0, 50 if mobile else 0)
-	leave.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	leave.add_theme_font_size_override("font_size", 19 if mobile else 16)
-	ResponsiveLayout.set_button_wrap(leave)
-	leave.pressed.connect(_leave)
-	_content.add_child(leave)
+	_leave_button = Button.new()
+	_leave_button.text = "稍后再来 (Leave)"
+	_leave_button.custom_minimum_size = Vector2(0, 50 if mobile else 0)
+	_leave_button.add_theme_font_size_override("font_size", 19 if mobile else 16)
+	ResponsiveLayout.set_modal_action(_leave_button, 48.0)
+	_leave_button.pressed.connect(_leave)
+	_root.add_child(_leave_button)
 	get_viewport().size_changed.connect(_apply_layout)
 	_apply_layout()
 
@@ -182,12 +189,19 @@ func _apply_layout() -> void:
 	ResponsiveLayout.fit_fullscreen(_root, self)
 	var size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(760.0, 620.0), Vector2(260.0, 320.0))
 	var content_w := maxf(220.0, size.x - (44.0 if mobile else 56.0))
-	var scroll_h := maxf(220.0, size.y - (40.0 if mobile else 52.0))
+	var scroll_h := maxf(180.0, size.y - (108.0 if mobile else 114.0))
 	if is_instance_valid(_scroll):
 		_scroll.custom_minimum_size = Vector2(content_w, scroll_h)
 	if is_instance_valid(_content):
 		_content.custom_minimum_size = Vector2(content_w, 0)
 	ResponsiveLayout.normalize_tree(_panel, mobile)
+	if is_instance_valid(_leave_button):
+		var action_h := 54.0 if mobile else 48.0
+		_leave_button.add_theme_font_size_override("font_size", 19 if mobile else 16)
+		if mobile:
+			ResponsiveLayout.place_viewport_action(_leave_button, self, action_h, 18.0)
+		else:
+			ResponsiveLayout.place_panel_action(_leave_button, _panel, action_h, 24.0)
 	for b in _buttons:
 		if is_instance_valid(b):
 			(b as Button).autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART

@@ -23,6 +23,7 @@ var _panel: Panel
 var _list: VBoxContainer
 var _status: Label
 var _scroll: ScrollContainer
+var _close: Button
 var _open: bool = false
 
 
@@ -86,11 +87,17 @@ func _build() -> void:
 	_scroll.add_child(_list)
 
 	var hint := Label.new()
-	hint.text = LocaleManager.t("review.hint", "R 关闭　·　仅被拒绝的成绩可申诉")
+	hint.text = "仅被拒绝的成绩可申诉；桌面端也可按 R 关闭"
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_font_size_override("font_size", 13)
 	hint.add_theme_color_override("font_color", Color(0.55, 0.6, 0.7))
 	vb.add_child(hint)
+	_close = Button.new()
+	_close.text = "关闭 / Close"
+	_close.add_theme_font_size_override("font_size", FONT_BODY)
+	ResponsiveLayout.set_modal_action(_close, 46.0)
+	_close.pressed.connect(func(): _set_open(false))
+	vb.add_child(_close)
 	_apply_layout()
 
 
@@ -102,7 +109,9 @@ func _apply_layout() -> void:
 	var panel_size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(700, 560), Vector2(300, 360))
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_scroll):
-		_scroll.custom_minimum_size = Vector2(0, maxf(180.0, panel_size.y - (130.0 if mobile else 120.0)))
+		_scroll.custom_minimum_size = Vector2(0, maxf(140.0, panel_size.y - (200.0 if mobile else 180.0)))
+	if is_instance_valid(_close):
+		_close.custom_minimum_size.y = 52.0 if mobile else 46.0
 
 
 func _refresh() -> void:

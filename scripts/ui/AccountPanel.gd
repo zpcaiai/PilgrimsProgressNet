@@ -210,6 +210,7 @@ func _build() -> void:
 	confirm.add_theme_font_size_override("font_size", FONT_BODY)
 	confirm.custom_minimum_size = Vector2(200, 44)
 	ResponsiveLayout.set_button_wrap(confirm)
+	ResponsiveLayout.set_modal_action(confirm, 44.0)
 	confirm.pressed.connect(_confirm)
 	act_row.add_child(confirm)
 	var close := Button.new()
@@ -217,6 +218,7 @@ func _build() -> void:
 	close.add_theme_font_size_override("font_size", FONT_BODY)
 	close.custom_minimum_size = Vector2(140, 44)
 	ResponsiveLayout.set_button_wrap(close)
+	ResponsiveLayout.set_modal_action(close, 44.0)
 	close.pressed.connect(func(): _set_open(false))
 	act_row.add_child(close)
 

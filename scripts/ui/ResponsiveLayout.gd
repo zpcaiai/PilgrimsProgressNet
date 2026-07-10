@@ -83,6 +83,40 @@ static func set_button_wrap(button: Button) -> void:
 	button.clip_text = false
 
 
+static func set_modal_action(button: Button, min_height: float = 48.0) -> void:
+	if button == null:
+		return
+	set_button_wrap(button)
+	button.set_meta("modal_action", true)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.custom_minimum_size.y = maxf(min_height, button.custom_minimum_size.y)
+
+
+static func place_panel_action(button: Button, panel: Control, height: float,
+			inset: float = 16.0) -> void:
+	if button == null or panel == null or not (button.get_parent() is Control):
+		return
+	var panel_rect := panel.get_global_rect()
+	var parent_rect := (button.get_parent() as Control).get_global_rect()
+	button.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	button.position = panel_rect.position - parent_rect.position + Vector2(inset, panel_rect.size.y - height - inset)
+	button.size = Vector2(maxf(120.0, panel_rect.size.x - inset * 2.0), height)
+	button.move_to_front()
+
+
+static func place_viewport_action(button: Button, host: Node, height: float,
+			inset: float = 18.0) -> void:
+	if button == null or not (button.get_parent() is Control):
+		return
+	var bounds := viewport_size(host)
+	var parent_rect := (button.get_parent() as Control).get_global_rect()
+	button.set_meta("viewport_action", true)
+	button.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	button.position = Vector2(inset, bounds.y - height - inset) - parent_rect.position
+	button.size = Vector2(maxf(120.0, bounds.x - inset * 2.0), height)
+	button.move_to_front()
+
+
 static func normalize_tree(root: Node, mobile: bool = false) -> void:
 	if root == null:
 		return

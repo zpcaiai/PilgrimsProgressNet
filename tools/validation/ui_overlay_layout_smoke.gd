@@ -1,6 +1,6 @@
 extends Node
-## Verifies the shared chapter overlays stay inside the viewport at representative
-## phone, tablet, and desktop sizes. Scripture Gate is checked with all 16 chapters.
+## Verifies chapter overlays and their primary actions stay inside the viewport at
+## representative phone, tablet, and desktop sizes. All 16 gates are checked.
 
 const VIEWPORTS := [
 	Vector2i(390, 844),
@@ -32,7 +32,14 @@ func _ready() -> void:
 
 func _inside_viewport(rect: Rect2, viewport: Vector2) -> bool:
 	return (rect.position.x >= -1.0 and rect.position.y >= -1.0
-		and rect.end.x <= viewport.x + 1.0 and rect.end.y <= viewport.y + 1.0)
+			and rect.end.x <= viewport.x + 1.0 and rect.end.y <= viewport.y + 1.0)
+
+
+func _collect_modal_actions(node: Node, result: Array[Button]) -> void:
+	if node is Button and node.has_meta("modal_action"):
+		result.append(node as Button)
+	for child in node.get_children():
+		_collect_modal_actions(child, result)
 
 
 func _check_panel(label: String, owner: Node, viewport: Vector2) -> void:
@@ -43,6 +50,18 @@ func _check_panel(label: String, owner: Node, viewport: Vector2) -> void:
 	var rect := panel.get_global_rect()
 	if not _inside_viewport(rect, viewport):
 		_failures.append("[%s] panel %s escaped viewport %s" % [label, rect, viewport])
+	var actions: Array[Button] = []
+	_collect_modal_actions(owner, actions)
+	if actions.is_empty():
+		_failures.append("[%s] has no visible next/close action" % label)
+	for action in actions:
+		var action_rect := action.get_global_rect()
+		if not action.visible or action.disabled or not action_rect.has_area():
+			_failures.append("[%s] action '%s' is not usable" % [label, action.text])
+		elif not _inside_viewport(action_rect, viewport):
+			_failures.append("[%s] action '%s' escaped viewport: %s" % [label, action.text, action_rect])
+		elif not action.has_meta("viewport_action") and not rect.encloses(action_rect):
+			_failures.append("[%s] action '%s' escaped its panel: %s" % [label, action.text, action_rect])
 	var scroll := owner.get("_scroll") as ScrollContainer
 	var content := owner.get("_content") as Control
 	if is_instance_valid(scroll) and is_instance_valid(content):
@@ -94,7 +113,7 @@ func _run() -> void:
 
 	await _set_viewport_size(original_size)
 	if _failures.is_empty():
-		print("UI OVERLAY LAYOUT SMOKE PASSED: 16 chapter gates and 9 overlay families across 5 viewports")
+		print("UI OVERLAY ACTION SMOKE PASSED: 16 gates and 9 overlay families across 5 viewports")
 		get_tree().quit(0)
 		return
 	for failure in _failures:

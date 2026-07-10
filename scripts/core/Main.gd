@@ -322,9 +322,16 @@ func _show_controls_hint() -> void:
 	sb.set_border_width_all(2)
 	panel.add_theme_stylebox_override("panel", sb)
 	root.add_child(panel)
+	var frame := VBoxContainer.new()
+	frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	frame.add_theme_constant_override("separation", 10)
+	panel.add_child(frame)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	panel.add_child(scroll)
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	frame.add_child(scroll)
 	var vb := VBoxContainer.new()
 	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_theme_constant_override("separation", 10)
@@ -351,21 +358,27 @@ func _show_controls_hint() -> void:
 		l.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if ResponsiveLayout.is_mobile(self) else TextServer.AUTOWRAP_WORD_SMART
 		l.add_theme_font_size_override("font_size", 24 if ResponsiveLayout.is_mobile(self) else 18)
 		vb.add_child(l)
-	_add_button(vb, "知道了 Got it", func():
+	var confirm := _add_button(frame, "确认并开始 / Confirm & Start", func():
 		EventBus.unlock_player("controls_hint")
 		cl.queue_free()
 	)
+	ResponsiveLayout.set_modal_action(confirm, 48.0)
+	confirm.reparent(root)
 	var apply_layout := func():
 		var mobile := ResponsiveLayout.is_mobile(cl)
 		ResponsiveLayout.fit_fullscreen(root, cl)
 		var size := ResponsiveLayout.fit_center_panel(panel, cl, Vector2(720, 560), Vector2(280, 320))
 		if mobile:
-			scroll.custom_minimum_size = Vector2(maxf(220.0, size.x - 48.0), maxf(220.0, size.y - 48.0))
+			scroll.custom_minimum_size = Vector2(maxf(220.0, size.x - 48.0), maxf(160.0, size.y - 126.0))
 			vb.custom_minimum_size = Vector2(maxf(200.0, size.x - 72.0), 0)
 		else:
-			scroll.custom_minimum_size = Vector2(maxf(240.0, size.x - 48.0), maxf(240.0, size.y - 48.0))
+			scroll.custom_minimum_size = Vector2(maxf(240.0, size.x - 48.0), maxf(180.0, size.y - 110.0))
 			vb.custom_minimum_size = Vector2(maxf(220.0, size.x - 72.0), 0)
 		ResponsiveLayout.normalize_tree(panel, mobile)
+		if mobile:
+			ResponsiveLayout.place_viewport_action(confirm, cl, 62.0, 18.0)
+		else:
+			ResponsiveLayout.place_panel_action(confirm, panel, 48.0, 24.0)
 	get_viewport().size_changed.connect(apply_layout)
 	apply_layout.call()
 

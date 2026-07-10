@@ -81,14 +81,21 @@ func _build() -> void:
 		margin.add_theme_constant_override(m, int(safe))
 	add_child(margin)
 
+	var frame := VBoxContainer.new()
+	frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	frame.add_theme_constant_override("separation", 12)
+	margin.add_child(frame)
+
 	var scroll := ScrollContainer.new()
-	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	margin.add_child(scroll)
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	frame.add_child(scroll)
 
 	var center := CenterContainer.new()
 	var safe_size := ResponsiveLayout.safe_size(self)
-	center.custom_minimum_size = Vector2(maxf(240.0, safe_size.x), maxf(260.0, safe_size.y))
+	center.custom_minimum_size = Vector2(maxf(240.0, safe_size.x), 0)
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.add_child(center)
@@ -152,13 +159,12 @@ func _build() -> void:
 	coda.add_theme_font_size_override("font_size", 18)
 	box.add_child(coda)
 
-	box.add_child(_spacer(14))
 	var btn := Button.new()
-	btn.text = "继续 Continue"
+	btn.text = "确认并继续 / Confirm & Continue"
 	btn.add_theme_font_size_override("font_size", 18)
-	ResponsiveLayout.set_button_wrap(btn)
+	ResponsiveLayout.set_modal_action(btn, 52.0)
 	btn.pressed.connect(_on_continue)
-	box.add_child(btn)
+	frame.add_child(btn)
 
 	var tw := create_tween()
 	tw.tween_property(bg, "color:a", 0.93, 1.2)

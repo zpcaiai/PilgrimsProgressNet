@@ -137,6 +137,7 @@ func _build() -> void:
 	close.text = LocaleManager.t("conv.close_y", "关闭 (Y)")
 	close.tooltip_text = LocaleManager.t("conv.close_y", "关闭 (Y)")
 	ResponsiveLayout.set_button_wrap(close)
+	ResponsiveLayout.set_modal_action(close, 44.0)
 	close.pressed.connect(func(): _set_open(false))
 	_seticon(close, "close", LocaleManager.t("conv.close_y", "关闭 (Y)"))
 	rrow.add_child(close)

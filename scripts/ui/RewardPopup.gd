@@ -94,6 +94,7 @@ func _build() -> void:
 	btn.add_theme_font_size_override("font_size", 18)
 	btn.custom_minimum_size = Vector2(0, 46)
 	ResponsiveLayout.set_button_wrap(btn)
+	ResponsiveLayout.set_modal_action(btn, 46.0)
 	btn.pressed.connect(_dismiss)
 	vb.add_child(btn)
 	_apply_layout()
@@ -125,6 +126,7 @@ func _on_unseen(rewards: Array) -> void:
 			token_name, String(r.get("season", "")), board_name, int(r.get("rank", 0)), diff])
 	_body.text = "\n".join(PackedStringArray(lines))
 	_set_visible(true)
+	call_deferred("_apply_layout")
 	get_tree().paused = true
 
 

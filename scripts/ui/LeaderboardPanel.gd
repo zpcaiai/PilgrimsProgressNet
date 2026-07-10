@@ -23,6 +23,7 @@ var _season_tabs: Container
 var _scroll: ScrollContainer
 var _list: VBoxContainer
 var _status: Label
+var _close: Button
 var _visible: bool = false
 var _active_board: String = "devout_score"
 var _active_season: String = "current"   # "current" or "all"
@@ -100,10 +101,16 @@ func _build() -> void:
 	_scroll.add_child(_list)
 
 	var hint := Label.new()
-	hint.text = LocaleManager.t("lb.close_b", "B 关闭")
+	hint.text = "可点下方按钮关闭；桌面端也可按 B"
 	hint.add_theme_font_size_override("font_size", 14)
 	hint.add_theme_color_override("font_color", Color(0.55, 0.6, 0.7))
 	vb.add_child(hint)
+	_close = Button.new()
+	_close.text = "关闭 / Close"
+	_close.add_theme_font_size_override("font_size", FONT_BODY)
+	ResponsiveLayout.set_modal_action(_close, 46.0)
+	_close.pressed.connect(func(): _set_panel_visible(false))
+	vb.add_child(_close)
 	_apply_layout()
 
 
@@ -114,7 +121,9 @@ func _apply_layout() -> void:
 	var panel_size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(680, 560), Vector2(300, 360))
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	if is_instance_valid(_scroll):
-		_scroll.custom_minimum_size = Vector2(0, maxf(180.0, panel_size.y - (190.0 if mobile else 170.0)))
+		_scroll.custom_minimum_size = Vector2(0, maxf(140.0, panel_size.y - (250.0 if mobile else 220.0)))
+	if is_instance_valid(_close):
+		_close.custom_minimum_size.y = 52.0 if mobile else 46.0
 	for tabset in [_tabs, _season_tabs]:
 		if is_instance_valid(tabset):
 			for child in tabset.get_children():
@@ -229,6 +238,13 @@ func _difficulty_label() -> String:
 	return LocaleManager.t("lb.child", "童趣") if GameState.is_child_mode() else LocaleManager.t("lb.devout", "敬虔")
 
 
+func _set_panel_visible(value: bool) -> void:
+	_visible = value
+	_panel.visible = value
+	if value:
+		_refresh()
+
+
 func _style(bg: Color) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = bg
@@ -243,8 +259,5 @@ func _style(bg: Color) -> StyleBoxFlat:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_B:
-		_visible = not _visible
-		_panel.visible = _visible
-		if _visible:
-			_refresh()
+		_set_panel_visible(not _visible)
 		get_viewport().set_input_as_handled()

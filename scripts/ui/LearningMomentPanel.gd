@@ -6,6 +6,7 @@ const ResponsiveLayout := preload("res://scripts/ui/ResponsiveLayout.gd")
 
 var _root: Control
 var _panel: PanelContainer
+var _frame: VBoxContainer
 var _scroll: ScrollContainer
 var _content: VBoxContainer
 var _title: Label
@@ -51,9 +52,17 @@ func _build_ui() -> void:
 	_panel.add_theme_stylebox_override("panel", sb)
 	center.add_child(_panel)
 
+	_frame = VBoxContainer.new()
+	_frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_frame.add_theme_constant_override("separation", 12)
+	_panel.add_child(_frame)
+
 	_scroll = ScrollContainer.new()
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_panel.add_child(_scroll)
+	_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_frame.add_child(_scroll)
 
 	_content = VBoxContainer.new()
 	_content.custom_minimum_size = Vector2(720, 0)
@@ -79,8 +88,9 @@ func _build_ui() -> void:
 	_continue.text = "继续默想 / Continue"
 	_continue.custom_minimum_size = Vector2(0, 48)
 	_continue.add_theme_font_size_override("font_size", 20)
+	ResponsiveLayout.set_modal_action(_continue, 48.0)
 	_continue.pressed.connect(_hide_current)
-	_content.add_child(_continue)
+	_root.add_child(_continue)
 
 	get_viewport().size_changed.connect(_apply_layout)
 	_apply_layout()
@@ -93,19 +103,25 @@ func _apply_layout() -> void:
 	ResponsiveLayout.fit_fullscreen(_root, self)
 	var size := ResponsiveLayout.fit_center_panel(_panel, self, Vector2(720.0, 520.0), Vector2(260.0, 300.0))
 	var content_w := maxf(220.0, size.x - (40.0 if mobile else 48.0))
-	var content_h := maxf(220.0, size.y - (40.0 if mobile else 48.0))
+	var content_h := maxf(160.0, size.y - (112.0 if mobile else 108.0))
 	if is_instance_valid(_scroll):
 		_scroll.custom_minimum_size = Vector2(content_w, content_h)
 	if is_instance_valid(_content):
 		_content.custom_minimum_size = Vector2(content_w, 0)
 	ResponsiveLayout.normalize_tree(_panel, mobile)
 	_title.add_theme_font_size_override("font_size", 28 if not mobile else 26)
-	_body.custom_minimum_size = Vector2(0, maxf(180.0, content_h - 110.0))
+	_body.custom_minimum_size = Vector2(0, maxf(140.0, content_h - 70.0))
 	_body.add_theme_font_size_override("normal_font_size", 21 if not mobile else 23)
 	_body.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if mobile else TextServer.AUTOWRAP_WORD_SMART
 	_body.scroll_active = false
 	_body.fit_content = true
 	_continue.add_theme_font_size_override("font_size", 20 if not mobile else 22)
+	var action_h := 54.0 if mobile else 48.0
+	_continue.custom_minimum_size.y = action_h
+	if mobile:
+		ResponsiveLayout.place_viewport_action(_continue, self, action_h, 18.0)
+	else:
+		ResponsiveLayout.place_panel_action(_continue, _panel, action_h, 20.0)
 
 
 func _process(_delta: float) -> void:
@@ -152,6 +168,16 @@ func _show(moment: Dictionary) -> void:
 	_root.visible = true
 	visible = true
 	EventBus.lock_player("learning_moment")
+	_refresh_open_layout()
+
+
+func _refresh_open_layout() -> void:
+	await get_tree().process_frame
+	if not is_instance_valid(_root) or not _root.visible:
+		return
+	_apply_layout()
+	if is_instance_valid(_scroll):
+		_scroll.scroll_vertical = 0
 
 
 func _hide_current() -> void:
