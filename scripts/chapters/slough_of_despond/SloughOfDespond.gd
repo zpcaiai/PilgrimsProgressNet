@@ -41,7 +41,7 @@ func _build_procedural() -> void:
 	fg.position = Vector3(4, 0.2, -20)
 
 	# Deep despair basin.
-	_add_mud(Vector3(0, 1, -32), Vector3(20, 2, 14), true)
+	_add_mud(Vector3(0, 1.4, -31), Vector3(22, 2.8, 20), true)
 	_add_safe_stone(Vector3(-6, 0, -32))
 
 	# Help waits at the deepest point.

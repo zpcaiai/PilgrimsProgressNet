@@ -19,6 +19,7 @@ var _battle_gear_root: Node3D
 var _battle_gear_nodes: Array[Node3D] = []
 var _is_greybox: bool = false
 var _fig: Node3D
+var _humanoid_animator: HumanoidAnimator = null
 var _vanity_root: Node3D
 var _camera: Camera3D
 var _interactor: Area3D
@@ -26,7 +27,9 @@ var _current_target: Interactable = null
 var _breath_timer: float = 0.0
 var _glancing: bool = false
 var _swimming: bool = false
-var _sink_depth: float = 0.0  # mud sink (visual), driven by MudSystem
+var _sink_depth: float = 0.0  # current mud sink (visual), driven by MudSystem
+var _target_sink_depth: float = 0.0
+var _mud_struggling: bool = false
 # Footstep / landing dust
 var _dust: CPUParticles3D
 var _land_puff: CPUParticles3D
@@ -575,6 +578,7 @@ func _physics_process(delta: float) -> void:
 		_mesh_root.rotation.y = lerp_angle(_mesh_root.rotation.y, target_yaw, rotation_speed * delta)
 
 	move_and_slide()
+	_update_visual_submersion(delta)
 	_update_dust()
 	_update_facing()
 	_update_interaction()
@@ -652,14 +656,12 @@ func set_swimming(on: bool) -> void:
 	if on == _swimming:
 		return
 	_swimming = on
-	if is_instance_valid(_fig):
-		var anim := HumanoidAnimator.find_in(_fig)
-		if anim != null:
-			anim.swimming = on
-	if is_instance_valid(_mesh_root):
-		var sink := -0.45 if on else 0.0
-		var tw := create_tween()
-		tw.tween_property(_mesh_root, "position:y", sink, 0.5).set_trans(Tween.TRANS_SINE)
+	if on:
+		_target_sink_depth = 0.0
+		set_mud_struggling(false)
+	var anim := _get_humanoid_animator()
+	if anim != null:
+		anim.swimming = on
 
 
 func is_swimming() -> bool:
@@ -673,9 +675,34 @@ func is_swimming() -> bool:
 func set_sink_depth(depth: float) -> void:
 	if _swimming:
 		return
-	if is_equal_approx(depth, _sink_depth):
+	_target_sink_depth = maxf(0.0, depth)
+
+
+## Blend the figure into the Slough's laboured swimming/struggle animation.
+## Kept separate from set_swimming so the River of Death retains its crawl.
+func set_mud_struggling(on: bool, intensity: float = 0.0) -> void:
+	_mud_struggling = on
+	var anim := _get_humanoid_animator()
+	if anim != null:
+		anim.mud_struggling = on
+		anim.struggle_intensity = clampf(intensity, 0.0, 1.0) if on else 0.0
+
+
+func is_mud_struggling() -> bool:
+	return _mud_struggling
+
+
+func _get_humanoid_animator() -> HumanoidAnimator:
+	if is_instance_valid(_humanoid_animator):
+		return _humanoid_animator
+	if is_instance_valid(_fig):
+		_humanoid_animator = HumanoidAnimator.find_in(_fig)
+	return _humanoid_animator
+
+
+func _update_visual_submersion(delta: float) -> void:
+	if not is_instance_valid(_mesh_root):
 		return
-	_sink_depth = depth
-	if is_instance_valid(_mesh_root):
-		var tw := create_tween()
-		tw.tween_property(_mesh_root, "position:y", -depth, 0.35).set_trans(Tween.TRANS_SINE)
+	var target := 0.45 if _swimming else _target_sink_depth
+	_sink_depth = lerpf(_sink_depth, target, clampf(delta * 5.5, 0.0, 1.0))
+	_mesh_root.position.y = -_sink_depth

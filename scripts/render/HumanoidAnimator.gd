@@ -25,6 +25,8 @@ var make_shadow: bool = true
 var shadow_width: float = 0.62
 var height_scale: float = 1.0   # so the vertical bob stays proportional to size
 var swimming: bool = false      # when true, override the walk with a swim stroke
+var mud_struggling: bool = false
+var struggle_intensity: float = 0.0
 
 # tuning
 const WALK_FREQ := 7.5          # stride cadence (rad/s base)
@@ -39,6 +41,7 @@ const TARGET_SPEED := 4.5       # m/s that counts as a full-amplitude stride
 const MOVE_THRESHOLD := 0.5     # m/s before "walking" kicks in
 const SWIM_FREQ := 3.6          # swim-stroke cadence (rad/s)
 const SWIM_PITCH := 0.85        # forward pitch of the body while swimming (rad)
+const STRUGGLE_FREQ := 4.8
 
 var _base_body_y: float = 0.0
 var _t: float = 0.0
@@ -95,6 +98,9 @@ func _process(delta: float) -> void:
 	if body == null or delta <= 0.0:
 		return
 
+	if mud_struggling:
+		_struggle(delta)
+		return
 	if swimming:
 		_swim(delta)
 		return
@@ -182,3 +188,33 @@ func _swim(delta: float) -> void:
 		knee_l.rotation.x = -0.18 - maxf(0.0, sw) * 0.18
 	if is_instance_valid(knee_r):
 		knee_r.rotation.x = -0.18 - maxf(0.0, -sw) * 0.18
+
+
+## A laboured, mostly upright stroke for the Slough of Despond. It is visibly
+## less controlled than the River of Death crawl: arms sweep wide, knees drive
+## unevenly and the torso rolls while the pilgrim fights the sucking mire.
+func _struggle(delta: float) -> void:
+	var strength := clampf(struggle_intensity, 0.0, 1.0)
+	_phase += delta * lerpf(3.5, STRUGGLE_FREQ, strength)
+	var sw := sin(_phase)
+	var churn := cos(_phase * 0.82)
+	var ease := clampf(delta * 6.0, 0.0, 1.0)
+	body.rotation.x = lerpf(body.rotation.x, lerpf(0.2, 0.42, strength), ease)
+	body.rotation.z = lerpf(body.rotation.z, sw * 0.11 * strength, ease)
+	body.position.y = _base_body_y + (absf(churn) * 0.07 - 0.025) * height_scale * strength
+	if is_instance_valid(arm_l):
+		arm_l.rotation.x = -0.72 + sw * lerpf(0.75, 1.2, strength)
+		arm_l.rotation.y = 0.28 + churn * 0.42 * strength
+		arm_l.rotation.z = -0.28 - churn * 0.24 * strength
+	if is_instance_valid(arm_r):
+		arm_r.rotation.x = -0.72 - sw * lerpf(0.75, 1.2, strength)
+		arm_r.rotation.y = -0.28 + churn * 0.42 * strength
+		arm_r.rotation.z = 0.28 + churn * 0.24 * strength
+	if is_instance_valid(hip_l):
+		hip_l.rotation.x = 0.18 + sw * 0.42 * strength
+	if is_instance_valid(hip_r):
+		hip_r.rotation.x = 0.18 - sw * 0.42 * strength
+	if is_instance_valid(knee_l):
+		knee_l.rotation.x = -0.3 - maxf(0.0, -sw) * 0.55 * strength
+	if is_instance_valid(knee_r):
+		knee_r.rotation.x = -0.3 - maxf(0.0, sw) * 0.55 * strength

@@ -8,9 +8,12 @@ var movement_multiplier: float = 0.7
 var effects_per_tick: Dictionary = {"despair": 1, "weariness": 1}
 var tick_interval: float = 2.0
 var is_deep: bool = false
+var edge_sink_depth: float = 0.16
+var center_sink_depth: float = 0.34
 var _player: PlayerController = null
 var _accum: float = 0.0
 var _tick_count: int = 0
+var _zone_size: Vector3 = Vector3.ONE
 
 
 ## True while the pilgrim is standing in this mud (read by MudSystem to drive
@@ -19,15 +22,32 @@ func is_occupied() -> bool:
 	return _player != null
 
 
+## Returns a smooth edge-to-centre depth for the occupied point. The physical
+## capsule remains on the floor; MudSystem uses this value to submerge the
+## visible figure and blend into the mire struggle pose.
+func current_sink_depth() -> float:
+	if _player == null or not is_instance_valid(_player):
+		return 0.0
+	var local := to_local(_player.global_position)
+	var half_x := maxf(_zone_size.x * 0.5, 0.01)
+	var half_z := maxf(_zone_size.z * 0.5, 0.01)
+	var edge_distance := 1.0 - maxf(absf(local.x) / half_x, absf(local.z) / half_z)
+	var depth_blend := smoothstep(0.04, 0.78, clampf(edge_distance, 0.0, 1.0))
+	return lerpf(edge_sink_depth, center_sink_depth, depth_blend)
+
+
 func setup(size: Vector3, deep: bool = false, tint: Color = Color(0, 0, 0, 0)) -> void:
 	collision_layer = 0
 	collision_mask = 1
 	monitoring = true
 	is_deep = deep
+	_zone_size = size
 	add_to_group("mud_zone")
 	if deep:
 		movement_multiplier = 0.45
 		effects_per_tick = {"despair": 2, "fear": 1, "hope": -1}
+		edge_sink_depth = 0.58
+		center_sink_depth = 1.12
 	# Collision
 	var col := CollisionShape3D.new()
 	var box := BoxShape3D.new()

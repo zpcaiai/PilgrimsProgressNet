@@ -10,8 +10,8 @@ class_name MudSystem
 ##   4. sinking, fading FOOTPRINTS pressed into the mud as he wades.
 ## Purely a juice layer: the MudZone hazards still own the slow + despair ticks.
 
-const SINK_SHALLOW := 0.26
-const SINK_DEEP := 0.52
+const STRUGGLE_START_DEPTH := 0.56
+const STRUGGLE_FULL_DEPTH := 1.08
 const STEP_DIST := 0.82          # metres between footprints
 const FOOT_LIFE := 5.5
 
@@ -117,12 +117,19 @@ func _physics_process(_delta: float) -> void:
 		_player = _find_player()
 		if _player == null:
 			return
-	# Deepest mud the pilgrim currently stands in.
+	# Deepest mud the pilgrim currently stands in. Each zone grows deeper toward
+	# its centre, so the pose progresses from wading to swimming and struggling.
 	var sink := 0.0
+	var slowest_terrain := 1.0
 	for z in get_tree().get_nodes_in_group("mud_zone"):
 		if z is MudZone and (z as MudZone).is_occupied():
-			sink = maxf(sink, SINK_DEEP if (z as MudZone).is_deep else SINK_SHALLOW)
+			sink = maxf(sink, (z as MudZone).current_sink_depth())
+			slowest_terrain = minf(slowest_terrain, (z as MudZone).movement_multiplier)
 	_player.set_sink_depth(sink)
+	_player.terrain_multiplier = slowest_terrain
+	var struggling := sink >= STRUGGLE_START_DEPTH
+	var struggle_strength := inverse_lerp(STRUGGLE_START_DEPTH, STRUGGLE_FULL_DEPTH, sink)
+	_player.set_mud_struggling(struggling, clampf(struggle_strength, 0.0, 1.0))
 
 	var pos := _player.global_position
 	if sink <= 0.0:
@@ -135,7 +142,7 @@ func _physics_process(_delta: float) -> void:
 	var flat := Vector3(pos.x - _last_foot_pos.x, 0.0, pos.z - _last_foot_pos.z)
 	if flat.length() >= STEP_DIST:
 		var dir := flat.normalized()
-		_drop_footprint(pos, dir, sink >= SINK_DEEP)
+		_drop_footprint(pos, dir, sink >= STRUGGLE_START_DEPTH)
 		_last_foot_pos = pos
 		_foot_left = not _foot_left
 

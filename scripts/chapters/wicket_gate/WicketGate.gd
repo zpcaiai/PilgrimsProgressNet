@@ -8,9 +8,14 @@ const TRUTH_SHIELD := preload("res://scripts/level/TruthShield.gd")
 var _shield: Node = null
 var _tower_built: bool = false
 var _knock_access_built: bool = false
+var _gate_door: Node3D = null
+var _gate_door_closed_position: Vector3 = Vector3.ZERO
+var _gate_opened: bool = false
+var _entry_completed: bool = false
 
 
 func _after_glb_built() -> void:
+	_capture_gate_door()
 	_install_wicket_gate_pressure()
 	_install_knock_access()
 
@@ -64,6 +69,15 @@ func _install_wicket_gate_pressure() -> void:
 		make_floating_label("点「盾牌」举起真理盾牌；桌面键位 L", player.global_position + Vector3(0, 2.0, -4), Color(1.0, 0.9, 0.45))
 	if EventBus.has_signal("dialogue_ended") and not EventBus.dialogue_ended.is_connected(_on_dialogue_ended):
 		EventBus.dialogue_ended.connect(_on_dialogue_ended)
+	if EventBus.has_signal("game_flag_changed") and not EventBus.game_flag_changed.is_connected(_on_game_flag_changed):
+		EventBus.game_flag_changed.connect(_on_game_flag_changed)
+	if GameState.has_flag("passed_wicket_gate"):
+		_open_gate_visual(false)
+		_complete_gate_entry.call_deferred()
+	elif GameState.has_flag("knocked_gate"):
+		# Recover older saves created while node-level dialogue flags were ignored.
+		# Reopen the decision immediately instead of leaving the player at a shut door.
+		_start_knock_dialogue.call_deferred()
 
 
 func _install_knock_access() -> void:
@@ -96,15 +110,63 @@ func _start_knock_dialogue() -> void:
 
 func _on_dialogue_ended(dialogue_id: String) -> void:
 	if dialogue_id == "wicket_gate_knock" and GameState.has_flag("passed_wicket_gate"):
-		GameState.set_flag("knocked_gate", true)
-		if _arrows != null:
-			_arrows.active = false
-		QuestManager.update_quest_progress("enter_gate")
-		if is_instance_valid(player):
-			player.teleport(Vector3(0, 1, -25))
-		make_light_burst(Vector3(0, 1.4, -22), Color(1.0, 0.88, 0.48), 48)
-		EventBus.toast("善意把你拉进门内；火箭停在门槛之外。")
-		_advance_after_delay()
+		_complete_gate_entry()
+
+
+func _on_game_flag_changed(flag_name: String, _old_value: Variant, new_value: Variant) -> void:
+	if flag_name == "passed_wicket_gate" and bool(new_value):
+		_open_gate_visual(true)
+
+
+func _capture_gate_door() -> void:
+	var found := find_child("PROP_GateDoor", true, false)
+	if found is Node3D:
+		_gate_door = found as Node3D
+		_gate_door_closed_position = _gate_door.position
+
+
+func _open_gate_visual(animate: bool = true) -> void:
+	if _gate_opened:
+		return
+	_gate_opened = true
+	if not is_instance_valid(_gate_door):
+		return
+	_set_gate_collision_disabled(_gate_door)
+	var open_position := _gate_door_closed_position + Vector3(0, 4.8, 0)
+	if animate:
+		var tween := create_tween()
+		tween.tween_property(_gate_door, "position", open_position, 0.72) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	else:
+		_gate_door.position = open_position
+
+
+func _set_gate_collision_disabled(root: Node) -> void:
+	if root is CollisionShape3D:
+		(root as CollisionShape3D).set_deferred("disabled", true)
+	for child in root.get_children():
+		_set_gate_collision_disabled(child)
+
+
+func _complete_gate_entry() -> void:
+	if _entry_completed:
+		return
+	_entry_completed = true
+	_open_gate_visual(true)
+	GameState.set_flag("knocked_gate", true)
+	if _arrows != null:
+		_arrows.active = false
+	QuestManager.update_quest_progress("enter_gate")
+	if is_instance_valid(player):
+		# Just inside the gate, before the chapter exit. The player continues forward
+		# into the Scripture Gate instead of being silently advanced past it.
+		player.teleport(Vector3(0, 1, -10.4))
+	make_light_burst(Vector3(0, 2.2, -8), Color(1.0, 0.88, 0.48), 48)
+	EventBus.toast("窄门已经打开；善意把你拉进门内。继续向前进入经文之门。")
+
+
+func is_gate_open() -> bool:
+	return _gate_opened
 
 
 func _build_beelzebub_tower() -> void:

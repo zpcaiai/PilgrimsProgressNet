@@ -208,14 +208,16 @@ func _emit_current_node() -> void:
 		end_dialogue()
 		return
 	_mark_node_seen(_current_node_id)
-	# Auto-apply node-level on_enter effects (optional).
-	if node.has("on_enter"):
-		SpiritualStateManager.apply_effects(node["on_enter"])
-	# Node-level flags: reaching a node reliably sets story flags even if the
-	# player leaves before picking a flag-bearing choice (prevents soft-locks).
-	if node.has("set_flags"):
-		for fk in (node["set_flags"] as Dictionary).keys():
-			GameState.set_flag(String(fk), node["set_flags"][fk])
+	# Dialogue data historically used both names for node-level outcomes. Apply
+	# either spelling when the node is reached so story-critical final lines cannot
+	# leave their chapter flags unset.
+	for effect_field in ["on_enter", "effects"]:
+		if node.has(effect_field) and node[effect_field] is Dictionary:
+			SpiritualStateManager.apply_effects(node[effect_field])
+	for flag_field in ["set_flags", "flags"]:
+		if node.has(flag_field) and node[flag_field] is Dictionary:
+			for fk in (node[flag_field] as Dictionary).keys():
+				GameState.set_flag(String(fk), node[flag_field][fk])
 	node = _resolve_text_variant(node)
 	node = _localize_node(node)
 	EventBus.dialogue_node_changed.emit(node)

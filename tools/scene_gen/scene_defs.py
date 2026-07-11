@@ -1005,8 +1005,8 @@ def build_slough_of_despond():
           tex="mud", tile=3.0, roughness=0.5)
     # The deep despair bog at the centre: a near-black sheet of standing water,
     # proud of the mud so it reads as a wide, drowning pool.
-    s.box("ENV_Slough_DeepBog_WaterSurface", (18, 0.12, 30), (0.07, 0.09, 0.08),
-          (0, 0.19, -26), tex="mud", tile=2.0, roughness=0.32, metallic=0.1,
+    s.box("ENV_Slough_DeepBog_WaterSurface", (22, 0.16, 36), (0.055, 0.075, 0.068),
+          (0, 0.23, -27), tex="mud", tile=2.0, roughness=0.26, metallic=0.14,
           emissive=(0.015, 0.02, 0.018), bevel=False)
     s.box("ENV_Slough_SafeStonePath", (3, 0.2, 60), (0.5, 0.5, 0.55),
           (0, 0.08, -10))
@@ -1072,9 +1072,9 @@ def build_slough_of_despond():
            color=(0.3, 0.32, 0.26, 0.6))
     s.zone("COL_MudZone_Shallow_02", (12, 2, 8), (-7, 1, -14),
            color=(0.3, 0.32, 0.26, 0.6))
-    s.zone("COL_MudZone_Deep_01", (20, 2, 14), (0, 1, -32),
+    s.zone("COL_MudZone_Deep_01", (22, 2.8, 20), (0, 1.4, -31),
            color=(0.18, 0.22, 0.18, 0.78))
-    s.zone("COL_MudZone_Deep_02", (10, 2, 8), (7, 1, -24),
+    s.zone("COL_MudZone_Deep_02", (12, 2.6, 12), (7, 1.3, -23),
            color=(0.18, 0.22, 0.18, 0.78))
     s.zone("COL_FalseGround_01", (4, 0.6, 4), (4, 0.2, -20),
            color=(0.32, 0.34, 0.28, 0.5))
