@@ -732,7 +732,9 @@ func make_wayside_chapel(pos: Vector3, chapel_id: String, _kneel_effects: Dictio
 	)
 	add_child(pause)
 
-	make_floating_label("路旁小堂 Wayside Chapel", pos + Vector3(0, 2.7, 1.5), Color(0.85, 0.82, 0.7))
+	# The cross and warm light identify the chapel in-world. A persistent Label3D
+	# can be clipped by gateposts or appear as stray text at the screen edge; the
+	# centred worship toast and interaction prompt carry the readable wording.
 	var _cb2 := func(_p):
 		_grant_chapel_worship(chapel_id, kneel_text, candle, pos)
 	make_interactable(pos + Vector3(0, 0, 1.0), "停留礼拜：信望爱 +1",

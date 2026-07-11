@@ -156,6 +156,21 @@ func _run() -> void:
 			await get_tree().process_frame
 			if is_instance_valid(chapter.player) and chapter.player.global_position.z > -9.8:
 				_fail(String(chapter_id), "Goodwill did not pull the player inside the open gate")
+			if is_instance_valid(chapter.player):
+				chapter.player.teleport(Vector3(0, 1, -6.8))
+				await get_tree().physics_frame
+				var blocked := chapter.player.move_and_collide(Vector3(0, 0, -5.6), true)
+				if blocked != null:
+					var blocker := blocked.get_collider()
+					var blocker_name := str(blocker)
+					if blocker is Node:
+						var ancestry: Array[String] = []
+						var cursor := blocker as Node
+						while cursor != null and cursor != chapter:
+							ancestry.append("%s<%s>" % [String(cursor.name), cursor.get_class()])
+							cursor = cursor.get_parent()
+						blocker_name = " -> ".join(ancestry)
+					_fail(String(chapter_id), "open gate path is blocked by %s" % blocker_name)
 		print("  %-24s runtime contract OK" % String(chapter_id))
 
 	if is_instance_valid(chapter_manager.get_current_scene_instance()):

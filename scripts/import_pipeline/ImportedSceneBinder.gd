@@ -263,6 +263,12 @@ static func _should_add_box_collision(mi: MeshInstance3D) -> bool:
 
 
 static func _is_collision_candidate_name(nm: String) -> bool:
+	# Technical markers may contain structural words (for example
+	# TRIGGER_GateKnock), but they are areas/markers rather than architecture.
+	# Giving them box collision creates invisible walls over their triggers.
+	for prefix in ["TRIGGER_", "COL_", "LIGHT_", "VFX_", "CAM_", "SPAWN_", "PATH_", "NPC_", "ENEMY_"]:
+		if nm.begins_with(prefix):
+			return false
 	if nm.begins_with("VIS_") or nm.begins_with("PROP_"):
 		return true
 	for token in ["Wall", "House", "Building", "Castle", "Gate", "Fence",

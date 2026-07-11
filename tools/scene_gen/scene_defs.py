@@ -1134,14 +1134,13 @@ def build_wicket_gate():
             {"kind": "sphere", "radius": br * 0.6, "color": (0.22, 0.23, 0.28), "pos": (br * 0.7, br * 0.4, 0.3)},
         ], pos=(bx, 0, bz))
 
-    # Small gate chapel just inside the narrow way -- a place to kneel and give
-    # thanks the moment grace draws you through. "Enter through the narrow gate"
-    # (Mt 7:13). A real worship/restore point (PROP_Chapel) set on the platform's
-    # left, clear of the central road, the exit portal and the arrow zone behind.
-    _chapel(s, "PROP_Chapel", (-4.2, 0, -11), rot=(0, 90, 0), kind="gate")
-    s.marker("LIGHT_WicketChapelGlow", (-4.2, 3.2, -11))
+    # ChapterBase supplies the single cross-bearing wayside chapel on the right.
+    # Do not bake another chapel here: its rotated steeple previously crossed the
+    # centreline behind the raised door and formed an invisible/visible wall.
 
-    s.marker("NPC_Goodwill", (0, 0, -10.5))
+    # Goodwill waits beside the passage rather than standing in its centre. His
+    # physical character body must not become a second gate after the door opens.
+    s.marker("NPC_Goodwill", (-3.8, 0, -10.5))
     s.zone("TRIGGER_GateKnock", (3.4, 4, 1.6), (0, 2, -8),
            color=(0.9, 0.8, 0.4, 0.25))
     s.zone("TRIGGER_Exit_CrossAndTomb", (8, 4, 2), (0, 1.5, -12))
