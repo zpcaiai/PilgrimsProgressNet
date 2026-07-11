@@ -109,6 +109,12 @@ func _advance() -> void:
 func _ensure_exit_reflection(chapter_id: String) -> void:
 	if chapter_id == "" or GameState.has_flag("reflected_" + chapter_id):
 		return
+	# At the Wicket Gate, the Scripture Gate is the threshold reflection. Showing
+	# another modal immediately afterwards obscures the portal and can leave the
+	# player waiting at an apparently inactive exit.
+	if chapter_id == "wicket_gate" and GameState.has_flag("scripture_wicket_gate"):
+		ScriptureMemory.mark_reflected(chapter_id)
+		return
 	if ScriptureMemory.get_chapter_card(chapter_id).is_empty():
 		return
 	var moment := ScriptureMemory.chapter_reflection_moment(chapter_id)

@@ -97,7 +97,9 @@ func _run() -> void:
 			_fail(String(chapter_id), "player was not created")
 		elif _count_type(chapter.player, "CollisionShape3D") == 0:
 			_fail(String(chapter_id), "player has no collision shape")
-		if int(chapter.get("_chapels_built")) < 1:
+		if String(chapter_id) == "wicket_gate" and int(chapter.get("_chapels_built")) != 0:
+			_fail(String(chapter_id), "Wicket Gate must not build a chapel over its exit path")
+		elif String(chapter_id) != "wicket_gate" and int(chapter.get("_chapels_built")) < 1:
 			_fail(String(chapter_id), "chapter has no cross-bearing chapel")
 		if String(chapter_id) == "celestial_city":
 			if _count_journey_reviews(chapter) == 0:
@@ -159,7 +161,7 @@ func _run() -> void:
 			if is_instance_valid(chapter.player):
 				chapter.player.teleport(Vector3(0, 1, -6.8))
 				await get_tree().physics_frame
-				var blocked := chapter.player.move_and_collide(Vector3(0, 0, -5.6), true)
+				var blocked := chapter.player.move_and_collide(Vector3(0, 0, -10.0), true)
 				if blocked != null:
 					var blocker := blocked.get_collider()
 					var blocker_name := str(blocker)
@@ -171,6 +173,33 @@ func _run() -> void:
 							cursor = cursor.get_parent()
 						blocker_name = " -> ".join(ancestry)
 					_fail(String(chapter_id), "open gate path is blocked by %s" % blocker_name)
+			game_state.set_flag("scripture_wicket_gate", true)
+			var exit_triggers := chapter.find_children("*", "ChapterExitTrigger", true, false)
+			if exit_triggers.is_empty():
+				_fail(String(chapter_id), "exit portal trigger is missing")
+			var exit_was_overlapped := false
+			chapter.player.teleport(Vector3(0, 1, -9.2))
+			await get_tree().physics_frame
+			await get_tree().physics_frame
+			for _step in range(32):
+				chapter.player.move_and_collide(Vector3(0, 0, -0.25))
+				await get_tree().physics_frame
+				if not exit_triggers.is_empty() and is_instance_valid(exit_triggers[0]):
+					exit_was_overlapped = exit_was_overlapped or chapter.player in (exit_triggers[0] as Area3D).get_overlapping_bodies()
+			await get_tree().create_timer(0.8).timeout
+			if String(chapter_manager.current_chapter_id) != "cross_and_tomb":
+				var exit_detail := "missing"
+				if not exit_triggers.is_empty() and is_instance_valid(exit_triggers[0]):
+					var exit_area := exit_triggers[0] as Area3D
+					exit_detail = "pos=%s overlaps=%s seen=%s fired=%s gate_open=%s" % [
+						str(exit_area.global_position),
+						str(exit_area.get_overlapping_bodies().map(func(body): return String(body.name))),
+						exit_was_overlapped,
+						exit_area.get("_fired"),
+						exit_area.get("_gate_open")
+					]
+				_fail(String(chapter_id), "exit portal did not advance to cross_and_tomb; player=%s %s" % [
+					str(chapter.player.global_position), exit_detail])
 		print("  %-24s runtime contract OK" % String(chapter_id))
 
 	if is_instance_valid(chapter_manager.get_current_scene_instance()):

@@ -663,6 +663,10 @@ func _ensure_chapter_chapel() -> void:
 	var cid := ChapterManager.current_chapter_id
 	if cid == "":
 		return
+	# The Wicket Gate's compact threshold must stay completely clear from the door
+	# through its exit portal. This chapter intentionally has no wayside chapel.
+	if cid == "wicket_gate":
+		return
 	make_wayside_chapel(_default_chapel_position(cid), cid, {},
 		"你在十字架下停留礼拜：信心 +1，盼望 +1，爱心 +1。")
 
@@ -671,8 +675,6 @@ func _default_chapel_position(chapter_id: String) -> Vector3:
 	match chapter_id:
 		"city_of_destruction":
 			return Vector3(-13.0, 0, -14.0)
-		"wicket_gate":
-			return Vector3(4.0, 0, -12.0)
 		"cross_and_tomb":
 			return Vector3(-8.0, 0, -15.0)
 		"interpreter_house":

@@ -1134,16 +1134,18 @@ def build_wicket_gate():
             {"kind": "sphere", "radius": br * 0.6, "color": (0.22, 0.23, 0.28), "pos": (br * 0.7, br * 0.4, 0.3)},
         ], pos=(bx, 0, bz))
 
-    # ChapterBase supplies the single cross-bearing wayside chapel on the right.
-    # Do not bake another chapel here: its rotated steeple previously crossed the
-    # centreline behind the raised door and formed an invisible/visible wall.
+    # Keep the threshold and the whole road beyond it clear. Unlike the other
+    # chapters, the Wicket Gate has no wayside chapel: the gate itself is the
+    # place of prayer, and an earlier chapel blocked this compact passage.
 
     # Goodwill waits beside the passage rather than standing in its centre. His
     # physical character body must not become a second gate after the door opens.
     s.marker("NPC_Goodwill", (-3.8, 0, -10.5))
     s.zone("TRIGGER_GateKnock", (3.4, 4, 1.6), (0, 2, -8),
            color=(0.9, 0.8, 0.4, 0.25))
-    s.zone("TRIGGER_Exit_CrossAndTomb", (8, 4, 2), (0, 1.5, -12))
+    # Leave several deliberate walking steps between Goodwill's pull-in point
+    # and the exit so entering the gate cannot consume the portal event early.
+    s.zone("TRIGGER_Exit_CrossAndTomb", (8, 4, 3), (0, 1.5, -15))
     s.zone("COL_ArrowPressureZone", (10, 4, 28), (0, 2, 6),
            color=(0.4, 0.2, 0.45, 0.18))
 
