@@ -41,6 +41,23 @@ func _count_mud_systems(node: Node) -> int:
 	return count
 
 
+func _validate_npc_auto_dialogue(node: Node, chapter_id: String) -> void:
+	if node is Interactable and node.is_in_group("auto_dialogue_person"):
+		var person := node as Interactable
+		if not person.has_auto_dialogue():
+			_fail(chapter_id, "person %s has no automatic approach trigger" % String(person.name))
+	if node is NPCInteractable:
+		var npc := node as NPCInteractable
+		if npc.dialogue_id != "" and not npc.has_auto_dialogue():
+			_fail(chapter_id, "NPC %s has dialogue but no automatic approach trigger" % npc.npc_name)
+	if node is PilgrimFamily and node.find_child("AutoDialogueProximity", true, false) == null:
+		_fail(chapter_id, "the pilgrim's family has no automatic approach trigger")
+	if node is GiantDespair and node.find_child("AutoDialogueProximity", true, false) == null:
+		_fail(chapter_id, "Giant Despair has no automatic approach trigger")
+	for child in node.get_children():
+		_validate_npc_auto_dialogue(child, chapter_id)
+
+
 func _run() -> void:
 	var event_bus := get_node("/root/EventBus")
 	var game_state := get_node("/root/GameState")
@@ -108,6 +125,28 @@ func _run() -> void:
 			_fail(String(chapter_id), "chapter has no bound exit trigger")
 		if _count_type(chapter, "StaticBody3D") == 0:
 			_fail(String(chapter_id), "chapter has no solid world collision")
+		_validate_npc_auto_dialogue(chapter, String(chapter_id))
+		if String(chapter_id) == "city_of_destruction" and is_instance_valid(chapter.player):
+			var evangelist := chapter.find_child("Evangelist", true, false) as Interactable
+			if evangelist == null:
+				_fail(String(chapter_id), "Evangelist NPC is missing")
+			elif evangelist.get_auto_dialogue_id() != "evangelist_first_call":
+				_fail(String(chapter_id), "Evangelist automatic dialogue is not configured")
+			else:
+				chapter.player.teleport(evangelist.global_position + Vector3(4.2, 1.0, 0))
+				await get_tree().physics_frame
+				await get_tree().physics_frame
+				chapter.player.teleport(evangelist.global_position + Vector3(1.4, 1.0, 0))
+				await get_tree().physics_frame
+				await get_tree().create_timer(0.4).timeout
+				var history := DialogueManager.get_history_summary()
+				if not bool(history.get("active", false)) or String(history.get("dialogue", "")) != "evangelist_first_call":
+					_fail(String(chapter_id), "approaching Evangelist did not start his dialogue")
+				var facing_error := absf(wrapf(evangelist.global_rotation.y - PI * 0.5, -PI, PI))
+				if facing_error > 0.2:
+					_fail(String(chapter_id), "Evangelist did not turn toward the approaching player")
+				DialogueManager.end_dialogue()
+				await get_tree().process_frame
 		if String(chapter_id) == "slough_of_despond":
 			var deep_zones := 0
 			var deepest_sink := 0.0

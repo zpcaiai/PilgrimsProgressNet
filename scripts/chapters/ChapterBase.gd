@@ -541,13 +541,9 @@ func make_npc(npc_name: String, pos: Vector3, color: Color, dialogue_id: String 
 		area.interact_callback = on_interact
 	elif dialogue_id != "":
 		area.interact_callback = func(_p):
-			# Face-on-talk: pilgrim turns to the NPC, the NPC gives a small nod.
-			if _p != null and is_instance_valid(_p) and _p.has_method("glance_toward"):
-				_p.call("glance_toward", area.global_position)
-			var anim := HumanoidAnimator.find_in(area)
-			if anim != null:
-				anim.nudge(0.07)
+			area.face_toward_player(_p)
 			DialogueManager.start_dialogue(dialogue_id)
+	area.enable_auto_dialogue(dialogue_id, area)
 	add_child(area)
 	return area
 

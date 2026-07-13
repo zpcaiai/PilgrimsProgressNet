@@ -90,8 +90,7 @@ func _add_talk() -> void:
 	talk.prompt = "听妻子的恳求 (Hear your family)"
 	talk.one_shot = false
 	talk.interact_callback = func(p):
-		if is_instance_valid(p) and p.has_method("glance_toward"):
-			p.call("glance_toward", global_position)
+		talk.face_toward_player(p)
 		if not DialogueManager.is_active():
 			DialogueManager.start_dialogue("wife_concern")
 	var col := CollisionShape3D.new()
@@ -100,6 +99,7 @@ func _add_talk() -> void:
 	col.shape = sph
 	col.position = Vector3(0, 0.9, 0)
 	talk.add_child(col)
+	talk.enable_auto_dialogue("wife_concern", self, 2.8)
 	add_child(talk)
 
 

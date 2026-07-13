@@ -53,14 +53,10 @@ func setup(p_name: String, p_dialogue: String = "",
 	add_child(body)
 
 	interact_callback = func(_p):
-		# Face-on-talk: the pilgrim turns toward this NPC and the NPC gives a nod.
-		if _p != null and is_instance_valid(_p) and _p.has_method("glance_toward"):
-			_p.call("glance_toward", global_position)
-		var anim := HumanoidAnimator.find_in(self)
-		if anim != null:
-			anim.nudge(0.07)
+		face_toward_player(_p)
 		if dialogue_id != "" and not DialogueManager.is_active():
 			DialogueManager.start_dialogue(dialogue_id)
+	enable_auto_dialogue(dialogue_id, self)
 
 
 ## (The greybox capsule fallback is retired — every NPC is now a 3D body.)

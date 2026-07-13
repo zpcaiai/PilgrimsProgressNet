@@ -71,8 +71,7 @@ func _build_visual() -> void:
 	talk.prompt = "听绝望巨人的控告 (Face Giant Despair)"
 	talk.one_shot = false
 	talk.interact_callback = func(p):
-		if is_instance_valid(p) and p.has_method("glance_toward"):
-			p.call("glance_toward", global_position)
+		talk.face_toward_player(p)
 		if not DialogueManager.is_active():
 			DialogueManager.start_dialogue("giant_despair_accusation")
 	var tcol := CollisionShape3D.new()
@@ -81,6 +80,7 @@ func _build_visual() -> void:
 	tcol.shape = tsph
 	tcol.position = Vector3(0, 1.2, 0)
 	talk.add_child(tcol)
+	talk.enable_auto_dialogue("giant_despair_accusation", self, 4.6)
 	add_child(talk)
 
 
