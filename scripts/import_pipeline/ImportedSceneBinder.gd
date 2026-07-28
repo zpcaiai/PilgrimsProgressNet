@@ -72,7 +72,8 @@ const NPC_DISPLAY_NAME := {
 	"NPC_Hopeful": "Hopeful",
 	"NPC_Merchant_Applause": "Merchant of Applause",
 	"NPC_Merchant_Comfort": "Merchant",
-	"NPC_Merchant_Influence": "Merchant",
+	"NPC_Merchant_Influence": "Merchant of Influence",
+	"NPC_Merchant_Flattery": "Merchant of the Flattering Glass",
 	"NPC_GiantDespair": "Giant Despair",
 	"NPC_Shepherd_Knowledge": "Shepherd Knowledge",
 	"NPC_Shepherd_Experience": "Shepherd Experience",
@@ -102,14 +103,34 @@ const NPC_DIALOGUE_BY_CHAPTER := {
 		"NPC_Obstinate": "obstinate_road",
 		"NPC_Pliable": "pliable_doubting",
 	},
+	# Each merchant at the fair now sells a DIFFERENT lie, and each lie has its
+	# own rebuttal unlocked by an earlier chapter. Before this, all three
+	# merchants shared one generic pitch.
+	"vanity_fair": {
+		"NPC_Merchant_Applause": "vanity_stall_applause",
+		"NPC_Merchant_Comfort": "vanity_stall_comfort",
+		"NPC_Merchant_Influence": "vanity_stall_influence",
+		"NPC_Merchant_Flattery": "vanity_stall_flattery",
+	},
 }
 
 const TRIGGER_DIALOGUE := {
+	# --- previously orphaned dialogue files, now reachable -------------------
+	# Nine authored dialogues had zero references anywhere in the project. These
+	# are the ones with an obvious host trigger already in the scenes.
+	"TRIGGER_ApollyonApproach": "apollyon_intro",
+	"TRIGGER_ShadowValleyEntry": "shadow_valley_entry",
+	"TRIGGER_FamilyFear": "children_fear",
+	# ------------------------------------------------------------------------
 	"TRIGGER_ProclamationRead": "city_proclamation",
 	"TRIGGER_FeastWelcome": "celestial_feast_welcome",
 	"TRIGGER_PliableLeaves": "pliable_leaves",
-	"TRIGGER_ObstinateReturns": "obstinate_road",
-	"TRIGGER_PliableRoadDialogue": "pliable_doubting",
+	# These two used the CITY versions of each conversation. The files written
+	# for the road itself (wilderness_obstinate_returns / pliable_in_wilderness)
+	# had no reference anywhere, so Obstinate and Pliable said their city lines
+	# a second time instead of the ones about turning back from the road.
+	"TRIGGER_ObstinateReturns": "wilderness_obstinate_returns",
+	"TRIGGER_PliableRoadDialogue": "pliable_in_wilderness",
 	"TRIGGER_CityVoices": "wilderness_city_voices",
 	"TRIGGER_FixEyesOnLight": "wilderness_resolve",
 	"TRIGGER_HelpAppears": "help_rescue",
@@ -148,6 +169,14 @@ static func bind_scene(chapter: Node3D, glb_path: String) -> Vector3:
 
 	var nodes: Array = []
 	_collect(root, nodes)
+
+	# Switch on the baked ambient occlusion the scene generator wrote into
+	# COLOR_0 (tools/scene_gen/glb_ao.py). Godot's glTF importer brings the
+	# vertex-colour data in but does NOT set vertex_color_use_as_albedo on the
+	# material, so without this the bake sits in the file and never reaches the
+	# screen. It is the web build's ONLY source of contact shading —
+	# gl_compatibility has no SSAO, and all 16 art profiles ask for it.
+	_apply_baked_ao(nodes)
 
 	var spawn := Vector3(0, 1, 0)
 	var burden_node: Node3D = null
@@ -215,6 +244,52 @@ static func _collect(node: Node, out: Array) -> void:
 	out.append(node)
 	for c in node.get_children():
 		_collect(c, out)
+
+
+## Enable baked vertex-AO (and per-tier mesh budgets) on every imported surface.
+##
+## The scene GLBs now carry per-vertex ambient occlusion in COLOR_0. Godot needs
+## `vertex_color_use_as_albedo = true` on the material to multiply it into the
+## albedo; the glTF importer does not set that, so we do it here, once, at bind
+## time. Materials are duplicated only when they are shared resources we would
+## otherwise mutate for every scene that uses them.
+##
+## While we are walking every MeshInstance3D anyway, this is also the cheapest
+## place to apply the render-tier decisions that need per-surface access:
+## shadow casting off on the low tier, and LOD bias.
+static func _apply_baked_ao(nodes: Array) -> void:
+	var low := QualityTier.is_low()
+	var seen: Dictionary = {}
+	for n in nodes:
+		if not (n is MeshInstance3D):
+			continue
+		var mi := n as MeshInstance3D
+		var mesh := mi.mesh
+		if mesh == null:
+			continue
+		# Distant scenery does not need to be in the shadow pass on web.
+		if low:
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.lod_bias = 1.4 if low else 1.0
+		for si in range(mesh.get_surface_count()):
+			var m: Material = mi.get_active_material(si)
+			if not (m is StandardMaterial3D):
+				continue
+			var sm := m as StandardMaterial3D
+			if sm.vertex_color_use_as_albedo:
+				continue
+			var key := sm.get_instance_id()
+			if seen.has(key):
+				# Already converted this shared material this pass.
+				mi.set_surface_override_material(si, seen[key])
+				continue
+			var dup := sm.duplicate() as StandardMaterial3D
+			dup.vertex_color_use_as_albedo = true
+			# The bake is occlusion, not colour: keep it multiplying in linear
+			# space so it darkens without tinting.
+			dup.vertex_color_is_srgb = false
+			seen[key] = dup
+			mi.set_surface_override_material(si, dup)
 
 
 static func _box_size(node: Node) -> Vector3:
@@ -564,6 +639,10 @@ static func _bind_hazard(chapter: Node3D, node: Node, nm: String) -> void:
 	elif "FalseVoice" in nm:
 		z = FalseVoiceZone.new()
 		chapter.add_child(z)
+		# FalseVoiceZone has always supported an optional dialogue and no caller
+		# ever set one, so `false_voice_shadow.json` — written for exactly this
+		# — sat unreferenced while the zone only ticked numbers.
+		(z as FalseVoiceZone).dialogue_id = "false_voice_shadow"
 		(z as FalseVoiceZone).setup(size)
 	elif "Fear" in nm or "River" in nm:
 		z = FearZone.new()
@@ -618,6 +697,10 @@ static func _bind_prop(chapter: Node3D, node: Node, nm: String):
 		var d: Dictionary = PROMISE_LINES[kind]
 		var ps := PromiseStone.new()
 		chapter.add_child(ps)
+		# The stone declares WHICH promise it carries; the wording itself now
+		# comes from data/dialogues/promise_stone_lines.json (which had no
+		# reader before this).
+		ps.promise_key = kind
 		ps.setup(String(d["line"]), d["effects"], String(d["flag"]))
 		ps.global_position = pos
 		if node is Node3D:

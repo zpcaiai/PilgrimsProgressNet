@@ -11,6 +11,9 @@ var _hope_bar: ProgressBar
 var _love_bar: ProgressBar
 var _despair_bar: ProgressBar
 var _weariness_bar: ProgressBar
+var _sleep_bar: ProgressBar
+var _vanity_bar: ProgressBar
+var _river_bar: ProgressBar
 var _humility_bar: ProgressBar
 var _watchfulness_bar: ProgressBar
 var _fear_bar: ProgressBar
@@ -400,6 +403,18 @@ func _build_spiritual_panel() -> void:
 	_shame_bar = _add_stat_row(vb, "hud.shame", "羞愧 Shame", Color(0.72, 0.46, 0.36))
 	_weariness_bar = _add_stat_row(vb, "hud.weariness", "疲惫 Weariness", Color(0.6, 0.55, 0.4))
 
+	# CHAPTER PRESSURE METERS.
+	#
+	# GameState carries three per-chapter "temporary meters" — sleepiness on the
+	# Enchanted Ground, vanity pressure at the Fair, river depth at the crossing.
+	# All three drive real mechanics (SleepinessSystem, VanityPressureSystem,
+	# RiverDepthSystem) and NONE of them were ever shown, so the player was
+	# losing to a number they could not see. Each row appears only in the
+	# chapter that uses it.
+	_sleep_bar = _add_stat_row(vb, "hud.sleepiness", "困倦 Sleepiness", Color(0.55, 0.5, 0.75))
+	_vanity_bar = _add_stat_row(vb, "hud.vanity_pressure", "虚荣压力 Vanity", Color(0.9, 0.65, 0.35))
+	_river_bar = _add_stat_row(vb, "hud.river_depth", "水深 River", Color(0.4, 0.65, 0.9))
+
 	_burden_label = Label.new()
 	_burden_label.add_theme_font_size_override("font_size", FONT_BODY)
 	_burden_label.text = LocaleManager.t("hud.burden_carried", "Burden: carried")
@@ -412,6 +427,27 @@ func _build_spiritual_panel() -> void:
 	_load_label.modulate = Color(0.8, 0.8, 0.88)
 	ResponsiveLayout.apply_text_wrap(_load_label)
 	vb.add_child(_load_label)
+
+
+## Show only the pressure meter this chapter actually uses, so the panel does
+## not grow three permanently-zero rows.
+func _update_pressure_meters() -> void:
+	var cid := String(ChapterManager.current_chapter_id)
+	_set_meter(_sleep_bar, "sleepiness", cid == "enchanted_ground")
+	_set_meter(_vanity_bar, "vanity_pressure", cid == "vanity_fair")
+	_set_meter(_river_bar, "river_depth_pressure", cid == "river_of_death")
+
+
+func _set_meter(bar: ProgressBar, key: String, active: bool) -> void:
+	if not is_instance_valid(bar):
+		return
+	var row: Node = bar.get_parent()
+	var v := GameState.get_temporary_meter(key)
+	if row is CanvasItem:
+		(row as CanvasItem).visible = active and (v > 0 or bar.value > 0.5)
+	bar.value = v
+	if bar.has_meta("vlabel"):
+		(bar.get_meta("vlabel") as Label).text = str(v)
 
 
 func _add_stat_row(parent: VBoxContainer, key: String, fallback: String, color: Color) -> ProgressBar:
@@ -892,6 +928,7 @@ func _process(delta: float) -> void:
 		for _b in [_faith_bar, _hope_bar, _love_bar, _humility_bar, _watchfulness_bar, _despair_bar, _fear_bar, _shame_bar, _weariness_bar]:
 			if is_instance_valid(_b) and _b.has_meta("vlabel"):
 				(_b.get_meta("vlabel") as Label).text = str(int(round(_b.value)))
+		_update_pressure_meters()
 		var load_pct := int(round(SpiritualStateManager.get_movement_penalty() * 100.0))
 		_load_label.text = (LocaleManager.t("hud.load_slower", "Load: %d%% slower") % load_pct) if load_pct > 0 else LocaleManager.t("hud.load_light", "Load: light")
 		_load_label.modulate = Color(0.9, 0.6, 0.55) if load_pct >= 25 else Color(0.78, 0.8, 0.88)
@@ -1032,15 +1069,59 @@ func _on_dialogue_node(node: Dictionary) -> void:
 	_rebuild_choices()
 
 
+## One coloured preview row under a choice button: gains, costs and the lasting
+## marks (flags / items) the choice will leave on the journey.
+func _add_choice_preview(parent: VBoxContainer, choice: Dictionary) -> void:
+	var p: Dictionary = DialogueManager.get_choice_preview(choice)
+	var gain := String(p.get("gain", ""))
+	var cost := String(p.get("cost", ""))
+	var marks := String(p.get("marks", ""))
+	if gain == "" and cost == "" and marks == "":
+		return
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	var size := maxi(11, _choice_font() - 4)
+	if gain != "":
+		var l := Label.new()
+		l.text = "▲ " + gain
+		l.add_theme_font_size_override("font_size", size)
+		l.modulate = Color(0.55, 0.88, 0.55)
+		row.add_child(l)
+	if cost != "":
+		var l2 := Label.new()
+		l2.text = "▼ " + cost
+		l2.add_theme_font_size_override("font_size", size)
+		l2.modulate = Color(0.92, 0.55, 0.5)
+		row.add_child(l2)
+	if marks != "":
+		var l3 := Label.new()
+		l3.text = "◆ " + marks
+		l3.add_theme_font_size_override("font_size", size)
+		l3.modulate = Color(0.6, 0.75, 0.95)
+		ResponsiveLayout.apply_text_wrap(l3)
+		row.add_child(l3)
+	parent.add_child(row)
+
+
 func _rebuild_choices() -> void:
 	for c in _choice_box.get_children():
 		c.queue_free()
 	_current_choices = DialogueManager.get_available_choices()
 	var idx := 1
 	for choice in _current_choices:
+		# CONSEQUENCE PREVIEW.
+		#
+		# Choices used to be bare text with one uncoloured string of numbers
+		# glued on. A player could not tell a gain from a cost, and could not
+		# see the FLAG a choice sets — which is where this game's long-range
+		# consequence actually lives (accepting Help in chapter 3 changes what
+		# he says; taking the armour changes the Valley). Each choice is now a
+		# button plus a coloured preview line: gains green, costs red, lasting
+		# marks blue.
+		var wrap := VBoxContainer.new()
+		wrap.add_theme_constant_override("separation", 0)
 		var btn := Button.new()
-		var hint := DialogueManager.get_choice_effect_hint(choice)
-		btn.text = "%d.  %s%s" % [idx, String(choice.get("text", "")), ("    〔" + hint + "〕" if hint != "" else "")]
+		btn.text = "%d.  %s" % [idx, String(choice.get("text", ""))]
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.add_theme_font_size_override("font_size", _choice_font())
 		ResponsiveLayout.set_button_wrap(btn)
@@ -1048,7 +1129,9 @@ func _rebuild_choices() -> void:
 			btn.custom_minimum_size = Vector2(0, 56)
 		var cid := String(choice.get("id", ""))
 		btn.pressed.connect(func(): _pick_choice(cid))
-		_choice_box.add_child(btn)
+		wrap.add_child(btn)
+		_add_choice_preview(wrap, choice)
+		_choice_box.add_child(wrap)
 		idx += 1
 	# If a node has no choices, allow Space/E to continue (auto-end).
 	if _current_choices.is_empty():

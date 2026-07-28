@@ -49,6 +49,15 @@ func _build_procedural() -> void:
 	make_interactable(Vector3(-7, 0, -12.6), "阅读忍耐者的见证 (Read records)",
 		_cb1, null, Color(0.6, 0.5, 0.4), 0.3, 1.4, true)
 
+	# THE CLOUD OF WITNESSES.
+	#
+	# The Palace is the chapter about the communion of the saints, and it
+	# delivered that as one interactable that printed a sentence. It is now a
+	# place you walk: portraits along the hall, dark until you come near, each
+	# brightening and naming itself as you pass — and one of them chosen to
+	# match something YOU have actually done, so the wall is partly a mirror.
+	CloudOfWitnesses.build(self, Vector3(-9.5, 0, -4), Vector3(0, 0, -1), 7, PI * 0.5)
+
 	make_distant_label_to_valley()
 	spawn_player(Vector3(0, 1, 8))
 

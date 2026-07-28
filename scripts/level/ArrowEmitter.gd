@@ -12,6 +12,26 @@ var active: bool = true
 var _timer: float = 0.0
 var _player: Node3D = null
 
+# --- ESCALATION -------------------------------------------------------------
+# `pressure_level` was declared, incremented on every hit... and then read by
+# nothing. `fire_interval` was a constant. So the arrows at the Wicket Gate fell
+# at exactly the same rate whether you had been standing in them for two seconds
+# or forty, and the "urgency" the chapter is built around never actually arrived.
+#
+# The volley now ramps on two axes:
+#   * TIME at the gate — the longer you hesitate, the thicker it gets;
+#   * PRESSURE — every arrow that lands tightens it further, every one the
+#     Shield of Truth absorbs eases it. Hesitation compounds; standing behind
+#     truth relieves.
+# It is bounded on both ends, and the Children's Journey ramps at a third rate.
+const MIN_INTERVAL := 0.45
+const RAMP_TIME := 42.0        # seconds to reach full time-pressure
+var base_interval: float = 1.6
+var ramp_enabled: bool = true
+var _elapsed: float = 0.0
+var _ramp_scale: float = 1.0
+var _last_announced: int = -1
+
 const ARROW_TYPES := {
 	"fear": {
 		"effects": {"fear": 8},
@@ -43,19 +63,55 @@ const ARROW_TYPES := {
 
 func setup(target_player: Node3D) -> void:
 	_player = target_player
-	# Children's Journey: arrows are rarer and slower, easy to walk past.
+	# Children's Journey: arrows are rarer and slower, easy to walk past, and
+	# they escalate far more gently.
 	if GameState.is_child_mode():
 		fire_interval *= 1.9
 		arrow_speed *= 0.8
+		_ramp_scale = 0.33
+	base_interval = fire_interval
 
 
 func _process(delta: float) -> void:
 	if not active or _player == null or not is_instance_valid(_player):
 		return
+	_elapsed += delta
+	if ramp_enabled:
+		fire_interval = _current_interval()
 	_timer += delta
 	if _timer >= fire_interval:
 		_timer = 0.0
 		_fire()
+	_announce_pressure()
+
+
+## Interval right now, from elapsed time and accumulated pressure.
+func _current_interval() -> float:
+	var by_time := clampf(_elapsed / RAMP_TIME, 0.0, 1.0)
+	var by_pressure := clampf(float(pressure_level) / 100.0, 0.0, 1.0)
+	var t := clampf((by_time * 0.6 + by_pressure * 0.4) * _ramp_scale, 0.0, 1.0)
+	return lerpf(base_interval, MIN_INTERVAL, t)
+
+
+## Tell the player the volley is thickening — once per band, not per arrow.
+func _announce_pressure() -> void:
+	var band := 0
+	if pressure_level >= 70:
+		band = 3
+	elif pressure_level >= 45:
+		band = 2
+	elif pressure_level >= 22:
+		band = 1
+	if band == _last_announced:
+		return
+	_last_announced = band
+	match band:
+		1:
+			EventBus.toast("箭密了一些。别站着不动。")
+		2:
+			EventBus.toast("箭雨转急——举起真理的盾牌，或者叩门。")
+		3:
+			EventBus.toast("满天都是控告。往门那里去。")
 
 
 func _fire() -> void:

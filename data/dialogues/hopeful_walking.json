@@ -1,0 +1,126 @@
+{
+  "id": "hopeful_walking",
+  "_comment": "The general walking exchange with Hopeful, opened by pressing interact beside him (scripts/level/Companion.gd). Until this existed the companion could be listened to but never answered.",
+  "nodes": {
+    "start": {
+      "speaker": "Hopeful",
+      "speaker_zh": "盼望",
+      "text": "You have that look again. Say it, brother — what is it?",
+      "text_zh": "你又是那个神情了。说吧，弟兄——是什么？",
+      "text_variants": [
+        {
+          "conditions": {
+            "despair_min": 55
+          },
+          "text": "You have gone quiet. That is usually where it starts.",
+          "text_zh": "你安静下来了。往往就是从这里开始的。"
+        },
+        {
+          "conditions": {
+            "pride_min": 55
+          },
+          "text": "You are walking well today. Almost too well.",
+          "text_zh": "你今天走得很好。好得有点过头。"
+        }
+      ],
+      "choices": [
+        {
+          "id": "pray",
+          "text": "Let us pray. I would rather ask than carry this alone.",
+          "text_zh": "我们一起祷告吧。我不想一个人扛着。",
+          "effects": {
+            "faith": 6,
+            "hope": 6,
+            "despair": -8,
+            "love": 4
+          },
+          "flags": {
+            "prayed_with_hopeful": true
+          },
+          "next": "prayed"
+        },
+        {
+          "id": "ask",
+          "text": "What would you do, if you were me?",
+          "text_zh": "如果你是我，你会怎么做？",
+          "effects": {
+            "discernment": 6,
+            "humility": 4,
+            "pride": -4
+          },
+          "next": "advice"
+        },
+        {
+          "id": "encourage",
+          "text": "Enough about me. How are you, Hopeful?",
+          "text_zh": "别说我了。你呢，盼望？你还好吗？",
+          "effects": {
+            "love": 8,
+            "humility": 5,
+            "hope": 3
+          },
+          "flags": {
+            "asked_after_hopeful": true
+          },
+          "next": "returned"
+        },
+        {
+          "id": "walk",
+          "text": "Nothing. Let us keep walking.",
+          "text_zh": "没什么。我们继续走吧。",
+          "effects": {
+            "perseverance": 2
+          },
+          "next": "end"
+        }
+      ]
+    },
+    "prayed": {
+      "speaker": "Hopeful",
+      "speaker_zh": "盼望",
+      "text": "",
+      "text_zh": "你们并肩站了一会儿，没有说很多话。再抬头时，路还是那条路，但它不再压着你。",
+      "choices": [
+        {
+          "id": "on_prayed",
+          "text": "(Walk on together.)",
+          "text_zh": "（一同继续前行。）",
+          "next": "end"
+        }
+      ]
+    },
+    "advice": {
+      "speaker": "Hopeful",
+      "speaker_zh": "盼望",
+      "text": "",
+      "text_zh": "「我会做我上次做的事，」他说，「走错，然后被找回来。你别学这个——不过你要知道，被找回来是可以的。」",
+      "choices": [
+        {
+          "id": "on_advice",
+          "text": "(Nod.)",
+          "text_zh": "（点头。）",
+          "next": "end"
+        }
+      ]
+    },
+    "returned": {
+      "speaker": "Hopeful",
+      "speaker_zh": "盼望",
+      "text": "",
+      "text_zh": "他愣了一下，像是很久没有人问过他了。「我也怕。」他说，「不过有人问我，我就没那么怕了。」",
+      "choices": [
+        {
+          "id": "on_returned",
+          "text": "(Walk on together.)",
+          "text_zh": "（一同继续前行。）",
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

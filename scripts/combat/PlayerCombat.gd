@@ -134,6 +134,25 @@ func use_promise() -> void:
 	if promise_charge <= 0:
 		EventBus.toast("此刻还没有想起可回应的应许。先站稳、祷告或回想经文。")
 		return
+	# ACCUSATION CARDS FIRST.
+	#
+	# When Apollyon is in his accusation phase he throws named charges at you as
+	# drifting cards. Answering the card in front of you is the specific,
+	# intended play — and the matching promise is worth double — so a promise
+	# spent while a card is closing goes to the card, not to a generic counter.
+	var card_target := AccusationCard.nearest_to(_player, get_tree())
+	if card_target != null:
+		promise_charge -= 1
+		var held := ScriptureMemory.use_for_trial(String(card_target.charge_id))
+		var promise_id := String(held.get("id", "")) if not held.is_empty() else ""
+		var correct := card_target.answer(promise_id)
+		var e2 := _nearest_enemy(14.0)
+		if e2:
+			e2.receive_counter("promise", 42.0 if correct else 22.0)
+		Juice.shake(0.5 if correct else 0.3)
+		Juice.flash(Color(1.0, 0.96, 0.75, 0.24 if correct else 0.14), 0.32)
+		emit_signal("stats_changed")
+		return
 	promise_charge -= 1
 	var e := _nearest_enemy(8.0)
 	var trial_type := "deception"

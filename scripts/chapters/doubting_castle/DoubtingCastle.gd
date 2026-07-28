@@ -32,13 +32,33 @@ func _build_procedural() -> void:
 		GameState.set_flag("found_promise_key", true)
 		EventBus.toast("你摸到心口旁那把名叫“应许”的钥匙；绝望曾使你忘记它。")
 	else:
-		var _cb1 := func(_p):
+		# THE MEMORY OF THE CELL.
+		#
+		# Finding the key used to be one interactable in a corner: walk over,
+		# press E, read a toast. The chapter's entire point — that the way out
+		# had been in his own coat the whole time, and despair had made him
+		# forget — happened in a single line of text.
+		#
+		# It is now a sequence you walk. Shades of YOUR OWN earlier failures
+		# stand in the dark (read from your flags, so a player who never sank in
+		# the Slough is never shown the Slough); each says what it says about
+		# you, and each is answered by what grace already said back. Only when
+		# the last one is answered does the pilgrim remember what he has been
+		# carrying.
+		# NOTE: the callback is hoisted into a local. A multi-line lambda passed
+		# as a NON-FINAL call argument breaks the Godot 4.6 parser, and gdparse
+		# does not catch it (see docs/QUALITY_UPGRADE_2026.md).
+		var _take_key := func(_p):
 			SpiritualStateManager.has_promise_key = true
 			GameState.set_flag("found_promise_key", true)
 			QuestManager.update_quest_progress("escape_doubting_castle")
 			EventBus.toast("就在你自己的胸袋里：应许一直等在那里，正是绝望叫你不要寻找的地方。")
-		make_interactable(Vector3(-2.8, 0, 2), "搜寻牢房 (Search)",
-			_cb1, null, Color(0.85, 0.8, 0.5), 0.8, 1.2, true)
+		var key_interactable := make_interactable(Vector3(-2.8, 0, 2),
+			"取出怀里的应许 (Take the key)", _take_key,
+			null, Color(0.85, 0.8, 0.5), 0.8, 1.2, true)
+		var memories := CellMemories.build(self, Vector3(0, 0, 1.5), 4.0)
+		if key_interactable is Node3D:
+			memories.bind_key(key_interactable as Node3D)
 
 	# The locked door.
 	make_floating_label("锁门：应许能打开", Vector3(0, 4, -4), Color(0.8, 0.7, 0.6))

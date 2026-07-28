@@ -8,6 +8,8 @@ var effects: Dictionary = {"hope": 8, "despair": -12}
 var flag: String = ""
 var _glow_mesh: MeshInstance3D
 var _read: bool = false
+## Key into promise_stone_lines.json for this stone's authored inscription.
+var promise_key: String = ""
 var _pulse: float = 0.0
 
 
@@ -54,7 +56,11 @@ func _on_read(_player: Node) -> void:
 	SpiritualStateManager.apply_effects(effects)
 	if flag != "":
 		GameState.set_flag(flag, true)
-	EventBus.toast(line)
+	# `promise_stone_lines.json` holds the authored inscriptions and had NO
+	# reader anywhere in the project, so every promise stone showed whatever
+	# line its creator happened to pass in. Prefer the authored text — and its
+	# Chinese, which only exists in that file — when this stone declares a key.
+	EventBus.toast(_inscription())
 	# Dim the stone now that it has been read.
 	if is_instance_valid(_glow_mesh):
 		var mat := _glow_mesh.material_override as StandardMaterial3D
@@ -62,3 +68,19 @@ func _on_read(_player: Node) -> void:
 			mat.emission_energy_multiplier = 0.2
 			mat.albedo_color = Color(0.4, 0.4, 0.4)
 	EventBus.interaction_unavailable.emit()
+
+
+## The authored inscription for this stone, from data/dialogues/promise_stone_lines.json
+## (falls back to whatever `line` the caller supplied).
+func _inscription() -> String:
+	if promise_key == "" or not DialogueManager.has_dialogue("promise_stone_lines"):
+		return line
+	var doc := DialogueManager.load_dialogue("promise_stone_lines")
+	var lines: Dictionary = doc.get("lines", {})
+	if not lines.has(promise_key):
+		return line
+	var entry: Variant = lines[promise_key]
+	if entry is Dictionary:
+		var d := entry as Dictionary
+		return String(d.get("zh", d.get("en", line)))
+	return String(entry)

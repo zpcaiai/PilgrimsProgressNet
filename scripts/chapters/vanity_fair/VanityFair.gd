@@ -35,11 +35,18 @@ func _build_procedural() -> void:
 		lamp.omni_range = 12.0
 		add_child(lamp)
 
-	# Temptation stalls — each one a buy/refuse choice.
-	_stall(Vector3(-8, 0, -6), "the Crown of Honour", Color(0.9, 0.8, 0.2), {"pride": 12, "humility": -6})
-	_stall(Vector3(8, 0, -6), "the Cup of Pleasures", Color(0.8, 0.2, 0.4), {"deception": 12, "watchfulness": -6})
-	_stall(Vector3(-8, 0, -16), "the Cloak of Reputation", Color(0.5, 0.3, 0.9), {"pride": 10, "discernment": -5})
-	_stall(Vector3(8, 0, -16), "the Glass of Flattery", Color(0.3, 0.8, 0.9), {"deception": 10, "humility": -5})
+	# Temptation stalls. Each one now has its OWN dialogue with its own specific
+	# lie and its own rebuttal — unlocked by something that actually happened to
+	# you in an earlier chapter (see tools/data_gen/build_vanity_stalls.py).
+	# Previously all four shared one generic pitch and the only reply was "no".
+	_stall(Vector3(-8, 0, -6), "the Crown of Honour", Color(0.9, 0.8, 0.2),
+		{"pride": 12, "humility": -6}, "applause")
+	_stall(Vector3(8, 0, -6), "the Cup of Pleasures", Color(0.8, 0.2, 0.4),
+		{"deception": 12, "watchfulness": -6}, "comfort")
+	_stall(Vector3(-8, 0, -16), "the Cloak of Reputation", Color(0.5, 0.3, 0.9),
+		{"pride": 10, "discernment": -5}, "influence")
+	_stall(Vector3(8, 0, -16), "the Glass of Flattery", Color(0.3, 0.8, 0.9),
+		{"deception": 10, "humility": -5}, "flattery")
 
 	# Hopeful, a true companion in the crowd.
 	make_npc("Hopeful", Vector3(0, 0, -22), Color(0.55, 0.8, 0.7), "hopeful_joins")
@@ -80,7 +87,7 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 			GameState.add_companion("hopeful")
 			if companion == null:
 				spawn_companion("Hopeful", Color(0.55, 0.8, 0.7))
-	elif dialogue_id == "vanity_stall":
+	elif dialogue_id.begins_with("vanity_stall"):
 		# A purchase applies that specific stall's extra cost.
 		if GameState.has_flag("vanity_bought_pending"):
 			GameState.set_flag("vanity_bought_pending", false)
@@ -91,13 +98,19 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 				player.refresh_vanity()
 
 
-func _stall(pos: Vector3, ware: String, color: Color, buy_effects: Dictionary) -> void:
+func _stall(pos: Vector3, ware: String, color: Color, buy_effects: Dictionary,
+		stall_kind: String = "") -> void:
 	make_decor(Vector3(2.5, 2.5, 2.5), color, pos + Vector3(0, 1.25, 0), 0.6)
 	make_floating_label(_ware_label(ware), pos + Vector3(0, 3, 0), color)
+	# Prefer this stall's own dialogue; fall back to the shared one so an
+	# un-generated data set still works.
+	var dlg := "vanity_stall_" + stall_kind if stall_kind != "" else "vanity_stall"
+	if not DialogueManager.has_dialogue(dlg):
+		dlg = "vanity_stall"
 	var _cb2 := func(_p):
 		_active_ware = ware
 		_active_buy_effects = buy_effects
-		DialogueManager.start_dialogue("vanity_stall")
+		DialogueManager.start_dialogue(dlg)
 	make_interactable(pos + Vector3(0, 0, 1.6), "靠近 " + _ware_label(ware),
 		_cb2, null, color.darkened(0.2), 0.4, 1.6, false)
 

@@ -88,6 +88,25 @@ func face_toward_player(player: Node) -> void:
 	var anim := HumanoidAnimator.find_in(root)
 	if anim != null:
 		anim.nudge(0.07)
+		# Hold eye contact for the length of the conversation. The body turn
+		# above is a 0.18 s snap; head tracking is what makes an NPC feel like
+		# it is listening to you rather than merely pointed at you.
+		anim.look_at_node(player as Node3D)
+		_hold_gaze(anim)
+
+
+## Keep the NPC's head on the player until the conversation ends, then release
+## it back to idle drift.
+func _hold_gaze(anim: HumanoidAnimator) -> void:
+	if not is_instance_valid(anim):
+		return
+	await get_tree().create_timer(0.5).timeout
+	while is_instance_valid(anim) and DialogueManager.is_active():
+		await get_tree().create_timer(0.4).timeout
+	# Linger a beat after the dialogue closes so the release never snaps.
+	await get_tree().create_timer(1.4).timeout
+	if is_instance_valid(anim):
+		anim.clear_look_target()
 
 
 func has_auto_dialogue() -> bool:

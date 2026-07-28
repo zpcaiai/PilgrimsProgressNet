@@ -15,6 +15,8 @@ var terrain_multiplier: float = 1.0  # set by hazards (mud, etc.)
 var _mesh_root: Node3D
 var _body_mesh: MeshInstance3D
 var _burden_root: Node3D
+var _burden_sack: MeshInstance3D = null
+var _burden_tint_t: float = 0.0
 var _battle_gear_root: Node3D
 var _battle_gear_nodes: Array[Node3D] = []
 var _is_greybox: bool = false
@@ -44,9 +46,34 @@ var _cam_pivot: Node3D
 var _cam_yaw: float = 0.0
 var _cam_pitch: float = 0.0
 var _looking_mouse: bool = false
-const CAM_BASE_PITCH := -38.0
+const CAM_BASE_PITCH := -34.0
 const CAM_PITCH_MIN := -18.0
 const CAM_PITCH_MAX := 22.0
+
+# --- camera feel (2026 pass) -------------------------------------------------
+# The camera used to be a rigid grandchild of the player: no collision, no
+# damping, no lead, one fixed FOV, one fixed distance. It read as a webcam
+# bolted to the pilgrim's back, and it clipped straight through castle walls.
+# It now hangs off a SpringArm3D (walls push it in), lags the player slightly,
+# leads the travel direction, and breathes its FOV with speed and situation.
+const CAM_ARM_LENGTH := 10.2
+const CAM_ARM_HEIGHT := 2.35
+const CAM_SHOULDER := 0.55        # lateral offset — off-centre framing
+const CAM_FOLLOW_LAG := 9.0       # higher = tighter
+const CAM_LEAD := 1.4             # metres of look-ahead at full speed
+const FOV_BASE := 68.0
+const FOV_RUN := 74.0
+const FOV_TALK := 58.0
+var _cam_arm: SpringArm3D
+var _cam_lead: Vector3 = Vector3.ZERO
+var _fov_target: float = FOV_BASE
+var _cine_weight: float = 0.0     # 1.0 = fully on a cinematic marker
+var _cine_cam: Camera3D = null
+var _cine_from: Transform3D = Transform3D.IDENTITY
+var _cine_to: Transform3D = Transform3D.IDENTITY
+var _cine_time: float = 0.0
+var _cine_dur: float = 0.0
+var _cam_snapped: bool = false
 
 
 func _ready() -> void:
@@ -113,7 +140,7 @@ func _build() -> void:
 	_body_mesh.visible = false
 	_mesh_root.add_child(_body_mesh)
 
-	_fig = HumanoidFigure.make("Pilgrim", 2.0, self)
+	_fig = FigureFactory.make("Pilgrim", 2.0, self)
 	_mesh_root.add_child(_fig)
 
 	# A short beard makes the protagonist read clearly as a person while keeping
@@ -124,13 +151,21 @@ func _build() -> void:
 	beard_mesh.height = 0.24
 	beard.mesh = beard_mesh
 	beard.scale = Vector3(1.0, 0.72, 0.6)
-	beard.position = Vector3(0, 1.72, 0.12)
 	beard.material_override = _make_material(Color(0.3, 0.22, 0.15))
-	var _body_node: Node3D = _fig.get_node_or_null("Body")
-	if _body_node != null:
-		_body_node.add_child(beard)
+	# Parent the beard to the HEAD pivot (not the torso) so it turns with the
+	# head when the pilgrim looks at whoever he is talking to. Falls back to the
+	# torso, then the root, so an older figure layout still works.
+	var head_node: Node3D = _fig.find_child(HumanoidFigure.N_HEAD, true, false) as Node3D
+	if head_node != null:
+		beard.position = Vector3(0, -0.075, 0.10)
+		head_node.add_child(beard)
 	else:
-		_fig.add_child(beard)
+		beard.position = Vector3(0, 1.72, 0.12)
+		var _body_node: Node3D = _fig.get_node_or_null(HumanoidFigure.N_BODY)
+		if _body_node != null:
+			_body_node.add_child(beard)
+		else:
+			_fig.add_child(beard)
 	_battle_gear_root = _build_battle_gear()
 	_battle_gear_root.visible = false
 	_fig.add_child(_battle_gear_root)
@@ -151,16 +186,35 @@ func _build() -> void:
 	_mesh_root.add_child(_vanity_root)
 	refresh_vanity()
 
-	# Fixed-orientation follow camera (child, but parented to player so it
-	# tracks position; the player body never rotates, so the view stays stable)
+	# --- follow camera --------------------------------------------------
+	# The pivot is still a child of the player (so it tracks position without a
+	# second transform chain), but the camera now hangs off a SpringArm3D that
+	# sweeps against level geometry, so it slides in against walls instead of
+	# punching through them — the fix that makes interiors like Doubting Castle
+	# and the Interpreter's House actually playable.
 	_cam_pivot = Node3D.new()
 	_cam_pivot.name = "CameraPivot"
+	_cam_pivot.position = Vector3(0, CAM_ARM_HEIGHT, 0)
+	_cam_pivot.top_level = true          # damped follow, not rigid parenting
 	add_child(_cam_pivot)
+
+	_cam_arm = SpringArm3D.new()
+	_cam_arm.name = "CameraArm"
+	_cam_arm.spring_length = CAM_ARM_LENGTH
+	_cam_arm.margin = 0.35
+	# Only collide with world geometry (layer 1); never with triggers or NPCs.
+	_cam_arm.collision_mask = 1
+	_cam_arm.add_excluded_object(get_rid())
+	_cam_arm.rotation_degrees = Vector3(CAM_BASE_PITCH, 0, 0)
+	_cam_pivot.add_child(_cam_arm)
+
 	_camera = Camera3D.new()
-	_camera.position = Vector3(0, 6.5, 8.0)
-	_camera.rotation_degrees = Vector3(CAM_BASE_PITCH, 0, 0)
+	_camera.position = Vector3(CAM_SHOULDER, 0, 0)
+	_camera.fov = FOV_BASE
+	_camera.near = 0.1
+	_camera.far = 320.0
 	_camera.current = true
-	_cam_pivot.add_child(_camera)
+	_cam_arm.add_child(_camera)
 
 	# Interactor
 	_interactor = Area3D.new()
@@ -311,10 +365,130 @@ func _update_camera(delta: float) -> void:
 		var ly := Input.get_action_strength("look_down") - Input.get_action_strength("look_up")
 		if absf(lx) > 0.05 or absf(ly) > 0.05:
 			_apply_look(-lx * controller_look_sensitivity * delta, -ly * controller_look_sensitivity * delta)
-	if is_instance_valid(_cam_pivot):
-		_cam_pivot.rotation.y = deg_to_rad(_cam_yaw)
+	if not is_instance_valid(_cam_pivot):
+		return
+	if not _cam_snapped:
+		snap_camera()
+
+	# --- cinematic override (chapter establishing shot / set-piece) --------
+	if _cine_weight > 0.0 or _cine_dur > 0.0:
+		_update_cinematic(delta)
+		return
+
+	# --- look-ahead: the camera leads where the pilgrim is going ----------
+	var flat_vel := Vector3(velocity.x, 0, velocity.z)
+	var lead_target := Vector3.ZERO
+	if flat_vel.length() > 0.5:
+		lead_target = flat_vel.normalized() * CAM_LEAD * clampf(flat_vel.length() / 5.0, 0.0, 1.0)
+	_cam_lead = _cam_lead.lerp(lead_target, clampf(delta * 3.0, 0.0, 1.0))
+
+	# --- damped follow ----------------------------------------------------
+	var anchor := global_position + Vector3(0, CAM_ARM_HEIGHT, 0) + _cam_lead
+	var lag := clampf(delta * CAM_FOLLOW_LAG, 0.0, 1.0)
+	_cam_pivot.global_position = _cam_pivot.global_position.lerp(anchor, lag)
+	_cam_pivot.rotation.y = lerp_angle(_cam_pivot.rotation.y, deg_to_rad(_cam_yaw),
+		clampf(delta * 10.0, 0.0, 1.0))
+
+	if is_instance_valid(_cam_arm):
+		_cam_arm.rotation_degrees.x = CAM_BASE_PITCH + _cam_pitch
+		# Pull in a little when swimming or sunk in the mire so the pilgrim
+		# stays framed rather than shrinking to a dot on a flat plane.
+		var want_len := CAM_ARM_LENGTH
+		if _swimming:
+			want_len = CAM_ARM_LENGTH * 0.82
+		elif _sink_depth > 0.15:
+			want_len = CAM_ARM_LENGTH * 0.88
+		_cam_arm.spring_length = lerpf(_cam_arm.spring_length, want_len,
+			clampf(delta * 2.5, 0.0, 1.0))
+
+	# --- FOV breathing ----------------------------------------------------
 	if is_instance_valid(_camera):
-		_camera.rotation_degrees.x = CAM_BASE_PITCH + _cam_pitch
+		var want_fov := FOV_BASE
+		if control_locked:
+			want_fov = FOV_TALK          # conversations frame tighter
+		elif flat_vel.length() > 4.0:
+			want_fov = FOV_RUN           # speed opens the frame
+		_fov_target = lerpf(_fov_target, want_fov, clampf(delta * 3.0, 0.0, 1.0))
+		_camera.fov = _fov_target
+
+
+## Blend to a fixed world transform for `dur` seconds, then home to gameplay.
+## Used by ChapterCamera for the per-chapter establishing shot and by set-piece
+## moments. A SEPARATE camera is used rather than moving the gameplay one,
+## because the gameplay camera is a SpringArm3D child whose transform the arm
+## rewrites every frame — driving it directly would fight the arm.
+func push_cinematic(xform: Transform3D, dur: float = 4.0) -> void:
+	if not is_instance_valid(_camera):
+		return
+	if dur <= 0.0:
+		release_cinematic()
+		return
+	if not is_instance_valid(_cine_cam):
+		_cine_cam = Camera3D.new()
+		_cine_cam.name = "CinematicCamera"
+		_cine_cam.top_level = true
+		_cine_cam.fov = FOV_TALK
+		_cine_cam.near = 0.1
+		_cine_cam.far = 400.0
+		add_child(_cine_cam)
+	_cine_from = _camera.global_transform
+	_cine_to = xform
+	_cine_cam.global_transform = _cine_from
+	_cine_cam.current = true
+	_cine_time = 0.0
+	_cine_dur = dur
+
+
+## Release a cinematic shot early (player pressed a key / dialogue started).
+func release_cinematic() -> void:
+	if _cine_dur <= 0.0:
+		return
+	# Keep whatever blend-back time is left rather than snapping.
+	_cine_time = maxf(_cine_time, _cine_dur * 0.78)
+
+
+func is_cinematic() -> bool:
+	return _cine_dur > 0.0
+
+
+func _update_cinematic(delta: float) -> void:
+	# Keep the gameplay rig tracking underneath so the hand-back is seamless.
+	var anchor := global_position + Vector3(0, CAM_ARM_HEIGHT, 0)
+	_cam_pivot.global_position = _cam_pivot.global_position.lerp(anchor,
+		clampf(delta * CAM_FOLLOW_LAG, 0.0, 1.0))
+	_cam_pivot.rotation.y = deg_to_rad(_cam_yaw)
+	if is_instance_valid(_cam_arm):
+		_cam_arm.rotation_degrees.x = CAM_BASE_PITCH + _cam_pitch
+
+	if not is_instance_valid(_cine_cam):
+		_cine_dur = 0.0
+		return
+
+	_cine_time += delta
+	var t := clampf(_cine_time / maxf(_cine_dur, 0.001), 0.0, 1.0)
+	# Ease off the gameplay camera, hold the shot, then ease back.
+	var w := 1.0
+	if t < 0.14:
+		w = smoothstep(0.0, 1.0, t / 0.14)
+	elif t > 0.72:
+		w = 1.0 - smoothstep(0.0, 1.0, (t - 0.72) / 0.28)
+	_cine_weight = w
+
+	# A slow drift keeps the held shot alive instead of a frozen postcard.
+	var drift := _cine_to
+	drift.origin += drift.basis.x * sin(_cine_time * 0.4) * 0.35
+	drift.origin.y += sin(_cine_time * 0.27) * 0.12
+
+	var gameplay := _camera.global_transform
+	_cine_cam.global_transform = gameplay.interpolate_with(drift, w)
+	_cine_cam.fov = lerpf(_camera.fov, FOV_TALK, w * 0.6)
+
+	if t >= 1.0:
+		_cine_dur = 0.0
+		_cine_weight = 0.0
+		_camera.current = true
+		_cine_cam.queue_free()
+		_cine_cam = null
 
 
 func _on_control_locked(locked: bool) -> void:
@@ -513,7 +687,14 @@ func _build_backpack() -> Node3D:
 	sack.mesh = s
 	sack.scale = Vector3(1.0, 1.1, 0.8)
 	sack.position = Vector3(0, 1.05, 0.42)
-	sack.material_override = _make_material(Color(0.42, 0.30, 0.18))
+	# The burden now CARRIES WHAT YOU CARRY: the sack is tinted by whichever
+	# weight dominates your spiritual state (deception violet, pride crimson,
+	# shame ochre, fear blue, despair slate, weariness dun) and re-tinted as it
+	# changes. It used to be the same brown box for every player in every run —
+	# the most personal object in the game, rendered as the most generic one.
+	sack.material_override = _make_material(BurdenColour.current())
+	sack.name = "BurdenSack"
+	_burden_sack = sack
 	root.add_child(sack)
 	var flap := MeshInstance3D.new()
 	var fb := BoxMesh.new()
@@ -586,12 +767,29 @@ func _physics_process(delta: float) -> void:
 
 
 func _update_breath(delta: float, _moving: bool) -> void:
+	_update_burden_tint(delta)
 	# Subtle "heavy breathing" cue while burdened: bob the body slightly.
 	if not is_instance_valid(_body_mesh):
 		return
 	if SpiritualStateManager.has_burden:
 		_breath_timer += delta * 2.0
 		_body_mesh.position.y = 0.9 + sin(_breath_timer) * 0.03
+
+
+## Ease the burden's colour toward whatever the pilgrim is presently carrying.
+## Slow on purpose — a burden that changes hue mid-stride reads as a bug; one
+## that has shifted by the time you next look at it reads as truth.
+func _update_burden_tint(delta: float) -> void:
+	if not is_instance_valid(_burden_sack) or not SpiritualStateManager.has_burden:
+		return
+	_burden_tint_t += delta
+	if _burden_tint_t < 1.5:
+		return
+	_burden_tint_t = 0.0
+	var mat := _burden_sack.material_override as StandardMaterial3D
+	if mat == null:
+		return
+	mat.albedo_color = mat.albedo_color.lerp(BurdenColour.current(), 0.35)
 
 
 func _update_interaction() -> void:
@@ -645,6 +843,19 @@ func glance_toward(point: Vector3) -> void:
 func teleport(pos: Vector3) -> void:
 	global_position = pos
 	velocity = Vector3.ZERO
+	snap_camera()
+
+
+## Put the damped camera rig exactly where it belongs, with no interpolation.
+## Must be called after any teleport (chapter spawn, gate passage) — otherwise
+## the lagged follow swoops across the whole level to catch up.
+func snap_camera() -> void:
+	if not is_instance_valid(_cam_pivot):
+		return
+	_cam_lead = Vector3.ZERO
+	_cam_pivot.global_position = global_position + Vector3(0, CAM_ARM_HEIGHT, 0)
+	_cam_pivot.rotation.y = deg_to_rad(_cam_yaw)
+	_cam_snapped = true
 
 
 ## Enter / leave the water (River of Death). While swimming, the body sinks so

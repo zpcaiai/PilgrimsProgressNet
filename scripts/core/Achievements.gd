@@ -10,6 +10,12 @@ const SAVE_PATH := "user://achievements.cfg"
 # chapter_id (on completion) -> achievement id
 const CHAPTER_ACH := {
 	"city_of_destruction": "left_city",
+	# These three chapters had NO achievement mapping. Finishing them was the
+	# only silent completion in the game, and the "every chapter done" check
+	# below was really "13 of 16 done".
+	"wilderness_road": "road_taken",
+	"slough_of_despond": "out_of_the_mire",
+	"enchanted_ground": "stayed_awake",
 	"wicket_gate": "through_gate",
 	"cross_and_tomb": "burden_fallen",
 	"interpreter_house": "rooms_understood",

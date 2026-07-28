@@ -85,6 +85,13 @@ func remove_companion(companion_id: String) -> void:
 	companions.erase(companion_id)
 
 
+## Has the pilgrim ever entered this chapter this journey? (`visited_chapters`
+## has been maintained since the route system was written and had no reader;
+## the chapter-select map uses it to decide what may be revisited.)
+func has_visited_chapter(chapter_id: String) -> bool:
+	return visited_chapters.has(chapter_id)
+
+
 func has_companion(companion_id: String) -> bool:
 	return companions.has(companion_id)
 

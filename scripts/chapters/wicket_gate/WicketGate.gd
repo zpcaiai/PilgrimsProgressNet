@@ -163,6 +163,36 @@ func _complete_gate_entry() -> void:
 		player.teleport(Vector3(0, 1, -10.4))
 	make_light_burst(Vector3(0, 2.2, -8), Color(1.0, 0.88, 0.48), 48)
 	EventBus.toast("窄门已经打开；善意把你拉进门内。继续向前进入经文之门。")
+	_ensure_forward_exit()
+
+
+## Safety net for the procedural fallback layout.
+##
+## The line above tells the player to "walk on into the Scripture Gate", but
+## that gate is provided by the GLB's TRIGGER_Exit_CrossAndTomb marker. In the
+## procedural build that marker does not exist and this chapter has no other
+## call to go_to_next_chapter() anywhere — so a player who lands on the fallback
+## layout is left standing inside an open gate with no way out of the chapter.
+## Plant a real exit trigger just beyond the gate when nothing else provides one.
+func _ensure_forward_exit() -> void:
+	for n in get_tree().get_nodes_in_group("chapter_exit"):
+		if is_instance_valid(n):
+			return
+	if _find_exit_trigger(self) != null:
+		return
+	var exit := make_exit_trigger(Vector3(0, 1, -16), Vector3(14, 4, 3))
+	if exit != null:
+		exit.add_to_group("chapter_exit")
+
+
+func _find_exit_trigger(node: Node) -> Node:
+	for c in node.get_children():
+		if c is ChapterExitTrigger:
+			return c
+		var f := _find_exit_trigger(c)
+		if f != null:
+			return f
+	return null
 
 
 func is_gate_open() -> bool:

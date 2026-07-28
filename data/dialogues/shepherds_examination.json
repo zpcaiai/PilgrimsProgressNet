@@ -1,0 +1,121 @@
+{
+  "id": "shepherds_examination",
+  "_comment": "The Delectable Mountains examination. The Shepherds ask the pilgrim to say back what he learned in the Valley; the right answer is only offered to a player who actually stood against the accuser (flag defeated_apollyon / stood_against_accuser).",
+  "nodes": {
+    "start": {
+      "speaker": "Shepherd Experience",
+      "speaker_zh": "牧人·历练",
+      "text": "Before we lend you our glass, tell us something. In the Valley, the destroyer told you a lie. Name it — and name what answered it.",
+      "text_zh": "在我们把望远镜借给你之前，先说一件事。在山谷里，那毁坏者对你说了一个谎。说出来——再说出是什么回答了它。",
+      "choices": [
+        {
+          "id": "answer_accusation",
+          "conditions": {
+            "requires_flag": "stood_against_accuser"
+          },
+          "text": "He said I was still his. The answer was that I had been bought, and not by him.",
+          "text_zh": "他说我仍旧属他。答案是：我已经被赎了，而且赎我的不是他。",
+          "effects": {
+            "discernment": 8,
+            "faith": 6,
+            "hope": 4
+          },
+          "flags": {
+            "shepherd_exam_passed": true
+          },
+          "next": "well"
+        },
+        {
+          "id": "answer_worth",
+          "conditions": {
+            "requires_flag": "defeated_apollyon"
+          },
+          "text": "He told me what I was worth. He was counting the wrong things.",
+          "text_zh": "他告诉我我值多少。他数错了东西。",
+          "effects": {
+            "discernment": 7,
+            "humility": 4,
+            "shame": -6
+          },
+          "flags": {
+            "shepherd_exam_passed": true
+          },
+          "next": "well"
+        },
+        {
+          "id": "answer_guess",
+          "text": "I do not remember what he said. Only that I was still standing afterwards.",
+          "text_zh": "我不记得他说了什么。只记得那之后我还站着。",
+          "effects": {
+            "humility": 5,
+            "perseverance": 3
+          },
+          "flags": {
+            "shepherd_exam_partial": true
+          },
+          "next": "partly"
+        },
+        {
+          "id": "answer_deflect",
+          "text": "I beat him. Does the rest matter?",
+          "text_zh": "我胜了他。其余的还重要吗？",
+          "effects": {
+            "pride": 6,
+            "discernment": -3
+          },
+          "flags": {
+            "shepherd_exam_failed": true
+          },
+          "next": "gently"
+        }
+      ]
+    },
+    "well": {
+      "speaker": "Shepherd Knowledge",
+      "speaker_zh": "牧人·知识",
+      "text": "",
+      "text_zh": "牧人彼此看了一眼。「他记得的是那句话，不是那一仗。」——望远镜递到你手里，镜身还带着别人的体温。",
+      "choices": [
+        {
+          "id": "on_well",
+          "text": "(Take the glass.)",
+          "text_zh": "（接过望远镜。）",
+          "next": "end"
+        }
+      ]
+    },
+    "partly": {
+      "speaker": "Shepherd Knowledge",
+      "speaker_zh": "牧人·知识",
+      "text": "",
+      "text_zh": "「站住已经不容易了。」牧人说，「不过下一次，记住他说了什么——你会需要那句话的反面。」",
+      "choices": [
+        {
+          "id": "on_partly",
+          "text": "(Take the glass.)",
+          "text_zh": "（接过望远镜。）",
+          "next": "end"
+        }
+      ]
+    },
+    "gently": {
+      "speaker": "Shepherd Watchful",
+      "speaker_zh": "牧人·儆醒",
+      "text": "",
+      "text_zh": "「胜了的人常常忘了自己是怎么胜的。」牧人把望远镜递过来，手却慢了一拍，「前面的路上，你会想起我这句话。」",
+      "choices": [
+        {
+          "id": "on_gently",
+          "text": "(Take the glass.)",
+          "text_zh": "（接过望远镜。）",
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "",
+      "text": "",
+      "end": true
+    }
+  }
+}

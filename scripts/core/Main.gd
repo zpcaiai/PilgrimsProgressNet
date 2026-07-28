@@ -25,6 +25,10 @@ func _ready() -> void:
 	_ensure_input_actions()
 	_load_video_settings()
 	_apply_ui_scale()
+	# One line in the log saying which renderer and which character pipeline
+	# this build actually resolved to — so "why does it look different on my
+	# machine" is answerable without guessing.
+	FigureFactory.log_once()
 
 	_world_root = Node3D.new()
 	_world_root.name = "World"
@@ -239,6 +243,13 @@ func _show_title() -> void:
 	if SaveManager.has_save("slot_1"):
 		var summary := SaveManager.get_save_summary("slot_1")
 		_add_button(vb, LocaleManager.t("menu.continue", "Continue (%s)") % String(summary.get("chapter", "")), continue_game)
+	# ROUTE VARIANTS.
+	#
+	# MVP_ROUTE (5 chapters) and VERTICAL_SLICE_ROUTE (9) have existed in
+	# ChapterManager since the game was built in slices, and were referenced by
+	# nothing — dead code holding two genuinely useful products: a short demo
+	# and a classroom-length slice. They are choosable here now.
+	_add_button(vb, LocaleManager.t("menu.route", "旅程长度 Journey length"), _show_route_picker)
 	_add_button(vb, LocaleManager.t("menu.options", "Options"), _options_from_title)
 	_add_button(vb, LocaleManager.t("menu.achievements", "成就 Achievements"), _achievements_from_title)
 	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
@@ -400,8 +411,118 @@ func _on_demo_completed() -> void:
 	var spacer := Control.new()
 	spacer.custom_minimum_size = Vector2(0, 20)
 	vb.add_child(spacer)
+	# Close the loop instead of dead-ending on "Return to Title / Quit".
+	#
+	#  * The credits existed only as a `show_credits` flag that four data files
+	#    set and NOTHING ever read.
+	#  * There was no New Game+ at all: the only way back in discarded every
+	#    Scripture card the player had memorised, so a second journey started
+	#    poorer than the first.
+	#  * Achievements were reachable from the title screen and the pause menu —
+	#    but not from the one screen where the player has just finished.
+	_add_button(vb, LocaleManager.t("end.credits", "演职表 Credits"), _credits_from_end)
+	_add_button(vb, LocaleManager.t("menu.achievements", "成就 Achievements"), _achievements_from_end)
+	_add_button(vb, LocaleManager.t("end.newgame_plus", "再走一次（带着所学的）"),
+		start_new_game_plus)
 	_add_button(vb, LocaleManager.t("menu.return_title", "Return to Title"), _show_title)
 	_add_button(vb, LocaleManager.t("menu.quit", "Quit"), func(): get_tree().quit())
+
+
+func _achievements_from_end() -> void:
+	_clear_menu()
+	_show_achievements(_menu_layer, _on_demo_completed_screen)
+
+
+func _credits_from_end() -> void:
+	_show_credits()
+
+
+## The ending panel without the 2.5 s wait (used when coming BACK from credits
+## or the achievement list).
+func _on_demo_completed_screen() -> void:
+	_in_game = false
+	_hud.visible = false
+	_clear_menu()
+	var panel := _make_fullscreen_panel(Color(0.06, 0.05, 0.03, 1.0))
+	var vb := _make_centered_box(panel)
+	_add_title(vb, LocaleManager.t("end.title", "You have crossed the river and entered in."), 32, Color(0.98, 0.94, 0.72))
+	_add_title(vb, LocaleManager.t("end.l3", "The burden is gone. The City is before you."), 18, Color(0.65, 0.65, 0.75))
+	var sp := Control.new()
+	sp.custom_minimum_size = Vector2(0, 20)
+	vb.add_child(sp)
+	_add_button(vb, LocaleManager.t("end.credits", "演职表 Credits"), _credits_from_end)
+	_add_button(vb, LocaleManager.t("menu.achievements", "成就 Achievements"), _achievements_from_end)
+	_add_button(vb, LocaleManager.t("end.newgame_plus", "再走一次（带着所学的）"), start_new_game_plus)
+	_add_button(vb, LocaleManager.t("menu.return_title", "Return to Title"), _show_title)
+
+
+## New Game+: a fresh journey that keeps the Scripture cards you memorised and
+## your achievements (both live outside the save slot), and marks the run so a
+## later pass can acknowledge it. Everything describing *this* journey — flags,
+## spiritual state, quests — is reset exactly as in a normal new game.
+func start_new_game_plus() -> void:
+	var mode := "child" if GameState.is_child_mode() else "standard"
+	start_new_game(mode)
+	GameState.set_flag("new_game_plus", true)
+	EventBus.toast(LocaleManager.t("toast.ngplus",
+		"你再次上路——所记住的话语仍在你心里。"))
+
+
+## Roll the credits. This finally reads the `show_credits` flag that
+## data/spiritual_events/journey_completed.json, data/dialogues/final_gate_entry
+## and data/chapters/celestial_city.json have all been setting into the void.
+func _show_credits() -> void:
+	_clear_menu()
+	var panel := _make_fullscreen_panel(Color(0.03, 0.03, 0.05, 1.0))
+	var scroller := ScrollContainer.new()
+	scroller.set_anchors_preset(Control.PRESET_FULL_RECT)
+	scroller.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(scroller)
+	var vb := VBoxContainer.new()
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb.add_theme_constant_override("separation", 8)
+	scroller.add_child(vb)
+
+	var head := Control.new()
+	head.custom_minimum_size = Vector2(0, 48)
+	vb.add_child(head)
+	_add_title(vb, LocaleManager.t("credits.title", "天路 · 重担脱落"), 30, Color(0.98, 0.94, 0.72))
+	_add_title(vb, LocaleManager.t("credits.source",
+		"改编自约翰·班扬《天路历程》（1678，公有领域）"), 16, Color(0.72, 0.74, 0.82))
+
+	for line in _credit_lines():
+		var is_head := line.begins_with("— ")
+		_add_title(vb, line, 22 if is_head else 17,
+			Color(0.92, 0.89, 0.78) if is_head else Color(0.72, 0.74, 0.82))
+
+	var tail := Control.new()
+	tail.custom_minimum_size = Vector2(0, 32)
+	vb.add_child(tail)
+	_add_button(vb, LocaleManager.t("menu.back", "返回 Back"), _on_demo_completed_screen)
+	GameState.set_flag("credits_seen", true)
+
+
+func _credit_lines() -> Array[String]:
+	var lines: Array[String] = []
+	lines.append("— 十六章 The Sixteen —")
+	for cid in ChapterManager.route:
+		var d := ChapterManager.load_chapter_data(String(cid))
+		lines.append(String(d.get("title_zh", d.get("title", cid))))
+	lines.append("— 记念 Remembered —")
+	var cards := 0
+	if ScriptureMemory.has_method("known_cards"):
+		cards = (ScriptureMemory.known_cards() as Array).size()
+	lines.append(LocaleManager.t("credits.cards", "记住的经文：%d") % cards)
+	var journey := ""
+	if JourneyJournal.has_method("summary_text"):
+		journey = String(JourneyJournal.summary_text(6))
+	if journey.strip_edges() != "":
+		lines.append("— 你走过的路 Your Road —")
+		lines.append(journey)
+	lines.append("— —")
+	lines.append(LocaleManager.t("credits.thanks",
+		"愿这条路上的每一步，都记得是谁托住了你。"))
+	return lines
 
 
 # ---------------------------------------------------------------------------
@@ -957,6 +1078,28 @@ func _do_load_slot(slot: String) -> void:
 		EventBus.unlock_player("pause_menu")
 
 
+## Pick the route length for the NEXT new journey.
+func _show_route_picker() -> void:
+	_clear_menu()
+	var panel := _make_fullscreen_panel(Color(0.04, 0.04, 0.08, 1.0))
+	var vb := _make_centered_box(panel)
+	_add_title(vb, LocaleManager.t("route.title", "这一趟走多远？"), 28, Color(0.95, 0.9, 0.7))
+	_add_title(vb, LocaleManager.t("route.hint",
+		"随时可以改；已开始的旅程不受影响。"), 16, Color(0.65, 0.68, 0.78))
+	for id in ChapterManager.ROUTE_IDS.keys():
+		var rid := String(id)
+		var label := String(ChapterManager.ROUTE_IDS[rid])
+		var mark := "◆ " if ChapterManager.route_id == rid else "   "
+		_add_button(vb, mark + label, func(): _pick_route(rid))
+	_add_button(vb, LocaleManager.t("menu.back", "返回 Back"), _show_title)
+
+
+func _pick_route(rid: String) -> void:
+	ChapterManager.set_route(rid)
+	EventBus.toast(String(ChapterManager.ROUTE_IDS.get(rid, rid)))
+	_show_title()
+
+
 # ---------------------------------------------------------------------------
 # Route map (Tab)
 # ---------------------------------------------------------------------------
@@ -985,27 +1128,76 @@ func _toggle_route_map() -> void:
 	title.add_theme_color_override("font_color", Color(0.95, 0.88, 0.6))
 	vb.add_child(title)
 
+	# CHAPTER SELECT.
+	#
+	# The route map was a read-only list of Labels: it could tell you where you
+	# had been and gave you no way to go back there. Every chapter you had
+	# already completed is now a BUTTON, so a player can revisit a stretch of
+	# road — for teaching, for a different choice, or simply to look at it —
+	# without replaying eleven chapters to reach it. Chapters you have not
+	# reached stay inert, and a chapter whose `required_flags` you do not hold
+	# says which key is missing rather than silently refusing.
 	var current: String = ChapterManager.current_chapter_id
 	for raw_chapter_id in ChapterManager.route:
 		var chapter_id: String = String(raw_chapter_id)
 		var data: Dictionary = ChapterManager.load_chapter_data(chapter_id)
-		var label := Label.new()
 		var done: bool = GameState.has_flag(chapter_id + "_completed")
+		var visited: bool = GameState.has_visited_chapter(chapter_id) if GameState.has_method("has_visited_chapter") else done
 		var is_current: bool = chapter_id == current
 		var mark: String = "[完成]" if done else ("[当前]" if is_current else "[    ]")
 		var color: Color = Color(0.6, 0.85, 0.6) if done else (Color(1, 0.95, 0.6) if is_current else Color(0.55, 0.55, 0.62))
-		label.text = "%s  %s" % [mark, String(data.get("title", chapter_id))]
-		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.add_theme_font_size_override("font_size", 20)
-		label.add_theme_color_override("font_color", color)
-		vb.add_child(label)
+		var title_text := "%s  %s" % [mark, String(data.get("title_zh", data.get("title", chapter_id)))]
+
+		if (done or visited) and not is_current:
+			var btn := Button.new()
+			btn.text = title_text + "    ↩ 重走"
+			btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			btn.add_theme_font_size_override("font_size", 20)
+			btn.add_theme_color_override("font_color", color)
+			ResponsiveLayout.set_button_wrap(btn)
+			var cid := chapter_id
+			btn.pressed.connect(func(): _jump_to_chapter(cid))
+			vb.add_child(btn)
+		else:
+			var label := Label.new()
+			label.text = title_text
+			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			label.add_theme_font_size_override("font_size", 20)
+			label.add_theme_color_override("font_color", color)
+			vb.add_child(label)
 
 	var hint := Label.new()
-	hint.text = "点「地图」或「暂停」关闭" if DisplayServer.is_touchscreen_available() else "Tab / Esc 关闭"
+	hint.text = "点「地图」或「暂停」关闭" if DisplayServer.is_touchscreen_available() else "Tab / Esc 关闭 · 点已完成的章节可重走"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_color_override("font_color", Color(0.6, 0.6, 0.7))
 	vb.add_child(hint)
+
+
+## Revisit a chapter you have already walked.
+##
+## This also puts `ChapterManager.can_enter_chapter()` to work for the first
+## time. It has existed since the route system was written, reads the
+## `required_flags` every chapter JSON declares, and was called by NOTHING — so
+## those flags were decorative. Enforcing it HERE rather than on the linear path
+## is deliberate: the main journey should never be able to soft-lock itself, but
+## a free jump genuinely can land you somewhere you are not equipped for.
+func _jump_to_chapter(chapter_id: String) -> void:
+	if chapter_id == "" or chapter_id == ChapterManager.current_chapter_id:
+		return
+	if not ChapterManager.can_enter_chapter(chapter_id):
+		var data := ChapterManager.load_chapter_data(chapter_id)
+		var missing: Array[String] = []
+		for f in data.get("required_flags", []):
+			if not GameState.has_flag(String(f)):
+				missing.append(DialogueManager.flag_label(String(f)))
+		EventBus.toast("这一段还走不了：你还缺 %s。" % "、".join(PackedStringArray(missing)))
+		return
+	_route_visible = false
+	for c in _route_layer.get_children():
+		c.queue_free()
+	GameState.set_flag("revisited_chapter", true)
+	await ChapterManager.transition_to(chapter_id)
 
 
 # ---------------------------------------------------------------------------

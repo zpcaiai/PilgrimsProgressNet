@@ -827,7 +827,8 @@ def build_city_of_destruction():
 def build_wilderness_road():
     s = Scene("wilderness_road")
     dry = (0.44, 0.39, 0.30)
-    s.ground("ENV_Wilderness_Ground", (52, 116), dry)
+    s.ground("ENV_Wilderness_Ground", (52, 116), dry,
+             tex="dry_earth", tile=5.0, pbr="ground")
 
     # A worn road that doglegs gently through the waste and tips down into the
     # lowland (the Slough) at the far end. forward = -Z.
@@ -839,8 +840,10 @@ def build_wilderness_road():
           (0, 0.04, -40))
 
     # Low earth berms draw the eye down the road without walling it in.
-    s.box("PROP_Berm_Left", (3.0, 1.1, 72), (0.40, 0.35, 0.27), (12, 0.5, 2))
-    s.box("PROP_Berm_Right", (3.0, 1.0, 72), (0.40, 0.35, 0.27), (-12, 0.5, 2))
+    s.box("PROP_Berm_Left", (3.0, 1.1, 72), (0.40, 0.35, 0.27), (12, 0.5, 2),
+          tex="dry_earth", tile=3.2)
+    s.box("PROP_Berm_Right", (3.0, 1.0, 72), (0.40, 0.35, 0.27), (-12, 0.5, 2),
+          tex="dry_earth", tile=3.2)
 
     # The City of Destruction smouldering behind you -- a broken skyline you keep
     # leaving (behind the spawn, +Z; framed by CAM_CityBehindView).
@@ -925,7 +928,10 @@ def build_wilderness_road():
     # --- 精装修: richer wilderness dressing (decor; non-blocking) ---
     for i, (bx, bz, br) in enumerate([(10, 6, 1.2), (-11, -4, 1.0), (9, -18, 0.9),
                                       (-7, 9, 0.8), (8, 24, 1.1)], start=1):
-        s.sphere("PROP_Boulder_%02d" % i, br, (0.5, 0.47, 0.42), (bx, br * 0.55, bz))
+        # Spheres could not take a texture before the UV pass — boulders were
+        # flat-coloured balls in every chapter that used them.
+        s.sphere("PROP_Boulder_%02d" % i, br, (0.5, 0.47, 0.42), (bx, br * 0.55, bz),
+                 tex="stone", tile=1.6, pbr="rough_stone")
     # Dry grass tufts scattered along the verges.
     for i, (gx, gz) in enumerate([(3.2, 4), (-3.4, -2), (5, -14), (-5, 16),
                                   (2.6, -26), (-4, 28), (4, 12), (-2.8, -34)], start=1):
@@ -1076,7 +1082,18 @@ def build_slough_of_despond():
            color=(0.18, 0.22, 0.18, 0.78))
     s.zone("COL_MudZone_Deep_02", (12, 2.6, 12), (7, 1.3, -23),
            color=(0.18, 0.22, 0.18, 0.78))
-    s.zone("COL_FalseGround_01", (4, 0.6, 4), (4, 0.2, -20),
+    # LAYERED HAZARDS.
+    #
+    # Every danger type in the game was met alone, and every one of them had
+    # been seen by chapter 8 — so the back half had no new pressure to offer.
+    # The cheapest fix is not new hazards but COMBINATIONS: here the false
+    # ground now sits INSIDE the deep mire rather than politely beside it, so
+    # the ground that looks like rescue is the ground that drops you into the
+    # deepest part. The second one is placed on the obvious line a player walks
+    # to skirt the deep zone.
+    s.zone("COL_FalseGround_01", (4, 0.6, 4), (4, 0.2, -22),
+           color=(0.32, 0.34, 0.28, 0.5))
+    s.zone("COL_FalseGround_02", (3.4, 0.6, 3.4), (-6, 0.2, -29),
            color=(0.32, 0.34, 0.28, 0.5))
 
     s.zone("TRIGGER_PliableLeaves", (20, 4, 2), (0, 1.5, -12))
@@ -1103,10 +1120,17 @@ def build_slough_of_despond():
 # ===========================================================================
 def build_wicket_gate():
     s = Scene("wicket_gate")
-    s.ground("ENV_Wicket_Path", (16, 60), (0.26, 0.27, 0.31))
+    # Ground and rock now carry real surface. The curved/ground primitives only
+    # gained UV support in the 2026 geometry pass, so these two early chapters
+    # — the first stone the player ever walks on — had NO textured surface at
+    # all while later chapters had cobble, marble and mud.
+    s.ground("ENV_Wicket_Path", (16, 60), (0.26, 0.27, 0.31),
+             tex="cobble", tile=3.4, pbr="stone")
     _road(s, "ENV_Wicket_Path_Strip", 40, 0, 4, (0.3, 0.31, 0.36))
-    s.box("ENV_Wicket_CliffEdges", (2.5, 6, 60), (0.14, 0.15, 0.2), (8.5, 3, 0))
-    s.box("ENV_Wicket_CliffEdges_R", (2.5, 6, 60), (0.14, 0.15, 0.2), (-8.5, 3, 0))
+    s.box("ENV_Wicket_CliffEdges", (2.5, 6, 60), (0.14, 0.15, 0.2), (8.5, 3, 0),
+          tex="stone", tile=3.0)
+    s.box("ENV_Wicket_CliffEdges_R", (2.5, 6, 60), (0.14, 0.15, 0.2), (-8.5, 3, 0),
+          tex="stone", tile=3.0)
     s.box("ENV_Wicket_GatePlatform", (10, 0.3, 10), (0.32, 0.3, 0.3),
           (0, 0.1, -9))
 
@@ -1148,6 +1172,12 @@ def build_wicket_gate():
     s.zone("TRIGGER_Exit_CrossAndTomb", (8, 4, 3), (0, 1.5, -15))
     s.zone("COL_ArrowPressureZone", (10, 4, 28), (0, 2, 6),
            color=(0.4, 0.2, 0.45, 0.18))
+    # LAYERED: churned ground beneath the arrow corridor. Arrows alone are a
+    # dodging problem and mud alone is a patience problem; together they are a
+    # decision — take the clean line and stay in the volley longer, or cut
+    # through the mire and be slowed while it falls.
+    s.zone("COL_MudZone_Shallow_Gate", (6, 2, 12), (0, 1, 8),
+           color=(0.30, 0.30, 0.26, 0.45))
 
     s.marker("VFX_ArrowEmitter_01", (7, 1.5, 12))
     s.marker("VFX_ArrowEmitter_02", (-7, 1.5, 12))
@@ -1305,6 +1335,8 @@ def build_interpreter_house():
     s.zone("TRIGGER_CageRoomStart", (4, 3, 4), (-14, 1.5, -11))
     s.zone("TRIGGER_NarrowRoomStart", (4, 3, 4), (14, 1.5, -10))
     s.zone("TRIGGER_Exit_HillDifficulty", (6, 4, 3), (0, 1.5, -20))
+    # Hosts children_fear (previously unreferenced): the family at the door.
+    s.zone("TRIGGER_FamilyFear", (7, 4, 4), (-6, 1.5, 6))
     s.zone("COL_DustCloudZone", (6, 3, 6), (-14, 1.5, 0), color=(0.5, 0.45, 0.4, 0.4))
     s.zone("COL_CageFearZone", (6, 3, 6), (-14, 1.5, -14), color=(0.3, 0.34, 0.4, 0.4))
     s.zone("COL_FalseDoor_Left", (1, 3, 2), (12.5, 1.5, -14), color=(0.5, 0.3, 0.3, 0.35))
@@ -1545,6 +1577,9 @@ def build_valley_humiliation():
     s.zone("TRIGGER_BossStart", (16, 4, 4), (0, 2, -2))
     s.zone("TRIGGER_BossVictory", (8, 4, 4), (0, 2, -16))
     s.zone("TRIGGER_Exit_ShadowValley", (8, 4, 2), (0, 1.5, -34))
+    # Approach beat before the fight — hosts apollyon_intro, one of nine
+    # authored dialogues that had no reference anywhere in the project.
+    s.zone("TRIGGER_ApollyonApproach", (16, 4, 3), (0, 1.5, 4))
     s.zone("COL_BossArenaBounds", (34, 6, 34), (0, 3, -6), color=(0.4, 0.2, 0.2, 0.1))
     s.zone("COL_DespairFlameZone", (10, 3, 10), (-8, 1.5, -12), color=(0.5, 0.2, 0.15, 0.4))
     s.zone("COL_ShameFieldZone", (10, 3, 10), (8, 1.5, -12), color=(0.4, 0.2, 0.4, 0.4))
@@ -1613,10 +1648,17 @@ def build_valley_shadow_death():
     s.zone("TRIGGER_ShadowCollapseCheck", (6, 4, 30), (0, 2, -6))
     s.zone("TRIGGER_Exit_VerticalSliceEnd", (8, 4, 2), (0, 1.5, -42))
 
+    # Entry beat — hosts shadow_valley_entry (previously unreferenced).
+    s.zone("TRIGGER_ShadowValleyEntry", (14, 4, 2.5), (0, 1.5, 12))
     s.zone("COL_FearZone_01", (5, 4, 8), (0, 2, 4), color=(0.1, 0.1, 0.2, 0.4))
     s.zone("COL_FearZone_02", (5, 4, 8), (0, 2, -20), color=(0.1, 0.1, 0.2, 0.4))
     s.zone("COL_FalseVoiceZone_Left", (4, 4, 6), (-4, 2, 2), color=(0.2, 0.1, 0.25, 0.4))
     s.zone("COL_FalseVoiceZone_Right", (4, 4, 6), (4, 2, -14), color=(0.2, 0.1, 0.25, 0.4))
+    # LAYERED: a stretch where the whisper and the fear field overlap, right at
+    # the narrowest part of the ledge — the one place in the chapter where you
+    # cannot simply walk wide of both.
+    s.zone("COL_FearZone_03", (6, 4, 7), (3.2, 2, -8), color=(0.1, 0.1, 0.2, 0.4))
+    s.zone("COL_FalseVoiceZone_Ledge", (5, 4, 7), (3.6, 2, -8), color=(0.2, 0.1, 0.25, 0.4))
     s.zone("COL_NarrowCliffEdge", (1.5, 6, 84), (5.4, 3, 0), color=(0.4, 0.1, 0.1, 0.25))
     s.zone("COL_DarknessDeepZone", (8, 5, 20), (0, 2.5, -2), color=(0.05, 0.05, 0.1, 0.5))
 
@@ -1724,6 +1766,9 @@ def build_vanity_fair():
     s.marker("NPC_Merchant_Applause", (-8, 0, 6))
     s.marker("NPC_Merchant_Comfort", (8, 0, 6))
     s.marker("NPC_Merchant_Influence", (0, 0, 10))
+    # Fourth merchant: the flattering mirror. Each stall now has its own lie and
+    # its own rebuttal (see tools/data_gen/build_vanity_stalls.py).
+    s.marker("NPC_Merchant_Flattery", (-6, 0, 12))
     s.marker("NPC_TrialJudge", (0, 1.0, -16))
 
     s.zone("TRIGGER_EnterVanityFair", (10, 4, 3), (0, 1.5, 20))
@@ -2055,7 +2100,9 @@ def build_enchanted_ground():
     s.zone("COL_SleepZone_01", (8, 3, 10), (0, 1.5, 4), color=(0.6, 0.6, 0.4, 0.35))
     s.zone("COL_SleepZone_02", (8, 3, 10), (0, 1.5, -20), color=(0.6, 0.6, 0.4, 0.35))
     s.zone("COL_DreamFlowerZone", (6, 3, 6), (-5, 1.5, 16), color=(0.8, 0.5, 0.7, 0.3))
-    s.zone("COL_SoftGrassRestZone", (6, 3, 6), (-6, 1.5, -6), color=(0.55, 0.7, 0.45, 0.35))
+    # LAYERED: the inviting rest patch now sits inside the second sleep field,
+    # so the ground that looks most like mercy is the ground that takes you.
+    s.zone("COL_SoftGrassRestZone", (6, 3, 6), (-2.5, 1.5, -18), color=(0.55, 0.7, 0.45, 0.35))
 
     s.marker("VFX_SleepMist", (0, 1.5, 0))
     s.marker("VFX_DreamPollen", (-5, 1.5, 16))

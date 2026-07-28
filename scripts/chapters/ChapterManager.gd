@@ -204,12 +204,45 @@ const VERTICAL_SLICE_ROUTE := [
 	"valley_humiliation",
 ]
 
-# The shipped build now plays the full canonical pilgrimage to the Celestial City.
+# The shipped build plays the full canonical pilgrimage to the Celestial City.
+#
+# The two shorter routes above were declared when the game was being built in
+# slices and then never referenced again — `route` was assigned exactly once,
+# here, and nothing could change it. They are genuinely useful (a 5-chapter
+# demo and a 9-chapter vertical slice are what you hand a classroom or a
+# playtester), so `set_route()` now exposes them and the title screen offers
+# them. The canonical route remains the default for every normal start.
+const ROUTE_IDS := {
+	"canonical": "完整旅程（16 章）",
+	"vertical_slice": "竖切体验（9 章，至屈辱谷）",
+	"mvp": "短程试玩（5 章，至十字架）",
+}
+
 var route: Array = CANONICAL_ROUTE
+var route_id: String = "canonical"
 var _data_cache: Dictionary = {}
 var _world_root: Node = null
 var _current_scene_instance: Node = null
 var current_chapter_id: String = ""
+
+
+## Choose which route this journey walks. Must be called BEFORE start_chapter().
+func set_route(id: String) -> void:
+	match id:
+		"mvp":
+			route = MVP_ROUTE
+		"vertical_slice":
+			route = VERTICAL_SLICE_ROUTE
+		_:
+			id = "canonical"
+			route = CANONICAL_ROUTE
+	route_id = id
+	GameState.set_flag("route_" + id, true)
+
+
+## Route length, for menus and the ending screen.
+func route_length() -> int:
+	return route.size()
 
 
 func _ready() -> void:
@@ -279,12 +312,21 @@ func get_chapter_index(chapter_id: String) -> int:
 
 
 func get_next_chapter_id(chapter_id: String) -> String:
+	# THE ACTIVE ROUTE WINS.
+	#
+	# This used to return the chapter JSON's `next_chapter_id` unconditionally,
+	# which meant the short routes could never actually end: picking the
+	# 5-chapter demo would still walk you straight on into chapter 6. The route
+	# is now consulted first, and only falls back to the JSON link when the
+	# chapter is not part of the active route at all.
+	var idx := get_chapter_index(chapter_id)
+	if idx >= 0:
+		if idx + 1 < route.size():
+			return String(route[idx + 1])
+		return ""      # end of THIS route
 	var data := load_chapter_data(chapter_id)
 	if data.has("next_chapter_id"):
 		return String(data["next_chapter_id"])
-	var idx := get_chapter_index(chapter_id)
-	if idx >= 0 and idx + 1 < route.size():
-		return route[idx + 1]
 	return ""
 
 
@@ -419,7 +461,20 @@ func go_to_next_chapter() -> void:
 		# End of route: signal the game-complete flow.
 		EventBus.toast("这段朝圣路已经完成。")
 		return
-	start_chapter(next_id)
+	await transition_to(next_id)
+
+
+## Veil the screen, THEN swap the chapter. Every in-journey chapter change goes
+## through here rather than calling start_chapter() directly, so the cut is
+## hidden on BOTH sides — fade out here, fade back in from the
+## EventBus.chapter_started handler in Transition.
+func transition_to(chapter_id: String) -> void:
+	var loop := Engine.get_main_loop()
+	if loop is SceneTree:
+		var tr: Node = (loop as SceneTree).root.get_node_or_null("Transition")
+		if tr != null and tr.has_method("veil_out"):
+			await tr.call("veil_out")
+	start_chapter(chapter_id)
 
 
 func load_chapter_scene(chapter_id: String) -> void:

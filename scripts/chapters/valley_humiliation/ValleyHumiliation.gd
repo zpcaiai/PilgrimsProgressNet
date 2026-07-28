@@ -55,6 +55,11 @@ func _on_dialogue_ended(dialogue_id: String) -> void:
 
 func _on_victory(_v: bool) -> void:
 	QuestManager.update_quest_progress("valley_humiliation")
+	# `defeated_apollyon` was only ever written by ApollyonBoss.gd, so a win
+	# through THIS path left it unset — while the next chapter
+	# (valley_shadow_death) lists it in required_flags and the ending review
+	# reads it as a grace beat. Setting it here makes both paths agree.
+	GameState.set_flag("defeated_apollyon", true)
 	await get_tree().create_timer(2.0).timeout
 	EventBus.toast("控告者的权势破碎了。山谷打开，更幽暗的路仍在前方。")
 	await get_tree().create_timer(1.0).timeout

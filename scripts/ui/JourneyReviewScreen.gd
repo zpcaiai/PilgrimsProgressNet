@@ -180,5 +180,12 @@ func _on_continue() -> void:
 	EventBus.unlock_player("journey_review")
 	if GameState.has_flag("journey_completed") and not GameState.has_flag("ending_screen_opened"):
 		GameState.set_flag("ending_screen_opened", true)
-		EventBus.demo_completed.emit()
+		# A last reflection before the ending panel. `demo_end_reflection.json` was
+	# written for precisely this beat and had never been referenced by anything.
+	if DialogueManager.has_dialogue("demo_end_reflection") \
+			and not GameState.has_flag("end_reflection_seen"):
+		GameState.set_flag("end_reflection_seen", true)
+		DialogueManager.start_dialogue("demo_end_reflection")
+		await EventBus.dialogue_ended
+	EventBus.demo_completed.emit()
 	queue_free()

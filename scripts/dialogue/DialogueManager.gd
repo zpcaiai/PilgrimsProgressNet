@@ -20,6 +20,12 @@ func is_active() -> bool:
 	return _active
 
 
+## Does a dialogue file exist? (Cheap existence check, no parse — callers use
+## it to decide whether to arm an optional moment at all.)
+func has_dialogue(dialogue_id: String) -> bool:
+	return FileAccess.file_exists(DIALOGUE_DIR + dialogue_id + ".json")
+
+
 func load_dialogue(dialogue_id: String) -> Dictionary:
 	var path := DIALOGUE_DIR + dialogue_id + ".json"
 	if not FileAccess.file_exists(path):
@@ -125,8 +131,22 @@ func _choice_conditions_met(choice: Dictionary) -> bool:
 	return true
 
 
-## Plain-text signed summary of a choice's spiritual effects (for a HUD hint), e.g. "信+10 惧-5".
-func get_choice_effect_hint(choice: Dictionary) -> String:
+## Which spiritual states a choice is GOOD for. Everything not listed is a
+## cost — despair, shame, fear, pride, deception, weariness, doubt.
+const VIRTUES := ["faith", "hope", "love", "humility", "discernment",
+	"perseverance", "watchfulness", "repentance"]
+
+const STATE_SHORT := {
+	"faith": "信", "hope": "望", "love": "爱", "humility": "谦",
+	"discernment": "辨", "perseverance": "毅", "watchfulness": "警",
+	"repentance": "悔", "despair": "绝", "shame": "羞", "fear": "惧",
+	"pride": "傲", "deception": "欺", "weariness": "乏", "doubt": "疑",
+}
+
+
+## Signed spiritual deltas a choice will apply, merged from both the legacy
+## flat keys and the `effects` block.
+func get_choice_effects(choice: Dictionary) -> Dictionary:
 	var eff: Dictionary = {}
 	for key in choice.keys():
 		if SpiritualStateManager.NUMERIC_STATES.has(key):
@@ -135,13 +155,85 @@ func get_choice_effect_hint(choice: Dictionary) -> String:
 		for k in (choice["effects"] as Dictionary).keys():
 			if SpiritualStateManager.NUMERIC_STATES.has(k):
 				eff[k] = int(eff.get(k, 0)) + int(choice["effects"][k])
-	var names := {"faith":"信","hope":"望","love":"爱","humility":"谦","discernment":"辨","perseverance":"毅","watchfulness":"警","despair":"绝","shame":"羞","fear":"惧","pride":"傲","deception":"欺","weariness":"乏"}
+	return eff
+
+
+## Plain-text signed summary of a choice's spiritual effects, e.g. "信+10 惧-5".
+func get_choice_effect_hint(choice: Dictionary) -> String:
+	var eff := get_choice_effects(choice)
 	var parts: Array = []
 	for k in eff.keys():
 		var v := int(eff[k])
 		if v != 0:
-			parts.append("%s%+d" % [names.get(k, k), v])
+			parts.append("%s%+d" % [STATE_SHORT.get(k, k), v])
 	return " ".join(PackedStringArray(parts))
+
+
+## Full consequence preview for one choice, split so the HUD can colour it.
+##
+## The old preview showed a single flat string of numeric deltas. It never
+## mentioned the FLAGS a choice sets — which is where most of the long-range
+## consequence in this game actually lives (`pliable_shallow` changes what Help
+## says an entire chapter later; `took_armour` changes the Valley) — and it gave
+## no visual difference between a gain and a cost. Returns:
+##
+##   { gain: "信+10 望+4", cost: "惧-5", marks: "记：接受帮助", sets: [flag...] }
+func get_choice_preview(choice: Dictionary) -> Dictionary:
+	var eff := get_choice_effects(choice)
+	var gains: Array = []
+	var costs: Array = []
+	for k in eff.keys():
+		var v := int(eff[k])
+		if v == 0:
+			continue
+		var label := "%s%+d" % [STATE_SHORT.get(k, k), v]
+		var good := (VIRTUES.has(k) and v > 0) or (not VIRTUES.has(k) and v < 0)
+		if good:
+			gains.append(label)
+		else:
+			costs.append(label)
+
+	var sets: Array = []
+	if choice.has("flags") and choice["flags"] is Dictionary:
+		for f in (choice["flags"] as Dictionary).keys():
+			if bool(choice["flags"][f]):
+				sets.append(String(f))
+	var items: Array = []
+	if choice.has("items") and choice["items"] is Dictionary:
+		for it in (choice["items"] as Dictionary).keys():
+			items.append(String(it))
+
+	var marks: Array = []
+	for f in sets:
+		marks.append(flag_label(f))
+	for it in items:
+		marks.append("得 " + flag_label(it))
+
+	return {
+		"gain": " ".join(PackedStringArray(gains)),
+		"cost": " ".join(PackedStringArray(costs)),
+		"marks": " · ".join(PackedStringArray(marks)),
+		"sets": sets,
+	}
+
+
+## Human-readable name for a flag or item id, so previews and menus read as
+## language rather than as variable names. Public: the chapter-select map uses
+## it to say which key is missing.
+func flag_label(id: String) -> String:
+	var known := {
+		"accepted_help": "接受帮助", "pliable_shallow": "易迁半途而废",
+		"took_armour": "披上军装", "has_scroll": "书卷", "has_sword": "圣灵的宝剑",
+		"has_armor": "全副军装", "has_promise_key": "应许的钥匙",
+		"has_shepherd_map": "牧人的地图", "vanity_token": "虚荣的挂饰",
+		"knocked_gate": "叩过窄门", "interpreter_full": "看完三堂课",
+		"defeated_apollyon": "胜过亚玻伦", "vanity_bought_pending": "买下虚荣",
+		"chapel_pilgrim": "在路旁小堂跪拜",
+	}
+	if known.has(id):
+		return String(known[id])
+	# Fall back to a readable form of the raw id.
+	return id.replace("_", " ")
 
 func select_choice(choice_id: String) -> void:
 	if not _active:

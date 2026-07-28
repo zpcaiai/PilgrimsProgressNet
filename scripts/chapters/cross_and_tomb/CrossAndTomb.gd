@@ -42,6 +42,39 @@ func _build_procedural() -> void:
 	make_trigger(Vector3(0, 2.5, -13), Vector3(12, 5, 2), func(_b): _begin_cross_event(), true)
 
 
+var _burden_mesh: MeshInstance3D = null
+var _burden_label: String = ""
+
+
+## Say what was actually put down. The composition is read from the pilgrim's
+## own state at the moment of the Cross, so two players hear two different
+## sentences — and inside the tomb the colour is drained out of the mesh, so
+## forgiveness is shown as TRANSFORMATION rather than as deletion.
+func _name_the_burden() -> void:
+	var rows := BurdenColour.composition()
+	if not rows.is_empty():
+		var names: Array[String] = []
+		for r in rows.slice(0, 3):
+			names.append(_state_name(String(r["state"])))
+		EventBus.toast("落下的是：%s。" % "、".join(PackedStringArray(names)))
+	if is_instance_valid(_burden_mesh):
+		var m := _burden_mesh.material_override as StandardMaterial3D
+		if m != null:
+			var tw := create_tween()
+			tw.tween_property(m, "albedo_color", Color(0.72, 0.70, 0.66), 2.4)
+
+
+func _state_name(k: String) -> String:
+	match k:
+		"deception": return "被欺哄"
+		"pride": return "骄傲"
+		"shame": return "羞愧"
+		"fear": return "惧怕"
+		"despair": return "绝望"
+		"weariness": return "疲惫"
+		_: return k
+
+
 func _begin_cross_event() -> void:
 	if _triggered:
 		return
@@ -54,10 +87,17 @@ func _begin_cross_event() -> void:
 	box.size = Vector3(0.7, 0.7, 0.5)
 	burden.mesh = box
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.25, 0.2, 0.18)
+	# The burden that rolls into the tomb is YOUR burden: tinted by whatever you
+	# have actually been carrying (see BurdenColour). Naming it aloud as it goes
+	# is what makes this the moment the chapter is named after, rather than a
+	# brown box falling over.
+	mat.albedo_color = BurdenColour.current()
+	mat.roughness = 0.85
 	burden.material_override = mat
 	add_child(burden)
 	burden.global_position = player.global_position + Vector3(0, 1.1, 0)
+	_burden_mesh = burden
+	_burden_label = BurdenColour.dominant_label()
 
 	await get_tree().create_timer(0.6).timeout
 
@@ -78,6 +118,7 @@ func _begin_cross_event() -> void:
 	GameState.set_flag("mvp_completed", true)
 	QuestManager.update_quest_progress("reach_the_cross")
 	EventBus.toast("你的重担松开、坠落，被恩典回应。")
+	_name_the_burden()
 
 	# Roll the burden into the tomb and brighten the hill.
 	var tween := create_tween()

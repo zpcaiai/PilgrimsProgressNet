@@ -101,9 +101,9 @@ func _advance() -> void:
 	await get_tree().create_timer(0.4).timeout
 	if target_chapter != "":
 		ChapterManager.complete_chapter(ChapterManager.current_chapter_id)
-		ChapterManager.start_chapter(target_chapter)
+		await ChapterManager.transition_to(target_chapter)
 	else:
-		ChapterManager.go_to_next_chapter()
+		await ChapterManager.go_to_next_chapter()
 
 
 func _ensure_exit_reflection(chapter_id: String) -> void:

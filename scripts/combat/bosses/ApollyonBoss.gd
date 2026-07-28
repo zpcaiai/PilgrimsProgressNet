@@ -160,23 +160,197 @@ func _apply_data(d: Dictionary) -> void:
 				p["threshold"] = float(p["threshold"]) * 0.5
 
 
-func _attack() -> void:
-	var effects := attack_effects
+# --------------------------------------------------------------------------
+# THREE PHASES THAT ACTUALLY DIFFER
+#
+# The fight was described as three phases and implemented as one: `_attack()`
+# swapped which dictionary of numbers it applied and changed nothing else. Same
+# cadence, same behaviour, same counterplay — so a player experienced one attack
+# repeated until the bar emptied, while the toast claimed the phase had changed.
+#
+# Each phase now has its own verb, and each verb has its own answer:
+#
+#   1 INTIMIDATION  — a bellow: a wide roar that hits hardest if you are close
+#                     and facing him. ANSWER: back off / guard. Telegraphed by a
+#                     rising rumble so it can be read.
+#   2 ACCUSATION    — named charges as AccusationCards drifting at you.
+#                     ANSWER: the matching promise (see AccusationCard).
+#   3 DESPERATE ASSAULT — a charge along your position with a real dodge window.
+#                     ANSWER: dodge, then punish while he is over-committed.
+#
+# Every phase still applies the data-driven `attack_effects` from
+# data/enemies/apollyon.json, so tuning stays in data.
+
+const CHARGE_LIST := ["unworthy", "failure", "secret", "abandoned", "pointless"]
+const ROAR_RADIUS := 6.5
+const DIVE_SPEED := 15.0
+const DIVE_TIME := 0.55
+
+var _charge_bag: Array[String] = []
+var _telegraph: float = 0.0
+var _diving: bool = false
+var _dive_dir: Vector3 = Vector3.ZERO
+var _dive_t: float = 0.0
+var _recovering: float = 0.0
+
+
+func _phase_effects() -> Dictionary:
 	for p in phases:
 		if int(p.get("phase", 0)) == current_phase:
-			effects = p.get("attack_effects", attack_effects)
-			break
-	SpiritualStateManager.apply_effects(effects)
+			return p.get("attack_effects", attack_effects)
+	return attack_effects
+
+
+func _attack() -> void:
+	match current_phase:
+		1:
+			_attack_roar()
+		2:
+			_attack_accusation()
+		_:
+			_attack_dive()
+
+
+## PHASE 1 — a bellow. Radial, so distance is the answer; telegraphed so the
+## distance can be taken.
+func _attack_roar() -> void:
+	_telegraph = 0.9
+	Juice.shake(0.18)
+	EventBus.toast("亚玻伦深吸一口气——退开。")
+	await get_tree().create_timer(0.9).timeout
+	if not is_inside_tree():
+		return
+	_telegraph = 0.0
+	var p := _player_node()
+	Juice.shake(0.7)
+	Juice.flash(Color(0.55, 0.10, 0.10, 0.20), 0.35)
+	if p == null:
+		return
+	var d := global_position.distance_to(p.global_position)
+	if d > ROAR_RADIUS:
+		EventBus.toast("吼声从你身边掠过。距离也是一种回答。")
+		SpiritualStateManager.apply_effects({"fear": 2})
+		return
+	# Full force at his feet, tapering to nothing at the edge.
+	var falloff := clampf(1.0 - d / ROAR_RADIUS, 0.25, 1.0)
+	var eff := _scaled(_phase_effects(), falloff)
+	SpiritualStateManager.apply_effects(eff)
+	_hit_player(eff)
+
+
+## PHASE 2 — named accusations you can answer one at a time.
+func _attack_accusation() -> void:
+	var p := _player_node()
+	if p == null:
+		return
+	if _charge_bag.is_empty():
+		_charge_bag = CHARGE_LIST.duplicate()
+		_charge_bag.shuffle()
+	var charge: String = _charge_bag.pop_back()
+	var from := global_position + Vector3(0, 2.4, 0) \
+		+ (p.global_position - global_position).normalized() * 1.6
+	var card := AccusationCard.make(charge, from, p)
+	# Scale the landing cost by the tuned phase effects so data still drives it.
+	card.effects_on_land = _phase_effects().duplicate()
+	get_parent().add_child(card)
+	# A charge that lands weakens you; a charge you answer weakens HIM.
+	var on_answer := func(correct: bool):
+		receive_counter("promise", 26.0 if correct else 14.0)
+	card.answered.connect(on_answer)
+	Juice.shake(0.14)
+
+
+## PHASE 3 — a committed charge with a dodge window and a punish window.
+func _attack_dive() -> void:
+	var p := _player_node()
+	if p == null or _diving:
+		return
+	_telegraph = 0.5
+	EventBus.toast("他俯身冲来——闪开。")
+	Juice.shake(0.22)
+	await get_tree().create_timer(0.5).timeout
+	if not is_inside_tree() or p == null or not is_instance_valid(p):
+		return
+	_telegraph = 0.0
+	_dive_dir = (p.global_position - global_position)
+	_dive_dir.y = 0.0
+	_dive_dir = _dive_dir.normalized()
+	_dive_t = DIVE_TIME
+	_diving = true
+
+
+func _physics_process(delta: float) -> void:
+	if _recovering > 0.0:
+		_recovering -= delta
+	if not _diving:
+		# Normal pursuit / attack cadence lives in SymbolicEnemy. Overriding
+		# _physics_process WITHOUT chaining would have silently disabled his
+		# chase and his whole attack timer.
+		super._physics_process(delta)
+		return
+	# --- committed charge --------------------------------------------------
+	_dive_t -= delta
+	velocity.x = _dive_dir.x * DIVE_SPEED
+	velocity.z = _dive_dir.z * DIVE_SPEED
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+	move_and_slide()
+	var p := _player_node()
+	if p != null and global_position.distance_to(p.global_position) < 1.9:
+		var eff := _phase_effects()
+		SpiritualStateManager.apply_effects(eff)
+		_hit_player(eff)
+		Juice.shake(0.8)
+		Juice.hitstop(0.09)
+		_end_dive()
+		return
+	if _dive_t <= 0.0:
+		# Over-committed: a window where counters bite twice as hard.
+		_end_dive()
+		_recovering = 1.6
+		EventBus.toast("他冲空了，重心散了——就是现在。")
+
+
+func _end_dive() -> void:
+	_diving = false
+	_dive_t = 0.0
+	velocity.x = 0.0
+	velocity.z = 0.0
+
+
+## Counters land harder while he is recovering from a missed charge.
+func receive_counter(source_type: String, amount: float) -> void:
+	# Punish window: a counter landed while he is recovering from a missed
+	# charge is worth double. This is the reward for reading the telegraph.
+	if _recovering > 0.0:
+		amount *= 2.0
+		FloatingNumbers.spawn(global_position + Vector3.UP * 3.0, "破绽 ×2",
+			Color(1.0, 0.9, 0.55), 30)
+	# The base class handles influence, hit feedback and defeat; we only add the
+	# phase bookkeeping on top.
+	super.receive_counter(source_type, amount)
+	if is_instance_valid(self):
+		_update_phase()
+
+
+func _scaled(effects: Dictionary, k: float) -> Dictionary:
+	var out := {}
+	for key in effects.keys():
+		out[key] = int(round(float(effects[key]) * k))
+	return out
+
+
+func _hit_player(effects: Dictionary) -> void:
 	var combats := get_tree().get_nodes_in_group("player_combat")
 	if combats.size() > 0:
 		combats[0].take_hit(effects, enemy_type)
 
 
-func receive_counter(source_type: String, amount: float) -> void:
-	influence -= amount * get_weakness_multiplier(source_type)
-	_update_phase()
-	if influence <= 0.0:
-		on_defeated()
+func _player_node() -> Node3D:
+	var tree := get_tree()
+	if tree == null:
+		return null
+	return tree.get_first_node_in_group("player") as Node3D
 
 
 func _update_phase() -> void:
@@ -189,8 +363,13 @@ func _update_phase() -> void:
 	if new_phase != current_phase:
 		current_phase = new_phase
 		phase_changed.emit(current_phase)
-		var names := ["", "Intimidation", "Accusation", "Desperate Assault"]
-		EventBus.toast("亚玻伦压迫更紧：第 %d 阶段（%s）。" % [current_phase, names[min(current_phase, 3)]])
+		var names := ["", "恐吓 Intimidation", "控告 Accusation", "困兽之斗 Desperate Assault"]
+		var how := ["",
+			"他要吼——离远些，或站稳。",
+			"他要一句句控告你——用应许逐句回应（U）。",
+			"他要俯冲——闪开（K），然后趁他重心散时反击。"]
+		EventBus.toast("第 %d 阶段：%s。%s" % [
+			current_phase, names[mini(current_phase, 3)], how[mini(current_phase, 3)]])
 		Juice.shake(0.5)
 		Juice.flash(Color(0.6, 0.12, 0.12, 0.22), 0.35)
 

@@ -19,6 +19,10 @@ static func grant_full_armor() -> void:
 		{"faith": 10, "watchfulness": 10, "perseverance": 10})
 	EventBus.toast("你为山谷穿戴军装：信心、警醒与忍耐得了坚固。")
 	AudioManager.play_sfx("blessing")
+	# `receive_armor.json` was written for this exact moment and referenced by
+	# nothing, so the armour arrived as a toast and a stat block. Speak it.
+	if DialogueManager.has_dialogue("receive_armor") and not DialogueManager.is_active():
+		DialogueManager.start_dialogue("receive_armor")
 
 
 func setup(size: Vector3) -> void:

@@ -84,7 +84,17 @@ def tex_paths(name):
 # Cap textures embedded into per-scene GLBs so the base geometry stays light
 # (the full-res 1024px maps are loaded at runtime by MaterialKit for hero props;
 # baked ground/walls only need a modest embedded copy).
-EMBED_MAX = 160
+#
+# 2026: this used to be a hard 160 px for every target. 160 px is a THUMBNAIL —
+# stretched across a 30 m cliff face it is worse than no texture at all, and it
+# was the reason the "PBR library applied" pass produced so little visible
+# surface detail. It is now tier-driven:
+#
+#   desktop build  -> 512 px  (default)
+#   web build      -> 160 px  (PILGRIM_EMBED_MAX=160, set by build_scenes.py --web)
+#
+# Override with the PILGRIM_EMBED_MAX environment variable.
+EMBED_MAX = int(os.environ.get("PILGRIM_EMBED_MAX", "384"))
 
 
 def _embed_bytes(png_path, max_dim=EMBED_MAX):
@@ -109,6 +119,8 @@ def _embed_bytes(png_path, max_dim=EMBED_MAX):
 # glTF component / target constants
 _FLOAT = 5126
 _UINT = 5125
+_USHORT = 5123
+_UBYTE = 5121
 _ARRAY_BUFFER = 34962
 _ELEMENT_ARRAY_BUFFER = 34963
 
@@ -655,19 +667,21 @@ def terrain_mesh(sx, sz, amp=0.07, seed=1, cell=3.0, base_y=0.0, skirt=0.5):
             a = iz * row + ix
             b = a + row
             I.extend([a, b, a + 1, a + 1, b, b + 1])
-    # flat underside
+    # Lower ring vertices for the skirt — but NO underside triangles.
+    #
+    # The old writer emitted a COMPLETE second grid of downward-facing polygons,
+    # so every chapter's ground cost roughly 3x the triangles it needed, for a
+    # surface the camera (locked to an overhead pitch) can never see. The
+    # positions are kept because ring() indexes into this grid to build the
+    # skirt; only the 2 * nx * nz invisible triangles are gone.
     by = base_y - skirt
     base_off = len(P)
     for iz in range(nz + 1):
         gz = -hz + sz * iz / nz
         for ix in range(nx + 1):
             gx = -hx + sx * ix / nx
-            P.append((gx, by, gz)); N.append((0, -1, 0))
-    for iz in range(nz):
-        for ix in range(nx):
-            a = base_off + iz * row + ix
-            b = a + row
-            I.extend([a, a + 1, b, a + 1, b + 1, b])
+            P.append((gx, by, gz))
+            N.append((0, -1, 0))
     # skirt around the 4 borders (top edge ring -> bottom edge ring)
     top_edges, bot_edges = [], []
 
@@ -695,13 +709,133 @@ def terrain_mesh(sx, sz, amp=0.07, seed=1, cell=3.0, base_y=0.0, skirt=0.5):
 
 
 # ---------------------------------------------------------------------------
+# UV generation for the SMOOTH (indexed) primitives
+# ---------------------------------------------------------------------------
+# Until now only box_uv() and pyramid_uv() produced TEXCOORD_0, so the entire
+# curved half of the kit — every column, dome, vase, bell, tree trunk, barrel
+# and the ground itself — could not carry a texture at all. tex= was silently
+# ignored on those calls, which is why the "16-texture PBR library" showed up
+# on so little of the actual scene. These rebuild the same parametrisations the
+# *_mesh() functions use, and emit the matching UVs.
+#
+# Convention: `tile` is metres per texture repeat, so a 12 m wall and a 1 m post
+# show the same texel density instead of the same stretched image.
+
+
+def cylinder_mesh_uv(radius, height, sides=24, tile=1.4):
+    P, N, I = cylinder_mesh(radius, height, sides)
+    circ = 2.0 * math.pi * radius
+    UV = []
+    for (x, y, z) in P:
+        u = (math.atan2(z, x) / (2.0 * math.pi) + 0.5) * (circ / max(tile, 0.01))
+        v = (y + height / 2.0) / max(tile, 0.01)
+        UV.append((u, v))
+    return P, N, UV, I
+
+
+def cone_mesh_uv(radius, height, sides=24, tile=1.4):
+    P, N, I = cone_mesh(radius, height, sides)
+    circ = 2.0 * math.pi * radius
+    UV = []
+    for (x, y, z) in P:
+        u = (math.atan2(z, x) / (2.0 * math.pi) + 0.5) * (circ / max(tile, 0.01))
+        v = (y + height / 2.0) / max(tile, 0.01)
+        UV.append((u, v))
+    return P, N, UV, I
+
+
+def sphere_mesh_uv(radius, segs=24, rings=14, tile=1.4):
+    P, N, I = sphere_mesh(radius, segs, rings)
+    span = max(radius * 2.0, 0.01) / max(tile, 0.01)
+    UV = []
+    for (nx, ny, nz) in N:
+        u = (math.atan2(nz, nx) / (2.0 * math.pi) + 0.5) * span * math.pi
+        v = (math.acos(max(-1.0, min(1.0, ny))) / math.pi) * span
+        UV.append((u, v))
+    return P, N, UV, I
+
+
+def torus_mesh_uv(ring_r, tube_r, segs=28, sides=14, tile=1.4):
+    P, N, I = torus_mesh(ring_r, tube_r, segs, sides)
+    UV = []
+    outer = 2.0 * math.pi * ring_r / max(tile, 0.01)
+    inner = 2.0 * math.pi * tube_r / max(tile, 0.01)
+    row = sides + 1
+    for k in range(len(P)):
+        i = k // row
+        j = k % row
+        UV.append((i / float(segs) * outer, j / float(sides) * inner))
+    return P, N, UV, I
+
+
+def lathe_mesh_uv(profile, segs=24, tile=1.4):
+    P, N, I = lathe_mesh(profile, segs)
+    m = len(profile)
+    # arc length along the profile -> V, so a tall vase does not squash its
+    # texture near the neck.
+    arc = [0.0]
+    for k in range(1, m):
+        r0, y0 = profile[k - 1]
+        r1, y1 = profile[k]
+        arc.append(arc[-1] + math.hypot(r1 - r0, y1 - y0))
+    total_r = max(p[0] for p in profile)
+    circ = 2.0 * math.pi * max(total_r, 0.01)
+    UV = []
+    for k in range(len(P)):
+        if k < (segs + 1) * m:
+            i = k // m
+            j = k % m
+            UV.append((i / float(segs) * circ / max(tile, 0.01),
+                       arc[j] / max(tile, 0.01)))
+        else:
+            # cap vertices: planar projection
+            x, y, z = P[k]
+            UV.append((x / max(tile, 0.01), z / max(tile, 0.01)))
+    return P, N, UV, I
+
+
+def terrain_mesh_uv(sx, sz, amp=0.07, seed=1, cell=3.0, base_y=0.0,
+                    skirt=0.5, tile=4.0):
+    P, N, I = terrain_mesh(sx, sz, amp, seed, cell, base_y, skirt)
+    t = max(tile, 0.01)
+    UV = [(x / t, z / t) for (x, _y, z) in P]
+    return P, N, UV, I
+
+
+# ---------------------------------------------------------------------------
 # PBR material role inference (name + colour -> metallic / roughness)
 # ---------------------------------------------------------------------------
 def _kw(name, words):
     return any(w in name for w in words)
 
 
-def infer_pbr(name, color):
+# Explicit surface roles. A scene_defs call can pass pbr="marble" instead of
+# relying on the name/colour heuristic below — always preferred for hero props.
+PBR_ROLES = {
+    "metal":    (0.95, 0.28),
+    "gold":     (0.90, 0.30),
+    "brass":    (0.85, 0.38),
+    "iron":     (0.80, 0.55),
+    "water":    (0.10, 0.05),
+    "ice":      (0.05, 0.12),
+    "glass":    (0.02, 0.08),
+    "marble":   (0.02, 0.22),
+    "stone":    (0.00, 0.62),
+    "rough_stone": (0.00, 0.80),
+    "wood":     (0.00, 0.72),
+    "cloth":    (0.00, 0.88),
+    "skin":     (0.00, 0.60),
+    "foliage":  (0.00, 0.85),
+    "ground":   (0.00, 0.92),
+    "mud":      (0.00, 0.70),
+    "ash":      (0.00, 0.95),
+    "emissive": (0.00, 0.45),
+}
+
+
+def infer_pbr(name, color, role=None):
+    if role and role in PBR_ROLES:
+        return PBR_ROLES[role]
     """Return (metallic, roughness) for a surface from its node name + colour.
     Keeps the storybook palette but gives each material family a distinct
     response: metals shine, water is glossy, stone/wood/foliage read apart."""
@@ -715,8 +849,18 @@ def infer_pbr(name, color):
                "Crown", "Lamp", "Brazier", "Chain", "Spear", "Trumpet",
                "Coin", "Sconce")):
         return 0.95, 0.30
-    # bright warm colour reads as gilded metal (celestial gold props)
-    if r > 0.82 and g > 0.70 and b < 0.64:
+    # Bright warm colour reads as gilded metal — but ONLY on props whose name
+    # does not already say "this is cloth / ground / skin / light".
+    #
+    # The old rule had no such guard, so any sandy floor, wheat field, tan
+    # awning or warm-lit wall in the whole project was silently promoted to
+    # metallic 0.85 and rendered like polished brass. That single heuristic did
+    # more damage to the material read than the missing normal maps.
+    if r > 0.82 and g > 0.70 and b < 0.64 and not _kw(n, (
+            "Ground", "Terrain", "Sand", "Dirt", "Path", "Road", "Floor",
+            "Field", "Wheat", "Straw", "Hay", "Cloth", "Banner", "Awning",
+            "Tent", "Robe", "Skin", "Flesh", "Glow", "Light", "Ray", "Dust",
+            "Flame", "Fire", "Ember", "Candle", "Torch", "Wood", "Plank")):
         return 0.85, 0.32
     if _kw(n, ("Glow", "Light", "Ray", "Spotlight", "Glitter", "Particle")):
         return 0.0, 0.45
@@ -755,6 +899,13 @@ class GLB:
         self.bin = bytearray()
         self._mat_cache = {}
         self._tex_cache = {}
+        # Raw geometry kept alongside every emitted mesh so a later pass can
+        # bake per-vertex AO (see bake_vertex_ao) without re-deriving it from
+        # the packed buffer.
+        self.mesh_geo = []          # index-aligned with self.meshes
+        self.mesh_solid = []        # False for transparent zone volumes
+        self.skins = []             # glTF skins (see skin())
+        self.animations = []        # glTF animations (see animation())
 
     def _align(self):
         while len(self.bin) % 4 != 0:
@@ -860,6 +1011,9 @@ class GLB:
     # -- meshes --
     def mesh(self, tris, material_idx) -> int:
         """Flat-shaded triangle soup (per-face normals)."""
+        return self._emit_soup(tris, material_idx, solid=True)
+
+    def _emit_soup(self, tris, material_idx, solid=True) -> int:
         positions, normals, indices = [], [], []
         for (p0, p1, p2) in tris:
             n = _face_normal(p0, p1, p2)
@@ -867,7 +1021,7 @@ class GLB:
             positions.extend([p0, p1, p2])
             normals.extend([n, n, n])
             indices.extend([base, base + 1, base + 2])
-        return self._emit(positions, normals, indices, material_idx)
+        return self._emit(positions, normals, indices, material_idx, solid=solid)
 
     def mesh_indexed(self, positions, normals, indices, material_idx) -> int:
         """Smooth indexed mesh (shared verts, supplied normals)."""
@@ -877,7 +1031,8 @@ class GLB:
         """Indexed mesh carrying texture coordinates (TEXCOORD_0)."""
         return self._emit(positions, normals, indices, material_idx, uvs=uvs)
 
-    def _emit(self, positions, normals, indices, material_idx, uvs=None) -> int:
+    def _emit(self, positions, normals, indices, material_idx, uvs=None,
+              solid=True) -> int:
         attrs = {"POSITION": self._acc_vec3(positions),
                  "NORMAL": self._acc_vec3(normals)}
         if uvs is not None:
@@ -890,22 +1045,303 @@ class GLB:
                 "material": material_idx,
             }]
         })
+        self.mesh_geo.append((positions, normals, indices))
+        self.mesh_solid.append(solid)
         return len(self.meshes) - 1
+
+    # -- vertex colours (baked AO) --
+    def _acc_vec4(self, vals) -> int:
+        """COLOR_0 as NORMALIZED UNSIGNED BYTES.
+
+        Baked AO is a single 0..1 factor per vertex; storing it as four floats
+        costs 16 bytes per vertex, which added ~1.5 MB to the larger chapters
+        for no visible gain. glTF's normalized ubyte4 is 4 bytes and 1/255
+        precision, which is finer than an 8-bit framebuffer can show anyway.
+        """
+        data = bytearray()
+        for v in vals:
+            data.extend(struct.pack("<4B",
+                                    max(0, min(255, int(round(v[0] * 255.0)))),
+                                    max(0, min(255, int(round(v[1] * 255.0)))),
+                                    max(0, min(255, int(round(v[2] * 255.0)))),
+                                    max(0, min(255, int(round(v[3] * 255.0))))))
+        view = self._add_view(bytes(data), _ARRAY_BUFFER)
+        self.accessors.append({
+            "bufferView": view, "componentType": _UBYTE, "count": len(vals),
+            "type": "VEC4", "normalized": True,
+        })
+        return len(self.accessors) - 1
+
+    # -- node world transforms (needed for the AO bake) --
+    def _world_transforms(self):
+        """{node_index: (matrix4x4 as 16 floats, row-major)} for every node."""
+        parent = {}
+        for i, n in enumerate(self.nodes):
+            for c in n.get("children", []):
+                parent[c] = i
+
+        def local(n):
+            t = n.get("translation", [0.0, 0.0, 0.0])
+            q = n.get("rotation", [0.0, 0.0, 0.0, 1.0])
+            sc = n.get("scale", [1.0, 1.0, 1.0])
+            x, y, z, w = q
+            xx, yy, zz = x * x, y * y, z * z
+            xy, xz, yz = x * y, x * z, y * z
+            wx, wy, wz = w * x, w * y, w * z
+            r = [
+                (1 - 2 * (yy + zz)) * sc[0], (2 * (xy - wz)) * sc[1], (2 * (xz + wy)) * sc[2], t[0],
+                (2 * (xy + wz)) * sc[0], (1 - 2 * (xx + zz)) * sc[1], (2 * (yz - wx)) * sc[2], t[1],
+                (2 * (xz - wy)) * sc[0], (2 * (yz + wx)) * sc[1], (1 - 2 * (xx + yy)) * sc[2], t[2],
+                0.0, 0.0, 0.0, 1.0,
+            ]
+            return r
+
+        def mul(a, b):
+            out = [0.0] * 16
+            for i in range(4):
+                for j in range(4):
+                    out[i * 4 + j] = sum(a[i * 4 + k] * b[k * 4 + j] for k in range(4))
+            return out
+
+        cache = {}
+
+        def world(i):
+            if i in cache:
+                return cache[i]
+            m = local(self.nodes[i])
+            pi = parent.get(i)
+            if pi is not None:
+                m = mul(world(pi), m)
+            cache[i] = m
+            return m
+
+        for i in range(len(self.nodes)):
+            world(i)
+        return cache
+
+    @staticmethod
+    def _xform_point(m, p):
+        return (m[0] * p[0] + m[1] * p[1] + m[2] * p[2] + m[3],
+                m[4] * p[0] + m[5] * p[1] + m[6] * p[2] + m[7],
+                m[8] * p[0] + m[9] * p[1] + m[10] * p[2] + m[11])
+
+    @staticmethod
+    def _xform_dir(m, v):
+        return _normalize((m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
+                           m[4] * v[0] + m[5] * v[1] + m[6] * v[2],
+                           m[8] * v[0] + m[9] * v[1] + m[10] * v[2]))
+
+    def bake_vertex_ao(self, rays=None, cell=None, verbose=False):
+        """Bake scene-level ambient occlusion into COLOR_0 on every solid mesh.
+
+        The gl_compatibility renderer used by the web build has no SSAO, and the
+        16 chapter art profiles all ask for it. This gives every renderer the
+        contact shading for free, baked once at build time.
+
+        Returns the number of meshes baked (0 if the AO module is unavailable,
+        in which case the scene exports exactly as before).
+        """
+        try:
+            import glb_ao
+        except Exception:
+            try:
+                from . import glb_ao  # type: ignore
+            except Exception:
+                return 0
+
+        grid = glb_ao.OcclusionGrid(cell or glb_ao.CELL)
+        xf = self._world_transforms()
+        # node index -> mesh index (a mesh emitted by this writer is used once)
+        mesh_nodes = {}
+        for i, n in enumerate(self.nodes):
+            if "mesh" in n:
+                mesh_nodes.setdefault(n["mesh"], i)
+
+        # ---- pass 1: occupancy from every solid triangle ----
+        for mi, node_i in mesh_nodes.items():
+            if mi >= len(self.mesh_solid) or not self.mesh_solid[mi]:
+                continue
+            pos, _nrm, idx = self.mesh_geo[mi]
+            m = xf[node_i]
+            wp = [self._xform_point(m, p) for p in pos]
+            for k in range(0, len(idx) - 2, 3):
+                grid.add_triangle(wp[idx[k]], wp[idx[k + 1]], wp[idx[k + 2]])
+
+        if not grid.cells:
+            return 0
+
+        # ---- pass 2: per-vertex occlusion ----
+        baked = 0
+        n_rays = rays or glb_ao.RAYS
+        for mi, node_i in mesh_nodes.items():
+            if mi >= len(self.mesh_solid) or not self.mesh_solid[mi]:
+                continue
+            pos, nrm, _idx = self.mesh_geo[mi]
+            m = xf[node_i]
+            wp = [self._xform_point(m, p) for p in pos]
+            wn = [self._xform_dir(m, n) for n in nrm]
+            ao = glb_ao.bake(grid, wp, wn, rays=n_rays)
+            acc = self._acc_vec4([(a, a, a, 1.0) for a in ao])
+            self.meshes[mi]["primitives"][0]["attributes"]["COLOR_0"] = acc
+            baked += 1
+        if verbose:
+            print("      AO: %d meshes, %d occupancy cells" % (baked, len(grid.cells)))
+        return baked
+
+    # ------------------------------------------------------------------ skinning
+    # Everything below turns this writer from "a hierarchy of rigid boxes" into
+    # a real character pipeline: JOINTS_0 / WEIGHTS_0 vertex attributes, a skin
+    # with inverse bind matrices, and keyframed animations. It is what lets the
+    # pilgrim's shoulder and knee DEFORM instead of the old approach, where the
+    # only thing a joint could do was rotate a separate rigid cylinder.
+
+    def _acc_scalar_f(self, vals) -> int:
+        data = bytearray()
+        for v in vals:
+            data.extend(struct.pack("<f", v))
+        view = self._add_view(bytes(data))
+        self.accessors.append({
+            "bufferView": view, "componentType": _FLOAT, "count": len(vals),
+            "type": "SCALAR", "min": [min(vals)], "max": [max(vals)],
+        })
+        return len(self.accessors) - 1
+
+    def _acc_vec4f(self, vals) -> int:
+        data = bytearray()
+        for v in vals:
+            data.extend(struct.pack("<4f", v[0], v[1], v[2], v[3]))
+        view = self._add_view(bytes(data))
+        self.accessors.append({
+            "bufferView": view, "componentType": _FLOAT, "count": len(vals),
+            "type": "VEC4",
+        })
+        return len(self.accessors) - 1
+
+    def _acc_joints(self, vals) -> int:
+        """VEC4 of unsigned shorts: which four bones influence each vertex."""
+        data = bytearray()
+        for v in vals:
+            data.extend(struct.pack("<4H", v[0], v[1], v[2], v[3]))
+        view = self._add_view(bytes(data), _ARRAY_BUFFER)
+        self.accessors.append({
+            "bufferView": view, "componentType": _USHORT, "count": len(vals),
+            "type": "VEC4",
+        })
+        return len(self.accessors) - 1
+
+    def _acc_weights(self, vals) -> int:
+        data = bytearray()
+        for v in vals:
+            data.extend(struct.pack("<4f", v[0], v[1], v[2], v[3]))
+        view = self._add_view(bytes(data), _ARRAY_BUFFER)
+        self.accessors.append({
+            "bufferView": view, "componentType": _FLOAT, "count": len(vals),
+            "type": "VEC4",
+        })
+        return len(self.accessors) - 1
+
+    def _acc_mat4(self, mats) -> int:
+        """Column-major 4x4 matrices (inverse bind matrices)."""
+        data = bytearray()
+        for m in mats:
+            data.extend(struct.pack("<16f", *m))
+        view = self._add_view(bytes(data))
+        self.accessors.append({
+            "bufferView": view, "componentType": _FLOAT, "count": len(mats),
+            "type": "MAT4",
+        })
+        return len(self.accessors) - 1
+
+    def skinned_mesh(self, positions, normals, joints, weights, indices,
+                     material_idx, uvs=None, colors=None) -> int:
+        """A mesh whose vertices are bound to bones.
+
+        joints  : [(j0, j1, j2, j3), ...] bone indices INTO the skin's joint list
+        weights : [(w0, w1, w2, w3), ...] normalised influence per vertex
+        """
+        attrs = {"POSITION": self._acc_vec3(positions),
+                 "NORMAL": self._acc_vec3(normals),
+                 "JOINTS_0": self._acc_joints(joints),
+                 "WEIGHTS_0": self._acc_weights(weights)}
+        if uvs is not None:
+            attrs["TEXCOORD_0"] = self._acc_vec2(uvs)
+        if colors is not None:
+            attrs["COLOR_0"] = self._acc_vec4(colors)
+        idx_acc = self._acc_indices(indices)
+        self.meshes.append({
+            "primitives": [{
+                "attributes": attrs,
+                "indices": idx_acc,
+                "material": material_idx,
+            }]
+        })
+        self.mesh_geo.append((positions, normals, indices))
+        self.mesh_solid.append(False)   # characters never bake scene AO
+        return len(self.meshes) - 1
+
+    def skin(self, joint_node_indices, rest_world_positions, name="Skin") -> int:
+        """Register a skin.
+
+        Rest poses in this pipeline are pure translations, so the inverse bind
+        matrix of a joint is simply a translation by -restPosition. (glTF stores
+        matrices column-major.)
+        """
+        ibms = []
+        for (px, py, pz) in rest_world_positions:
+            ibms.append([1.0, 0.0, 0.0, 0.0,
+                         0.0, 1.0, 0.0, 0.0,
+                         0.0, 0.0, 1.0, 0.0,
+                         -px, -py, -pz, 1.0])
+        self.skins.append({
+            "name": name,
+            "joints": list(joint_node_indices),
+            "inverseBindMatrices": self._acc_mat4(ibms),
+        })
+        return len(self.skins) - 1
+
+    def animation(self, name, tracks) -> int:
+        """Add a keyframed animation.
+
+        tracks : [ {node: int, path: "rotation"|"translation"|"scale",
+                    times: [t...], values: [(x,y,z,w) | (x,y,z) ...] } ]
+        """
+        samplers = []
+        channels = []
+        for tr in tracks:
+            times = list(tr["times"])
+            vals = tr["values"]
+            t_acc = self._acc_scalar_f(times)
+            if tr["path"] == "rotation":
+                v_acc = self._acc_vec4f(vals)
+            else:
+                v_acc = self._acc_vec3(vals)
+            samplers.append({"input": t_acc, "output": v_acc,
+                             "interpolation": "LINEAR"})
+            channels.append({"sampler": len(samplers) - 1,
+                             "target": {"node": tr["node"], "path": tr["path"]}})
+        self.animations.append({"name": name, "samplers": samplers,
+                                "channels": channels})
+        return len(self.animations) - 1
 
     # -- nodes --
     def node(self, name, translation=(0, 0, 0), rotation_deg=(0, 0, 0),
-             scale=(1, 1, 1), mesh_idx=None, children=None) -> int:
+             scale=(1, 1, 1), mesh_idx=None, children=None, skin_idx=None,
+             rotation_quat=None) -> int:
         n = {"name": name}
         if translation != (0, 0, 0):
             n["translation"] = [float(translation[0]), float(translation[1]),
                                 float(translation[2])]
-        if rotation_deg != (0, 0, 0):
+        if rotation_quat is not None:
+            n["rotation"] = [float(c) for c in rotation_quat]
+        elif rotation_deg != (0, 0, 0):
             q = euler_to_quat(*rotation_deg)
             n["rotation"] = [q[0], q[1], q[2], q[3]]
         if scale != (1, 1, 1):
             n["scale"] = [float(scale[0]), float(scale[1]), float(scale[2])]
         if mesh_idx is not None:
             n["mesh"] = mesh_idx
+        if skin_idx is not None:
+            n["skin"] = skin_idx
         if children:
             n["children"] = list(children)
         self.nodes.append(n)
@@ -927,6 +1363,10 @@ class GLB:
             "bufferViews": self.buffer_views,
             "buffers": [{"byteLength": len(self.bin)}],
         }
+        if self.skins:
+            gltf["skins"] = self.skins
+        if self.animations:
+            gltf["animations"] = self.animations
         if self.images:
             gltf["images"] = self.images
             gltf["textures"] = self.textures
@@ -970,8 +1410,11 @@ class Scene:
 
     # --- material helper ---
     def _mat(self, name, color, emissive=None, metallic=None, roughness=None,
-             blend=False, double_sided=False, tex=None):
-        m, r = infer_pbr(name, color)
+             blend=False, double_sided=False, tex=None, role=None):
+        # An explicit role (pbr="marble") beats the name/colour heuristic; the
+        # texture name is used as a role fallback, since "tex=stone" already
+        # states what the surface is.
+        m, r = infer_pbr(name, color, role=role or tex)
         if metallic is not None:
             m = metallic
         if roughness is not None:
@@ -1005,54 +1448,84 @@ class Scene:
             mesh = self.glb.mesh(tris, mat)
         return self.glb.node(name, translation=pos, rotation_deg=rot, mesh_idx=mesh)
 
-    def ground(self, name, size, color, pos=(0, 0, 0), flat=False):
+    def ground(self, name, size, color, pos=(0, 0, 0), flat=False,
+               tex=None, tile=4.0, pbr=None):
         # size = (x, z); undulating terrain whose mean top sits at pos.y
-        mat = self._mat(name, color)
+        mat = self._mat(name, color, tex=tex, role=pbr)
         if flat:
             mesh = self.glb.mesh(box_tris(size[0], 0.5, size[1]), mat)
             return self.glb.node(name, translation=(pos[0], pos[1] - 0.25, pos[2]),
                                  mesh_idx=mesh)
         seed = (abs(hash(name)) % 9973) + 1
-        P, N, I = terrain_mesh(size[0], size[1], amp=0.07, seed=seed,
-                               base_y=0.0, skirt=0.6)
-        mesh = self.glb.mesh_indexed(P, N, I, mat)
+        if tex and tex_paths(tex)[0]:
+            P, N, UV, I = terrain_mesh_uv(size[0], size[1], amp=0.07, seed=seed,
+                                          base_y=0.0, skirt=0.6, tile=tile)
+            mesh = self.glb.mesh_uv(P, N, UV, I, mat)
+        else:
+            P, N, I = terrain_mesh(size[0], size[1], amp=0.07, seed=seed,
+                                   base_y=0.0, skirt=0.6)
+            mesh = self.glb.mesh_indexed(P, N, I, mat)
         return self.glb.node(name, translation=(pos[0], pos[1], pos[2]),
                              mesh_idx=mesh)
 
     def cylinder(self, name, radius, height, color, pos=(0, 0, 0),
                  rot=(0, 0, 0), sides=24, emissive=None, metallic=None,
-                 roughness=None):
-        mat = self._mat(name, color, emissive, metallic, roughness)
-        P, N, I = cylinder_mesh(radius, height, max(8, sides))
-        mesh = self.glb.mesh_indexed(P, N, I, mat)
+                 roughness=None, tex=None, tile=1.4, pbr=None):
+        mat = self._mat(name, color, emissive, metallic, roughness, tex=tex, role=pbr)
+        if tex and tex_paths(tex)[0]:
+            P, N, UV, I = cylinder_mesh_uv(radius, height, max(8, sides), tile)
+            mesh = self.glb.mesh_uv(P, N, UV, I, mat)
+        else:
+            P, N, I = cylinder_mesh(radius, height, max(8, sides))
+            mesh = self.glb.mesh_indexed(P, N, I, mat)
         return self.glb.node(name, translation=pos, rotation_deg=rot, mesh_idx=mesh)
 
     def cone(self, name, radius, height, color, pos=(0, 0, 0), rot=(0, 0, 0),
-             sides=24, emissive=None, metallic=None, roughness=None):
-        mat = self._mat(name, color, emissive, metallic, roughness)
-        P, N, I = cone_mesh(radius, height, max(8, sides))
-        mesh = self.glb.mesh_indexed(P, N, I, mat)
+             sides=24, emissive=None, metallic=None, roughness=None,
+             tex=None, tile=1.4, pbr=None):
+        mat = self._mat(name, color, emissive, metallic, roughness, tex=tex, role=pbr)
+        if tex and tex_paths(tex)[0]:
+            P, N, UV, I = cone_mesh_uv(radius, height, max(8, sides), tile)
+            mesh = self.glb.mesh_uv(P, N, UV, I, mat)
+        else:
+            P, N, I = cone_mesh(radius, height, max(8, sides))
+            mesh = self.glb.mesh_indexed(P, N, I, mat)
         return self.glb.node(name, translation=pos, rotation_deg=rot, mesh_idx=mesh)
 
     def sphere(self, name, radius, color, pos=(0, 0, 0), rot=(0, 0, 0),
-               segs=24, rings=14, emissive=None, metallic=None, roughness=None):
-        mat = self._mat(name, color, emissive, metallic, roughness)
-        P, N, I = sphere_mesh(radius, segs, rings)
-        mesh = self.glb.mesh_indexed(P, N, I, mat)
+               segs=24, rings=14, emissive=None, metallic=None, roughness=None,
+               tex=None, tile=1.4, pbr=None):
+        mat = self._mat(name, color, emissive, metallic, roughness, tex=tex, role=pbr)
+        if tex and tex_paths(tex)[0]:
+            P, N, UV, I = sphere_mesh_uv(radius, segs, rings, tile)
+            mesh = self.glb.mesh_uv(P, N, UV, I, mat)
+        else:
+            P, N, I = sphere_mesh(radius, segs, rings)
+            mesh = self.glb.mesh_indexed(P, N, I, mat)
         return self.glb.node(name, translation=pos, rotation_deg=rot, mesh_idx=mesh)
 
     def torus(self, name, ring_r, tube_r, color, pos=(0, 0, 0), rot=(0, 0, 0),
-              segs=28, sides=14, emissive=None, metallic=None, roughness=None):
-        mat = self._mat(name, color, emissive, metallic, roughness)
-        P, N, I = torus_mesh(ring_r, tube_r, segs, sides)
-        mesh = self.glb.mesh_indexed(P, N, I, mat)
+              segs=28, sides=14, emissive=None, metallic=None, roughness=None,
+              tex=None, tile=1.4, pbr=None):
+        mat = self._mat(name, color, emissive, metallic, roughness, tex=tex, role=pbr)
+        if tex and tex_paths(tex)[0]:
+            P, N, UV, I = torus_mesh_uv(ring_r, tube_r, segs, sides, tile)
+            mesh = self.glb.mesh_uv(P, N, UV, I, mat)
+        else:
+            P, N, I = torus_mesh(ring_r, tube_r, segs, sides)
+            mesh = self.glb.mesh_indexed(P, N, I, mat)
         return self.glb.node(name, translation=pos, rotation_deg=rot, mesh_idx=mesh)
 
     def lathe(self, name, profile, color, pos=(0, 0, 0), rot=(0, 0, 0),
-              segs=24, emissive=None, metallic=None, roughness=None):
-        mat = self._mat(name, color, emissive, metallic, roughness)
-        P, N, I = lathe_mesh(profile, segs)
-        mesh = self.glb.mesh_indexed(P, N, I, mat)
+              segs=24, emissive=None, metallic=None, roughness=None,
+              tex=None, tile=1.4, pbr=None):
+        mat = self._mat(name, color, emissive, metallic, roughness, tex=tex, role=pbr)
+        if tex and tex_paths(tex)[0]:
+            P, N, UV, I = lathe_mesh_uv(profile, segs, tile)
+            mesh = self.glb.mesh_uv(P, N, UV, I, mat)
+        else:
+            P, N, I = lathe_mesh(profile, segs)
+            mesh = self.glb.mesh_indexed(P, N, I, mat)
         return self.glb.node(name, translation=pos, rotation_deg=rot, mesh_idx=mesh)
 
     def pyramid(self, name, size, height, color, pos=(0, 0, 0), rot=(0, 0, 0),
@@ -1138,7 +1611,10 @@ class Scene:
     def zone(self, name, size, pos=(0, 0, 0), color=(0.6, 0.3, 0.3, 0.22)):
         m = self.glb.material(color, blend=True, double_sided=True,
                               metallic=0.0, roughness=1.0)
-        mesh = self.glb.mesh(box_tris(*size), m)
+        # solid=False: a transparent trigger volume must NOT cast baked AO, or
+        # every hazard zone would paint a dark rectangle on the ground beneath
+        # it. (107 zones across the 16 chapters — this matters.)
+        mesh = self.glb._emit_soup(box_tris(*size), m, solid=False)
         return self.glb.node(name, translation=pos, mesh_idx=mesh)
 
     # --- markers (empty nodes) ---
@@ -1146,7 +1622,12 @@ class Scene:
         return self.glb.node(name, translation=pos, rotation_deg=rot)
 
     # --- output ---
-    def save(self, path):
+    def save(self, path, bake_ao=True, ao_rays=None, verbose=False):
+        if bake_ao and os.environ.get("PILGRIM_NO_AO", "") != "1":
+            try:
+                self.glb.bake_vertex_ao(rays=ao_rays, verbose=verbose)
+            except Exception as exc:  # never let a bake failure break the build
+                print("      [warn] AO bake skipped: %s" % exc)
         data = self.glb.to_glb(self.name)
         with open(path, "wb") as f:
             f.write(data)

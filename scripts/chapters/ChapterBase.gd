@@ -71,6 +71,36 @@ func _ready() -> void:
 	# Optional multiplayer layer: render other pilgrims' async ghosts in this
 	# chapter. Fully inert (and skipped) if the net layer isn't installed.
 	_attach_ghost_layer()
+	# The chapter's characteristic temptation, spoken once when its pressure has
+	# actually built. This is what finally connects SpiritualStateManager's
+	# ten-temptation resistance model to the dialogue layer — before this, not a
+	# single line in the game used it.
+	add_child(TemptationMoment.new())
+	# The chapter's spiritual theme and core mechanic, stated once at the start.
+	# Both fields are authored in every data/chapters/*.json and were previously
+	# read only by a fallback branch that the normal flow never reaches.
+	_announce_chapter_theme()
+
+
+## A one-line teaching frame at the top of each chapter: what this stretch of
+## road is ABOUT, and what you will be doing. Uses `spiritual_theme` and
+## `core_mechanic` from the chapter data, which until now were dead fields.
+func _announce_chapter_theme() -> void:
+	var data := ChapterManager.get_current_chapter_data()
+	var theme := String(data.get("spiritual_theme_zh", data.get("spiritual_theme", "")))
+	var mech := String(data.get("core_mechanic_zh", data.get("core_mechanic", "")))
+	if theme == "" and mech == "":
+		return
+	# After the chapter card (2.4 s hold) and before the opening narration ends.
+	await get_tree().create_timer(9.5).timeout
+	if not is_inside_tree() or DialogueManager.is_active():
+		return
+	var parts: Array[String] = []
+	if theme != "":
+		parts.append("主题：" + theme)
+	if mech != "":
+		parts.append("这一章你要做的：" + mech)
+	EventBus.toast(" · ".join(PackedStringArray(parts)))
 
 
 func _on_recenter_requested() -> void:
@@ -506,7 +536,7 @@ func make_npc(npc_name: String, pos: Vector3, color: Color, dialogue_id: String 
 	# Visual: a real in-engine 3D body, tinted by the character's palette (with
 	# `color` as the fallback garment tint for un-tabled folk). Standing NPCs
 	# idle in place (no mover).
-	area.add_child(HumanoidFigure.make(npc_name, 2.0, null, true, color))
+	area.add_child(FigureFactory.make(npc_name, 2.0, null, true, color))
 	# Floating name
 	var label := Label3D.new()
 	label.text = label_name
@@ -622,7 +652,7 @@ func _advance_after_delay() -> void:
 	_advancing = true
 	# Small delay so toasts/animations settle before the scene swaps.
 	await get_tree().create_timer(0.4).timeout
-	ChapterManager.go_to_next_chapter()
+	await ChapterManager.go_to_next_chapter()
 
 
 # ---------------------------------------------------------------------------
@@ -800,9 +830,20 @@ func _apply_world_rebuild() -> void:
 	# Bespoke per-chapter centrepiece (deep-polish layer) on top of the profile.
 	ChapterArt.build(self, ChapterManager.current_chapter_id)
 	_dbg("rb:postfx")
-	# The painterly oil filter is stylised-only (Children's Journey); realistic
-	# Devout mode skips it.
-	if not RenderConfig.is_realistic():
+	_attach_grade(prof)
+
+
+## Screen-space grade. Two mutually exclusive looks:
+##   Children's Journey -> PainterlyPostFX (oil / storybook wash)
+##   Devout (realistic) -> CinematicPostFX (vignette, grain, per-chapter tint)
+## Before this pass the realistic mode had NO screen grade at all, which is a
+## large part of why the 16 chapters read as one neutral render with different
+## props — especially on the gl_compatibility build, where SSAO and volumetric
+## fog (the Environment's other identity levers) do not exist at all.
+func _attach_grade(prof: Dictionary) -> void:
+	if RenderConfig.is_realistic():
+		CinematicPostFX.attach(self, prof)
+	else:
 		_attach_postfx(prof.get("post", {}))
 
 
@@ -832,8 +873,20 @@ func _apply_environment(prof: Dictionary) -> void:
 		return
 	var amb: Dictionary = prof.get("ambient", {})
 	env.ambient_light_energy = float(amb.get("energy", 0.6))
-	if env.ambient_light_source == Environment.AMBIENT_SOURCE_COLOR:
-		env.ambient_light_color = amb.get("color", Color(0.5, 0.5, 0.55))
+	# The profile's ambient COLOUR used to be dead data: setup_environment() sets
+	# AMBIENT_SOURCE_SKY, and the old code only wrote the colour under
+	# AMBIENT_SOURCE_COLOR — so 16 hand-authored ambient colours never reached
+	# the screen. Blend it in instead: the sky still drives most of the ambient,
+	# but the authored colour tints it, which is what the profiles intended.
+	env.ambient_light_color = amb.get("color", Color(0.5, 0.5, 0.55))
+	if env.ambient_light_source == Environment.AMBIENT_SOURCE_SKY:
+		env.ambient_light_sky_contribution = float(amb.get("sky_contribution", 0.65))
+
+	# Per-chapter sky. GLB chapters all called setup_environment() with the same
+	# grey, and _apply_environment() never touched the sky material afterwards,
+	# so every imported chapter shared one sky. Tint it from the chapter's own
+	# sun and fog so the 16 skies differ without new authoring.
+	_tint_sky(env, prof)
 
 	var fog: Dictionary = prof.get("fog", {})
 	env.fog_enabled = bool(fog.get("enabled", false))
@@ -842,7 +895,7 @@ func _apply_environment(prof: Dictionary) -> void:
 		env.fog_density = float(fog.get("density", 0.012))
 		env.fog_aerial_perspective = float(fog.get("aerial", 0.4))
 		env.fog_sky_affect = 0.3
-	if bool(fog.get("volumetric", false)):
+	if bool(fog.get("volumetric", false)) and QualityTier.supports_volumetric_fog():
 		env.volumetric_fog_enabled = true
 		env.volumetric_fog_density = float(fog.get("vol_density", 0.03))
 		env.volumetric_fog_albedo = fog.get("albedo", Color(0.7, 0.72, 0.75))
@@ -891,34 +944,82 @@ func _apply_environment(prof: Dictionary) -> void:
 
 	# Ambient occlusion grounds every object with contact shadow; photoreal mode
 	# tightens the radius and pairs it with screen-space indirect light.
-	env.ssao_enabled = bool(prof.get("ssao", true))
+	env.ssao_enabled = bool(prof.get("ssao", true)) and QualityTier.supports_ssao()
 	if env.ssao_enabled:
 		env.ssao_radius = 1.2 if photoreal else 2.0
 		env.ssao_intensity = 2.2 if photoreal else 1.5
-	env.ssil_enabled = bool(prof.get("ssil", photoreal))
+	env.ssil_enabled = bool(prof.get("ssil", photoreal)) and QualityTier.supports_ssil()
 
 	# ---- Photoreal-only (Forward+ desktop): real GI + reflections. ----
 	# Every property below is silently ignored by the gl_compatibility (web)
 	# renderer, so the web build is unaffected; the Forward+ desktop build gains
 	# bounced light and real reflections — the biggest step toward "photographed".
 	if photoreal:
-		# Real-time global illumination: sky/sun light bounces between surfaces.
-		env.sdfgi_enabled = true
-		env.sdfgi_use_occlusion = true
-		env.sdfgi_bounce_feedback = 0.5
-		env.sdfgi_energy = 1.0
-		# Screen-space reflections on water, wet stone, polished floors and metal.
-		env.ssr_enabled = true
-		env.ssr_max_steps = 56
-		env.ssr_fade_in = 0.15
-		env.ssr_fade_out = 2.0
+		if QualityTier.supports_sdfgi():
+			# Real-time global illumination: sky/sun light bounces between surfaces.
+			env.sdfgi_enabled = true
+			env.sdfgi_use_occlusion = true
+			env.sdfgi_bounce_feedback = 0.5
+			env.sdfgi_energy = 1.0
+		if QualityTier.supports_ssr():
+			# Screen-space reflections on water, wet stone, floors and metal.
+			env.ssr_enabled = true
+			env.ssr_max_steps = 56
+			env.ssr_fade_in = 0.15
+			env.ssr_fade_out = 2.0
 		# Let the sky drive image-based ambient + reflections when it's the bg.
 		if env.background_mode == Environment.BG_SKY:
 			env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 		# Stronger ambient fill stands in for bounced GI on the gl_compatibility
 		# (web) renderer — where SDFGI/SSAO are unavailable — so shadowed faces
-		# read as softly lit rather than pitch black. Works on every renderer.
-		env.ambient_light_energy = maxf(env.ambient_light_energy, 1.15)
+		# read as softly lit rather than pitch black. On Forward+ the real GI is
+		# doing that job, so the crutch is dialled back and the picture keeps its
+		# contrast instead of going flat.
+		if QualityTier.supports_sdfgi():
+			env.ambient_light_energy = maxf(env.ambient_light_energy, 0.85)
+		else:
+			env.ambient_light_energy = maxf(env.ambient_light_energy, 1.15)
+
+
+## Tint the procedural sky from the chapter's own sun/fog so the 16 chapters no
+## longer share one grey dome. Purely derived — no new authoring needed — but an
+## explicit `sky` block in the profile always wins.
+func _tint_sky(env: Environment, prof: Dictionary) -> void:
+	if env == null or env.background_mode != Environment.BG_SKY or env.sky == null:
+		return
+	var mat := env.sky.sky_material as ProceduralSkyMaterial
+	if mat == null:
+		return
+	var sun: Dictionary = prof.get("sun", {})
+	var fog: Dictionary = prof.get("fog", {})
+	var sun_c: Color = sun.get("color", Color(1.0, 0.96, 0.9))
+	var sun_e := float(sun.get("energy", 1.1))
+	var fog_c: Color = fog.get("color", Color(0.62, 0.64, 0.67))
+
+	var sky_conf: Dictionary = prof.get("sky", {})
+	# Zenith: cool and deeper the dimmer the sun; horizon: agrees with the fog so
+	# the finite ground plane melts into the sky instead of ending in a hard line.
+	var top: Color = sky_conf.get("top", Color(
+		clampf(0.24 + sun_c.r * 0.24 * sun_e, 0.05, 0.85),
+		clampf(0.34 + sun_c.g * 0.26 * sun_e, 0.06, 0.90),
+		clampf(0.52 + sun_c.b * 0.26 * sun_e, 0.08, 0.98)))
+	var horizon: Color = sky_conf.get("horizon", fog_c.lerp(sun_c, 0.30))
+	mat.sky_top_color = top
+	mat.sky_horizon_color = horizon
+	mat.sky_curve = float(sky_conf.get("curve", 0.12))
+	mat.ground_horizon_color = horizon
+	mat.ground_bottom_color = horizon.darkened(0.45)
+	mat.ground_curve = 0.02
+	# A visible sun disc anchors the light direction and gives the sky a subject.
+	mat.sun_angle_max = float(sky_conf.get("sun_size", 6.0))
+	mat.sun_curve = 0.08
+	# `energy_multiplier` only exists on Godot 4.2+ sky materials; set it
+	# defensively so an older engine still loads this script.
+	var sky_energy := float(sky_conf.get("energy", clampf(0.7 + sun_e * 0.25, 0.5, 1.6)))
+	if "energy_multiplier" in mat:
+		mat.set("energy_multiplier", sky_energy)
+	elif "sky_energy_multiplier" in mat:
+		mat.set("sky_energy_multiplier", sky_energy)
 
 
 func _tonemap_enum(mode: String) -> int:
@@ -946,6 +1047,7 @@ func _apply_lighting(prof: Dictionary) -> void:
 	if key == null:
 		key = DirectionalLight3D.new()
 		add_child(key)
+	key.name = "KeyLight"
 	key.rotation_degrees = sun_d.get("angle", Vector3(-50, -40, 0))
 	var kc: Color = sun_d.get("color", Color(1, 1, 1))
 	if _pal_ok:
@@ -954,16 +1056,76 @@ func _apply_lighting(prof: Dictionary) -> void:
 	key.light_energy = float(sun_d.get("energy", 1.1))
 	key.shadow_enabled = true
 	key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
-	key.shadow_blur = 1.2
-	key.light_angular_distance = 1.0
+	# Forward+ has physical soft shadows (light_angular_distance widens the
+	# penumbra with distance, like a real sun); gl_compatibility has only fixed
+	# PCF, where a non-zero angular distance just costs quality. Split them.
+	if QualityTier.is_forward_plus():
+		key.shadow_blur = 1.1
+		key.light_angular_distance = 1.0
+		key.directional_shadow_max_distance = 140.0
+		key.directional_shadow_split_1 = 0.06
+		key.directional_shadow_split_2 = 0.17
+		key.directional_shadow_split_3 = 0.45
+	else:
+		key.shadow_blur = 1.4
+		key.light_angular_distance = 0.0
+		key.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+		key.directional_shadow_max_distance = 85.0
+	key.shadow_normal_bias = 1.4
+	key.shadow_bias = 0.06
 
+	# A second, shadowless fill from the opposite side models form. This used to
+	# allocate a NEW light on every rebuild (no dedup check), so a chapter that
+	# rebuilt its art profile twice ended up double-lit and progressively washed
+	# out. Reuse a named node instead.
 	var fill_d: Dictionary = prof.get("fill", {})
-	var fill := DirectionalLight3D.new()
+	var fill: DirectionalLight3D = get_node_or_null("FillLight") as DirectionalLight3D
+	if fill == null:
+		fill = DirectionalLight3D.new()
+		fill.name = "FillLight"
+		add_child(fill)
 	fill.rotation_degrees = fill_d.get("angle", Vector3(-25, 150, 0))
 	fill.light_color = fill_d.get("color", Color(0.6, 0.7, 0.85))
 	fill.light_energy = float(fill_d.get("energy", 0.3))
 	fill.shadow_enabled = false
-	add_child(fill)
+
+	# Point/spot shadows are the single biggest "grounded" cue in the interior
+	# chapters (Interpreter's House, Palace Beautiful, Doubting Castle), and the
+	# single biggest cost on web. Grant them to the nearest few lights on the
+	# high tier only.
+	_grant_point_shadows()
+
+
+## Enable shadow casting on the N nearest omni/spot lights, budget by tier.
+## Every point light in the project previously had shadow_enabled = false, so
+## lanterns, braziers and altar lights cast no contact shadow at all.
+func _grant_point_shadows() -> void:
+	var budget := QualityTier.point_shadow_budget()
+	if budget <= 0:
+		return
+	var lights: Array[Light3D] = []
+	_collect_point_lights(self, lights)
+	if lights.is_empty():
+		return
+	var origin := _spawn_position
+	# NOTE: hoisted into a local rather than passed inline — a multi-line lambda
+	# as a call argument trips the Godot 4.6 parser (see docs/ notes).
+	var by_distance := func(a: Light3D, b: Light3D) -> bool:
+		return a.global_position.distance_squared_to(origin) < b.global_position.distance_squared_to(origin)
+	lights.sort_custom(by_distance)
+	var n := mini(budget, lights.size())
+	for i in range(n):
+		var l := lights[i]
+		l.shadow_enabled = true
+		l.shadow_bias = 0.04
+		l.shadow_normal_bias = 1.2
+
+
+func _collect_point_lights(node: Node, out: Array[Light3D]) -> void:
+	for c in node.get_children():
+		if c is OmniLight3D or c is SpotLight3D:
+			out.append(c as Light3D)
+		_collect_point_lights(c, out)
 
 
 func _apply_dressing(list: Array) -> void:

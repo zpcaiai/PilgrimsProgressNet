@@ -22,14 +22,19 @@ func _ready() -> void:
 
 func _build() -> void:
 	# --- wife: built to the pilgrim's exact height (2.0 m), maroon dress ---
+	# NOTE: deliberately NOT FigureFactory. The family animate their own arms
+	# by driving the figure's ArmL / ArmR nodes directly (they free the
+	# standard animator first), which is a primitive-figure-only contract.
 	var wife := HumanoidFigure.make("Wife", 2.0, null, true, Color(0.49, 0.23, 0.27))
 	add_child(wife)
 	_free_animator(wife)
 	_wife_body = wife.get_node_or_null("Body")
 	if _wife_body != null:
 		_wife_base_y = _wife_body.position.y
-	_wife_arm_l = wife.get_node_or_null("Body/ArmL")
-	_wife_arm_r = wife.get_node_or_null("Body/ArmR")
+	# Arms moved under Body/Chest in the 2026 figure rework; find_child keeps
+	# this working across both layouts instead of hard-coding a node path.
+	_wife_arm_l = wife.find_child("ArmL", true, false) as Node3D
+	_wife_arm_r = wife.find_child("ArmR", true, false) as Node3D
 
 	# solid body (the pilgrim bumps her) + her plea, on interact
 	_add_solid()
@@ -55,7 +60,7 @@ func _add_kid(pos: Vector3, height: float, tint: Color, lean: float, arm_name: S
 	kid.rotation.z = lean  # lean toward the mother
 	_free_animator(kid)
 	var body := kid.get_node_or_null("Body")
-	var arm := kid.get_node_or_null("Body/" + arm_name)
+	var arm := kid.find_child(arm_name, true, false) as Node3D
 	var base_y := 0.0
 	if body != null:
 		base_y = body.position.y
